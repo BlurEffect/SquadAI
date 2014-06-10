@@ -19,17 +19,17 @@ bool Application::Initialise()
 
 //--------------------------------------------------------------------------------------
 // Updates the components of the application.
+// Returns true if all components were successfully updated, false otherwise.
 //--------------------------------------------------------------------------------------
-void Application::Update()
+bool Application::Update()
 {
 
 }
 
 //--------------------------------------------------------------------------------------
 // Releases resources used by the application and terminates the components.
-// Returns true if all clean up operations were successful, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Application::Cleanup()
+void Application::Cleanup()
 {
 	return true;
 }

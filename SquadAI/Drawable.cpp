@@ -10,13 +10,10 @@
 //--------------------------------------------------------------------------------------
 // Default constructor.
 //--------------------------------------------------------------------------------------
-Drawable::Drawable(void) : m_pVertexBuffer(nullptr),
-						   m_pIndexBuffer(nullptr),
-		                   m_pInstanceBuffer(nullptr),
-						   m_vertexCount(0),
-						   m_indexCount(0)
+Drawable::Drawable(void) : m_vertexCount(0),
+						   m_indexCount(0),
+						   m_instancingSetUp(false)
 {
-
 }
 
 //--------------------------------------------------------------------------------------
@@ -38,131 +35,108 @@ Drawable::~Drawable(void)
 //--------------------------------------------------------------------------------------
 // Prepares the Drawable for hardware instancing by setting up an instance buffer.
 // Param1: A pointer to the device that should be used for the creation of this Drawable.
-// Param2: The maximal number of instances for this mesh, set zero or negative if no instancing needed.
-// Param3: Determines whether a static or dynamic instance buffer will be created.
+// Param2: Enum value indicating the desired usage for the instance buffer that will be created by this function
+// Param3: A pointer to the instance data.
+// Param4: The maximal number of instances for this Drawable.
 // Returns true if instancing was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Drawable::InitialiseInstancing(ID3D11Device* pDevice, int maxNumberOfInstances, bool isDynamic, const Instance* const pInstances, int instanceCount)
+bool Drawable::InitialiseInstancing(ID3D11Device* pDevice, D3D11_USAGE usage, Instance* pInstances, UINT maxNumberOfInstances)
 {
 	// Check if the maximal number of instances is valid
-	if(maxNumberOfInstances < 1)
+	if(maxNumberOfInstances == 0)
 	{
 		return false;
 	}
 
 	m_maxNumberOfInstances = maxNumberOfInstances;
-	m_usesDynamicInstanceBuffer = isDynamic;
 
-	// Create the instance buffer
-	D3D11_BUFFER_DESC instanceBufferDesc;	
-	ZeroMemory(&instanceBufferDesc, sizeof(instanceBufferDesc));
-
-	if(isDynamic)
+	if(m_instanceBuffer.Initialise(InstanceBuffer, usage, pInstances, maxNumberOfInstances))
 	{
-		instanceBufferDesc.Usage		  = D3D11_USAGE_DYNAMIC;
-	}else
-	{
-		instanceBufferDesc.Usage		  = D3D11_USAGE_DEFAULT;		
+		m_instancingSetUp = true;
 	}
 
-	instanceBufferDesc.ByteWidth      = sizeof(Instance) * m_maxNumberOfInstances;
-	instanceBufferDesc.BindFlags	  = D3D11_BIND_VERTEX_BUFFER;
-	instanceBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	instanceBufferDesc.MiscFlags	  = 0;
-
-	D3D11_SUBRESOURCE_DATA		instanceData;
-	ZeroMemory(&instanceData, sizeof(instanceData));
-	
-	if(pInstances != nullptr)
-	{
-		instanceData.pSysMem = pInstances;
-		instanceData.SysMemPitch = 0;
-		instanceData.SysMemSlicePitch = 0;
-
-		return SUCCEEDED(pDevice -> CreateBuffer( &instanceBufferDesc, &instanceData, &m_pInstanceBuffer));
-	}
-
-	return SUCCEEDED(pDevice -> CreateBuffer( &instanceBufferDesc, nullptr, &m_pInstanceBuffer));
+	return m_instancingSetUp;
 }
 
 //--------------------------------------------------------------------------------------
-// The structure of a vertex.
+// Renders the Drawable.
+// Param1: The device context to use for rendering.
 //--------------------------------------------------------------------------------------
-bool Drawable::Draw(void)
+void Drawable::Draw(ID3D11DeviceContext* pDeviceContext)
 {
+	// Set the vertex buffer to active in the input assembler so it can be rendered.
+	pDeviceContext -> IASetVertexBuffers(0, 1, m_vertexBuffer.GetBuffer(), m_vertexBuffer.GetStride(), m_vertexBuffer.GetOffset());
 
+	// Set the index buffer to active in the input assembler so it can be rendered.
+	pDeviceContext -> IASetIndexBuffer(*m_indexBuffer.GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+	// Set the type of primitive that should be rendered from this vertex buffer (trianglelist as default implementation)
+	pDeviceContext -> IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	pDeviceContext -> DrawIndexed(m_indexCount, 0, 0);
 }
 
 //--------------------------------------------------------------------------------------
-// The structure of a vertex.
+// Uses hardware instancing to draw a number of instances of this Drawable.
+// Param1: The device context to use for rendering.
+// Param2: A pointer to the instance data. Setting this to NULL will lead to the old instance data being used
+// Param3: The number of instances to be rendered.
+// Param4: The offset into the instance buffer, from which 
+// Returns true if the drawcall was successful, false if instancing was not set up for this Drawable of if the number of
+// instances set to be drawn is greater than the actual instance buffer
 //--------------------------------------------------------------------------------------
-bool Drawable::DrawInstanced(void)
+bool Drawable::DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pInstances, UINT instanceCount, UINT offset)
 {
-	
-	D3D11_MAPPED_SUBRESOURCE resource;
-    pDeviceContext->Map(m_pInstanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-    memcpy(resource.pData, &pInstances[0], sizeof(Instance) * instanceCount ); //NUMBER_OF_BRICKS_PER_TYPE);
-   
-	// check for contents
-	//Instance* dataView = reinterpret_cast<Instance*>(resource.pData);
+	if((offset + instanceCount > m_maxNumberOfInstances) || !m_instancingSetUp)
+	{
+		// Invalid number of instances or instancing was not set up properly
+		return false;
+	}
 
-	pDeviceContext->Unmap(m_pInstanceBuffer, 0);
-	
+	// If new instance data was sent, update the instance buffer, otherwise use the old instance data
+	if(pInstances)
+	{
+		m_instanceBuffer.Update(pDeviceContext, pInstances, instanceCount, offset);
+	}
 
-
-
-	unsigned int strides[2];
-	unsigned int offsets[2];
+	UINT strides[2];
+	UINT offsets[2];
 	ID3D11Buffer* bufferPointers[2];
 
 	// Set the buffer strides.
-	strides[0] = sizeof(Vertex); 
-	strides[1] = sizeof(Instance); 
+	strides[0] = *m_vertexBuffer.GetStride(); 
+	strides[1] = *m_instanceBuffer.GetStride(); 
 
 	// Set the buffer offsets.
-	offsets[0] = 0;
-	offsets[1] = 0;
+	offsets[0] = *m_vertexBuffer.GetOffset();
+	offsets[1] = *m_instanceBuffer.GetOffset();
 
 	// Set the array of pointers to the vertex and instance buffers.
-	bufferPointers[0] = m_pVertexBuffer;	
-	bufferPointers[1] = m_pInstanceBuffer;
+	bufferPointers[0] = *m_vertexBuffer.GetBuffer();	
+	bufferPointers[1] = *m_instanceBuffer.GetBuffer();
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	pDeviceContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
 
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	//pDeviceContext -> IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
-
 	// Set the index buffer to active in the input assembler so it can be rendered.
-	pDeviceContext -> IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	pDeviceContext -> IASetIndexBuffer(*m_indexBuffer.GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles (as default).
 	pDeviceContext -> IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	pDeviceContext -> DrawIndexedInstanced( m_indexCount, instanceCount, 0, 0, 0);
+	pDeviceContext -> DrawIndexedInstanced(m_indexCount, instanceCount, 0, 0, 0);
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
 // Releases resources.
-// Returns true if clean up was successful, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Drawable::Cleanup(void)
+void Drawable::Cleanup(void)
 {
-	if(m_pVertexBuffer)
-	{
-		m_pVertexBuffer->Release();
-		m_pVertexBuffer = nullptr;
-	}
+	// Release all the buffers associated to this Drawable.
 
-	if(m_pIndexBuffer)
-	{
-		m_pIndexBuffer->Release();
-		m_pIndexBuffer = nullptr;
-	}
-
-	if(m_pInstanceBuffer)
-	{
-		m_pInstanceBuffer->Release();
-		m_pInstanceBuffer = nullptr;
-	}
+	m_vertexBuffer.Cleanup();
+	m_indexBuffer.Cleanup();
+	m_instanceBuffer.Cleanup();
 }

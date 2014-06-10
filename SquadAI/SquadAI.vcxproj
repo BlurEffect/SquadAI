@@ -89,6 +89,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="Triangle.cpp" />
+    <ClCompile Include="Buffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -101,6 +102,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="Triangle.h" />
+    <ClInclude Include="Buffer.h" />
     <ClInclude Include="VertexData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

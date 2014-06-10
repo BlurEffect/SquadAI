@@ -10,6 +10,8 @@
 // Includes
 #include <d3d11.h>
 #include "VertexData.h"
+#include "Buffer.h"
+
 
 class Drawable
 {
@@ -17,18 +19,18 @@ public:
 	Drawable(void);
 	virtual ~Drawable(void);
 	virtual bool Initialise(ID3D11Device* pDevice) = 0;
-	virtual bool InitialiseInstancing(ID3D11Device* pDevice, int maxNumberOfInstances, bool isDynamic);
-	virtual bool Draw(void) = 0;
-	virtual bool DrawInstanced(void) = 0;
-	virtual bool Cleanup(void) = 0;
+	virtual bool InitialiseInstancing(ID3D11Device* pDevice, D3D11_USAGE usage, Instance* pInstances, UINT maxNumberOfInstances);
+	virtual void Draw(ID3D11DeviceContext* pDeviceContext);
+	virtual bool DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pInstances, UINT instanceCount, UINT offset);
+	virtual void Cleanup(void);
 private:
-	ID3D11Buffer*	m_pVertexBuffer;	// Holds the vertices for this drawable object
-	ID3D11Buffer*	m_pIndexBuffer;		// Holds the indices for this drawable object
-	ID3D11Buffer*	m_pInstanceBuffer;	// Holds the instance data for this drawable object (only used for instanced drawing)
-	int				m_vertexCount;		// The number of vertices making up this drawable
-	int				m_indexCount;		// The number of indices for this drawable
-	int				m_maxNumberOfInstances;	// The maximal number of instances for this Drawable
-	bool			m_usesDynamicInstanceBuffer; // Is the instance buffer used dynamic or static
+	Buffer<Vertex>	 m_vertexBuffer;				// Holds the vertices for this drawable object
+	Buffer<long>	 m_indexBuffer;					// Holds the indices for this drawable object
+	Buffer<Instance> m_instanceBuffer;				// Holds the instance data for this drawable object (only used for instanced drawing)
+	int				 m_vertexCount;					// The number of vertices making up this drawable
+	int				 m_indexCount;					// The number of indices for this drawable
+	int				 m_maxNumberOfInstances;		// The maximal number of instances for this Drawable
+	bool			 m_instancingSetUp;				// Specifies whether instancing was set up properly for this Drawable
 };
 
 #endif // DRAWABLE_H

@@ -12,8 +12,8 @@ class Application
 {
 public:
 	bool Initialise();
-	void Update();
-	bool Cleanup();
+	bool Update();
+	void Cleanup();
 };
 
 #endif // APPLICATION_H

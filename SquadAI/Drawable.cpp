@@ -5,14 +5,15 @@
 */
 
 // Includes
-#include "Drawableh.h"
+#include "Drawable.h"
 
 //--------------------------------------------------------------------------------------
 // Default constructor.
 //--------------------------------------------------------------------------------------
 Drawable::Drawable(void) : m_vertexCount(0),
 						   m_indexCount(0),
-						   m_instancingSetUp(false)
+						   m_instancingSetUp(false),
+						   m_primitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
 {
 }
 
@@ -70,8 +71,8 @@ void Drawable::Draw(ID3D11DeviceContext* pDeviceContext)
 	// Set the index buffer to active in the input assembler so it can be rendered.
 	pDeviceContext -> IASetIndexBuffer(*m_indexBuffer.GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-	// Set the type of primitive that should be rendered from this vertex buffer (trianglelist as default implementation)
-	pDeviceContext -> IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	// Set the type of primitive that should be rendered from this vertex buffer.
+	pDeviceContext -> IASetPrimitiveTopology(m_primitiveTopology);
 
 	pDeviceContext -> DrawIndexed(m_indexCount, 0, 0);
 }
@@ -121,9 +122,8 @@ bool Drawable::DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pIns
 	// Set the index buffer to active in the input assembler so it can be rendered.
 	pDeviceContext -> IASetIndexBuffer(*m_indexBuffer.GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles (as default).
-	pDeviceContext -> IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	// Set the type of primitive that should be rendered from this vertex buffer
+	pDeviceContext -> IASetPrimitiveTopology(m_primitiveTopology);
 	pDeviceContext -> DrawIndexedInstanced(m_indexCount, instanceCount, 0, 0, 0);
 
 	return true;

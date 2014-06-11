@@ -85,7 +85,7 @@
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="Square.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="Triangle.cpp" />
@@ -95,10 +95,10 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Circle.h" />
-    <ClInclude Include="Drawableh.h" />
+    <ClInclude Include="Drawable.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="Square.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="Triangle.h" />

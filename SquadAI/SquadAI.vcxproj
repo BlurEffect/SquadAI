@@ -85,25 +85,73 @@
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="PixelShader.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SimpleInstancedVertexShader.cpp" />
+    <ClCompile Include="SimplePixelShader.cpp" />
+    <ClCompile Include="SimpleVertexShader.cpp" />
     <ClCompile Include="Square.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Circle.h" />
+    <ClInclude Include="PS_SimpleCompiled.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="PixelShader.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderParameters.h" />
+    <ClInclude Include="SimpleInstancedVertexShader.h" />
+    <ClInclude Include="SimplePixelShader.h" />
+    <ClInclude Include="SimpleVertexShader.h" />
     <ClInclude Include="Square.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="VertexData.h" />
+    <ClInclude Include="VertexShader.h" />
+    <ClInclude Include="VS_SimpleCompiled.h" />
+    <ClInclude Include="VS_SimpleInstancedCompiled.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\PS_Simple.FX">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">g_PS_SimpleCompiled</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS_SimpleCompiled.h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">g_PS_SimpleCompiled</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS_SimpleCompiled.h</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\VS_Simple.FX">
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">g_VS_SimpleCompiled</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS_SimpleCompiled.h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">g_VS_SimpleCompiled</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS_SimpleCompiled.h</HeaderFileOutput>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shaders\VS_SimpleInstanced.FX">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">g_VS_SimpleInstancedCompiled</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS_SimpleInstancedCompiled.h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">g_VS_SimpleInstancedCompiled</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS_SimpleInstancedCompiled.h</HeaderFileOutput>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

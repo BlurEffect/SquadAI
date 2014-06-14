@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ShaderFramework">
+      <UniqueIdentifier>{be253c10-8829-4c3d-bad2-f0bd4a215708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShaderFramework\HLSL Shaders">
+      <UniqueIdentifier>{11e55d40-c0a6-4513-97df-e16660035b15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ShaderFramework">
+      <UniqueIdentifier>{a61a67f7-bf36-4d9f-af4e-b9981c9ee27d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShaderFramework\Compiled Shaders">
+      <UniqueIdentifier>{690cacdf-4fb7-4805-81f7-7724fc83747d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -50,6 +62,24 @@
     </ClCompile>
     <ClCompile Include="Square.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleInstancedVertexShader.cpp">
+      <Filter>Source Files\ShaderFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="SimplePixelShader.cpp">
+      <Filter>Source Files\ShaderFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleVertexShader.cpp">
+      <Filter>Source Files\ShaderFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\ShaderFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>Source Files\ShaderFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader.cpp">
+      <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,5 +119,46 @@
     <ClInclude Include="Square.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>ShaderFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleInstancedVertexShader.h">
+      <Filter>ShaderFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="SimplePixelShader.h">
+      <Filter>ShaderFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleVertexShader.h">
+      <Filter>ShaderFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>ShaderFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="VS_SimpleCompiled.h">
+      <Filter>ShaderFramework\Compiled Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="VS_SimpleInstancedCompiled.h">
+      <Filter>ShaderFramework\Compiled Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="PS_SimpleCompiled.h">
+      <Filter>ShaderFramework\Compiled Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>ShaderFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderParameters.h">
+      <Filter>ShaderFramework</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\PS_Simple.FX">
+      <Filter>ShaderFramework\HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\VS_Simple.FX">
+      <Filter>ShaderFramework\HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\VS_SimpleInstanced.FX">
+      <Filter>ShaderFramework\HLSL Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

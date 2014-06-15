@@ -1,6 +1,6 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  SimplePixelShader.h
+*  SimplePixelShader.cpp
 *  Wrapper for the "PS_Simple.FX" pixel shader.
 *  Simple pixel shader that returns the vertex colour passed through from
 *  the vertex shader as pixel colour.
@@ -16,6 +16,7 @@ SimplePixelShader::SimplePixelShader( void )
 
 SimplePixelShader::~SimplePixelShader( void )
 {
+	Cleanup();
 }
 
 //--------------------------------------------------------------------------------------
@@ -25,60 +26,27 @@ SimplePixelShader::~SimplePixelShader( void )
 //--------------------------------------------------------------------------------------
 bool SimplePixelShader::Initialise(ID3D11Device* pDevice)
 {
-	HRESULT hr;
-
 	// Create the shader
-
-	hr = pDevice -> CreatePixelShader( g_simplePixelShader, sizeof( g_simplePixelShader ), nullptr, &m_pPixelShader );
-	if( FAILED ( hr ) )
-	{
-		return hr;
-	}
-
-	return S_OK;
+	return(SUCCEEDED(pDevice->CreatePixelShader(g_PS_SimpleCompiled, sizeof(g_PS_SimpleCompiled), nullptr, &m_pPixelShader));
 }
 
 //--------------------------------------------------------------------------------------
 // Free all allocated resources.
 //--------------------------------------------------------------------------------------
-HRESULT SimplePixelShader::Cleanup( void )
+void SimplePixelShader::Cleanup(void)
 {
-	return PixelShader::Cleanup();
-}
-
-//--------------------------------------------------------------------------------------
-// Update the per-scene constant buffer of the shader.
-//--------------------------------------------------------------------------------------
-HRESULT SimplePixelShader::UpdatePerSceneData( ID3D11DeviceContext* pContext, const PerSceneData& perSceneData)
-{
-	// Buffer not used in this shader
-	return E_FAIL;
-}
-
-//--------------------------------------------------------------------------------------
-// Update the per-frame constant buffer of the shader.
-//--------------------------------------------------------------------------------------
-HRESULT SimplePixelShader::UpdatePerFrameData( ID3D11DeviceContext* pContext, const PerFrameData& perFrameData)
-{
-	// Buffer not used in this shader
-	return E_FAIL;
+	PixelShader::Cleanup();
 }
 
 //--------------------------------------------------------------------------------------
 // Update the per-object constant buffer of the shader.
+// Param1: The device context used to update the constant buffer.
+// Param2: The structure holding the shader parameters for the current object.
+// Returns true if the per-object parameters of the shader were updated successfully, false if the shader doesn't make
+// use of per-object parameters or if the update failed.
 //--------------------------------------------------------------------------------------
-HRESULT SimplePixelShader::UpdatePerObjectData( ID3D11DeviceContext* pContext, const PerObjectData& perObjectData)
+bool SimplePixelShader::SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData)
 {
-	// not used in this shader
-	return E_FAIL;
+	// Per-object data not used by this shader -> return false
+	return false;
 }
-
-//--------------------------------------------------------------------------------------
-// Update the texture and corresponding sample state being used by the shader.
-//--------------------------------------------------------------------------------------
-HRESULT SimplePixelShader::UpdateTextureResource( int index, ID3D11DeviceContext* pContext, ID3D11ShaderResourceView* pTexture, ID3D11SamplerState* pSamplerState )
-{
-	// Not used in this shader
-	return E_FAIL;
-}
-

@@ -33,6 +33,11 @@ Buffer<BufferElementType>::~Buffer()
 template <class BufferElementType>
 bool Buffer<BufferElementType>::Initialise(BufferType bufferType, D3D11_USAGE bufferUsage, BufferElementType* pElements, UINT maxNumberOfElements)
 {
+	if(maxNumberOfElements == 0)
+	{
+		return false;
+	}
+
 	if(m_pBuffer)
 	{
 		Release();
@@ -43,7 +48,7 @@ bool Buffer<BufferElementType>::Initialise(BufferType bufferType, D3D11_USAGE bu
 	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
 
 	bufferDesc.Usage = bufferUsage;
-	bufferDesc.ByteWidth = sizeof(BufferElementType) * numberOfElements;
+	bufferDesc.ByteWidth = sizeof(BufferElementType) * maxNumberOfElements;
 
 	switch(bufferType)
 	{
@@ -55,6 +60,9 @@ bool Buffer<BufferElementType>::Initialise(BufferType bufferType, D3D11_USAGE bu
 		break;
 	case InstanceBuffer:
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		break;
+	case ConstantBuffer:
+		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		break;
 	}
 
@@ -84,15 +92,22 @@ bool Buffer<BufferElementType>::Initialise(BufferType bufferType, D3D11_USAGE bu
 // Param2: A pointer to the data that should be written to the buffer.
 // Param3: The number of elements that should be written to the buffer.
 // Param4: The offset into the current buffer, from which overwriting with the new data should be started.
-// Returns true if instancing was initialised successfully, false otherwise.
+// Returns true if the buffer was updated successfully, false otherwise.
 //--------------------------------------------------------------------------------------
 template <class BufferElementType>
-void Buffer<BufferElementType>::Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements, UINT offset)
+bool Buffer<BufferElementType>::Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements, UINT offset)
 {
 	D3D11_MAPPED_SUBRESOURCE resource;
-	pDeviceContext->Map(m_pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+
+	if(FAILED(pDeviceContext->Map(m_pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource))
+	{
+		return false;
+	}
+
 	memcpy(resource.pData, &m_pBuffer[offset], sizeof(BufferElementType) * numberOfElements );
 	pDeviceContext->Unmap(m_pBuffer, 0);
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------

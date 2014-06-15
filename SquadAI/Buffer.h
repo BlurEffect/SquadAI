@@ -20,7 +20,8 @@ enum BufferType
 {
 	VertexBuffer,
 	IndexBuffer,
-	InstanceBuffer
+	InstanceBuffer,
+	ConstantBuffer
 };
 
 template <class BufferElementType>
@@ -30,7 +31,7 @@ public:
 	Buffer(void);	 
 	~Buffer(void);
 	bool Initialise(BufferType bufferType, D3D11_USAGE bufferUsage, BufferElementType* pElements, UINT maxNumberOfElements);
-	void Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements, UINT offset);
+	bool Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements, UINT offset);
 	void Cleanup(void);
 	
 	// Data access

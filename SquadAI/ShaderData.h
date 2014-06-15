@@ -1,0 +1,6 @@
+
+
+enum ShaderType
+{
+	SimpleUnlit
+};

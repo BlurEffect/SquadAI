@@ -5,384 +5,324 @@
 *  responsible for drawing the scene.
 */
 
+// Used for debugging, uncommenting this line will for instance lead to the creation of the D3D device
+// in debug mode. Make sure this line is commented out for release version.
+#define DEBUG
+
 // Includes
 #include "Renderer.h"
 
-
-Renderer::Renderer() : m_pSwapChain( nullptr ),
-												   m_pD3d11Device( nullptr ),
-												   m_pD3d11DeviceContext( nullptr ),
-												   m_pRenderTargetView( nullptr ),
-												   m_pDepthStencilView( nullptr ),
-												   m_pDepthStencilBuffer( nullptr ),
-												   m_depthStencilState( nullptr ),
-												   m_depthDisabledStencilState( nullptr ),
-												   m_pRasterStateCullBackfaces( nullptr ),
-												   m_pRasterStateCullFrontfaces( nullptr ),
-												   m_alphaEnableBlendingState( nullptr ),
-												   m_alphaDisableBlendingState( nullptr ),
-												   m_pToneTexture( nullptr ),
-												   m_pToneTexSamplerState( nullptr ),
-												   m_brickRenderCount( 0 ),
-												   m_selectedBrickShaderGroup( GroupSimple ),
-												   m_activeShaderGroup( GroupSimple ),
-												   m_pColourMapRenderTargetTexture( nullptr ),
-												   m_pColourMapRenderTargetView( nullptr ),
-												   m_pColourMapShaderResourceView( nullptr ),
-												   m_pColourMapSamplerState( nullptr ),
-												   m_pNormalDepthMapRenderTargetTexture( nullptr ),
-												   m_pNormalDepthMapRenderTargetView( nullptr ),
-												   m_pNormalDepthMapShaderResourceView( nullptr ),
-												   m_pNormalDepthMapSamplerState( nullptr )
+Renderer::Renderer() : m_pSwapChain(nullptr),
+					   m_pD3d11Device(nullptr),
+					   m_pD3d11DeviceContext(nullptr),
+					   m_pRenderTargetView(nullptr),
+					   m_pDepthStencilView(nullptr),
+					   m_pDepthStencilBuffer(nullptr),
+					   m_pDepthEnabledStencilState(nullptr),
+					   m_pDepthDisabledStencilState(nullptr),
+					   m_pRasterStateCullBackfaces(nullptr),
+					   m_pBlendingEnabledBlendingState(nullptr),
+					   m_pBlendingDisabledBlendingState(nullptr)					 
 {
-	for(int i = 0; i < NumberOfShaders; ++i)
-	{
-		m_shaders[i] = nullptr;
-	}
-
-	m_pCelShadingRenderTargets[0] = nullptr;
-	m_pCelShadingRenderTargets[1] = nullptr;
 }
 
+Renderer::~Renderer()
+{
+	Cleanup();
+}
 
 //--------------------------------------------------------------------------------------
-// Initialise the renderer by setting up DirectX 11 
+// Initialises the renderer.
+// Param1: A handle to the window that the application will run in.
+// Param2: The width of the window in pixels.
+// Param3: The height of the window in pixels.
+// Returns true if the renderer was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-HRESULT RendererImplementation::Initialise( HWND hWnd, int windowWidth, int windowHeight, const XMFLOAT4X4& baseViewMatrix )
+bool Renderer::Initialise(HWND hWnd, int windowWidth, int windowHeight)
 {
 
-	return SUCCEEDED( InitialiseDevice( hWnd, windowWidth, windowHeight )) &&
-		   SUCCEEDED( InitialiseScene( windowWidth, windowHeight )) &&
+	return SUCCEEDED(InitialiseD3D(hWnd, windowWidth, windowHeight)) &&
+		   SUCCEEDED(InitialiseDrawables()) &&
+		   SUCCEEDED(InitialiseShaders()) &&
 		   SUCCEEDED( m_renderContext.Initialise() ) &&
 		   SUCCEEDED( m_textRenderer.Initialise( m_pD3d11Device, m_pD3d11DeviceContext, hWnd, windowWidth, windowHeight, MAX_SENTENCE_LENGTH, baseViewMatrix ) );
 }
 
 //--------------------------------------------------------------------------------------
-// Create the device and swap chain 
+// Initialises DirectX 11 by creating a device and other required components while also initialising 
+// all render states (such as blend and cull states) that will be used by the application.
+// Param1: A handle to the window that the application will run in.
+// Param2: The width of the window in pixels.
+// Param3: The height of the window in pixels.
+// Returns true if DirectX 11 was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-HRESULT RendererImplementation::InitialiseDevice( HWND hWnd, int windowWidth, int windowHeight )
+bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
 {
-	// todo: restructure this part, add more hresult tests for state creations
-
-	HRESULT hr = S_OK;
-
 	// Description of the swap chain buffer
+	DXGI_MODE_DESC swapChainBufferDesc;
+	ZeroMemory(&swapChainBufferDesc, sizeof(DXGI_MODE_DESC));
 
-	DXGI_MODE_DESC bufferDesc;
-
-	ZeroMemory(&bufferDesc, sizeof(DXGI_MODE_DESC));
-
-	bufferDesc.Width					= windowWidth;
-	bufferDesc.Height					= windowHeight;
-	bufferDesc.RefreshRate.Numerator	= 60;
-	bufferDesc.RefreshRate.Denominator	= 1;
-	bufferDesc.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;
-	bufferDesc.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	bufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
+	swapChainBufferDesc.Width					= windowWidth;
+	swapChainBufferDesc.Height					= windowHeight;
+	swapChainBufferDesc.RefreshRate.Numerator	= 60;
+	swapChainBufferDesc.RefreshRate.Denominator	= 1;
+	swapChainBufferDesc.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainBufferDesc.ScanlineOrdering		= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainBufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
 
 	// Description of the swap chain
-
 	DXGI_SWAP_CHAIN_DESC swapChainDesc; 
-
 	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 
-	swapChainDesc.BufferDesc			= bufferDesc;
+	swapChainDesc.BufferDesc			= swapChainBufferDesc;
 	swapChainDesc.SampleDesc.Count		= 1;
 	swapChainDesc.SampleDesc.Quality	= 0;
 	swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount			= 1;
 	swapChainDesc.OutputWindow			= hWnd; 
-	swapChainDesc.Windowed				= TRUE; 
+	swapChainDesc.Windowed				= FALSE; // use full screen
 	swapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;
 
 	// Create the swap chain and the device
-
-	// todo: remove debug
-	hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL,  /*D3D11_CREATE_DEVICE_DEBUG*/NULL, NULL, NULL, D3D11_SDK_VERSION, &swapChainDesc, &m_pSwapChain, &m_pD3d11Device, NULL, &m_pD3d11DeviceContext );
-	if( FAILED( hr ) )
-		return hr;
+#ifndef DEBUG
+	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL, D3D11_SDK_VERSION, &swapChainDesc, &m_pSwapChain, &m_pD3d11Device, NULL, &m_pD3d11DeviceContext)))
+	{
+		return false;
+	}
+#else
+	// Create the device in debug mode
+	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, NULL, NULL, D3D11_SDK_VERSION, &swapChainDesc, &m_pSwapChain, &m_pD3d11Device, NULL, &m_pD3d11DeviceContext)))
+	{
+		return false;
+	}
+#endif // DEBUG
 
 	// Create the back buffer
-	
 	ID3D11Texture2D* pBackBuffer;
-	hr = m_pSwapChain -> GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&pBackBuffer );
-	if( FAILED ( hr ) )
-		return hr;
-
-	hr =  m_pSwapChain -> GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&pBackBuffer );
-	if( FAILED (hr ) )
-		return hr;
+	if(FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer)))
+	{
+		return false;
+	}
 
 	// Create the render target
-	
-	hr = m_pD3d11Device -> CreateRenderTargetView( pBackBuffer, NULL, &m_pRenderTargetView );
-	if( FAILED ( hr ) )
-		return hr;
+	if(FAILED(m_pD3d11Device -> CreateRenderTargetView(pBackBuffer, NULL, &m_pRenderTargetView)))
+	{
+		return false;
+	}
 
-	pBackBuffer -> Release();
+	pBackBuffer->Release();
 
 	//Description of the depth and stencil buffers
-
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
+	ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
-	depthStencilBufferDesc.Width				= windowWidth;
-	depthStencilBufferDesc.Height				= windowHeight;
-	depthStencilBufferDesc.MipLevels			= 1;
-	depthStencilBufferDesc.ArraySize			= 1;
-	depthStencilBufferDesc.Format				= DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilBufferDesc.Width			  = windowWidth;
+	depthStencilBufferDesc.Height			  = windowHeight;
+	depthStencilBufferDesc.MipLevels		  = 1;
+	depthStencilBufferDesc.ArraySize		  = 1;
+	depthStencilBufferDesc.Format			  = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilBufferDesc.SampleDesc.Count   = 1;
 	depthStencilBufferDesc.SampleDesc.Quality = 0;
-	depthStencilBufferDesc.Usage				= D3D11_USAGE_DEFAULT;
-	depthStencilBufferDesc.BindFlags			= D3D11_BIND_DEPTH_STENCIL;
-	depthStencilBufferDesc.CPUAccessFlags		= 0; 
-	depthStencilBufferDesc.MiscFlags			= 0;
-
+	depthStencilBufferDesc.Usage			  = D3D11_USAGE_DEFAULT;
+	depthStencilBufferDesc.BindFlags		  = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilBufferDesc.CPUAccessFlags	  = 0; 
+	depthStencilBufferDesc.MiscFlags		  = 0;
 
 	// Create the depth and stencil view
-
-	m_pD3d11Device -> CreateTexture2D(&depthStencilBufferDesc, NULL, &m_pDepthStencilBuffer);
-	m_pD3d11Device -> CreateDepthStencilView(m_pDepthStencilBuffer, NULL, &m_pDepthStencilView);
+	if(FAILED(m_pD3d11Device->CreateTexture2D(&depthStencilBufferDesc, NULL, &m_pDepthStencilBuffer)))
+	{
+		return false;
+	}
+	if(FAILED(m_pD3d11Device->CreateDepthStencilView(m_pDepthStencilBuffer, NULL, &m_pDepthStencilView)))
+	{
+		return false;
+	}
 
 	// Set the render target
+	m_pD3d11DeviceContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 
-	m_pD3d11DeviceContext -> OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
+	// Initialise the required render states
+	if(!InitialiseRenderStates())
+	{
+		return false;
+	}
 
+	// Create the Viewport
+	D3D11_VIEWPORT viewport;
+	ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
+
+	viewport.TopLeftX	= 0;
+	viewport.TopLeftY	= 0;
+	viewport.Width		= static_cast<float>(windowWidth);
+	viewport.Height		= static_cast<float>(windowHeight);
+	viewport.MinDepth	= 0.0f;
+	viewport.MaxDepth	= 1.0f;
+
+	// Set the Viewport (Bind viewport to rasterizer stage)
+	m_pD3d11DeviceContext->RSSetViewports(1, &viewport);
+
+	return S_OK;
+}
+
+//--------------------------------------------------------------------------------------
+// Creates all render states used by the application and sets the default states on the device.
+// Returns true if all states were created successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Renderer::InitialiseRenderStates()
+{
 	// Create depth/stencil states
 
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	ZeroMemory( &depthStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
+	D3D11_DEPTH_STENCIL_DESC depthEnabledStencilDesc;
+	ZeroMemory( &depthEnabledStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
 
 	// Set up the description of the stencil state.
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthEnabledStencilDesc.DepthEnable    = true;
+	depthEnabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthEnabledStencilDesc.DepthFunc      = D3D11_COMPARISON_LESS;
 
-	depthStencilDesc.StencilEnable = true;
-	depthStencilDesc.StencilReadMask = 0xFF;
-	depthStencilDesc.StencilWriteMask = 0xFF;
+	depthEnabledStencilDesc.StencilEnable    = true;
+	depthEnabledStencilDesc.StencilReadMask  = 0xFF;
+	depthEnabledStencilDesc.StencilWriteMask = 0xFF;
 
 	// Stencil operations if pixel is front-facing.
-	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthEnabledStencilDesc.FrontFace.StencilFailOp      = D3D11_STENCIL_OP_KEEP;
+	depthEnabledStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthEnabledStencilDesc.FrontFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
+	depthEnabledStencilDesc.FrontFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
 
 	// Stencil operations if pixel is back-facing.
-	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthEnabledStencilDesc.BackFace.StencilFailOp      = D3D11_STENCIL_OP_KEEP;
+	depthEnabledStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthEnabledStencilDesc.BackFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
+	depthEnabledStencilDesc.BackFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
 
-	// Create the depth stencil state.
-	m_pD3d11Device -> CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
-
+	// Create the depth stencil state with depth enabled
+	m_pD3d11Device->CreateDepthStencilState(&depthEnabledStencilDesc, &m_pDepthEnabledStencilState);
 
 	D3D11_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
 	ZeroMemory( &depthDisabledStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
 
 	// Set up the description of the stencil state.
-	depthDisabledStencilDesc.DepthEnable = false;
+	depthDisabledStencilDesc.DepthEnable    = false;
 	depthDisabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthDisabledStencilDesc.DepthFunc      = D3D11_COMPARISON_LESS;
 
-	depthDisabledStencilDesc.StencilEnable = true;
-	depthDisabledStencilDesc.StencilReadMask = 0xFF;
+	depthDisabledStencilDesc.StencilEnable    = true;
+	depthDisabledStencilDesc.StencilReadMask  = 0xFF;
 	depthDisabledStencilDesc.StencilWriteMask = 0xFF;
 
 	// Stencil operations if pixel is front-facing.
-	depthDisabledStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.FrontFace.StencilFailOp      = D3D11_STENCIL_OP_KEEP;
 	depthDisabledStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	depthDisabledStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthDisabledStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthDisabledStencilDesc.FrontFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.FrontFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
 
 	// Stencil operations if pixel is back-facing.
-	depthDisabledStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.BackFace.StencilFailOp      = D3D11_STENCIL_OP_KEEP;
 	depthDisabledStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	depthDisabledStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthDisabledStencilDesc.BackFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.BackFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
 
-	// Create the depth stencil state.
-	m_pD3d11Device -> CreateDepthStencilState(&depthDisabledStencilDesc, &m_depthDisabledStencilState);
+	// Create the depth stencil state with depth disabled
+	m_pD3d11Device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_pDepthDisabledStencilState);
 
-
-	// setup the rasterizer
+	// Create rasterizer state
 
 	// Create the description for the rasterizer
 	D3D11_RASTERIZER_DESC rasterDescCullBack;
 	ZeroMemory(&rasterDescCullBack, sizeof(D3D11_RASTERIZER_DESC));
 
 	rasterDescCullBack.AntialiasedLineEnable = false;
-	rasterDescCullBack.CullMode = D3D11_CULL_BACK;
-	rasterDescCullBack.DepthBias = 0;
-	rasterDescCullBack.DepthBiasClamp = 0.0f;
-	rasterDescCullBack.DepthClipEnable = true;
-	rasterDescCullBack.FillMode = D3D11_FILL_SOLID;
+	rasterDescCullBack.CullMode              = D3D11_CULL_BACK;
+	rasterDescCullBack.DepthBias             = 0;
+	rasterDescCullBack.DepthBiasClamp        = 0.0f;
+	rasterDescCullBack.DepthClipEnable       = true;
+	rasterDescCullBack.FillMode              = D3D11_FILL_SOLID;
 	rasterDescCullBack.FrontCounterClockwise = false;
-	rasterDescCullBack.MultisampleEnable = false;
-	rasterDescCullBack.ScissorEnable = false;
-	rasterDescCullBack.SlopeScaledDepthBias = 0.0f;
+	rasterDescCullBack.MultisampleEnable     = false;
+	rasterDescCullBack.ScissorEnable         = false;
+	rasterDescCullBack.SlopeScaledDepthBias  = 0.0f;
 
-	// Create the rasterizer state from the description we just filled out.
-	hr = m_pD3d11Device -> CreateRasterizerState( &rasterDescCullBack, &m_pRasterStateCullBackfaces );
-	if( FAILED( hr ) )
+	// Create the rasterizer state from the description
+	if(FAILED(m_pD3d11Device->CreateRasterizerState(&rasterDescCullBack, &m_pRasterStateCullBackfaces)))
 	{
-		return hr;
+		return false;
 	}
-
-	D3D11_RASTERIZER_DESC rasterDescCullFront;
-	ZeroMemory(&rasterDescCullFront, sizeof(D3D11_RASTERIZER_DESC));
-
-	rasterDescCullFront.AntialiasedLineEnable = false;
-	rasterDescCullFront.CullMode = D3D11_CULL_FRONT;
-	rasterDescCullFront.DepthBias = 0;
-	rasterDescCullFront.DepthBiasClamp = 0.0f;
-	rasterDescCullFront.DepthClipEnable = true;
-	rasterDescCullFront.FillMode = D3D11_FILL_SOLID;
-	rasterDescCullFront.FrontCounterClockwise = false;
-	rasterDescCullFront.MultisampleEnable = false;
-	rasterDescCullFront.ScissorEnable = false;
-	rasterDescCullFront.SlopeScaledDepthBias = 0.0f;
-
-	// Create the rasterizer state from the description we just filled out.
-	hr = m_pD3d11Device -> CreateRasterizerState( &rasterDescCullFront, &m_pRasterStateCullFrontfaces );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
 
 	// Create blend states
 
+	// Create blend state description
 	D3D11_BLEND_DESC alphaEnableBlendDesc;
 	ZeroMemory(&alphaEnableBlendDesc, sizeof(D3D11_BLEND_DESC));
 
-	// Create an alpha enabled blend state description.
-	alphaEnableBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-	alphaEnableBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-	alphaEnableBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	alphaEnableBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	alphaEnableBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	alphaEnableBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	alphaEnableBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	alphaEnableBlendDesc.RenderTarget[0].BlendEnable           = TRUE;
+	alphaEnableBlendDesc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ONE;
+	alphaEnableBlendDesc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
+	alphaEnableBlendDesc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+	alphaEnableBlendDesc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+	alphaEnableBlendDesc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+	alphaEnableBlendDesc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
 	alphaEnableBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
 
-	// Create the blend state using the description.
-	m_pD3d11Device -> CreateBlendState( &alphaEnableBlendDesc, &m_alphaEnableBlendingState );
+	// Create a blend state with blending enabled
+	if(FAILED(m_pD3d11Device->CreateBlendState(&alphaEnableBlendDesc, &m_pBlendingEnabledBlendingState)))
+	{
+		return false;
+	}
 
 	D3D11_BLEND_DESC alphaDisableBlendDesc;
 	ZeroMemory(&alphaDisableBlendDesc, sizeof(D3D11_BLEND_DESC));
 
 	// Create an alpha enabled blend state description.
-	alphaDisableBlendDesc.RenderTarget[0].BlendEnable = FALSE;
-	alphaDisableBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-	alphaDisableBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	alphaDisableBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	alphaDisableBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	alphaDisableBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	alphaDisableBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	alphaDisableBlendDesc.RenderTarget[0].BlendEnable           = FALSE;
+	alphaDisableBlendDesc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ONE;
+	alphaDisableBlendDesc.RenderTarget[0].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
+	alphaDisableBlendDesc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+	alphaDisableBlendDesc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+	alphaDisableBlendDesc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ZERO;
+	alphaDisableBlendDesc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
 	alphaDisableBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
 
-	// Create the blend state using the description.
-	m_pD3d11Device -> CreateBlendState( &alphaDisableBlendDesc, &m_alphaDisableBlendingState );
+	// Create a blend state with blending disabled
+	if(FAILED(m_pD3d11Device -> CreateBlendState(&alphaDisableBlendDesc, &m_pBlendingDisabledBlendingState)))
+	{
+		return false;
+	}
 
-	m_pD3d11DeviceContext -> RSSetState( m_pRasterStateCullBackfaces );
-
-	Prepare3DRendering();
-
-	return S_OK;
+	SetDefaultRenderStates();
 }
 
 //--------------------------------------------------------------------------------------
-// Further more scene-related initialisations (creation of shaders, viewport)
+// Creates and initialise the Drawables available to the renderer.
+// Returns true if the drawables were created and intialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-HRESULT RendererImplementation::InitialiseScene( int windowWidth, int windowHeight )
+bool Renderer::InitialiseDrawables(void)
 {
-	HRESULT hr = S_OK;
-
-	// Load the brick models
-	hr = Load3dModels();
-	if( FAILED ( hr ) )
-		return hr;
-
-	// Initialise shaders
-	hr = InitialiseShaders();
-	if( FAILED ( hr ) )
-		return hr;
-
-	hr = InitialiseImageBasedCelShading( windowWidth, windowHeight );
-	if( FAILED ( hr ) )
-		return hr;
-
-	// Create the Viewport
-	D3D11_VIEWPORT viewport;
-	ZeroMemory( &viewport, sizeof( D3D11_VIEWPORT ) );
-
-	viewport.TopLeftX	= 0;
-	viewport.TopLeftY	= 0;
-	viewport.Width		= static_cast<float>( windowWidth );
-	viewport.Height		= static_cast<float>( windowHeight );
-	viewport.MinDepth	= 0.0f;
-	viewport.MaxDepth	= 1.0f;
-
-	// Set the Viewport (Bind viewport to rasterizer stage)
-	m_pD3d11DeviceContext -> RSSetViewports( 1, &viewport );
-
-	// Initialise tone texture to be used with the toon colour shader 02
-	
-	hr = D3DX11CreateShaderResourceViewFromFile(m_pD3d11Device, L"ToneTexture3Shades.png", NULL, NULL, &m_pToneTexture, NULL);
-	if( FAILED( hr ) )
+	// Create the Drawables
+	for(int i = 0; i < NumberOfDrawableTypes; ++i)
 	{
-		return hr;
+		m_drawableObjects[i] = DrawableFactory::CreateDrawable(DrawableType(i));
+		if(!m_drawableObjects[i])
+		{
+			return false;
+		}
 	}
 
-	// Description of the Sample State
-	D3D11_SAMPLER_DESC sampDesc;
-	ZeroMemory(&sampDesc, sizeof(sampDesc));
-	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-   
-	// Create the Sample State
-	hr = m_pD3d11Device -> CreateSamplerState(&sampDesc, &m_pToneTexSamplerState);
-	if( FAILED( hr ) )
+	// Initialise the Drawables
+	for(int i = 0; i < NumberOfDrawableTypes; ++i)
 	{
-		return hr;
+		if(!m_drawableObjects[i]->Initialise(m_pD3d11Device))
+		{
+			return false;
+		}
 	}
-
-	// Setup the per scene data (won't change during execution), setting shader parameters
-
-	m_perSceneData.m_diffuseLightColor = DIRECTIONAL_LIGHT_COLOUR;
-	m_perSceneData.m_lightDirection	   = DIRECTIONAL_LIGHT_DIRECTION;
-	m_perSceneData.m_edgeColour        = EDGE_COLOUR;
-
-	m_perSceneData.m_vertexOffset01 = 0.1f;
-	m_perSceneData.m_vertexOffset02 = 0.002f; //0.001
-
-	m_perSceneData.m_edgeThreshold = 0.2f;		
-
-	m_perSceneData.m_moveBias			 = 0.01f; // 0.5f when scaling is applied
-
-	m_perSceneData.m_outlineWidth		 = 0.005f;
-
-	m_perSceneData.m_viewportWidth  = static_cast<float>( windowWidth );
-	m_perSceneData.m_viewportHeight = static_cast<float>( windowHeight );
-	m_perSceneData.m_thickness      = 1.0f;
-	m_perSceneData.m_thresholdNormalsEdges    = 0.2f;
-	m_perSceneData.m_thresholdDepthEdges      = 0.005f;  // was 0.05f
-	
-
-	return SUCCEEDED( m_grid.Initialise( m_pD3d11Device, XMFLOAT3( 0, 0, 0 ), GRID_SIZE_X, GRID_SIZE_Z, GRID_UNIT.x, GRID_UNIT.z ) ) &&
-		   SUCCEEDED( m_cursor.Initialise( m_pD3d11Device, XMFLOAT3( 0, 0, 0 ), XMFLOAT3( GRID_UNIT.x, GRID_UNIT.y, GRID_UNIT.z ) ) );
 }
 
 //--------------------------------------------------------------------------------------
 // Initialise shaders that will be used by the application.
+// Returns true if the shaders were initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-HRESULT RendererImplementation::InitialiseShaders()
+bool Renderer::InitialiseShaders()
 {
 	HRESULT hr = S_OK;
 
@@ -690,21 +630,23 @@ HRESULT RendererImplementation::Load3dModels( void )
 }
 
 //--------------------------------------------------------------------------------------
-// Cleanup renderer, free ressources
+// Cleanup renderer, free ressources.
 //--------------------------------------------------------------------------------------
-HRESULT RendererImplementation::Cleanup( void )
+void Renderer::Cleanup( void )
 {
-	m_renderContext.Cleanup();
-	m_textRenderer.Cleanup();
-	m_grid.Cleanup();
-	m_cursor.Cleanup();
-	
-	for( int i = 0; i < NumberOfBrickTypes; ++i )
+	// Cleanup all drawables
+	for(int i = 0; i < NumberOfDrawableTypes; ++i)
 	{
-		m_legoBrickMeshes[i].Cleanup();
+		if(m_drawableObjects[i])
+		{
+			m_drawableObjects[i]->Cleanup();
+			delete m_drawableObjects[i];
+			m_drawableObjects[i] = nullptr;
+		}
 	}
+	
 
-	m_legoStudMesh.Cleanup();
+
 
 	for(int i = 0; i < NumberOfShaders; ++i)
 	{
@@ -721,35 +663,19 @@ HRESULT RendererImplementation::Cleanup( void )
 		m_shaderGroups[i].Cleanup();
 	}
 
-	if( m_pSwapChain )					{ m_pSwapChain			-> Release(); m_pSwapChain			= nullptr; }
-	if( m_pD3d11Device )				{ m_pD3d11Device		-> Release(); m_pD3d11Device		= nullptr; }
-	if( m_pD3d11DeviceContext )			{ m_pD3d11DeviceContext	-> Release(); m_pD3d11DeviceContext	= nullptr; }
-	if( m_pRenderTargetView )			{ m_pRenderTargetView	-> Release(); m_pRenderTargetView	= nullptr; }
-	if( m_pDepthStencilView )			{ m_pDepthStencilView	-> Release(); m_pDepthStencilView	= nullptr; }
-	if( m_pDepthStencilBuffer )			{ m_pDepthStencilBuffer -> Release(); m_pDepthStencilBuffer	= nullptr; }
+	// Cleanup all the DirectX stuff
+	if(m_pSwapChain)		  { m_pSwapChain->Release();          m_pSwapChain		    = nullptr; }
+	if(m_pD3d11Device)		  { m_pD3d11Device->Release();        m_pD3d11Device	    = nullptr; }
+	if(m_pD3d11DeviceContext) { m_pD3d11DeviceContext->Release(); m_pD3d11DeviceContext = nullptr; }
+	if(m_pRenderTargetView)	  { m_pRenderTargetView->Release();   m_pRenderTargetView   = nullptr; }
+	if(m_pDepthStencilView)   { m_pDepthStencilView->Release();   m_pDepthStencilView   = nullptr; }
+	if(m_pDepthStencilBuffer) { m_pDepthStencilBuffer->Release(); m_pDepthStencilBuffer = nullptr; }
 
-	if( m_depthStencilState )			{ m_depthStencilState		    -> Release(); m_depthStencilState	       = nullptr; }
-	if( m_depthDisabledStencilState )	{ m_depthDisabledStencilState	-> Release(); m_depthDisabledStencilState  = nullptr; }
-	if( m_pRasterStateCullBackfaces )	{ m_pRasterStateCullBackfaces	-> Release(); m_pRasterStateCullBackfaces  = nullptr; }
-	if( m_pRasterStateCullFrontfaces )	{ m_pRasterStateCullFrontfaces	-> Release(); m_pRasterStateCullFrontfaces = nullptr; }
-	if( m_alphaEnableBlendingState )	{ m_alphaEnableBlendingState	-> Release(); m_alphaEnableBlendingState   = nullptr; }
-	if( m_alphaDisableBlendingState )	{ m_alphaDisableBlendingState	-> Release(); m_alphaDisableBlendingState  = nullptr; }
-
-	if( m_pToneTexture )				{ m_pToneTexture          -> Release(); m_pToneTexture	       = nullptr; }
-	if( m_pToneTexSamplerState )		{ m_pToneTexSamplerState  -> Release(); m_pToneTexSamplerState = nullptr; }
-
-	if( m_pColourMapRenderTargetTexture )	{ m_pColourMapRenderTargetTexture  -> Release(); m_pColourMapRenderTargetTexture = nullptr; }
-	if( m_pColourMapRenderTargetView )		{ m_pColourMapRenderTargetView     -> Release(); m_pColourMapRenderTargetView	 = nullptr; }
-	if( m_pColourMapShaderResourceView )	{ m_pColourMapShaderResourceView   -> Release(); m_pColourMapShaderResourceView	 = nullptr; }
-	if( m_pColourMapSamplerState )			{ m_pColourMapSamplerState         -> Release(); m_pColourMapSamplerState	     = nullptr; }
-
-	if( m_pNormalDepthMapRenderTargetTexture )	{ m_pNormalDepthMapRenderTargetTexture -> Release(); m_pNormalDepthMapRenderTargetTexture  = nullptr; }
-	if( m_pNormalDepthMapRenderTargetView )		{ m_pNormalDepthMapRenderTargetView    -> Release(); m_pNormalDepthMapRenderTargetView	   = nullptr; }
-	if( m_pNormalDepthMapShaderResourceView )	{ m_pNormalDepthMapShaderResourceView  -> Release(); m_pNormalDepthMapShaderResourceView   = nullptr; }
-	if( m_pNormalDepthMapSamplerState )			{ m_pNormalDepthMapSamplerState        -> Release(); m_pNormalDepthMapSamplerState	       = nullptr; }
-
-
-	return S_OK;
+	if(m_pDepthEnabledStencilState)	     { m_pDepthEnabledStencilState->Release();      m_pDepthEnabledStencilState	     = nullptr; }
+	if(m_pDepthDisabledStencilState)	 { m_pDepthDisabledStencilState->Release();     m_pDepthDisabledStencilState     = nullptr; }
+	if(m_pRasterStateCullBackfaces)	     { m_pRasterStateCullBackfaces->Release();      m_pRasterStateCullBackfaces      = nullptr; }
+	if(m_pBlendingEnabledBlendingState)  { m_pBlendingEnabledBlendingState->Release();  m_pBlendingEnabledBlendingState  = nullptr; }
+	if(m_pBlendingDisabledBlendingState) { m_pBlendingDisabledBlendingState->Release(); m_pBlendingDisabledBlendingState = nullptr; }
 }
 
 //--------------------------------------------------------------------------------------
@@ -902,6 +828,21 @@ void RendererImplementation::RenderBricks( XMFLOAT4X4 const * viewMatrix, XMFLOA
 	m_renderContext.Reset();
 }
 
+//--------------------------------------------------------------------------------------
+// Sets the default render states for the application.
+//--------------------------------------------------------------------------------------
+void Renderer::SetDefaultRenderStates(void)
+{
+	// Enable backface culling
+	m_pD3d11DeviceContext->RSSetState(m_pRasterStateCullBackfaces);
+
+	// Enable depth buffering
+	m_pD3d11DeviceContext->OMSetDepthStencilState(m_pDepthEnabledStencilState, 1);
+	
+	// Disable alpha blending
+	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	m_pD3d11DeviceContext -> OMSetBlendState(m_pBlendingDisabledBlendingState, blendFactor, 0xffffffff);
+}
 
 //--------------------------------------------------------------------------------------
 // Render the editor grid and cursor

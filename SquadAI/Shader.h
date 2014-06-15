@@ -23,8 +23,8 @@ public:
 
 	virtual bool Initialise (ID3D11Device* pDevice) = 0;
 	virtual void Cleanup(void) = 0;
-	virtual bool SerFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData)  = 0;
-	virtual bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData) = 0;
+	virtual bool SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData);
+	virtual bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
 	virtual void Activate(ID3D11DeviceContext* pContext) = 0;
 };
 

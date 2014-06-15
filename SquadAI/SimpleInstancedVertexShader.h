@@ -14,6 +14,7 @@
 #include "VS_SimpleInstancedCompiled.h"
 #include "VertexShader.h"
 #include "ShaderParameters.h"
+#include "Buffer.h"
 
 using namespace DirectX;
 
@@ -24,13 +25,10 @@ public:
 	~SimpleInstancedVertexShader(void);
 	bool Initialise(ID3D11Device* pDevice);
 	void Cleanup(void);
-	bool UpdatePerFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData);
-	bool UpdatePerObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
+	bool SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData);
+	bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
 
 private:
-
-	// The input layout required by this shader
-	const static D3D11_INPUT_ELEMENT_DESC m_sInputLayoutDescription[9];
 
 	//--------------------------------------------------------------------------------------
 	// Constant buffer used by this shader. To be updated once per frame.
@@ -39,6 +37,12 @@ private:
 	{
 		XMFLOAT4X4 m_viewProjection; // The combined view and projection matrices
 	};
+
+	// The input layout required by this shader
+	const static D3D11_INPUT_ELEMENT_DESC m_sInputLayoutDescription[6];
+
+	ConstBufferPerFrame	        m_cbPerFrame;		 // Stores the per per frame data
+	Buffer<ConstBufferPerFrame> m_pCbPerFrameBuffer; // The constant buffer used by the shader
 };
 
 #endif // SIMPLE_INSTANCED_VERTEX_SHADER_H

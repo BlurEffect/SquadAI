@@ -15,6 +15,7 @@ PixelShader::PixelShader(void) : m_pPixelShader(nullptr)
 
 PixelShader::~PixelShader(void)
 {
+	Cleanup();
 }
 
 //--------------------------------------------------------------------------------------
@@ -24,7 +25,7 @@ void PixelShader::Cleanup(void)
 {
 	if(m_pPixelShader)
 	{
-		m_pPixelShader -> Release();
+		m_pPixelShader->Release();
 		m_pPixelShader = nullptr;
 	}
 }
@@ -35,5 +36,5 @@ void PixelShader::Cleanup(void)
 //--------------------------------------------------------------------------------------
 void PixelShader::Activate(ID3D11DeviceContext* pContext)
 {
-	pContext -> PSSetShader(m_pPixelShader, 0, 0);
+	pContext->PSSetShader(m_pPixelShader, 0, 0);
 }

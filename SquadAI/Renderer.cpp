@@ -22,7 +22,8 @@ Renderer::Renderer() : m_pSwapChain(nullptr),
 					   m_pDepthDisabledStencilState(nullptr),
 					   m_pRasterStateCullBackfaces(nullptr),
 					   m_pBlendingEnabledBlendingState(nullptr),
-					   m_pBlendingDisabledBlendingState(nullptr)					 
+					   m_pBlendingDisabledBlendingState(nullptr),
+					   m_pCurrentShaderGroup(nullptr)
 {
 }
 
@@ -324,309 +325,18 @@ bool Renderer::InitialiseDrawables(void)
 //--------------------------------------------------------------------------------------
 bool Renderer::InitialiseShaders()
 {
-	HRESULT hr = S_OK;
-
-	// Create shaders and group them in shader groups to be used in conjunction
-
-	// Create and initialise shaders
-	for(int i = 0; i < NumberOfShaders; ++i)
+	for(int i = 0; i < NumberOfShaderTypes; ++i)
 	{
-		m_shaders[i] = CreateShader( Shaders( i ) );
-		m_shaders[i] -> Initialise( m_pD3d11Device );
-	}
-
-	// Initialise shader groups with the correct number of passes
-	m_shaderGroups[GroupEditorGeometry].Initialise(1);
-	m_shaderGroups[GroupSimple].Initialise(1);
-	m_shaderGroups[GroupLighted].Initialise(1);
-	m_shaderGroups[GroupToon01].Initialise(2);
-	m_shaderGroups[GroupToon02].Initialise(2);
-	m_shaderGroups[GroupToon03].Initialise(1);
-	m_shaderGroups[GroupToon04].Initialise(2);
-	m_shaderGroups[GroupToon05].Initialise(2);
-	m_shaderGroups[GroupToon06].Initialise(2);
-
-	// Assign shaders to the passes of the shader groups
-	// todo: find a better solution that doesn't require this casting stuff (store vertex/pixel shaders separately, one factory for each?
-
-	m_shaderGroups[GroupEditorGeometry].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[EditorGeometryVS] );
-	m_shaderGroups[GroupEditorGeometry].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[EditorGeometryPS] );
-	
-	m_shaderGroups[GroupSimple].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[SimpleVS] );
-	m_shaderGroups[GroupSimple].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[SimplePS] );
-
-	m_shaderGroups[GroupLighted].m_pShaderPasses[0].m_vertexShader = dynamic_cast<VertexShader*>( m_shaders[LightedVS] );
-	m_shaderGroups[GroupLighted].m_pShaderPasses[0].m_pixelShader  = dynamic_cast<PixelShader*>( m_shaders[LightedPS] );
-
-	m_shaderGroups[GroupToon01].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonEdges01VS] );
-	m_shaderGroups[GroupToon01].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonEdges01PS] );
-	m_shaderGroups[GroupToon01].m_pShaderPasses[1].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonColour01VS] );
-	m_shaderGroups[GroupToon01].m_pShaderPasses[1].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonColour01PS] );
-
-	m_shaderGroups[GroupToon02].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonEdges02VS] );
-	m_shaderGroups[GroupToon02].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonEdges02PS] );
-	m_shaderGroups[GroupToon02].m_pShaderPasses[1].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonColour02VS] );
-	m_shaderGroups[GroupToon02].m_pShaderPasses[1].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonColour02PS] );
-	
-	m_shaderGroups[GroupToon03].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[Toon03VS] );
-	m_shaderGroups[GroupToon03].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[Toon03PS] );
-
-	m_shaderGroups[GroupToon04].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonColour04VS] );
-	m_shaderGroups[GroupToon04].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonColour04PS] );
-	m_shaderGroups[GroupToon04].m_pShaderPasses[1].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonEdges04VS] );
-	m_shaderGroups[GroupToon04].m_pShaderPasses[1].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonEdges04PS] );
-	
-	m_shaderGroups[GroupToon05].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonColour05VS] );
-	m_shaderGroups[GroupToon05].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonColour05PS] );
-	m_shaderGroups[GroupToon05].m_pShaderPasses[1].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ToonEdges05VS] );
-	m_shaderGroups[GroupToon05].m_pShaderPasses[1].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ToonEdges05PS] );
-	
-	m_shaderGroups[GroupToon06].m_pShaderPasses[0].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[CreateMapsToon06VS] );
-	m_shaderGroups[GroupToon06].m_pShaderPasses[0].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[CreateMapsToon06PS] );
-	m_shaderGroups[GroupToon06].m_pShaderPasses[1].m_vertexShader  = dynamic_cast<VertexShader*>( m_shaders[ComposeImageToon06VS] );
-	m_shaderGroups[GroupToon06].m_pShaderPasses[1].m_pixelShader   = dynamic_cast<PixelShader*>( m_shaders[ComposeImageToon06PS] );
-	
-	return S_OK;
-}
-
-//--------------------------------------------------------------------------------------
-// Initialise the textures and associated views requied for image-based cel shading
-//--------------------------------------------------------------------------------------
-HRESULT	RendererImplementation::InitialiseImageBasedCelShading( int windowWidth, int windowHeight )
-{
-	HRESULT hr;
-	
-	hr = m_screenQuad.Initialise( m_pD3d11Device );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
-	// Initialise textures and views for the colour map
-
-	// Initialize the render target texture description.
-	D3D11_TEXTURE2D_DESC colourTextureDesc;
-	ZeroMemory( &colourTextureDesc, sizeof( colourTextureDesc ) );
-
-	// Setup the render target texture description.
-	colourTextureDesc.Width				= windowWidth;
-	colourTextureDesc.Height			= windowHeight;
-	colourTextureDesc.MipLevels			= 1;
-	colourTextureDesc.ArraySize			= 1;
-	colourTextureDesc.Format			= DXGI_FORMAT_R32G32B32A32_FLOAT;
-	colourTextureDesc.SampleDesc.Count	= 1;
-	colourTextureDesc.Usage				= D3D11_USAGE_DEFAULT;
-	colourTextureDesc.BindFlags			= D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	colourTextureDesc.CPUAccessFlags	= 0;
-	colourTextureDesc.MiscFlags			= 0;
-
-	// Create the render target texture.
-	hr = m_pD3d11Device -> CreateTexture2D( &colourTextureDesc, NULL, &m_pColourMapRenderTargetTexture );
-	if( FAILED( hr ) )
-	{
-		return hr;
+		if(!m_shaderGroups[i].Initialise(m_pD3d11Device, ShaderType(i)))
+		{
+			return false;
+		}
 	}
 	
-	D3D11_RENDER_TARGET_VIEW_DESC colourRenderTargetViewDesc;
-	ZeroMemory( &colourRenderTargetViewDesc, sizeof( colourRenderTargetViewDesc ) );
+	// Set the default shader group to use
+	SetShaderGroup(SimpleUnlit);
 
-	// Setup the description of the render target view.
-	colourRenderTargetViewDesc.Format = colourTextureDesc.Format;
-	colourRenderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	colourRenderTargetViewDesc.Texture2D.MipSlice = 0;
-
-	// Create the render target view.
-	hr = m_pD3d11Device -> CreateRenderTargetView( m_pColourMapRenderTargetTexture, &colourRenderTargetViewDesc, &m_pColourMapRenderTargetView );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC colourShaderResourceViewDesc;
-	ZeroMemory( &colourShaderResourceViewDesc, sizeof( colourShaderResourceViewDesc ) );
-
-	// Setup the description of the shader resource view.
-	colourShaderResourceViewDesc.Format = colourTextureDesc.Format;
-	colourShaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	colourShaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	colourShaderResourceViewDesc.Texture2D.MipLevels = 1;
-
-	// Create the shader resource view.
-	hr = m_pD3d11Device->CreateShaderResourceView( m_pColourMapRenderTargetTexture, &colourShaderResourceViewDesc, &m_pColourMapShaderResourceView );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
-	// Create the samplerstate for the colour map
-	// Description of the Sample State
-	D3D11_SAMPLER_DESC colourMapSampDesc;
-	ZeroMemory( &colourMapSampDesc, sizeof( colourMapSampDesc ) );
-
-	colourMapSampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	colourMapSampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	colourMapSampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    colourMapSampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    colourMapSampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    colourMapSampDesc.MinLOD = 0;
-    colourMapSampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	// Create the Sample State
-	hr = m_pD3d11Device -> CreateSamplerState( &colourMapSampDesc, &m_pColourMapSamplerState );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
-	// Initialise textures and views for the normal/depth map
-
-	// Initialize the render target texture description.
-	D3D11_TEXTURE2D_DESC textureDesc;
-	ZeroMemory( &textureDesc, sizeof( textureDesc ) );
-
-	// Setup the render target texture description.
-	textureDesc.Width				= windowWidth;
-	textureDesc.Height				= windowHeight;
-	textureDesc.MipLevels			= 1;
-	textureDesc.ArraySize			= 1;
-	textureDesc.Format				= DXGI_FORMAT_R32G32B32A32_FLOAT;
-	textureDesc.SampleDesc.Count	= 1;
-	textureDesc.Usage				= D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags			= D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags		= 0;
-	textureDesc.MiscFlags			= 0;
-
-	// Create the render target texture.
-	hr = m_pD3d11Device -> CreateTexture2D( &textureDesc, NULL, &m_pNormalDepthMapRenderTargetTexture );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-	
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	ZeroMemory( &renderTargetViewDesc, sizeof( renderTargetViewDesc ) );
-
-	// Setup the description of the render target view.
-	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-	// Create the render target view.
-	hr = m_pD3d11Device -> CreateRenderTargetView( m_pNormalDepthMapRenderTargetTexture, &renderTargetViewDesc, &m_pNormalDepthMapRenderTargetView );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-	ZeroMemory( &shaderResourceViewDesc, sizeof( shaderResourceViewDesc ) );
-
-	// Setup the description of the shader resource view.
-	shaderResourceViewDesc.Format = textureDesc.Format;
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-
-	// Create the shader resource view.
-	hr = m_pD3d11Device->CreateShaderResourceView( m_pNormalDepthMapRenderTargetTexture, &shaderResourceViewDesc, &m_pNormalDepthMapShaderResourceView );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
-	// Create the samplerstate for the colour map
-	// Description of the Sample State
-	D3D11_SAMPLER_DESC normalDepthMapSampDesc;
-	ZeroMemory( &normalDepthMapSampDesc, sizeof( normalDepthMapSampDesc ) );
-	normalDepthMapSampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	normalDepthMapSampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	normalDepthMapSampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    normalDepthMapSampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    normalDepthMapSampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    normalDepthMapSampDesc.MinLOD = 0;
-    normalDepthMapSampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-   
-	// Create the Sample State
-	hr = m_pD3d11Device -> CreateSamplerState( &normalDepthMapSampDesc, &m_pNormalDepthMapSamplerState );
-	if( FAILED( hr ) )
-	{
-		return hr;
-	}
-
-	// Prepare the render targets array
-	m_pCelShadingRenderTargets[0] = m_pColourMapRenderTargetView;
-	m_pCelShadingRenderTargets[1] = m_pNormalDepthMapRenderTargetView;
-
-	return S_OK;
-}
-
-//--------------------------------------------------------------------------------------
-// Load in the 3d models of the lego bricks from the respective files.
-//--------------------------------------------------------------------------------------
-HRESULT RendererImplementation::Load3dModels( void )
-{
-	return SUCCEEDED( m_legoBrickMeshes[Std1x1x1].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x1_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x1].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x1_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x2_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x2_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x2_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x2_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x3_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x3_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x3_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x3_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x4_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x4_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x4_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x4_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std4x1x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std4x1x4_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x6_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x6_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x6_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x6_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std4x1x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std4x1x6_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x8_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x8_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x8_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x8_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x10_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x10_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x10_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x10_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std4x1x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std4x1x10_NoStud.txt", NUMBER_OF_BRICKS_PER_TYPE  ) ) &&
-		   SUCCEEDED( m_legoStudMesh.Initialise( m_pD3d11Device, "Models/LegoBrick_Stud.txt", NUMBER_OF_STUDS ) );
-		
-
-		// Brick models with the studs already attached, shouldn't be used anymore
-		/*SUCCEEDED( m_legoBrickMeshes[Std1x1x1].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x1.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x1].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x1.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x2.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x2.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x2.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x2].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x2.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x3.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x3.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x3.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x3].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x3.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x4.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x4.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x4.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x4.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std4x1x4].Initialise( m_pD3d11Device, "Models/LegoBrick_Std4x1x4.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x6.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x6.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x6.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x6.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std4x1x6].Initialise( m_pD3d11Device, "Models/LegoBrick_Std4x1x6.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x8.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x8.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x8.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x8].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x8.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x1x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x1x10.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std1x3x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std1x3x10.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x1x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x1x10.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std2x3x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std2x3x10.txt" ) ) &&
-		   SUCCEEDED( m_legoBrickMeshes[Std4x1x10].Initialise( m_pD3d11Device, "Models/LegoBrick_Std4x1x10.txt" ) );*/
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -645,23 +355,13 @@ void Renderer::Cleanup( void )
 		}
 	}
 	
-
-
-
-	for(int i = 0; i < NumberOfShaders; ++i)
-	{
-		if( m_shaders[i] )
-		{ 
-			m_shaders[i] -> Cleanup();
-			delete m_shaders[i];
-			m_shaders[i] = nullptr; 
-		}
-	}
-
-	for(int i = 0; i < NumberOfShaderGroups; ++i)
+	for(int i = 0; i < NumberOfShaderTypes; ++i)
 	{
 		m_shaderGroups[i].Cleanup();
 	}
+
+	// Group pointed to is destroyed above
+	m_pCurrentShaderGroup = nullptr;
 
 	// Cleanup all the DirectX stuff
 	if(m_pSwapChain)		  { m_pSwapChain->Release();          m_pSwapChain		    = nullptr; }
@@ -678,29 +378,14 @@ void Renderer::Cleanup( void )
 	if(m_pBlendingDisabledBlendingState) { m_pBlendingDisabledBlendingState->Release(); m_pBlendingDisabledBlendingState = nullptr; }
 }
 
+
+
 //--------------------------------------------------------------------------------------
 // Update the renderer, draw the scene
 //--------------------------------------------------------------------------------------
-void RendererImplementation::Update( const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix, const XMFLOAT4X4& orthoProjMatrix, const EditorData& editorData, int numberOfBricks, int numberOfStuds, const PerformanceData& performanceData, const XMFLOAT3& cameraPosition )
+void Renderer::RenderScene( const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix, const XMFLOAT4X4& orthoProjMatrix, const EditorData& editorData, int numberOfBricks, int numberOfStuds, const PerformanceData& performanceData, const XMFLOAT3& cameraPosition )
 {
-	UpdateScene();
-	DrawScene( viewMatrix, projMatrix, orthoProjMatrix, editorData, numberOfBricks, numberOfStuds, performanceData, cameraPosition );
-}
-
-//--------------------------------------------------------------------------------------
-// Update the scene, camera and objects
-//--------------------------------------------------------------------------------------
-void RendererImplementation::UpdateScene( void )
-{
-	// More of a placeholder at the moment
-}
-
-//--------------------------------------------------------------------------------------
-// Draw the scene
-//--------------------------------------------------------------------------------------
-void RendererImplementation::DrawScene( const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix, const XMFLOAT4X4& orthoProjMatrix, const EditorData& editorData, int numberOfBricks, int numberOfStuds, const PerformanceData& performanceData, const XMFLOAT3& cameraPosition )
-{
-	// Clear the backbuffer
+// Clear the backbuffer
 	m_pD3d11DeviceContext -> ClearRenderTargetView( m_pRenderTargetView, BACKGROUND_COLOUR );
 	// Clear the other render targets
 	m_pD3d11DeviceContext -> ClearRenderTargetView( m_pCelShadingRenderTargets[0], BACKGROUND_COLOUR );
@@ -735,6 +420,7 @@ void RendererImplementation::DrawScene( const XMFLOAT4X4& viewMatrix, const XMFL
 	// Present the backbuffer to the screen
 	m_pSwapChain -> Present(0, 0);
 }
+
 
 //--------------------------------------------------------------------------------------
 // Render the lego bricks
@@ -828,21 +514,7 @@ void RendererImplementation::RenderBricks( XMFLOAT4X4 const * viewMatrix, XMFLOA
 	m_renderContext.Reset();
 }
 
-//--------------------------------------------------------------------------------------
-// Sets the default render states for the application.
-//--------------------------------------------------------------------------------------
-void Renderer::SetDefaultRenderStates(void)
-{
-	// Enable backface culling
-	m_pD3d11DeviceContext->RSSetState(m_pRasterStateCullBackfaces);
 
-	// Enable depth buffering
-	m_pD3d11DeviceContext->OMSetDepthStencilState(m_pDepthEnabledStencilState, 1);
-	
-	// Disable alpha blending
-	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-	m_pD3d11DeviceContext -> OMSetBlendState(m_pBlendingDisabledBlendingState, blendFactor, 0xffffffff);
-}
 
 //--------------------------------------------------------------------------------------
 // Render the editor grid and cursor
@@ -942,159 +614,26 @@ RenderContext* RendererImplementation::GetRenderContext( void )
 }
 
 //--------------------------------------------------------------------------------------
-// Factory function for creating shaders. Returns a pointer to the dynamically
-// allocated shader object.
+// Sets the default render states for the application.
 //--------------------------------------------------------------------------------------
-Shader* RendererImplementation::CreateShader( Shaders shaderIdentifier )
+void Renderer::SetDefaultRenderStates(void)
 {
-	Shader* pShader = nullptr;
+	// Enable backface culling
+	m_pD3d11DeviceContext->RSSetState(m_pRasterStateCullBackfaces);
 
-	switch( shaderIdentifier )
-	{
-	case EditorGeometryVS:
-		pShader = new EditorGeometryVertexShader();
-		break;
-	case EditorGeometryPS:
-		pShader = new EditorGeometryPixelShader();
-		break;
-	case SimpleVS:
-		pShader = new SimpleVertexShader();
-		break;
-	case SimplePS:
-		pShader = new SimplePixelShader();
-		break;
-	case LightedVS:
-		pShader = new LightedVertexShader();
-		break;		
-	case LightedPS:
-		pShader = new LightedPixelShader();
-		break;	
-	case ToonColour01VS:
-		pShader = new ToonColourVertexShader01();
-		break;		
-	case ToonColour01PS:
-		pShader = new ToonColourPixelShader01();
-		break;		
-	case ToonEdges01VS:
-		pShader = new ToonEdgesVertexShader01();
-		break;		
-	case ToonEdges01PS:
-		pShader = new ToonEdgesPixelShader01();
-		break;	
-	case ToonColour02VS:
-		pShader = new ToonColourVertexShader02();
-		break;	
-	case ToonColour02PS:
-		pShader = new ToonColourPixelShader02();
-		break;	
-	case ToonEdges02VS:
-		pShader = new ToonEdgesVertexShader02();
-		break;		
-	case ToonEdges02PS:
-		pShader = new ToonEdgesPixelShader02();
-		break;	
-	case Toon03VS:
-		pShader = new ToonVertexShader03();
-		break;		
-	case Toon03PS:
-		pShader = new ToonPixelShader03();
-		break;	
-	case ToonColour04VS:
-		pShader = new ToonColourVertexShader04();
-		break;	
-	case ToonColour04PS:
-		pShader = new ToonColourPixelShader04();
-		break;	
-	case ToonEdges04VS:
-		pShader = new ToonEdgesVertexShader04();
-		break;		
-	case ToonEdges04PS:
-		pShader = new ToonEdgesPixelShader04();
-		break;	
-	case ToonColour05VS:
-		pShader = new ToonColourVertexShader05();
-		break;	
-	case ToonColour05PS:
-		pShader = new ToonColourPixelShader05();
-		break;	
-	case ToonEdges05VS:
-		pShader = new ToonEdgesVertexShader05();
-		break;		
-	case ToonEdges05PS:
-		pShader = new ToonEdgesPixelShader05();
-		break;	
-	case CreateMapsToon06VS:
-		pShader = new CreateMapsVertexShaderToon06();
-		break;	
-	case CreateMapsToon06PS:
-		pShader = new CreateMapsPixelShaderToon06();
-		break;	
-	case ComposeImageToon06VS:
-		pShader = new ComposeImageVertexShaderToon06();
-		break;		
-	case ComposeImageToon06PS:
-		pShader = new ComposeImagePixelShaderToon06();
-		break;	
-	}
-
-	return pShader;
-}
-
-//--------------------------------------------------------------------------------------
-// Set new shaders and update their constant buffers with the current scene and frame data.
-//--------------------------------------------------------------------------------------
-void RendererImplementation::SwitchShader( ShaderGroups newShaderGroup )
-{
-	m_shaderGroups[newShaderGroup].m_pShaderPasses[0].m_vertexShader -> Activate( m_pD3d11DeviceContext );
-	m_shaderGroups[newShaderGroup].m_pShaderPasses[0].m_pixelShader -> Activate( m_pD3d11DeviceContext );
-
-	m_shaderGroups[newShaderGroup].m_pShaderPasses[0].m_vertexShader -> UpdatePerSceneData( m_pD3d11DeviceContext, m_perSceneData );
-	m_shaderGroups[newShaderGroup].m_pShaderPasses[0].m_pixelShader -> UpdatePerSceneData( m_pD3d11DeviceContext, m_perSceneData );
-
-	m_shaderGroups[newShaderGroup].m_pShaderPasses[0].m_vertexShader -> UpdatePerFrameData( m_pD3d11DeviceContext, m_perFrameData );
-	m_shaderGroups[newShaderGroup].m_pShaderPasses[0].m_pixelShader -> UpdatePerFrameData( m_pD3d11DeviceContext, m_perFrameData );
-
-	m_activeShaderGroup = newShaderGroup;
-	if( newShaderGroup != GroupEditorGeometry )
-	{
-		m_selectedBrickShaderGroup = newShaderGroup;
-	}
-
-	// special case
-	if( m_activeShaderGroup == GroupToon03 || m_activeShaderGroup == GroupToon04 || m_activeShaderGroup == GroupToon05 || m_activeShaderGroup == GroupToon06 )
-	{
-		m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[0].m_pixelShader -> UpdateTextureResource( 0, m_pD3d11DeviceContext, m_pToneTexture, m_pToneTexSamplerState );
-	}
-}
-
-//--------------------------------------------------------------------------------------
-// Switch to a new pass for the current shader group.
-//--------------------------------------------------------------------------------------
-void RendererImplementation::SwitchPass( int newPass )
-{
-	if( newPass < m_shaderGroups[m_activeShaderGroup].m_numberOfPasses )
-	{
-		m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_vertexShader -> Activate( m_pD3d11DeviceContext );
-		m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> Activate( m_pD3d11DeviceContext );
-
-		m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_vertexShader -> UpdatePerSceneData( m_pD3d11DeviceContext, m_perSceneData );
-		m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> UpdatePerSceneData( m_pD3d11DeviceContext, m_perSceneData );
-
-		m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_vertexShader -> UpdatePerFrameData( m_pD3d11DeviceContext, m_perFrameData );
-		m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> UpdatePerFrameData( m_pD3d11DeviceContext, m_perFrameData );
+	// Enable depth buffering
+	m_pD3d11DeviceContext->OMSetDepthStencilState(m_pDepthEnabledStencilState, 1);
 	
-		// special case
-		if( m_activeShaderGroup == GroupToon02 )
-		{
-			m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> UpdateTextureResource( 0, m_pD3d11DeviceContext, m_pToneTexture, m_pToneTexSamplerState );
-		}
+	// Disable alpha blending
+	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	m_pD3d11DeviceContext -> OMSetBlendState(m_pBlendingDisabledBlendingState, blendFactor, 0xffffffff);
+}
 
-		// special case
-		if( m_activeShaderGroup == GroupToon06 )
-		{
-
-			m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> UpdateTextureResource( 0, m_pD3d11DeviceContext, m_pColourMapShaderResourceView, m_pColourMapSamplerState );
-			m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> UpdateTextureResource( 1, m_pD3d11DeviceContext, m_pNormalDepthMapShaderResourceView, m_pNormalDepthMapSamplerState );
-		}
-	}
+//--------------------------------------------------------------------------------------
+// Changes the shader group currently used by the renderer.
+// Param1: The type of the requested shader group and associated shaders.
+//--------------------------------------------------------------------------------------
+void Renderer::SetShaderGroup(ShaderType type)
+{
+	m_pCurrentShaderGroup = &m_shaderGroups[type];
 }

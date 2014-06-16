@@ -20,7 +20,7 @@ class ShaderFactory
 {
 public:
 	static VertexShader* CreateVertexShader(ShaderType, bool doCreateInstancedVersion);
-	static PixelShader*  CreatePixel(ShaderType, bool doCreateInstancedVersion);
+	static PixelShader*  CreatePixelShader(ShaderType, bool doCreateInstancedVersion);
 };
 
 #endif // SHADER_FACTORY_H

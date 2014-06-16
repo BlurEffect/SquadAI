@@ -90,6 +90,9 @@
     <ClCompile Include="ShaderFactory.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderGroup.cpp">
+      <Filter>Source Files\ShaderFramework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -170,7 +173,7 @@
     <ClInclude Include="ShaderFactory.h">
       <Filter>Header Files\ShaderFramework</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderData.h">
+    <ClInclude Include="ShaderGroup.h">
       <Filter>Header Files\ShaderFramework</Filter>
     </ClInclude>
   </ItemGroup>

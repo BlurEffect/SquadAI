@@ -70,8 +70,8 @@ void SimpleInstancedVertexShader::Cleanup(void)
 // Update the per-frame constant buffer of the shader.
 // Param1: The device context used to update the constant buffer.
 // Param2: The structure holding the shader parameters for the current frame.
-// Returns true if the per-frame parameters of the shader were updated successfully, false if the shader doesn't make
-// use of per-frame parameters or if the update failed.
+// Returns true if the per-frame parameters of the shader were updated successfully (that is also true
+// in the case that the shader doesn't actually use per-frame parameters), false if the update failed.
 //--------------------------------------------------------------------------------------
 bool SimpleInstancedVertexShader::SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData)
 {

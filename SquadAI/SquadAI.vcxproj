@@ -89,6 +89,7 @@
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderFactory.cpp" />
+    <ClCompile Include="ShaderGroup.cpp" />
     <ClCompile Include="SimpleInstancedVertexShader.cpp" />
     <ClCompile Include="SimplePixelShader.cpp" />
     <ClCompile Include="SimpleVertexShader.cpp" />
@@ -113,7 +114,7 @@
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderFactory.h" />
-    <ClInclude Include="ShaderData.h" />
+    <ClInclude Include="ShaderGroup.h" />
     <ClInclude Include="ShaderParameters.h" />
     <ClInclude Include="SimpleInstancedVertexShader.h" />
     <ClInclude Include="SimplePixelShader.h" />

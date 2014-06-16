@@ -17,6 +17,7 @@
 #include "DrawableFactory.h"
 #include "ObjectRenderData.h"
 #include "ShaderParameters.h"
+#include "ShaderGroup.h"
 
 using namespace DirectX;
 
@@ -32,18 +33,17 @@ public:
 private:
 	bool		InitialiseD3D( HWND hwnd, int windowWidth, int windowHeight  );
 	bool		InitialiseRenderStates();
-	HRESULT		InitialiseScene( int windowWidth, int windowHeight );
-	HRESULT		InitialiseShaders();
-	HRESULT		InitialiseImageBasedCelShading( int windowWidth, int windowHeight );
-	HRESULT     Load3dModels( void );
+	bool		InitialiseDrawables(void);
+	bool		InitialiseShaders();
+
 	void 		UpdateScene( void );
 	void		DrawScene( const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix, const XMFLOAT4X4& orthoProjMatrix, const EditorData& editorData, int numberOfBricks, int numberOfStuds, const PerformanceData& performanceData, const XMFLOAT3& cameraPosition );
 	void		RenderBricks( XMFLOAT4X4 const * viewMatrix, XMFLOAT4X4 const * projMatrix, const XMFLOAT3& cameraPosition, const EditorData& editorData );
 	void		RenderEditorGeometry( XMFLOAT4X4 const * viewMatrix, XMFLOAT4X4 const * projMatrix, const EditorData& editorData );
 
-	bool InitialiseDrawables(void);
+	
 	void SetDefaultRenderStates(void);
-
+	void SetShaderGroup(ShaderType type);
 
 	void		Prepare3DRendering();
 	void		Prepare2DRendering();
@@ -63,11 +63,15 @@ private:
 	// Render states
 	ID3D11DepthStencilState* m_pDepthEnabledStencilState;
 	ID3D11DepthStencilState* m_pDepthDisabledStencilState;
-
 	ID3D11RasterizerState*	 m_pRasterStateCullBackfaces;
-	
 	ID3D11BlendState*		 m_pBlendingEnabledBlendingState;
 	ID3D11BlendState*		 m_pBlendingDisabledBlendingState;
+
+	ShaderGroup*			 m_pCurrentShaderGroup;
+	ShaderGroup				 m_shaderGroups[NumberOfShaderTypes]; // Shader groups available to the renderer
+	Drawable*				 m_drawableObjects[NumberOfDrawableTypes];
+	PerFrameData			 m_perFrameData; 
+	PerObjectData			 m_perObjectData;
 
 	//RenderContext			m_renderContext;
 	//TextRenderer			m_textRenderer;
@@ -76,12 +80,6 @@ private:
 
 	//Shader*					m_shaders[NumberOfShaders];
 	//ShaderGroup				m_shaderGroups[NumberOfShaderGroups];
-	
-	Drawable*				m_drawableObjects[NumberOfDrawableTypes];
-	PerFrameData			m_perFrameData;
-	PerObjectData			m_perObjectData;
-
-	
 };
 
 #endif // RENDERER_H

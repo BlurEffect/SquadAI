@@ -49,7 +49,7 @@ VertexShader* ShaderFactory::CreateVertexShader(ShaderType type, bool doCreateIn
 // Returns a pointer to the new shader. When the creation of the shader failed or the passed
 // in shader type is invalid, a null pointer will be returned.
 //--------------------------------------------------------------------------------------
-PixelShader* ShaderFactory::CreatePixel(ShaderType type, bool doCreateInstancedVersion)
+PixelShader* ShaderFactory::CreatePixelShader(ShaderType type, bool doCreateInstancedVersion)
 {
 	PixelShader* pPixelShader = nullptr;
 

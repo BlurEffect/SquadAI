@@ -80,10 +80,10 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Circle.cpp" />
+    <ClCompile Include="CircleDrawable.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="DrawableFactory.cpp" />
-    <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="GridDrawable.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PixelShader.cpp" />
@@ -93,23 +93,24 @@
     <ClCompile Include="SimpleInstancedVertexShader.cpp" />
     <ClCompile Include="SimplePixelShader.cpp" />
     <ClCompile Include="SimpleVertexShader.cpp" />
-    <ClCompile Include="Square.cpp" />
+    <ClCompile Include="SquareDrawable.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
-    <ClCompile Include="Triangle.cpp" />
+    <ClCompile Include="TriangleDrawable.cpp" />
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Circle.h" />
+    <ClInclude Include="CircleDrawable.h" />
     <ClInclude Include="DrawableFactory.h" />
+    <ClInclude Include="GridSettings.h" />
     <ClInclude Include="ObjectRenderData.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />
     <ClInclude Include="Drawable.h" />
-    <ClInclude Include="Grid.h" />
+    <ClInclude Include="GridDrawable.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="Shader.h" />
@@ -119,11 +120,11 @@
     <ClInclude Include="SimpleInstancedVertexShader.h" />
     <ClInclude Include="SimplePixelShader.h" />
     <ClInclude Include="SimpleVertexShader.h" />
-    <ClInclude Include="Square.h" />
+    <ClInclude Include="SquareDrawable.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TestEnvironment.h" />
     <ClInclude Include="TextRenderer.h" />
-    <ClInclude Include="Triangle.h" />
+    <ClInclude Include="TriangleDrawable.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="VertexData.h" />
     <ClInclude Include="VertexShader.h" />

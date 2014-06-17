@@ -22,13 +22,13 @@ Drawable* DrawableFactory::CreateDrawable(DrawableType type)
 	switch(type)
 	{
 	case TriangleType:
-		pDrawable = new Triangle();
+		pDrawable = new TriangleDrawable();
 		break;
 	case SquareType:
-		pDrawable = new Square();
+		pDrawable = new SquareDrawable();
 		break;
 	case CircleType:
-		pDrawable = new Circle();
+		pDrawable = new CircleDrawable();
 		break;
 	}
 

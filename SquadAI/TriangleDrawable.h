@@ -1,24 +1,24 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  Triangle.h
+*  TriangleDrawable.h
 *  Drawable that encapsulates a triangle-shaped mesh.
 */
 
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#ifndef TRIANGLE_DRAWABLE_H
+#define TRIANGLE_DRAWABLE_H
 
 // Includes
 #include <d3d11.h>
 #include "Drawable.h"
 
-class Triangle : public Drawable
+class TriangleDrawable : public Drawable
 {
 public:
-	Triangle(void);
-	~Triangle(void);
+	TriangleDrawable(void);
+	~TriangleDrawable(void);
 	bool Initialise(ID3D11Device* pDevice);
 private:
 
 };
 
-#endif // TRIANGLE_H
+#endif // TRIANGLE_DRAWABLE_H

@@ -10,9 +10,9 @@
 
 // Includes
 #include "Drawable.h"
-#include "Triangle.h"
-#include "Square.h"
-#include "Circle.h"
+#include "TriangleDrawable.h"
+#include "SquareDrawable.h"
+#include "CircleDrawable.h"
 #include "ObjectRenderData.h"
 
 class DrawableFactory

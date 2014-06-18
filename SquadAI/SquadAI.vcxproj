@@ -85,6 +85,7 @@
     <ClCompile Include="DrawableFactory.cpp" />
     <ClCompile Include="GridDrawable.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="CircleDrawable.h" />
     <ClInclude Include="DrawableFactory.h" />
     <ClInclude Include="GridSettings.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="ObjectRenderData.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />
     <ClInclude Include="Drawable.h" />

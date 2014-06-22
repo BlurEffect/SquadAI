@@ -12,12 +12,15 @@
 #include <windows.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <vector>
 
 #include "Drawable.h"
 #include "DrawableFactory.h"
-#include "ObjectRenderData.h"
+#include "RendererData.h"
 #include "ShaderParameters.h"
 #include "ShaderGroup.h"
+#include "RenderContext.h"
+#include "RendererSettings.h"
 
 using namespace DirectX;
 
@@ -27,30 +30,22 @@ public:
 	Renderer(void);
 	~Renderer(void);
 	bool Initialise(HWND hWnd, int windowWidth, int windowHeight);
-	void Update(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix, const XMFLOAT4X4& orthoProjMatrix, const EditorData& editorData, int numberOfBricks, int numberOfStuds, const PerformanceData& performanceData, const XMFLOAT3& cameraPosition);
+	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
 	void Cleanup(void);
 	
+	// Data access functions
+
+	RenderContext& GetRenderContext(void);
+
 private:
 	bool		InitialiseD3D( HWND hwnd, int windowWidth, int windowHeight  );
 	bool		InitialiseRenderStates();
 	bool		InitialiseDrawables(void);
 	bool		InitialiseShaders();
-
-	void 		UpdateScene( void );
-	void		DrawScene( const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix, const XMFLOAT4X4& orthoProjMatrix, const EditorData& editorData, int numberOfBricks, int numberOfStuds, const PerformanceData& performanceData, const XMFLOAT3& cameraPosition );
-	void		RenderBricks( XMFLOAT4X4 const * viewMatrix, XMFLOAT4X4 const * projMatrix, const XMFLOAT3& cameraPosition, const EditorData& editorData );
-	void		RenderEditorGeometry( XMFLOAT4X4 const * viewMatrix, XMFLOAT4X4 const * projMatrix, const EditorData& editorData );
-
+	void        RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
 	
-	void SetDefaultRenderStates(void);
-	void SetShaderGroup(ShaderType type);
-
-	void		Prepare3DRendering();
-	void		Prepare2DRendering();
-
-	Shader*		CreateShader( Shaders shaderIdentifier );
-	void		SwitchShader( ShaderGroups newShaderGroup );
-	void		SwitchPass( int newPass );
+	void	    SetDefaultRenderStates(void);
+	void	    SetShaderGroup(ShaderType type);
 
 	// Initialise D3D
 	IDXGISwapChain*			m_pSwapChain;
@@ -67,11 +62,15 @@ private:
 	ID3D11BlendState*		 m_pBlendingEnabledBlendingState;
 	ID3D11BlendState*		 m_pBlendingDisabledBlendingState;
 
+	// Shader stuff
 	ShaderGroup*			 m_pCurrentShaderGroup;
 	ShaderGroup				 m_shaderGroups[NumberOfShaderTypes]; // Shader groups available to the renderer
 	Drawable*				 m_drawableObjects[NumberOfDrawableTypes];
 	PerFrameData			 m_perFrameData; 
 	PerObjectData			 m_perObjectData;
+
+	// Other
+	RenderContext            m_renderContext;
 
 	//RenderContext			m_renderContext;
 	//TextRenderer			m_textRenderer;

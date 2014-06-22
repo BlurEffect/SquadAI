@@ -41,12 +41,9 @@ Renderer::~Renderer()
 //--------------------------------------------------------------------------------------
 bool Renderer::Initialise(HWND hWnd, int windowWidth, int windowHeight)
 {
-
 	return SUCCEEDED(InitialiseD3D(hWnd, windowWidth, windowHeight)) &&
 		   SUCCEEDED(InitialiseDrawables()) &&
-		   SUCCEEDED(InitialiseShaders()) &&
-		   SUCCEEDED( m_renderContext.Initialise() ) &&
-		   SUCCEEDED( m_textRenderer.Initialise( m_pD3d11Device, m_pD3d11DeviceContext, hWnd, windowWidth, windowHeight, MAX_SENTENCE_LENGTH, baseViewMatrix ) );
+		   SUCCEEDED(InitialiseShaders());
 }
 
 //--------------------------------------------------------------------------------------
@@ -378,239 +375,61 @@ void Renderer::Cleanup( void )
 	if(m_pBlendingDisabledBlendingState) { m_pBlendingDisabledBlendingState->Release(); m_pBlendingDisabledBlendingState = nullptr; }
 }
 
-
-
 //--------------------------------------------------------------------------------------
-// Update the renderer, draw the scene
+// Render the current scene.
+// Param1: The view matrix of the camera for which to render the frame.
+// Param2: The projection matrix of the camera for which to render the frame.
 //--------------------------------------------------------------------------------------
-void Renderer::RenderScene( const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projMatrix, const XMFLOAT4X4& orthoProjMatrix, const EditorData& editorData, int numberOfBricks, int numberOfStuds, const PerformanceData& performanceData, const XMFLOAT3& cameraPosition )
+void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
 {
-// Clear the backbuffer
-	m_pD3d11DeviceContext -> ClearRenderTargetView( m_pRenderTargetView, BACKGROUND_COLOUR );
-	// Clear the other render targets
-	m_pD3d11DeviceContext -> ClearRenderTargetView( m_pCelShadingRenderTargets[0], BACKGROUND_COLOUR );
-	m_pD3d11DeviceContext -> ClearRenderTargetView( m_pCelShadingRenderTargets[1], BACKGROUND_COLOUR );
+	// Clear the backbuffer
+	m_pD3d11DeviceContext -> ClearRenderTargetView(m_pRenderTargetView, g_cBackgroundColour);
 
 	// Refresh the Depth/Stencil view
 	m_pD3d11DeviceContext -> ClearDepthStencilView( m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
 	// Update the per frame data
-	XMStoreFloat4x4( &m_perFrameData.m_viewProjection, XMLoadFloat4x4(&viewMatrix) * XMLoadFloat4x4(&projMatrix) );
-	XMStoreFloat4x4( &m_perFrameData.m_viewMatrix, XMLoadFloat4x4(&viewMatrix) );
-	XMStoreFloat4x4( &m_perFrameData.m_projectionMatrix, XMLoadFloat4x4(&projMatrix) );
-	m_perFrameData.m_viewPosition = cameraPosition;
-
-	Prepare3DRendering();
-
-	RenderBricks( &viewMatrix, &projMatrix, cameraPosition, editorData);
-
-	// Only render grid/cursor and text if presentation mode is not active
-	if( !editorData.m_isPresentationModeActive)
-	{
-		RenderEditorGeometry( &viewMatrix, &projMatrix, editorData );
+	XMStoreFloat4x4(&m_perFrameData.m_viewProjection, XMLoadFloat4x4(&viewMatrix) * XMLoadFloat4x4(&projectionMatrix));
 	
-		Prepare2DRendering();
-	
-		XMFLOAT4X4 worldMat;
-		XMStoreFloat4x4( &worldMat, XMMatrixIdentity());
-
-		m_textRenderer.Render( m_pD3d11DeviceContext, worldMat, orthoProjMatrix, editorData, numberOfBricks, m_brickRenderCount, numberOfStuds, m_studRenderCount, performanceData );
-	}
+	// Render the test environment
+	RenderTestEnvironment(viewMatrix, projectionMatrix);
 
 	// Present the backbuffer to the screen
 	m_pSwapChain -> Present(0, 0);
-}
 
-
-//--------------------------------------------------------------------------------------
-// Render the lego bricks
-//--------------------------------------------------------------------------------------
-void RendererImplementation::RenderBricks( XMFLOAT4X4 const * viewMatrix, XMFLOAT4X4 const * projMatrix, const XMFLOAT3& cameraPosition, const EditorData& editorData )
-{
-
-	SwitchShader( editorData.m_selectedShaderGroup );
-
-	if( m_shaderGroups[m_selectedBrickShaderGroup].m_numberOfPasses > 1 && m_activeShaderGroup != GroupToon04 && m_activeShaderGroup != GroupToon05 && m_activeShaderGroup != GroupToon06 )
-	{
-		// Change the cull mode, only draw backfaces
-		m_pD3d11DeviceContext -> RSSetState( m_pRasterStateCullFrontfaces );
-	}else
-	{
-		m_pD3d11DeviceContext -> RSSetState( m_pRasterStateCullBackfaces );
-	}
-
-	// set the proper render target
-	if( m_activeShaderGroup == GroupToon06 )
-	{
-		m_pD3d11DeviceContext -> OMSetRenderTargets(2, m_pCelShadingRenderTargets, m_pDepthStencilView);
-	}else
-	{
-		m_pD3d11DeviceContext -> OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
-	}
-
-	m_brickRenderCount = 0;
-	m_studRenderCount = 0;
-
-	for( int i = 0; i < NumberOfBrickTypes; ++i )
-	{
-		if( m_renderContext.GetInstanceCount( LegoBrickType(i) ) != 0 )
-		{
-			m_legoBrickMeshes[i].Render( m_pD3d11DeviceContext, m_renderContext.GetInstances( LegoBrickType(i) ), m_renderContext.GetInstanceCount( LegoBrickType(i) ) );
-			m_brickRenderCount += m_renderContext.GetInstanceCount( LegoBrickType(i) );
-		}
-	}
-
-	// Draw the studs
-	m_studRenderCount = m_renderContext.GetStudInstanceCount();
-	m_legoStudMesh.Render( m_pD3d11DeviceContext, m_renderContext.GetStudInstances(), m_studRenderCount );
-
-	if( m_shaderGroups[m_selectedBrickShaderGroup].m_numberOfPasses > 1 )
-	{
-		if( m_activeShaderGroup == GroupToon06)
-		{
-			m_pD3d11DeviceContext -> OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
-		}
-
-		SwitchPass( 1 );
-
-		if( m_activeShaderGroup != GroupToon04 && m_activeShaderGroup != GroupToon05 )
-		{
-			m_pD3d11DeviceContext -> RSSetState( m_pRasterStateCullBackfaces );
-		}else
-		{
-			m_pD3d11DeviceContext -> RSSetState( m_pRasterStateCullFrontfaces );
-		}
-
-		if( m_activeShaderGroup != GroupToon06 )
-		{
-			for( int i = 0; i < NumberOfBrickTypes; ++i )
-			{
-				if( m_renderContext.GetInstanceCount( LegoBrickType(i) ) != 0 )
-					m_legoBrickMeshes[i].Render( m_pD3d11DeviceContext, m_renderContext.GetInstances( LegoBrickType(i) ), m_renderContext.GetInstanceCount( LegoBrickType(i) ) );
-			}
-			m_legoStudMesh.Render( m_pD3d11DeviceContext, m_renderContext.GetStudInstances(), m_studRenderCount );
-		}else
-		{
-			// disable depth buffering
-			m_pD3d11DeviceContext -> OMSetDepthStencilState( m_depthDisabledStencilState, 1 );
-			
-			m_screenQuad.Render( m_pD3d11DeviceContext );
-			
-			// enable depth buffering
-			m_pD3d11DeviceContext -> OMSetDepthStencilState( m_depthStencilState, 1 );
-
-			// Reset the resources
-			ID3D11ShaderResourceView* nullS(nullptr);
-			m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> UpdateTextureResource( 0, m_pD3d11DeviceContext, nullS, m_pColourMapSamplerState );
-			m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[1].m_pixelShader -> UpdateTextureResource( 1, m_pD3d11DeviceContext, nullS, m_pNormalDepthMapSamplerState );
-		}
-	}
-	
-	// Change the cull mode, only draw frontfaces (back to normal)
-	m_pD3d11DeviceContext -> RSSetState( m_pRasterStateCullBackfaces );
-
-	// todo: only do this if somethin changes
-	// reset instance counts
+	// Reset the render context for the next frame
 	m_renderContext.Reset();
 }
 
-
-
 //--------------------------------------------------------------------------------------
-// Render the editor grid and cursor
+// Renders the test environment.
+// Param1: The view matrix of the camera for which to render the frame.
+// Param2: The projection matrix of the camera for which to render the frame.
 //--------------------------------------------------------------------------------------
-void RendererImplementation::RenderEditorGeometry( XMFLOAT4X4 const * viewMatrix, XMFLOAT4X4 const * projMatrix, const EditorData& editorData )
+void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
 {
+	// Set and activate the shader
+	SetShaderGroup(SimpleUnlit);
+	m_pCurrentShaderGroup->Activate(m_pD3d11DeviceContext, false);
 
-	SwitchShader( GroupEditorGeometry );
-	
-	// Draw the grid
+	// Calculate the view projection matrix
+	XMFLOAT4X4 viewProjection;
+	XMStoreFloat4x4(&viewProjection, XMLoadFloat4x4(&viewMatrix) * XMLoadFloat4x4(&projectionMatrix));
 
-	// Update per object data
-	XMMATRIX matWorldGrid = XMMatrixTranslation( 0.0f, editorData.m_cursorPosition.m_y * GRID_UNIT.y, 0.0f );
-	XMStoreFloat4x4( &m_perObjectData.m_WVP, matWorldGrid * XMLoadFloat4x4(viewMatrix) * XMLoadFloat4x4(projMatrix) );
-	m_perObjectData.m_colour = GRID_COLOUR;
-
-	m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[0].m_vertexShader -> UpdatePerObjectData( m_pD3d11DeviceContext, m_perObjectData );
-
-	m_grid.Render( m_pD3d11DeviceContext );
-
-	// Draw the cursor
-	
-	XMMATRIX matWorldCursor = XMMatrixIdentity();
-	
-	// Calculate the translation matrix of the vector.
-
-	// Get the cursor position in world space, not in grid coordinates
-	XMFLOAT3 actualCursorPosition( editorData.m_cursorPosition.m_x * GRID_UNIT.x, editorData.m_cursorPosition.m_y * GRID_UNIT.y, editorData.m_cursorPosition.m_z * GRID_UNIT.z );
-	XMMATRIX matTranslationCursor = XMMatrixTranslationFromVector( XMLoadFloat3( &actualCursorPosition ) );
-
-	// Calculate the rotation matrix of the vector
-	
-	// the actual rotation of the cursor
-	XMMATRIX matPureRotationCursor = XMMatrixRotationAxis( XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f ), XMConvertToRadians( static_cast<float>( editorData.m_brickRotation ) ) );
-	// calculate translation matrices to and from the rotation centre
-	XMMATRIX matTranslationRotCentre = XMMatrixTranslation(GRID_UNIT.x/2.0f, 0.0f, GRID_UNIT.z/2.0f);	// Rotation centre (from origin).
-	XMVECTOR determinant;
-	XMMATRIX matTranslationRotCentreInv = XMMatrixInverse(&determinant, matTranslationRotCentre);
-	// Combine the matrices to the completed rotation matrix
-	XMMATRIX matRotationCursor = matTranslationRotCentreInv * matPureRotationCursor * matTranslationRotCentre;
-
-	// calculate the scaling matrix for the cursor
-	XMMATRIX matScalingCursor = XMMatrixIdentity();
-	
-	// if deletion mode is active, cursor will be of the size of a single grid unit
-	if(!editorData.m_isDeletionModeActive)
-		matScalingCursor = XMMatrixScaling( static_cast<float>( editorData.m_cursorExtents.m_x ), static_cast<float>( editorData.m_cursorExtents.m_y ), static_cast<float>( editorData.m_cursorExtents.m_z ) );
-
-	matWorldCursor = matScalingCursor * matRotationCursor * matTranslationCursor;
-	
-	// Update per object data
-	XMStoreFloat4x4( &m_perObjectData.m_WVP, matWorldCursor * XMLoadFloat4x4(viewMatrix) * XMLoadFloat4x4(projMatrix) );
-
-	if(editorData.m_isDeletionModeActive)
+	// Render the objects collected by the render context
+	for(int i = 0; i < NumberOfDrawableTypes; ++i)
 	{
-		m_perObjectData.m_colour = CURSOR_DELETE_COLOUR;
-	}else
-	{
-		m_perObjectData.m_colour = CURSOR_COLOUR;
+		for(int k = 0; k < m_renderContext.GetDrawableCount(DrawableType(i)); ++k)
+		{
+			// Update the per object data according to the current instance
+			m_perObjectData.m_colour = m_renderContext.GetInstances(DrawableType(i))[k].m_colour;
+			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMLoadFloat4x4(&m_renderContext.GetInstances(DrawableType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
+			// Update the shader's constant buffer
+			m_pCurrentShaderGroup->SetObjectData(m_pD3d11DeviceContext, m_perObjectData, OnlyBasic);
+			// Draw the object
+			m_drawableObjects[i]->Draw(m_pD3d11DeviceContext);
+		}
 	}
-
-	m_shaderGroups[m_activeShaderGroup].m_pShaderPasses[0].m_vertexShader -> UpdatePerObjectData( m_pD3d11DeviceContext, m_perObjectData );
-
-	m_cursor.Render( m_pD3d11DeviceContext );
-}
-
-
-//--------------------------------------------------------------------------------------
-// Prepare device for rendering of 3d objects
-//--------------------------------------------------------------------------------------
-void RendererImplementation::Prepare3DRendering()
-{
-	// enable depth buffering
-	m_pD3d11DeviceContext -> OMSetDepthStencilState( m_depthStencilState, 1 );
-	
-	// Turn off alpha blending
-	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-	m_pD3d11DeviceContext -> OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
-}
-
-//--------------------------------------------------------------------------------------
-// Prepare device for rendering of 2d objects (text, textures)
-//--------------------------------------------------------------------------------------
-void RendererImplementation::Prepare2DRendering()
-{
-	// disable depth buffering
-	m_pD3d11DeviceContext -> OMSetDepthStencilState( m_depthDisabledStencilState, 1 );
-
-	// Turn on alpha blending
-	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-	m_pD3d11DeviceContext -> OMSetBlendState(m_alphaEnableBlendingState, blendFactor, 0xffffffff);
-}
-
-RenderContext* RendererImplementation::GetRenderContext( void )
-{
-	return &m_renderContext;
 }
 
 //--------------------------------------------------------------------------------------
@@ -636,4 +455,11 @@ void Renderer::SetDefaultRenderStates(void)
 void Renderer::SetShaderGroup(ShaderType type)
 {
 	m_pCurrentShaderGroup = &m_shaderGroups[type];
+}
+
+// Data access functions
+
+RenderContext& Renderer::GetRenderContext(void)
+{
+	return m_renderContext;
 }

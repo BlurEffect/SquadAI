@@ -20,6 +20,7 @@ public:
 	bool Initialise(HINSTANCE hInst, HWND hWnd);
 	void Update(void);
 	void Cleanup(void);
+
 private:
 	Input m_input; // The input object that is queried for key and mouse states
 };

@@ -96,6 +96,9 @@
     <ClCompile Include="InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -155,9 +158,6 @@
     <ClInclude Include="TestEnvironment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectRenderData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DrawableFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -183,6 +183,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

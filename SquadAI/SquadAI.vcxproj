@@ -88,6 +88,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PixelShader.cpp" />
+    <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderFactory.cpp" />
     <ClCompile Include="ShaderGroup.cpp" />
@@ -104,17 +105,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CircleDrawable.h" />
     <ClInclude Include="DrawableFactory.h" />
     <ClInclude Include="GridSettings.h" />
     <ClInclude Include="InputManager.h" />
-    <ClInclude Include="ObjectRenderData.h" />
+    <ClInclude Include="EntityData.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="GridDrawable.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PixelShader.h" />
+    <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="RendererData.h" />
+    <ClInclude Include="RendererSettings.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderFactory.h" />
     <ClInclude Include="ShaderGroup.h" />

@@ -14,6 +14,9 @@
 // Includes
 #include <windows.h>	
 #include <dinput.h>	  
+#include <DirectXMath.h>
+
+using namespace DirectX;
 
 class Input
 {
@@ -24,6 +27,20 @@ public:
 	bool Initialise(HINSTANCE hInst, HWND hWnd);
 	void Update(void);
 	void Cleanup(void);
+
+	const XMFLOAT3& GetMouseMovement(void) const;
+
+	bool LeftMouseButtonDown(void) const;
+	bool RightMouseButtonDown(void) const;
+	bool MiddleMouseButtonDown(void) const;
+
+	bool LeftMouseButtonPressed(void) const;
+	bool RightMouseButtonPressed(void) const;
+	bool MiddleMouseButtonPressed(void) const;
+
+	bool LeftMouseButtonReleased(void) const;
+	bool RightMouseButtonReleased(void) const;
+	bool MiddleMouseButtonReleased(void) const;
 
 private:
 	bool SetupDirectInput(HINSTANCE hInst, HWND hWnd);

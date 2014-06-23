@@ -13,7 +13,8 @@
 #include "TriangleDrawable.h"
 #include "SquareDrawable.h"
 #include "CircleDrawable.h"
-#include "ObjectRenderData.h"
+#include "GridDrawable.h"
+#include "RendererData.h"
 
 class DrawableFactory
 {

@@ -9,11 +9,16 @@
 #define APPLICATION_H
 
 // Includes
+#include <Windows.h>
+#include <DirectXMath.h>
+
 #include "Camera.h"
 #include "InputManager.h"
 #include "Renderer.h"
 #include "TestEnvironment.h"
 #include "ApplicationSettings.h"
+
+using namespace DirectX;
 
 class Application
 {

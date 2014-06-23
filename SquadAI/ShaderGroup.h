@@ -11,7 +11,6 @@
 // Includes
 #include "VertexShader.h"
 #include "PixelShader.h"
-#include "ShaderFactory.h"
 
 //--------------------------------------------------------------------------------------
 // Identifies a specific type of shader mostly considering the effect they have.

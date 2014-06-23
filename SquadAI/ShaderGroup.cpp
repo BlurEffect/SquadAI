@@ -7,6 +7,7 @@
 
 // Includes
 #include "ShaderGroup.h"
+#include "ShaderFactory.h"
 
 ShaderGroup::ShaderGroup(void) : m_pVertexShader(nullptr),
 								 m_pInstancedVertexShader(nullptr),
@@ -107,7 +108,7 @@ void ShaderGroup::Cleanup(void)
 // Returns true if the per-frame parameters of the shader were updated successfully (that is also true
 // in the case that the shader doesn't actually use per-frame parameters), false if the update failed.
 //--------------------------------------------------------------------------------------
-bool ShaderGroup::SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData, ShaderRestriction restriction = Both)
+bool ShaderGroup::SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData, ShaderRestriction restriction)
 {
 	bool result = false;
 
@@ -140,7 +141,7 @@ bool ShaderGroup::SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData
 // Returns true if the per-frame parameters of the shader were updated successfully (that is also true
 // in the case that the shader doesn't actually use per-object parameters), false if the update failed.
 //--------------------------------------------------------------------------------------
-bool ShaderGroup::SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData, ShaderRestriction restriction = Both)
+bool ShaderGroup::SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData, ShaderRestriction restriction)
 {
 	bool result = false;
 
@@ -174,11 +175,11 @@ void ShaderGroup::Activate(ID3D11DeviceContext* pContext, bool doActivateInstanc
 {
 	if(doActivateInstancedVersion)
 	{
-		m_pVertexShader->Activate(pContext);
-		m_pPixelShader->Activate(pContext);
-	}else
-	{
 		m_pInstancedVertexShader->Activate(pContext);
 		m_pInstancedPixelShader->Activate(pContext);
+	}else
+	{
+		m_pVertexShader->Activate(pContext);
+		m_pPixelShader->Activate(pContext);
 	}
 }

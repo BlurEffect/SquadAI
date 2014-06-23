@@ -10,8 +10,8 @@
 #define RENDERER_DATA_H
 
 // Includes
-#include "EntityData.h"
 #include <DirectXMath.h>
+#include "EntityData.h"
 
 using namespace DirectX;
 

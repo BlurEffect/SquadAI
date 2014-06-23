@@ -14,8 +14,8 @@
 
 HINSTANCE	g_hInst		  = NULL;       // the handle to the instance
 HWND        g_hWnd		  = NULL;		// the handle to the window the application is running in
-int			g_width		  = 400;		// the width of the window in pixels
-int			g_height	  = 400;		// the height of the window in pixels
+int			g_width		  = 800;		// the width of the window in pixels
+int			g_height	  = 600;		// the height of the window in pixels
 Application	g_application;				// the squad AI application
 
 // Forward declarations
@@ -39,9 +39,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
 	}
 
-	if(!g_application.Initialise()) //hInstance, g_hWnd, g_width, g_height
+	if(!g_application.Initialise(hInstance, g_hWnd, g_width, g_height))
 	{
-		return 0;
+			return 0;
 	}
 
     // Main message loop
@@ -73,10 +73,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 //--------------------------------------------------------------------------------------
 HRESULT Cleanup(void)
 {
-	if(!g_application.Cleanup())
-	{
-		return E_FAIL;
-	}
+	g_application.Cleanup();
 
 	// Unregister the window class to free up memory
 	UnregisterClass(L"SquadAIWindowClass", g_hInst);
@@ -114,8 +111,8 @@ HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
     g_hInst = hInstance;
 
 	// Determine the resolution of the screen
-	g_width  = GetSystemMetrics(SM_CXSCREEN);
-	g_height = GetSystemMetrics(SM_CYSCREEN);
+	//g_width  = GetSystemMetrics(SM_CXSCREEN);
+	//g_height = GetSystemMetrics(SM_CYSCREEN);
 
 	// Setup screen settings for full screen
 	DEVMODE dmScreenSettings;
@@ -127,10 +124,10 @@ HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
 	dmScreenSettings.dmFields     = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 	// Change the display settings to full screen.
-	ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
+	//ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
 
     g_hWnd = CreateWindow(L"SquadAIWindowClass", L"Squad AI",
-                          WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+                          WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_EX_OVERLAPPEDWINDOW, //last was WS_POPUP
 						  0, 0, g_width, g_height, NULL, NULL, hInstance,
                           NULL);
 

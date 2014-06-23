@@ -18,14 +18,12 @@
 //--------------------------------------------------------------------------------------
 VertexShader* ShaderFactory::CreateVertexShader(ShaderType type, bool doCreateInstancedVersion)
 {
-	VertexShader* pVertexShader = nullptr;
-
 	if(doCreateInstancedVersion)
 	{
 		switch(type)
 		{
 		case SimpleUnlit:
-			pVertexShader = new SimpleInstancedVertexShader();
+			return new SimpleInstancedVertexShader();
 			break;
 		}
 	}else
@@ -33,12 +31,12 @@ VertexShader* ShaderFactory::CreateVertexShader(ShaderType type, bool doCreateIn
 		switch(type)
 		{
 		case SimpleUnlit:
-			pVertexShader = new SimpleVertexShader();
+			return new SimpleVertexShader();
 			break;
 		}
 	}
 
-	return pVertexShader;
+	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------
@@ -51,14 +49,12 @@ VertexShader* ShaderFactory::CreateVertexShader(ShaderType type, bool doCreateIn
 //--------------------------------------------------------------------------------------
 PixelShader* ShaderFactory::CreatePixelShader(ShaderType type, bool doCreateInstancedVersion)
 {
-	PixelShader* pPixelShader = nullptr;
-
 	if(doCreateInstancedVersion)
 	{
 		switch(type)
 		{
 		case SimpleUnlit:
-			pPixelShader = new SimplePixelShader(); // same as non-instanced version
+			return new SimplePixelShader(); // same as non-instanced version
 			break;
 		}
 	}else
@@ -66,10 +62,10 @@ PixelShader* ShaderFactory::CreatePixelShader(ShaderType type, bool doCreateInst
 		switch(type)
 		{
 		case SimpleUnlit:
-			pPixelShader = new SimplePixelShader();
+			return new SimplePixelShader();
 			break;
 		}
 	}
 
-	return pPixelShader;
+	return nullptr;
 }

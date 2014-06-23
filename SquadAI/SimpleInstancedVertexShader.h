@@ -26,7 +26,6 @@ public:
 	bool Initialise(ID3D11Device* pDevice);
 	void Cleanup(void);
 	bool SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData);
-	bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
 
 private:
 

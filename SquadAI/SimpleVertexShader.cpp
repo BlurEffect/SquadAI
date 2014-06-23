@@ -12,7 +12,7 @@
 // The vertex input layout expected by this vertex shader
 const D3D11_INPUT_ELEMENT_DESC SimpleVertexShader::m_sInputLayoutDescription[] = 
 { 
-	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT   , 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 } 
+	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 } 
 };
 
 SimpleVertexShader::SimpleVertexShader(void)
@@ -48,7 +48,7 @@ bool SimpleVertexShader::Initialise(ID3D11Device* pDevice)
 	}
 
 	// Initialise the constant buffer
-	return m_pCbPerObjectBuffer.Initialise(ConstantBuffer, D3D11_USAGE_DYNAMIC, nullptr, 1);
+	return m_pCbPerObjectBuffer.Initialise(ConstantBuffer, pDevice, D3D11_USAGE_DYNAMIC, nullptr, 1);
 }
 
 //--------------------------------------------------------------------------------------

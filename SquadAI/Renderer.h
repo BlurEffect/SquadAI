@@ -72,13 +72,6 @@ private:
 	// Other
 	RenderContext            m_renderContext;
 
-	//RenderContext			m_renderContext;
-	//TextRenderer			m_textRenderer;
-	//ShaderGroups			m_selectedBrickShaderGroup;
-	//ShaderGroups			m_activeShaderGroup;
-
-	//Shader*					m_shaders[NumberOfShaders];
-	//ShaderGroup				m_shaderGroups[NumberOfShaderGroups];
 };
 
 #endif // RENDERER_H

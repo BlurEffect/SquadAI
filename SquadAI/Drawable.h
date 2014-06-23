@@ -12,7 +12,6 @@
 #include "VertexData.h"
 #include "Buffer.h"
 
-
 class Drawable
 {
 public:

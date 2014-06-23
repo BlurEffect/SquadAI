@@ -53,8 +53,8 @@ bool TriangleDrawable::Initialise(ID3D11Device* pDevice)
 
 	// Create and initialise the vertex and index buffers
 
-	m_vertexBuffer.Initialise(VertexBuffer, D3D11_USAGE_IMMUTABLE, pVertices, m_vertexCount);
-	m_indexBuffer.Initialise(IndexBuffer, D3D11_USAGE_IMMUTABLE, pIndices, m_indexCount);
+	m_vertexBuffer.Initialise(VertexBuffer, pDevice, D3D11_USAGE_IMMUTABLE, pVertices, m_vertexCount);
+	m_indexBuffer.Initialise(IndexBuffer, pDevice, D3D11_USAGE_IMMUTABLE, pIndices, m_indexCount);
 
 	// Release the temporary arrays
 	delete [] pVertices;
@@ -62,4 +62,6 @@ bool TriangleDrawable::Initialise(ID3D11Device* pDevice)
 
 	delete [] pIndices;
 	pIndices = nullptr;
+
+	return true;
 }

@@ -5,8 +5,6 @@
 *  responsible for drawing the scene.
 */
 
-// Used for debugging, uncommenting this line will for instance lead to the creation of the D3D device
-// in debug mode. Make sure this line is commented out for release version.
 #define DEBUG
 
 // Includes
@@ -41,9 +39,29 @@ Renderer::~Renderer()
 //--------------------------------------------------------------------------------------
 bool Renderer::Initialise(HWND hWnd, int windowWidth, int windowHeight)
 {
-	return SUCCEEDED(InitialiseD3D(hWnd, windowWidth, windowHeight)) &&
-		   SUCCEEDED(InitialiseDrawables()) &&
-		   SUCCEEDED(InitialiseShaders());
+	/*
+	return InitialiseD3D(hWnd, windowWidth, windowHeight) &&
+		   InitialiseDrawables() &&
+		   InitialiseShaders();
+		   */
+
+	if(!InitialiseD3D(hWnd, windowWidth, windowHeight))
+	{
+		return false;
+	}
+
+	if(! InitialiseDrawables())
+	{
+		return false;
+	}
+
+	if(!InitialiseShaders())
+	{
+		return false;
+	}
+
+	return true;
+
 }
 
 //--------------------------------------------------------------------------------------
@@ -78,18 +96,18 @@ bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
 	swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount			= 1;
 	swapChainDesc.OutputWindow			= hWnd; 
-	swapChainDesc.Windowed				= FALSE; // use full screen
+	swapChainDesc.Windowed				= TRUE; // was FALSE use full screen
 	swapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;
 
 	// Create the swap chain and the device
-#ifndef DEBUG
-	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL, D3D11_SDK_VERSION, &swapChainDesc, &m_pSwapChain, &m_pD3d11Device, NULL, &m_pD3d11DeviceContext)))
+#ifdef DEBUG
+	// Create the device in debug mode
+	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, NULL, NULL, D3D11_SDK_VERSION, &swapChainDesc, &m_pSwapChain, &m_pD3d11Device, NULL, &m_pD3d11DeviceContext)))
 	{
 		return false;
 	}
 #else
-	// Create the device in debug mode
-	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, NULL, NULL, D3D11_SDK_VERSION, &swapChainDesc, &m_pSwapChain, &m_pD3d11Device, NULL, &m_pD3d11DeviceContext)))
+	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL, D3D11_SDK_VERSION, &swapChainDesc, &m_pSwapChain, &m_pD3d11Device, NULL, &m_pD3d11DeviceContext)))
 	{
 		return false;
 	}
@@ -159,7 +177,7 @@ bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
 	// Set the Viewport (Bind viewport to rasterizer stage)
 	m_pD3d11DeviceContext->RSSetViewports(1, &viewport);
 
-	return S_OK;
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -288,6 +306,8 @@ bool Renderer::InitialiseRenderStates()
 	}
 
 	SetDefaultRenderStates();
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -314,6 +334,8 @@ bool Renderer::InitialiseDrawables(void)
 			return false;
 		}
 	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -383,10 +405,10 @@ void Renderer::Cleanup( void )
 void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
 {
 	// Clear the backbuffer
-	m_pD3d11DeviceContext -> ClearRenderTargetView(m_pRenderTargetView, g_cBackgroundColour);
+	m_pD3d11DeviceContext->ClearRenderTargetView(m_pRenderTargetView, g_cBackgroundColour);
 
 	// Refresh the Depth/Stencil view
-	m_pD3d11DeviceContext -> ClearDepthStencilView( m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0 );
+	m_pD3d11DeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Update the per frame data
 	XMStoreFloat4x4(&m_perFrameData.m_viewProjection, XMLoadFloat4x4(&viewMatrix) * XMLoadFloat4x4(&projectionMatrix));
@@ -395,7 +417,7 @@ void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& proje
 	RenderTestEnvironment(viewMatrix, projectionMatrix);
 
 	// Present the backbuffer to the screen
-	m_pSwapChain -> Present(0, 0);
+	m_pSwapChain->Present(0, 0);
 
 	// Reset the render context for the next frame
 	m_renderContext.Reset();
@@ -411,6 +433,9 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 	// Set and activate the shader
 	SetShaderGroup(SimpleUnlit);
 	m_pCurrentShaderGroup->Activate(m_pD3d11DeviceContext, false);
+
+	// Set the proper render states
+	SetDefaultRenderStates();
 
 	// Calculate the view projection matrix
 	XMFLOAT4X4 viewProjection;

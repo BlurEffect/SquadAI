@@ -54,7 +54,7 @@ bool SimpleInstancedVertexShader::Initialise(ID3D11Device* pDevice)
 	}
 
 	// Initialise the constant buffer
-	return m_pCbPerFrameBuffer.Initialise(ConstantBuffer, D3D11_USAGE_DYNAMIC, nullptr, 1);
+	return m_pCbPerFrameBuffer.Initialise(ConstantBuffer, pDevice, D3D11_USAGE_DYNAMIC, nullptr, 1);
 }
 
 //--------------------------------------------------------------------------------------

@@ -23,11 +23,11 @@ public:
 	void Update(const XMFLOAT3& moveVector);
 	void Cleanup(void);
 
-	inline const XMFLOAT4X4* GetViewMatrix(void) const;
-	inline const XMFLOAT4X4* GetProjectionMatrix(void) const;
-	inline const XMFLOAT3*   GetCameraPosition(void) const;
+	const XMFLOAT4X4& GetViewMatrix(void) const;
+	const XMFLOAT4X4& GetProjectionMatrix(void) const;
+	const XMFLOAT3&   GetCameraPosition(void) const;
 
-	inline void SetMovementSpeed(const XMFLOAT3& newMovementSpeed);
+	void SetMovementSpeed(const XMFLOAT3& newMovementSpeed);
 private:
 	void Move(const XMFLOAT3& moveVector);
 

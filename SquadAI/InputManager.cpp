@@ -12,6 +12,11 @@ InputManager::InputManager(void)
 {
 }
 
+InputManager::~InputManager(void)						
+{
+	Cleanup();
+}
+
 //--------------------------------------------------------------------------------------
 // Initialise the input component.
 // Param1: A handle to the instance.
@@ -37,4 +42,12 @@ void InputManager::Update()
 void InputManager::Cleanup(void)
 {
 	m_input.Cleanup();
+}
+
+// Data access functions
+
+const XMFLOAT3& InputManager::GetCameraMovement(void) const
+{
+	// todo: left right movement only if middle mouse button down!
+	return m_input.GetMouseMovement();
 }

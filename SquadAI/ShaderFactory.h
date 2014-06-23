@@ -11,7 +11,7 @@
 // Includes
 #include "VertexShader.h"
 #include "PixelShader.h"
-#include "ShaderData.h"
+#include "ShaderGroup.h"
 #include "SimpleVertexShader.h"
 #include "SimpleInstancedVertexShader.h"
 #include "SimplePixelShader.h"

@@ -9,8 +9,8 @@
 #define TEST_ENVIRONMENT_H
 
 // Includes
-#include "RenderContext.h"
 #include <DirectXMath.h>
+#include "RenderContext.h"
 
 using namespace DirectX;
 

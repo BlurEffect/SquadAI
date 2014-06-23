@@ -56,6 +56,8 @@ private:
 	DIMOUSESTATE2 m_mouseState;				// The current mouse state
 	char		  m_oldKeyboardState[256];  // The keyboard state of the previous update
 	char		  m_keyboardState[256];		// The current keyboard state
+
+	XMFLOAT3	  m_mouseMovement; // Describes the mouse movement along x and y axis as well as mouse wheel movement
 };
 
 #endif // INPUT_H

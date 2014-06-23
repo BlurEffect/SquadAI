@@ -9,7 +9,10 @@
 #define INPUT_MANAGER_H
 
 // Includes
+#include <DirectXMath.h>
 #include "Input.h"
+
+using namespace DirectX;
 
 class InputManager
 {
@@ -21,8 +24,11 @@ public:
 	void Update(void);
 	void Cleanup(void);
 
+	const XMFLOAT3& GetCameraMovement(void) const;
+
 private:
-	Input m_input; // The input object that is queried for key and mouse states
+	Input    m_input;          // The input object that is queried for key and mouse states
+
 };
 
 #endif // INPUT_MANAGER_H

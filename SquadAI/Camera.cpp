@@ -51,10 +51,10 @@ bool Camera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XM
 
 	if(isOrthographic)
 	{
-		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fov, static_cast<float>(windowWidth)/windowHeight, clipNear, clipFar ) );
+		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(static_cast<float>(windowWidth), static_cast<float>(windowHeight), clipNear, clipFar));
 	}else
 	{
-		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(static_cast<float>(windowWidth), static_cast<float>(windowHeight), clipNear, clipFar));
+		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fov, static_cast<float>(windowWidth)/windowHeight, clipNear, clipFar ) );
 	}
 
 	return true;
@@ -67,7 +67,9 @@ bool Camera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XM
 void Camera::Update(const XMFLOAT3& moveVector)
 {
 	if(moveVector.x == 0 && moveVector.y == 0 && moveVector.z == 0)
+	{
 		return;
+	}
 
 	// Update the camera position
 	Move(moveVector);
@@ -102,6 +104,7 @@ void Camera::Update(const XMFLOAT3& moveVector)
 //--------------------------------------------------------------------------------------
 void Camera::Move(const XMFLOAT3& moveVector)
 {
+	return; // todo: remove when camera movement working correctly
 	XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) 
 									    + XMLoadFloat3(&m_right) * moveVector.x * m_movementSpeed.x		// add horizontal movement
 										+ XMLoadFloat3(&m_up) * moveVector.y * m_movementSpeed.y		// add vertical movement
@@ -116,22 +119,21 @@ void Camera::Cleanup(void)
 	// A placeholder at the moment.
 }
 
-
 // data access functions
 
-const XMFLOAT4X4* Camera::GetViewMatrix(void) const
+const XMFLOAT4X4& Camera::GetViewMatrix(void) const
 {
-	return &m_viewMatrix;
+	return m_viewMatrix;
 }
 
-const XMFLOAT4X4* Camera::GetProjectionMatrix(void) const
+const XMFLOAT4X4& Camera::GetProjectionMatrix(void) const
 {
-	return &m_projectionMatrix;
+	return m_projectionMatrix;
 }
 
-const XMFLOAT3* Camera::GetCameraPosition(void) const
+const XMFLOAT3& Camera::GetCameraPosition(void) const
 {
-	return &m_position;
+	return m_position;
 }
 
 void Camera::SetMovementSpeed(const XMFLOAT3& newMovementSpeed)

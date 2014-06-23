@@ -25,11 +25,13 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 	EntityType type(SoldierTeamA);
 	XMFLOAT3 position(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 rotation(0.0f, 0.0f, 0.0f);
-	XMFLOAT3 scale(1.0f, 1.0f, 1.0f);
+	XMFLOAT3 scale(10.0f, 10.0f, 10.0f);
 
 	XMFLOAT4X4 matTransform;
 	XMStoreFloat4x4(&matTransform, XMMatrixIdentity());
-
+	matTransform._11 = 100.0f;
+	matTransform._22 = 100.0f;
+	matTransform._33 = 100.0f;
 	pRenderContext.AddInstance(type, matTransform);
 }
 

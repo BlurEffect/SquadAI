@@ -48,9 +48,6 @@
     <ClCompile Include="Drawable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SimpleInstancedVertexShader.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>

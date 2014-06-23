@@ -17,6 +17,11 @@ Input::Input(void) : m_pDI(nullptr),
 	ZeroMemory(&m_keyboardState, sizeof(m_keyboardState));
 }
 
+Input::~Input(void)
+{
+	Cleanup();
+}
+
 //--------------------------------------------------------------------------------------
 // Initialise the input component.
 // Param1: A handle to the instance.
@@ -51,7 +56,7 @@ void Input::Cleanup(void)
 // Param2: A handle to the window.
 // Returns true if direct input was set up successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool WINAPI Input::SetupDirectInput(HINSTANCE hInst, HWND hWnd)
+bool Input::SetupDirectInput(HINSTANCE hInst, HWND hWnd)
 { 
     // Create the DirectInput object. 
 	if(FAILED(DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(&m_pDI), NULL)))
@@ -164,6 +169,11 @@ void Input::UpdateMouseInput()
 			m_pDIMouseDevice->GetDeviceState(sizeof(m_mouseState), &m_mouseState);
 		}
 	}
+
+	// Update the mouse movement vector
+	m_mouseMovement.x = static_cast<float>(m_mouseState.lX);
+	m_mouseMovement.y = static_cast<float>(m_mouseState.lY);
+	m_mouseMovement.z = static_cast<float>(m_mouseState.lZ);
 }
 
 //--------------------------------------------------------------------------------------
@@ -223,3 +233,87 @@ void Input::CleanupDirectInput()
         m_pDI = nullptr;
     } 
 } 
+
+// Access mouse input
+
+//--------------------------------------------------------------------------------------
+// Returns the current mouse movement consisting of the movement of the mouse detected 
+// along x and y axis as well as the movement of the mouse wheel as the z-component of the
+// returned vector.
+//--------------------------------------------------------------------------------------
+const XMFLOAT3& Input::GetMouseMovement(void) const
+{
+	return m_mouseMovement;
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the left mouse button was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::LeftMouseButtonDown(void) const
+{
+	return (m_mouseState.rgbButtons[0] & 0x80) && (!(m_oldMouseState.rgbButtons[0] & 0x80)); 
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the right mouse button was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::RightMouseButtonDown(void) const
+{
+	return (m_mouseState.rgbButtons[1] & 0x80) && (!(m_oldMouseState.rgbButtons[1] & 0x80));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the middle mouse button was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::MiddleMouseButtonDown(void) const
+{
+	return (m_mouseState.rgbButtons[2] & 0x80) && (!(m_oldMouseState.rgbButtons[2] & 0x80));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the left mouse button is pushed down.
+//--------------------------------------------------------------------------------------
+bool Input::LeftMouseButtonPressed(void) const
+{
+	return (m_mouseState.rgbButtons[0] & 0x80);
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the right mouse button is pushed down.
+//--------------------------------------------------------------------------------------
+bool Input::RightMouseButtonPressed(void) const
+{
+	return (m_mouseState.rgbButtons[1] & 0x80);
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the middle mouse button is pushed down.
+//--------------------------------------------------------------------------------------
+bool Input::MiddleMouseButtonPressed(void) const
+{
+	return (m_mouseState.rgbButtons[2] & 0x80);
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the left mouse button was released in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::LeftMouseButtonReleased(void) const
+{
+	return (!(m_mouseState.rgbButtons[0] & 0x80)) && (m_oldMouseState.rgbButtons[0] & 0x80);
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the right mouse button was released in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::RightMouseButtonReleased(void) const
+{
+	return (!(m_mouseState.rgbButtons[1] & 0x80)) && (m_oldMouseState.rgbButtons[1] & 0x80);
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the middle mouse button was released in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::MiddleMouseButtonReleased(void) const
+{
+	return (!(m_mouseState.rgbButtons[2] & 0x80)) && (m_oldMouseState.rgbButtons[2] & 0x80);
+}

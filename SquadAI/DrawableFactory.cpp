@@ -17,21 +17,22 @@
 //--------------------------------------------------------------------------------------
 Drawable* DrawableFactory::CreateDrawable(DrawableType type)
 {
-	Drawable* pDrawable = nullptr;
-
 	switch(type)
 	{
 	case TriangleType:
-		pDrawable = new TriangleDrawable();
+		return new TriangleDrawable();
 		break;
 	case SquareType:
-		pDrawable = new SquareDrawable();
+		return new SquareDrawable();
 		break;
 	case CircleType:
-		pDrawable = new CircleDrawable();
+		return new CircleDrawable();
+		break;
+	case GridType:
+		return new GridDrawable();
 		break;
 	}
 
-	return pDrawable;
+	return nullptr;
 }
 

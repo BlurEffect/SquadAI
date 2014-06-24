@@ -32,7 +32,7 @@ enum DrawableType
 const DrawableType g_cDrawableMappings[NumberOfEntities] = 
 {
 	GridType,     // Grid
-	TriangleType, // SoldierTeamA
+	CircleType, // SoldierTeamA
 	TriangleType, // DeadSoldierTeamA
 	TriangleType, // SoldierTeamB
 	TriangleType, // DeadSoldierTeamB
@@ -44,7 +44,7 @@ const DrawableType g_cDrawableMappings[NumberOfEntities] =
 const XMFLOAT4 g_cColourMappings[NumberOfEntities] = 
 {
 	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), // Grid
-	XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), // SoldierTeamA
+	XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), // SoldierTeamA
 	XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f), // DeadSoldierTeamA
 	XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), // SoldierTeamB
 	XMFLOAT4(0.0f, 0.2f, 0.0f, 1.0f), // DeadSoldierTeamB

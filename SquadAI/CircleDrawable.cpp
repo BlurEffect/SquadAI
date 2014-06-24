@@ -47,7 +47,7 @@ bool CircleDrawable::Initialise(ID3D11Device* pDevice)
 
 	// Define vertices and indices for the Drawable
 
-	float step = XMConvertToRadians(180.0f / static_cast<float>(slices) / 2.0f);
+	float step = XMConvertToRadians(180.0f / (static_cast<float>(slices) / 2.0f));
 
 	pVertices[0].m_position = XMFLOAT3(-0.5f, 0.0f, 0.0f);
 
@@ -55,7 +55,7 @@ bool CircleDrawable::Initialise(ID3D11Device* pDevice)
 	float x = 0.0f;
 	float y = 0.0f;
 
-	float angle = -XM_PIDIV2; // -PI/2
+	float angle = -XM_PIDIV2; 
 	for(unsigned int i = 0; i < slices/2; ++i)
 	{
 		x = 0.5f * sin(angle);

@@ -10,6 +10,7 @@
 
 // Includes
 #include <DirectXMath.h>
+#include "CameraSettings.h"
 
 using namespace DirectX;
 
@@ -40,6 +41,14 @@ private:
 	XMFLOAT3	m_right;			// The vector from the camera pointing to the right
 	XMFLOAT3	m_lookAt;			// The vector from the camera in direction to its current target (z-axis)
 	XMFLOAT3	m_up;				// The vector facing up from the camera (y-axis)
+
+	float	    m_windowWidth;       // The width of the application window in pixels
+	float       m_windowHeight;      // The height of the application window in pixels
+	float       m_nearClippingPlane; // The near clipping plane of the camera
+	float       m_farClippingPlane;  // The far clipping plane of the camera
+
+	bool        m_isOrthographic;   // Tells whether the camera uses orthographic or perspective projection
+	float       m_orthoZoomFactor;  // The current zoom factor when using orthographic projection;
 };
 
 #endif // CAMERA_H

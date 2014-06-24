@@ -108,9 +108,11 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraSettings.h" />
     <ClInclude Include="CircleDrawable.h" />
     <ClInclude Include="DrawableFactory.h" />
     <ClInclude Include="GridSettings.h" />
+    <ClInclude Include="Helpers.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="EntityData.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />

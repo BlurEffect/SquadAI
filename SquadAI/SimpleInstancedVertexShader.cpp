@@ -77,7 +77,7 @@ bool SimpleInstancedVertexShader::SetFrameData(ID3D11DeviceContext* pContext, co
 {
 	m_cbPerFrame.m_viewProjection = perFrameData.m_viewProjection;
 
-	if(!m_pCbPerFrameBuffer.Update(pContext, &m_cbPerFrame, 1, 0))
+	if(!m_pCbPerFrameBuffer.Update(pContext, &m_cbPerFrame, 1))
 	{
 		return false;
 	}

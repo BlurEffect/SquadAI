@@ -197,6 +197,12 @@
     <ClInclude Include="RendererSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CameraSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PS_Simple.FX">

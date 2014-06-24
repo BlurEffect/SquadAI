@@ -28,7 +28,7 @@ public:
 
 private:
 	Input    m_input;          // The input object that is queried for key and mouse states
-
+	XMFLOAT3 m_cameraMovement; // The camera movement for the current frame
 };
 
 #endif // INPUT_MANAGER_H

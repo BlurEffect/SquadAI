@@ -10,9 +10,15 @@
 
 Camera::Camera() : m_position(0.0f, 0.0f, 0.0f), 
 				   m_movementSpeed(0.1f, 0.1f, 0.1f),
-				   m_right( 1.0f, 0.0f, 0.0f ), 
-				   m_lookAt( 0.0f, 0.0f, 0.0f ), 
-				   m_up( 0.0f, 1.0f, 0.0f )
+				   m_right(1.0f, 0.0f, 0.0f), 
+				   m_lookAt(0.0f, 0.0f, 1.0f), 
+				   m_up(0.0f, 1.0f, 0.0f),
+				   m_windowWidth(400),
+		           m_windowHeight(400),
+			       m_nearClippingPlane(1.0f),
+				   m_farClippingPlane(1000.0f),
+				   m_isOrthographic(false),
+				   m_orthoZoomFactor(1.0f)
 {
 	XMStoreFloat4x4( &m_viewMatrix, XMMatrixIdentity() );
 	XMStoreFloat4x4( &m_projectionMatrix, XMMatrixIdentity() );
@@ -39,19 +45,24 @@ Camera::~Camera()
 //--------------------------------------------------------------------------------------
 bool Camera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, float fov, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed, bool isOrthographic)
 {
-	m_position = position;
-	m_lookAt   = lookAt;
-	m_up	   = up;		
-		
+	m_position          = position;
+	m_lookAt            = lookAt;
+	m_up	            = up;		
+	m_windowWidth       = static_cast<float>(windowWidth);
+	m_windowHeight      = static_cast<float>(windowHeight);
+	m_nearClippingPlane = clipNear;
+	m_farClippingPlane  = clipFar;
+	m_isOrthographic    = isOrthographic;
+
 	// Calculate the right vector
 	XMStoreFloat3(&m_right, XMVector3Cross(XMLoadFloat3(&m_up), XMLoadFloat3(&m_lookAt)));
 	
 	// Calculate the view matrix
 	XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(XMLoadFloat3(&m_position), XMLoadFloat3(&m_lookAt), XMLoadFloat3(&m_up)));
 
-	if(isOrthographic)
+	if(m_isOrthographic)
 	{
-		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(static_cast<float>(windowWidth), static_cast<float>(windowHeight), clipNear, clipFar));
+		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_orthoZoomFactor, m_windowHeight * m_orthoZoomFactor, m_nearClippingPlane, m_farClippingPlane));
 	}else
 	{
 		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fov, static_cast<float>(windowWidth)/windowHeight, clipNear, clipFar ) );
@@ -91,9 +102,9 @@ void Camera::Update(const XMFLOAT3& moveVector)
 	m_viewMatrix._33 = m_lookAt.z;
 	m_viewMatrix._34 = 0.0f;
 
-	XMStoreFloat( &m_viewMatrix._41, - XMVector3Dot( XMLoadFloat3( &m_position ), XMLoadFloat3( &m_right ) ) );
-	XMStoreFloat( &m_viewMatrix._42, - XMVector3Dot( XMLoadFloat3( &m_position ), XMLoadFloat3( &m_up ) ) );
-	XMStoreFloat( &m_viewMatrix._43, - XMVector3Dot( XMLoadFloat3( &m_position ), XMLoadFloat3( &m_lookAt ) ) );
+	XMStoreFloat(&m_viewMatrix._41, - XMVector3Dot(XMLoadFloat3(&m_position), XMLoadFloat3(&m_right)));
+	XMStoreFloat(&m_viewMatrix._42, - XMVector3Dot(XMLoadFloat3(&m_position), XMLoadFloat3(&m_up)));
+	XMStoreFloat(&m_viewMatrix._43, - XMVector3Dot(XMLoadFloat3(&m_position), XMLoadFloat3(&m_lookAt)));
 	m_viewMatrix._44 = 1.0f;
 }
 
@@ -104,11 +115,31 @@ void Camera::Update(const XMFLOAT3& moveVector)
 //--------------------------------------------------------------------------------------
 void Camera::Move(const XMFLOAT3& moveVector)
 {
-	return; // todo: remove when camera movement working correctly
-	XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) 
-									    + XMLoadFloat3(&m_right) * moveVector.x * m_movementSpeed.x		// add horizontal movement
-										+ XMLoadFloat3(&m_up) * moveVector.y * m_movementSpeed.y		// add vertical movement
-										+ XMLoadFloat3(&m_lookAt) * moveVector.z * m_movementSpeed.z);	// add movement along z-axis
+	if(m_isOrthographic)
+	{
+		XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) 
+											- XMLoadFloat3(&m_right) * moveVector.x * m_movementSpeed.x		// add horizontal movement
+											+ XMLoadFloat3(&m_up) * moveVector.y * m_movementSpeed.y		// add vertical movement
+											);
+
+		m_orthoZoomFactor -= moveVector.z * m_movementSpeed.z * g_cOrthoZoomWeight;
+		if(m_orthoZoomFactor < g_cOrthoMinimalZoomFactor)
+		{
+			m_orthoZoomFactor = g_cOrthoMinimalZoomFactor;
+		}else if(m_orthoZoomFactor > g_cOrthoMaximalZoomFactor)
+		{
+			m_orthoZoomFactor = g_cOrthoMaximalZoomFactor;
+		}
+
+
+		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_orthoZoomFactor, m_windowHeight * m_orthoZoomFactor, m_nearClippingPlane, m_farClippingPlane));
+	}else
+	{
+		XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) 
+											- XMLoadFloat3(&m_right) * moveVector.x * m_movementSpeed.x		// add horizontal movement
+											+ XMLoadFloat3(&m_up) * moveVector.y * m_movementSpeed.y		// add vertical movement
+											+ XMLoadFloat3(&m_lookAt) * moveVector.z * m_movementSpeed.z);	// add movement along z-axis
+	}
 }
 
 //--------------------------------------------------------------------------------------

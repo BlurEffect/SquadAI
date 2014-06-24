@@ -72,7 +72,7 @@ bool SimpleVertexShader::SetObjectData(ID3D11DeviceContext* pContext, const PerO
 	m_cbPerObject.m_worldViewProjection = perObjectData.m_worldViewProjection;
 	m_cbPerObject.m_colour				= perObjectData.m_colour;
 
-	if(!m_pCbPerObjectBuffer.Update(pContext, &m_cbPerObject, 1, 0))
+	if(!m_pCbPerObjectBuffer.Update(pContext, &m_cbPerObject, 1))
 	{
 		return false;
 	}

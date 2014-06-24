@@ -20,7 +20,7 @@ public:
 	virtual bool Initialise(ID3D11Device* pDevice) = 0;
 	virtual bool InitialiseInstancing(ID3D11Device* pDevice, D3D11_USAGE usage, Instance* pInstances, UINT maxNumberOfInstances);
 	virtual void Draw(ID3D11DeviceContext* pDeviceContext);
-	virtual bool DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pInstances, UINT instanceCount, UINT offset);
+	virtual bool DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pInstances, UINT instanceCount);
 	virtual void Cleanup(void);
 protected:
 	Buffer<Vertex>		     m_vertexBuffer;			// Holds the vertices for this drawable object

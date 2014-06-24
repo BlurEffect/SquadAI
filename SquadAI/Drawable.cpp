@@ -86,9 +86,9 @@ void Drawable::Draw(ID3D11DeviceContext* pDeviceContext)
 // Returns true if the drawcall was successful, false if instancing was not set up for this Drawable of if the number of
 // instances set to be drawn is greater than the actual instance buffer
 //--------------------------------------------------------------------------------------
-bool Drawable::DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pInstances, UINT instanceCount, UINT offset)
+bool Drawable::DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pInstances, UINT instanceCount)
 {
-	if((offset + instanceCount > m_maxNumberOfInstances) || !m_instancingSetUp)
+	if((instanceCount > m_maxNumberOfInstances) || !m_instancingSetUp)
 	{
 		// Invalid number of instances or instancing was not set up properly
 		return false;
@@ -97,7 +97,7 @@ bool Drawable::DrawInstanced(ID3D11DeviceContext* pDeviceContext, Instance* pIns
 	// If new instance data was sent, update the instance buffer, otherwise use the old instance data
 	if(pInstances)
 	{
-		m_instanceBuffer.Update(pDeviceContext, pInstances, instanceCount, offset);
+		m_instanceBuffer.Update(pDeviceContext, pInstances, instanceCount);
 	}
 
 	UINT strides[2];

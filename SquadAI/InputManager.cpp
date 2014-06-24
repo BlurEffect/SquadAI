@@ -8,7 +8,7 @@
 // Includes
 #include "InputManager.h"
 
-InputManager::InputManager(void)						
+InputManager::InputManager(void) : m_cameraMovement(0.0f, 0.0f, 0.0f)					
 {
 }
 
@@ -34,6 +34,14 @@ bool InputManager::Initialise(HINSTANCE hInst, HWND hWnd)
 void InputManager::Update()
 {
 	m_input.Update();
+	
+	if(m_input.MiddleMouseButtonPressed())
+	{
+		m_cameraMovement = m_input.GetMouseMovement();
+	}else
+	{
+		m_cameraMovement = XMFLOAT3(0.0f, 0.0f, m_input.GetMouseMovement().z);
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -48,6 +56,5 @@ void InputManager::Cleanup(void)
 
 const XMFLOAT3& InputManager::GetCameraMovement(void) const
 {
-	// todo: left right movement only if middle mouse button down!
-	return m_input.GetMouseMovement();
+	return m_cameraMovement;
 }

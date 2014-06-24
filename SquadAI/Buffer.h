@@ -31,7 +31,7 @@ public:
 	Buffer(void);	 
 	~Buffer(void);
 	bool Initialise(BufferType bufferType, ID3D11Device* pDevice, D3D11_USAGE bufferUsage, BufferElementType* pElements, UINT maxNumberOfElements);
-	bool Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements, UINT offset);
+	bool Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements);
 	void Cleanup(void);
 	
 	// Data access
@@ -148,7 +148,7 @@ bool Buffer<BufferElementType>::Initialise(BufferType bufferType, ID3D11Device* 
 // Returns true if the buffer was updated successfully, false otherwise.
 //--------------------------------------------------------------------------------------
 template <class BufferElementType>
-bool Buffer<BufferElementType>::Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements, UINT offset)
+bool Buffer<BufferElementType>::Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements)
 {
 	// Attempt to write more data to the buffer than it can hold
 	if(numberOfElements > m_maxNumberOfElements)
@@ -163,7 +163,7 @@ bool Buffer<BufferElementType>::Update(ID3D11DeviceContext* pDeviceContext, Buff
 		return false;
 	}
 
-	memcpy(resource.pData, &m_pBuffer[offset], sizeof(BufferElementType) * numberOfElements );
+	memcpy(resource.pData, pElements, sizeof(BufferElementType) * numberOfElements );
 	pDeviceContext->Unmap(m_pBuffer, 0);
 
 	return true;

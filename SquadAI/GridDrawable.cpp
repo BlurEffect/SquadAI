@@ -9,7 +9,7 @@
 
 GridDrawable::GridDrawable(void) : Drawable()
 {
-	m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+	m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 }
 
 GridDrawable::~GridDrawable(void)
@@ -81,14 +81,14 @@ bool GridDrawable::Initialise(ID3D11Device* pDevice)
 	// Place the vertices forming lines parallel to the y-axis
 	while(vertexPos <= gridMax.x)
 	{
-		pVertices[index].m_position.x = gridMin.y;
-		pVertices[index].m_position.y = vertexPos;
+		pVertices[index].m_position.x = vertexPos;
+		pVertices[index].m_position.y = gridMin.y;
 		pVertices[index].m_position.z = 0.0f;
 		pIndices[index] = index;
 		++index;
 
-		pVertices[index].m_position.x = gridMax.y;
-		pVertices[index].m_position.y = vertexPos;
+		pVertices[index].m_position.x = vertexPos;
+		pVertices[index].m_position.y = gridMax.y;
 		pVertices[index].m_position.z = 0.0f;
 		pIndices[index] = index;
 		++index;

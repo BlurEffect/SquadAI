@@ -13,10 +13,10 @@
 
 using namespace DirectX;
 
-// Camera settings
+// Camera initialisation settings
 // Determine how the camera of the application is set up
-const XMFLOAT3 g_cInitialCameraPosition(0.0f, 0.0f, -20.0f);
-const XMFLOAT3 g_cInitialCameraLookAt(0.0f, 0.0f, 0.0f);
+const XMFLOAT3 g_cInitialCameraPosition(0.0f, 0.0f, -500.0f);
+const XMFLOAT3 g_cInitialCameraLookAt(0.0f, 0.0f, 1.0f);
 const XMFLOAT3 g_cCameraUpVector(0.0f, 1.0f, 0.0f);
 const XMFLOAT3 g_cInitialCameraSpeed(0.1f, 0.1f, 0.1f);
 const float    g_cCameraFieldOfView        = XM_PI/4;

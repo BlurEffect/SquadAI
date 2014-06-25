@@ -84,7 +84,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CircleDrawable.cpp" />
     <ClCompile Include="Drawable.cpp" />
-    <ClCompile Include="DrawableFactory.cpp" />
     <ClCompile Include="GridDrawable.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="InputManager.cpp" />
@@ -110,8 +109,6 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraSettings.h" />
     <ClInclude Include="CircleDrawable.h" />
-    <ClInclude Include="DrawableFactory.h" />
-    <ClInclude Include="GridSettings.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="EntityData.h" />

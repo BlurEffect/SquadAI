@@ -7,7 +7,11 @@
 // Includes
 #include "GridDrawable.h"
 
-GridDrawable::GridDrawable(void) : Drawable()
+GridDrawable::GridDrawable(float width, float height, int horizontalPartitions, int verticalPartitions) : Drawable(),
+																										  m_width(width),
+																										  m_height(height),
+																										  m_horizontalPartitions(horizontalPartitions),
+																									      m_verticalPartitions(verticalPartitions)
 {
 	m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 }
@@ -26,7 +30,7 @@ bool GridDrawable::Initialise(ID3D11Device* pDevice)
 	// Set the vertex and index count for this Drawable
 
 	// Calculate the vertex and index count:
-	m_vertexCount = (g_cNumberOfHorizontalPartitions + 1) * 2 + (g_cNumberOfVerticalPartitions + 1) * 2;
+	m_vertexCount = (m_horizontalPartitions + 1) * 2 + (m_verticalPartitions + 1) * 2;
 	m_indexCount  = m_vertexCount;
 
 	// Create temporary vertex and index arrays
@@ -44,12 +48,12 @@ bool GridDrawable::Initialise(ID3D11Device* pDevice)
 	}
 
 	// Determine the extents of a grid field
-	float horizontalSpacing = g_cGridWidth / static_cast<float>(g_cNumberOfHorizontalPartitions);
-	float verticalSpacing   = g_cGridHeight / static_cast<float>(g_cNumberOfVerticalPartitions);
+	float horizontalSpacing = m_width / static_cast<float>(m_horizontalPartitions);
+	float verticalSpacing   = m_height / static_cast<float>(m_verticalPartitions);
 		
 	// Minimal and maximal positions of vertices forming the grid
-	XMFLOAT2 gridMin(-g_cGridWidth / 2.0f, -g_cGridHeight / 2.0f);
-	XMFLOAT2 gridMax(g_cGridWidth / 2.0f, g_cGridHeight / 2.0f);
+	XMFLOAT2 gridMin(-m_width / 2.0f, -m_height / 2.0f);
+	XMFLOAT2 gridMax(m_width / 2.0f, m_height / 2.0f);
 
 	// Define vertices and indices for the Drawable
 

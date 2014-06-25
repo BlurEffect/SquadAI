@@ -32,7 +32,7 @@ enum DrawableType
 const DrawableType g_cDrawableMappings[NumberOfEntities] = 
 {
 	GridType,     // Grid
-	CircleType, // SoldierTeamA
+	TriangleType, // SoldierTeamA
 	TriangleType, // DeadSoldierTeamA
 	TriangleType, // SoldierTeamB
 	TriangleType, // DeadSoldierTeamB

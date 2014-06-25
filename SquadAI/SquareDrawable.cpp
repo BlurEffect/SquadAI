@@ -7,7 +7,8 @@
 // Includes
 #include "SquareDrawable.h"
 
-SquareDrawable::SquareDrawable(void) : Drawable()
+SquareDrawable::SquareDrawable(float length) : Drawable(),
+									           m_length(length)
 {
 }
 
@@ -43,10 +44,10 @@ bool SquareDrawable::Initialise(ID3D11Device* pDevice)
 
 	// Define vertices and indices for the Drawable
 
-	pVertices[0].m_position = XMFLOAT3(-0.5f, -0.5f, 0.0f);
-	pVertices[1].m_position = XMFLOAT3(-0.5f, 0.5f, 0.0f);
-	pVertices[2].m_position = XMFLOAT3(0.5f, -0.5f, 0.0f);
-	pVertices[3].m_position = XMFLOAT3(0.5f, 0.5f, 0.0f);
+	pVertices[0].m_position = XMFLOAT3(-m_length * 0.5f, -m_length * 0.5f, 0.0f);
+	pVertices[1].m_position = XMFLOAT3(-m_length * 0.5f, m_length * 0.5f, 0.0f);
+	pVertices[2].m_position = XMFLOAT3(m_length * 0.5f, -m_length * 0.5f, 0.0f);
+	pVertices[3].m_position = XMFLOAT3(m_length * 0.5f, m_length * 0.5f, 0.0f);
 
 	pIndices[0] = 0;
 	pIndices[1] = 1;

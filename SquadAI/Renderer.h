@@ -15,7 +15,10 @@
 #include <vector>
 
 #include "Drawable.h"
-#include "DrawableFactory.h"
+#include "TriangleDrawable.h"
+#include "SquareDrawable.h"
+#include "CircleDrawable.h"
+#include "GridDrawable.h"
 #include "RendererData.h"
 #include "ShaderParameters.h"
 #include "ShaderGroup.h"

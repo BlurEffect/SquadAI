@@ -25,6 +25,12 @@
     <Filter Include="Header Files\ShaderFramework\Compiled Shaders">
       <UniqueIdentifier>{690cacdf-4fb7-4805-81f7-7724fc83747d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Drawables">
+      <UniqueIdentifier>{39e769f3-6cdc-4f56-9ca3-47438a1d08e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drawables">
+      <UniqueIdentifier>{5a6c4ef4-a026-4d9c-af49-6cf611ca4d60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -43,9 +49,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Drawable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SimpleInstancedVertexShader.cpp">
@@ -69,32 +72,32 @@
     <ClCompile Include="TestEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DrawableFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderFactory.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
     <ClCompile Include="ShaderGroup.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
-    <ClCompile Include="CircleDrawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TriangleDrawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SquareDrawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GridDrawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderContext.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawable.cpp">
+      <Filter>Source Files\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="CircleDrawable.cpp">
+      <Filter>Source Files\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="GridDrawable.cpp">
+      <Filter>Source Files\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="TriangleDrawable.cpp">
+      <Filter>Source Files\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="SquareDrawable.cpp">
+      <Filter>Source Files\Drawables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -117,9 +120,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Drawable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PixelShader.h">
@@ -155,29 +155,11 @@
     <ClInclude Include="TestEnvironment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DrawableFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderFactory.h">
       <Filter>Header Files\ShaderFramework</Filter>
     </ClInclude>
     <ClInclude Include="ShaderGroup.h">
       <Filter>Header Files\ShaderFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="CircleDrawable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SquareDrawable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TriangleDrawable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GridDrawable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GridSettings.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputManager.h">
       <Filter>Header Files</Filter>
@@ -202,6 +184,21 @@
     </ClInclude>
     <ClInclude Include="Helpers.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CircleDrawable.h">
+      <Filter>Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawable.h">
+      <Filter>Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleDrawable.h">
+      <Filter>Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="SquareDrawable.h">
+      <Filter>Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="GridDrawable.h">
+      <Filter>Drawables</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

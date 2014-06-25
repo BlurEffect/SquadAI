@@ -13,16 +13,18 @@
 // Includes
 #include <d3d11.h>
 #include "Drawable.h"
-#include "GridSettings.h"
 
 class GridDrawable : public Drawable
 {
 public:
-	GridDrawable(void);
+	GridDrawable(float width, float height, int horizontalPartitions, int verticalPartitions);
 	~GridDrawable(void);
 	bool Initialise(ID3D11Device* pDevice);
 private:
-
+	float m_width;				  // The width of the grid
+	float m_height;				  // The height of the grid
+	int   m_horizontalPartitions; // The number of partitions along the x-axis of the grid
+	int   m_verticalPartitions;   // The number of partitions along the y-axis of the grid
 };
 
 #endif // GRID_DRAWABLE_H

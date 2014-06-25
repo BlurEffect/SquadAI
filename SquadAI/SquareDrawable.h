@@ -14,11 +14,12 @@
 class SquareDrawable : public Drawable
 {
 public:
-	SquareDrawable(void);
+	SquareDrawable(float length);
 	~SquareDrawable(void);
 	bool Initialise(ID3D11Device* pDevice);
-private:
 
+private:
+	float m_length; // The length of the sides of the square
 };
 
 #endif // SQUARE_DRAWABLE_H

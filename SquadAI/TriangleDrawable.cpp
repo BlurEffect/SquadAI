@@ -7,7 +7,9 @@
 // Includes
 #include "TriangleDrawable.h"
 
-TriangleDrawable::TriangleDrawable(void) : Drawable()
+TriangleDrawable::TriangleDrawable(float base, float height) : Drawable(), 
+															   m_base(base), 
+															   m_height(height)
 {
 }
 
@@ -43,9 +45,9 @@ bool TriangleDrawable::Initialise(ID3D11Device* pDevice)
 
 	// Define vertices and indices for the Drawable
 
-	pVertices[0].m_position = XMFLOAT3(-0.5f, -0.5f, 0.0f);
-	pVertices[1].m_position = XMFLOAT3(0.0f, 0.5f, 0.0f);
-	pVertices[2].m_position = XMFLOAT3(0.5f, -0.5f, 0.0f);
+	pVertices[0].m_position = XMFLOAT3(-m_base * 0.5f, -m_height * 0.5f, 0.0f);
+	pVertices[1].m_position = XMFLOAT3(0.0f, m_height* 0.5f, 0.0f);
+	pVertices[2].m_position = XMFLOAT3(m_base * 0.5f, -m_height * 0.5f, 0.0f);
 
 	pIndices[0] = 0;
 	pIndices[1] = 1;

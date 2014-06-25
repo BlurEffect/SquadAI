@@ -317,13 +317,29 @@ bool Renderer::InitialiseRenderStates()
 bool Renderer::InitialiseDrawables(void)
 {
 	// Create the Drawables
-	for(int i = 0; i < NumberOfDrawableTypes; ++i)
+
+	m_drawableObjects[TriangleType] = new TriangleDrawable(1.0f, 1.0f);
+	if(!m_drawableObjects[TriangleType])
 	{
-		m_drawableObjects[i] = DrawableFactory::CreateDrawable(DrawableType(i));
-		if(!m_drawableObjects[i])
-		{
-			return false;
-		}
+		return false;
+	}
+
+	m_drawableObjects[SquareType] = new SquareDrawable(1.0f);
+	if(!m_drawableObjects[SquareType])
+	{
+		return false;
+	}
+
+	m_drawableObjects[CircleType] = new CircleDrawable(0.5f, 24);
+	if(!m_drawableObjects[CircleType])
+	{
+		return false;
+	}
+
+	m_drawableObjects[GridType] = new GridDrawable(50, 50, 50, 50);
+	if(!m_drawableObjects[GridType])
+	{
+		return false;
 	}
 
 	// Initialise the Drawables

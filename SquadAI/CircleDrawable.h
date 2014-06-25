@@ -14,11 +14,12 @@
 class CircleDrawable : public Drawable
 {
 public:
-	CircleDrawable(void);
+	CircleDrawable(float radius, int segments);
 	~CircleDrawable(void);
 	bool Initialise(ID3D11Device* pDevice);
 private:
-
+	float m_radius;   // The radius of the circle
+	int   m_segments; // Determines the number of segments for the circle and thus the "roundness" of it
 };
 
 #endif // CIRCLE_DRAWABLE_H

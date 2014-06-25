@@ -14,11 +14,13 @@
 class TriangleDrawable : public Drawable
 {
 public:
-	TriangleDrawable(void);
+	TriangleDrawable(float base, float height);
 	~TriangleDrawable(void);
 	bool Initialise(ID3D11Device* pDevice);
-private:
 
+private:
+	float m_base;   // The length of the base of the triangle
+	float m_height; // The height of the triangle
 };
 
 #endif // TRIANGLE_DRAWABLE_H

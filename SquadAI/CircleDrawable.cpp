@@ -7,7 +7,9 @@
 // Includes
 #include "CircleDrawable.h"
 
-CircleDrawable::CircleDrawable(void) : Drawable()
+CircleDrawable::CircleDrawable(float radius, int segments) : Drawable(),
+															 m_radius(radius),
+															 m_segments(segments)
 {
 	m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 }
@@ -25,11 +27,8 @@ bool CircleDrawable::Initialise(ID3D11Device* pDevice)
 {
 	// Set the vertex and index count for this Drawable
 
-	// Use this many slices for the circle
-	int slices = 24;
-
-	m_vertexCount = slices + 2;
-	m_indexCount  = slices + 2;
+	m_vertexCount = m_segments + 2;
+	m_indexCount  = m_segments + 2;
 
 	// Create temporary vertex and index arrays
 
@@ -47,7 +46,7 @@ bool CircleDrawable::Initialise(ID3D11Device* pDevice)
 
 	// Define vertices and indices for the Drawable
 
-	float step = XMConvertToRadians(180.0f / (static_cast<float>(slices) / 2.0f));
+	float step = XMConvertToRadians(180.0f / (static_cast<float>(m_segments) / 2.0f));
 
 	pVertices[0].m_position = XMFLOAT3(-0.5f, 0.0f, 0.0f);
 
@@ -56,10 +55,10 @@ bool CircleDrawable::Initialise(ID3D11Device* pDevice)
 	float y = 0.0f;
 
 	float angle = -XM_PIDIV2; 
-	for(unsigned int i = 0; i < slices/2; ++i)
+	for(unsigned int i = 0; i < m_segments/2; ++i)
 	{
-		x = 0.5f * sin(angle);
-		y = 0.5f * cos(angle);
+		x = m_radius * sin(angle);
+		y = m_radius * cos(angle);
 
 		pVertices[index++].m_position = XMFLOAT3(x, y, 0.0f);
 		pVertices[index++].m_position = XMFLOAT3(x, -y, 0.0f);

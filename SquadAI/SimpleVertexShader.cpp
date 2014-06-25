@@ -18,8 +18,8 @@ const D3D11_INPUT_ELEMENT_DESC SimpleVertexShader::m_sInputLayoutDescription[] =
 SimpleVertexShader::SimpleVertexShader(void)
 {
 	// Initialise constant buffer data
-	XMStoreFloat4x4( &m_cbPerObject.m_worldViewProjection, XMMatrixIdentity() );
-	m_cbPerObject.m_colour = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	XMStoreFloat4x4( &m_cbPerObjectData.m_worldViewProjection, XMMatrixIdentity() );
+	m_cbPerObjectData.m_colour = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 SimpleVertexShader::~SimpleVertexShader(void)
@@ -48,7 +48,7 @@ bool SimpleVertexShader::Initialise(ID3D11Device* pDevice)
 	}
 
 	// Initialise the constant buffer
-	return m_pCbPerObjectBuffer.Initialise(ConstantBuffer, pDevice, D3D11_USAGE_DYNAMIC, nullptr, 1);
+	return m_cbPerObject.Initialise(ConstantBuffer, pDevice, D3D11_USAGE_DYNAMIC, nullptr, 1);
 }
 
 //--------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ bool SimpleVertexShader::Initialise(ID3D11Device* pDevice)
 //--------------------------------------------------------------------------------------
 void SimpleVertexShader::Cleanup(void)
 {
-	m_pCbPerObjectBuffer.Cleanup();
+	m_cbPerObject.Cleanup();
 	VertexShader::Cleanup();
 }
 
@@ -69,15 +69,15 @@ void SimpleVertexShader::Cleanup(void)
 //--------------------------------------------------------------------------------------
 bool SimpleVertexShader::SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData)
 {
-	m_cbPerObject.m_worldViewProjection = perObjectData.m_worldViewProjection;
-	m_cbPerObject.m_colour				= perObjectData.m_colour;
+	m_cbPerObjectData.m_worldViewProjection = perObjectData.m_worldViewProjection;
+	m_cbPerObjectData.m_colour				= perObjectData.m_colour;
 
-	if(!m_pCbPerObjectBuffer.Update(pContext, &m_cbPerObject, 1))
+	if(!m_cbPerObject.Update(pContext, &m_cbPerObjectData, 1))
 	{
 		return false;
 	}
 
-	pContext -> VSSetConstantBuffers( 0, 1, m_pCbPerObjectBuffer.GetBuffer() );
+	pContext -> VSSetConstantBuffers( 0, 1, m_cbPerObject.GetBuffer() );
 
 	return true;
 }

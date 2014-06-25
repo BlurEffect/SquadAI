@@ -21,7 +21,7 @@ using namespace DirectX;
 //--------------------------------------------------------------------------------------
 struct PerFrameData
 {
-	XMFLOAT4X4 m_viewProjection; // The combined view and projection matrices
+	XMFLOAT4X4 m_viewProjectionText; // The combined view and projection matrices used for text rendering
 };
 
 //--------------------------------------------------------------------------------------

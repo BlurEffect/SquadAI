@@ -5,13 +5,13 @@
 *  the vertex shader as pixel colour.
 */
 
-struct VS_OUTPUT
+struct PS_INPUT
 {
 	float4 Position	: SV_POSITION;
-	float4 Colour	: COLOUR;
+	float4 Colour	: COLOUR;      // The colour to use for this pixel
 };
 
-float4 PS(VS_OUTPUT input) : SV_TARGET
+float4 PS(PS_INPUT input) : SV_TARGET
 {
     return input.Colour;
 }

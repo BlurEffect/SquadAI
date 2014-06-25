@@ -1,30 +1,29 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  Camera.cpp
-*  The camera used to navigate the application. It provides a top down
+*  OrthographicCamera.cpp
+*  The orthographic camera used to navigate the application. It provides a top down
 *  view of the scene and allows pan and zoom.
 */
 
 // Includes
-#include "Camera.h"
+#include "OrthographicCamera.h"
 
-Camera::Camera() : m_position(0.0f, 0.0f, 0.0f), 
-				   m_movementSpeed(0.1f, 0.1f, 0.1f),
-				   m_right(1.0f, 0.0f, 0.0f), 
-				   m_lookAt(0.0f, 0.0f, 1.0f), 
-				   m_up(0.0f, 1.0f, 0.0f),
-				   m_windowWidth(400),
-		           m_windowHeight(400),
-			       m_nearClippingPlane(1.0f),
-				   m_farClippingPlane(1000.0f),
-				   m_isOrthographic(false),
-				   m_orthoZoomFactor(1.0f)
+OrthographicCamera::OrthographicCamera() : m_position(0.0f, 0.0f, 0.0f), 
+										   m_movementSpeed(0.1f, 0.1f, 0.1f),
+										   m_right(1.0f, 0.0f, 0.0f), 
+										   m_lookAt(0.0f, 0.0f, 1.0f), 
+										   m_up(0.0f, 1.0f, 0.0f),
+									       m_windowWidth(400),
+									       m_windowHeight(400),
+									       m_nearClippingPlane(1.0f),
+									       m_farClippingPlane(1000.0f),
+									       m_zoomFactor(1.0f)
 {
 	XMStoreFloat4x4( &m_viewMatrix, XMMatrixIdentity() );
 	XMStoreFloat4x4( &m_projectionMatrix, XMMatrixIdentity() );
 }
 
-Camera::~Camera()
+OrthographicCamera::~OrthographicCamera()
 {
 	Cleanup();
 }
@@ -43,7 +42,7 @@ Camera::~Camera()
 // Param10: Determines whether the camera will use perspective or orthographic projection. 
 // Returns true if the camera was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Camera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, float fov, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed, bool isOrthographic)
+bool OrthographicCamera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed)
 {
 	m_position          = position;
 	m_lookAt            = lookAt;
@@ -52,7 +51,7 @@ bool Camera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XM
 	m_windowHeight      = static_cast<float>(windowHeight);
 	m_nearClippingPlane = clipNear;
 	m_farClippingPlane  = clipFar;
-	m_isOrthographic    = isOrthographic;
+	m_movementSpeed     = newMovementSpeed;
 
 	// Calculate the right vector
 	XMStoreFloat3(&m_right, XMVector3Cross(XMLoadFloat3(&m_up), XMLoadFloat3(&m_lookAt)));
@@ -60,14 +59,8 @@ bool Camera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XM
 	// Calculate the view matrix
 	XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(XMLoadFloat3(&m_position), XMLoadFloat3(&m_lookAt), XMLoadFloat3(&m_up)));
 
-	if(m_isOrthographic)
-	{
-		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_orthoZoomFactor, m_windowHeight * m_orthoZoomFactor, m_nearClippingPlane, m_farClippingPlane));
-	}else
-	{
-		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fov, static_cast<float>(windowWidth)/windowHeight, clipNear, clipFar ) );
-	}
-
+	XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_zoomFactor, m_windowHeight * m_zoomFactor, m_nearClippingPlane, m_farClippingPlane));
+	
 	return true;
 }
 
@@ -75,7 +68,7 @@ bool Camera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XM
 // Update the camera and compute the new view matrix according to the user input.
 // Param1: A vector describing the camera movement.
 //--------------------------------------------------------------------------------------
-void Camera::Update(const XMFLOAT3& moveVector)
+void OrthographicCamera::Update(const XMFLOAT3& moveVector)
 {
 	if(moveVector.x == 0 && moveVector.y == 0 && moveVector.z == 0)
 	{
@@ -113,61 +106,51 @@ void Camera::Update(const XMFLOAT3& moveVector)
 // and taking the movement speed into account.
 // Param1: A vector containing the movement speed factor for movement along each axis.
 //--------------------------------------------------------------------------------------
-void Camera::Move(const XMFLOAT3& moveVector)
+void OrthographicCamera::Move(const XMFLOAT3& moveVector)
 {
-	if(m_isOrthographic)
+	XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) 
+										- XMLoadFloat3(&m_right) * moveVector.x * m_movementSpeed.x		// add horizontal movement
+										+ XMLoadFloat3(&m_up) * moveVector.y * m_movementSpeed.y		// add vertical movement
+										);
+
+	m_zoomFactor -= moveVector.z * m_movementSpeed.z;
+	if(m_zoomFactor < g_cOrthoMinimalZoomFactor)
 	{
-		XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) 
-											- XMLoadFloat3(&m_right) * moveVector.x * m_movementSpeed.x		// add horizontal movement
-											+ XMLoadFloat3(&m_up) * moveVector.y * m_movementSpeed.y		// add vertical movement
-											);
-
-		m_orthoZoomFactor -= moveVector.z * m_movementSpeed.z * g_cOrthoZoomWeight;
-		if(m_orthoZoomFactor < g_cOrthoMinimalZoomFactor)
-		{
-			m_orthoZoomFactor = g_cOrthoMinimalZoomFactor;
-		}else if(m_orthoZoomFactor > g_cOrthoMaximalZoomFactor)
-		{
-			m_orthoZoomFactor = g_cOrthoMaximalZoomFactor;
-		}
-
-
-		XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_orthoZoomFactor, m_windowHeight * m_orthoZoomFactor, m_nearClippingPlane, m_farClippingPlane));
-	}else
+		m_zoomFactor = g_cOrthoMinimalZoomFactor;
+	}else if(m_zoomFactor > g_cOrthoMaximalZoomFactor)
 	{
-		XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) 
-											- XMLoadFloat3(&m_right) * moveVector.x * m_movementSpeed.x		// add horizontal movement
-											+ XMLoadFloat3(&m_up) * moveVector.y * m_movementSpeed.y		// add vertical movement
-											+ XMLoadFloat3(&m_lookAt) * moveVector.z * m_movementSpeed.z);	// add movement along z-axis
+		m_zoomFactor = g_cOrthoMaximalZoomFactor;
 	}
+
+	XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_zoomFactor, m_windowHeight * m_zoomFactor, m_nearClippingPlane, m_farClippingPlane));
 }
 
 //--------------------------------------------------------------------------------------
 // Frees ressources associated to the camera.
 //--------------------------------------------------------------------------------------
-void Camera::Cleanup(void)
+void OrthographicCamera::Cleanup(void)
 {
 	// A placeholder at the moment.
 }
 
 // data access functions
 
-const XMFLOAT4X4& Camera::GetViewMatrix(void) const
+const XMFLOAT4X4& OrthographicCamera::GetViewMatrix(void) const
 {
 	return m_viewMatrix;
 }
 
-const XMFLOAT4X4& Camera::GetProjectionMatrix(void) const
+const XMFLOAT4X4& OrthographicCamera::GetProjectionMatrix(void) const
 {
 	return m_projectionMatrix;
 }
 
-const XMFLOAT3& Camera::GetCameraPosition(void) const
+const XMFLOAT3& OrthographicCamera::GetCameraPosition(void) const
 {
 	return m_position;
 }
 
-void Camera::SetMovementSpeed(const XMFLOAT3& newMovementSpeed)
+void OrthographicCamera::SetMovementSpeed(const XMFLOAT3& newMovementSpeed)
 {
 	m_movementSpeed = newMovementSpeed;
 }

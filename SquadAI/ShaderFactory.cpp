@@ -12,30 +12,21 @@
 // Factory function to create new vertex shaders. Dynamically creates new instances of the 
 // requested shader.
 // Param1: The type of vertex shader requested.
-// Param2: Determines whether the version of the shader set up for hardware instancing will be returned.
 // Returns a pointer to the new shader. When the creation of the shader failed or the passed
 // in shader type is invalid, a null pointer will be returned.
 //--------------------------------------------------------------------------------------
-VertexShader* ShaderFactory::CreateVertexShader(ShaderType type, bool doCreateInstancedVersion)
+VertexShader* ShaderFactory::CreateVertexShader(ShaderType type)
 {
-	if(doCreateInstancedVersion)
+	switch(type)
 	{
-		switch(type)
-		{
-		case SimpleUnlit:
-			return new SimpleInstancedVertexShader();
-			break;
-		}
-	}else
-	{
-		switch(type)
-		{
-		case SimpleUnlit:
-			return new SimpleVertexShader();
-			break;
-		}
+	case SimpleUnlit:
+		return new SimpleVertexShader();
+		break;
+	case Font:
+		return new FontVertexShader();
+		break;
 	}
-
+	
 	return nullptr;
 }
 
@@ -43,28 +34,19 @@ VertexShader* ShaderFactory::CreateVertexShader(ShaderType type, bool doCreateIn
 // Factory function to create new pixel shaders. Dynamically creates new instances of the 
 // requested shader.
 // Param1: The type of pixel shader requested.
-// Param2: Determines whether the version of the shader set up for hardware instancing will be returned.
 // Returns a pointer to the new shader. When the creation of the shader failed or the passed
 // in shader type is invalid, a null pointer will be returned.
 //--------------------------------------------------------------------------------------
-PixelShader* ShaderFactory::CreatePixelShader(ShaderType type, bool doCreateInstancedVersion)
+PixelShader* ShaderFactory::CreatePixelShader(ShaderType type)
 {
-	if(doCreateInstancedVersion)
+	switch(type)
 	{
-		switch(type)
-		{
-		case SimpleUnlit:
-			return new SimplePixelShader(); // same as non-instanced version
-			break;
-		}
-	}else
-	{
-		switch(type)
-		{
-		case SimpleUnlit:
-			return new SimplePixelShader();
-			break;
-		}
+	case SimpleUnlit:
+		return new SimplePixelShader();
+		break;
+	case Font:
+		return new FontPixelShader();
+		break;
 	}
 
 	return nullptr;

@@ -1,29 +1,26 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  SimpleVertexShader.h
-*  Wrapper for the "VS_Simple.FX" vertex shader.
-*  Performs standard transformation of the vertex position and forwards
-*  the result together with the object colour to the next stage.
+*  FontPixelShader.h
+*  Wrapper for the "PS_Font.FX" pixel shader.
+*  Pixel shader used for text rendering.
 */
 
-#ifndef SIMPLE_VERTEX_SHADER_H
-#define SIMPLE_VERTEX_SHADER_H
+#ifndef FONT_PIXEL_SHADER_H
+#define FONT_PIXEL_SHADER_H
 
 // Includes
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include "VS_SimpleCompiled.h"
-#include "VertexShader.h"
+#include "PS_FontCompiled.h"
+#include "PixelShader.h"
 #include "ShaderParameters.h"
 #include "Buffer.h"
 
-using namespace DirectX;
-
-class SimpleVertexShader : public VertexShader
+class FontPixelShader : public PixelShader
 {
 public:
-	SimpleVertexShader(void);
-	~SimpleVertexShader(void);
+	FontPixelShader(void);
+	~FontPixelShader(void);
 	bool Initialise(ID3D11Device* pDevice);
 	void Cleanup(void);
 	bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
@@ -35,15 +32,11 @@ private:
 	//--------------------------------------------------------------------------------------
 	struct ConstBufferPerObjectData
 	{
-		XMFLOAT4X4 m_worldViewProjection; // The combined world, view and projection matrices
 		XMFLOAT4   m_colour;			  // The colour that the object should be coloured in
 	};
-	
-	// The input layout required by this shader
-	const static D3D11_INPUT_ELEMENT_DESC m_sInputLayoutDescription[1];
 
 	ConstBufferPerObjectData	     m_cbPerObjectData; // Stores the per object data
 	Buffer<ConstBufferPerObjectData> m_cbPerObject;     // The constant buffer used by the shader
 };
 
-#endif // SIMPLE_VERTEX_SHADER_H
+#endif // FONT_PIXEL_SHADER_H

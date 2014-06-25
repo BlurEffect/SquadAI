@@ -22,9 +22,8 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 		   m_renderer.Initialise(hWnd, windowWidth, windowHeight) &&
 		   m_testEnvironment.Initialise();
 	*/
-	if(!m_camera.Initialise(g_cInitialCameraPosition, g_cInitialCameraLookAt, g_cCameraUpVector, g_cCameraFieldOfView, 
-							   windowWidth, windowHeight, g_cCameraNearClippingPlane, g_cCameraFarClippingPlane, 
-		                       g_cInitialCameraSpeed, g_cCreateOrthographicCamera))
+	if(!m_camera.Initialise(g_cInitialCameraPosition, g_cInitialCameraLookAt, g_cCameraUpVector, windowWidth, windowHeight, 
+						    g_cCameraNearClippingPlane, g_cCameraFarClippingPlane, g_cInitialCameraSpeed))
 	{
 		return false;
 	}

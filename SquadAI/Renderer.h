@@ -47,8 +47,9 @@ private:
 	bool		InitialiseShaders();
 	void        RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
 	
-	void	    SetDefaultRenderStates(void);
-	void	    SetShaderGroup(ShaderType type);
+	void	    PrepareDefaultGeometryRendering(void);
+	void	    PrepareTextRendering(void);
+	void        SetShaderGroup(ShaderType type);
 
 	// Initialise D3D
 	IDXGISwapChain*			m_pSwapChain;
@@ -66,13 +67,13 @@ private:
 	ID3D11BlendState*		 m_pBlendingDisabledBlendingState;
 
 	// Shader stuff
-	ShaderGroup*			 m_pCurrentShaderGroup;
-	ShaderGroup				 m_shaderGroups[NumberOfShaderTypes]; // Shader groups available to the renderer
-	Drawable*				 m_drawableObjects[NumberOfDrawableTypes];
+	ShaderType               m_currentShaderGroup;
+	ShaderGroup			     m_shaderGroups[NumberOfShaderTypes];
 	PerFrameData			 m_perFrameData; 
 	PerObjectData			 m_perObjectData;
 
 	// Other
+	Drawable*				 m_drawableObjects[NumberOfDrawableTypes];
 	RenderContext            m_renderContext;
 
 };

@@ -12,7 +12,7 @@
 #include <Windows.h>
 #include <DirectXMath.h>
 
-#include "Camera.h"
+#include "OrthographicCamera.h"
 #include "InputManager.h"
 #include "Renderer.h"
 #include "TestEnvironment.h"
@@ -27,10 +27,10 @@ public:
 	void Update(void);
 	void Cleanup(void);
 private:
-	Camera			m_camera;			// The camera component of the application
-	InputManager	m_inputManager;		// The input component of the application
-	Renderer		m_renderer;			// The renderer component of the application
-	TestEnvironment m_testEnvironment; // The test environment used ->could be array later on
+	OrthographicCamera m_camera;		   // The camera component of the application
+	InputManager	   m_inputManager;	   // The input component of the application
+	Renderer		   m_renderer;		   // The renderer component of the application
+	TestEnvironment    m_testEnvironment; // The test environment used ->could be array later on
 };
 
 #endif // APPLICATION_H

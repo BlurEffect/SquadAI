@@ -24,5 +24,4 @@ public:
 	bool Initialise(ID3D11Device* pDevice);
 };
 
-
 #endif // SIMPLE_PIXEL_SHADER_H

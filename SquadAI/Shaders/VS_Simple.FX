@@ -22,7 +22,7 @@ struct VS_OUTPUT
 	float4 Colour	: COLOUR;	   // The colour to use for this vertex
 };
 
-VS_OUTPUT VS( VS_INPUT input )
+VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output;
 

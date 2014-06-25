@@ -13,14 +13,15 @@
 #include "PixelShader.h"
 #include "ShaderGroup.h"
 #include "SimpleVertexShader.h"
-#include "SimpleInstancedVertexShader.h"
 #include "SimplePixelShader.h"
+#include "FontVertexShader.h"
+#include "FontPixelShader.h"
 
 class ShaderFactory
 {
 public:
-	static VertexShader* CreateVertexShader(ShaderType, bool doCreateInstancedVersion);
-	static PixelShader*  CreatePixelShader(ShaderType, bool doCreateInstancedVersion);
+	static VertexShader* CreateVertexShader(ShaderType);
+	static PixelShader*  CreatePixelShader(ShaderType);
 };
 
 #endif // SHADER_FACTORY_H

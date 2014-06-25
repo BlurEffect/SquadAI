@@ -1,12 +1,14 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  Camera.h
-*  The camera used to navigate the application. It provides a top down
+*  OrthographicCamera.h
+*  The orthographic camera used to navigate the application. It provides a top down
 *  view of the scene and allows pan and zoom.
 */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+// Note: Parts of this class could be moved into an abstract camera class that this class should then inherit from.
+
+#ifndef ORTHOGRAPHIC_CAMERA_H
+#define ORTHOGRAPHIC_CAMERA_H
 
 // Includes
 #include <DirectXMath.h>
@@ -14,13 +16,13 @@
 
 using namespace DirectX;
 
-class Camera
+class OrthographicCamera
 {
 public:
-	Camera(void);
-	~Camera(void);
+	OrthographicCamera(void);
+	~OrthographicCamera(void);
 
-	bool Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, float fov, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed, bool isOrthographic);
+	bool Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed);
 	void Update(const XMFLOAT3& moveVector);
 	void Cleanup(void);
 
@@ -32,9 +34,9 @@ public:
 private:
 	void Move(const XMFLOAT3& moveVector);
 
-	XMFLOAT4X4	m_viewMatrix;		// The view matrix associated to this camera
-	XMFLOAT4X4	m_projectionMatrix;	// The projection matrix associated to this camera
-	
+	XMFLOAT4X4	m_viewMatrix;				    // The view matrix associated to this camera
+	XMFLOAT4X4	m_projectionMatrix;	// The orthographic projection matrix associated to this camera
+
 	XMFLOAT3	m_position;		    // The current position of the camera
 	XMFLOAT3    m_movementSpeed;    // Determines how fast the camera moves, that is how sensible it is to user input
 
@@ -47,8 +49,7 @@ private:
 	float       m_nearClippingPlane; // The near clipping plane of the camera
 	float       m_farClippingPlane;  // The far clipping plane of the camera
 
-	bool        m_isOrthographic;   // Tells whether the camera uses orthographic or perspective projection
-	float       m_orthoZoomFactor;  // The current zoom factor when using orthographic projection;
+	float       m_zoomFactor;  // The current zoom factor
 };
 
-#endif // CAMERA_H
+#endif // ORTHOGRAPHIC_CAMERA_H

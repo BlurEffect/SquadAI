@@ -21,7 +21,7 @@ Renderer::Renderer() : m_pSwapChain(nullptr),
 					   m_pRasterStateCullBackfaces(nullptr),
 					   m_pBlendingEnabledBlendingState(nullptr),
 					   m_pBlendingDisabledBlendingState(nullptr),
-					   m_pCurrentShaderGroup(nullptr)
+					   m_currentShaderGroup(ShaderType(0))
 {
 }
 
@@ -39,29 +39,14 @@ Renderer::~Renderer()
 //--------------------------------------------------------------------------------------
 bool Renderer::Initialise(HWND hWnd, int windowWidth, int windowHeight)
 {
-	/*
-	return InitialiseD3D(hWnd, windowWidth, windowHeight) &&
-		   InitialiseDrawables() &&
-		   InitialiseShaders();
-		   */
-
-	if(!InitialiseD3D(hWnd, windowWidth, windowHeight))
+	if(InitialiseD3D(hWnd, windowWidth, windowHeight) && InitialiseDrawables() && InitialiseShaders())
 	{
-		return false;
+		// Set default render states and shaders
+		PrepareDefaultGeometryRendering();
+		return true;
 	}
 
-	if(! InitialiseDrawables())
-	{
-		return false;
-	}
-
-	if(!InitialiseShaders())
-	{
-		return false;
-	}
-
-	return true;
-
+	return false;
 }
 
 //--------------------------------------------------------------------------------------
@@ -305,8 +290,6 @@ bool Renderer::InitialiseRenderStates()
 		return false;
 	}
 
-	SetDefaultRenderStates();
-
 	return true;
 }
 
@@ -367,9 +350,6 @@ bool Renderer::InitialiseShaders()
 			return false;
 		}
 	}
-	
-	// Set the default shader group to use
-	SetShaderGroup(SimpleUnlit);
 
 	return true;
 }
@@ -389,14 +369,11 @@ void Renderer::Cleanup( void )
 			m_drawableObjects[i] = nullptr;
 		}
 	}
-	
+
 	for(int i = 0; i < NumberOfShaderTypes; ++i)
 	{
 		m_shaderGroups[i].Cleanup();
 	}
-
-	// Group pointed to is destroyed above
-	m_pCurrentShaderGroup = nullptr;
 
 	// Cleanup all the DirectX stuff
 	if(m_pSwapChain)		  { m_pSwapChain->Release();          m_pSwapChain		    = nullptr; }
@@ -425,9 +402,6 @@ void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& proje
 
 	// Refresh the Depth/Stencil view
 	m_pD3d11DeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// Update the per frame data
-	XMStoreFloat4x4(&m_perFrameData.m_viewProjection, XMLoadFloat4x4(&viewMatrix) * XMLoadFloat4x4(&projectionMatrix));
 	
 	// Render the test environment
 	RenderTestEnvironment(viewMatrix, projectionMatrix);
@@ -446,12 +420,7 @@ void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& proje
 //--------------------------------------------------------------------------------------
 void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
 {
-	// Set and activate the shader
-	SetShaderGroup(SimpleUnlit);
-	m_pCurrentShaderGroup->Activate(m_pD3d11DeviceContext, false);
-
-	// Set the proper render states
-	SetDefaultRenderStates();
+	PrepareDefaultGeometryRendering();
 
 	// Calculate the view projection matrix
 	XMFLOAT4X4 viewProjection;
@@ -466,7 +435,7 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 			m_perObjectData.m_colour = m_renderContext.GetInstances(DrawableType(i))[k].m_colour;
 			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMLoadFloat4x4(&m_renderContext.GetInstances(DrawableType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
 			// Update the shader's constant buffer
-			m_pCurrentShaderGroup->SetObjectData(m_pD3d11DeviceContext, m_perObjectData, OnlyBasic);
+			m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
 			// Draw the object
 			m_drawableObjects[i]->Draw(m_pD3d11DeviceContext);
 		}
@@ -474,9 +443,9 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 }
 
 //--------------------------------------------------------------------------------------
-// Sets the default render states for the application.
+// Sets the default render states and shaders for the default rendering of geometry.
 //--------------------------------------------------------------------------------------
-void Renderer::SetDefaultRenderStates(void)
+void Renderer::PrepareDefaultGeometryRendering(void)
 {
 	// Enable backface culling
 	m_pD3d11DeviceContext->RSSetState(m_pRasterStateCullBackfaces);
@@ -487,18 +456,39 @@ void Renderer::SetDefaultRenderStates(void)
 	// Disable alpha blending
 	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 	m_pD3d11DeviceContext -> OMSetBlendState(m_pBlendingDisabledBlendingState, blendFactor, 0xffffffff);
+
+	SetShaderGroup(SimpleUnlit);
+
+	m_shaderGroups[m_currentShaderGroup].Activate(m_pD3d11DeviceContext);
 }
 
 //--------------------------------------------------------------------------------------
-// Changes the shader group currently used by the renderer.
-// Param1: The type of the requested shader group and associated shaders.
+// Sets the default render states and shaders for text rendering.
 //--------------------------------------------------------------------------------------
-void Renderer::SetShaderGroup(ShaderType type)
+void Renderer::PrepareTextRendering(void)
 {
-	m_pCurrentShaderGroup = &m_shaderGroups[type];
+	// Enable backface culling
+	m_pD3d11DeviceContext->RSSetState(m_pRasterStateCullBackfaces);
+
+	// Disable depth buffering
+	m_pD3d11DeviceContext->OMSetDepthStencilState(m_pDepthDisabledStencilState, 1);
+	
+	// Turn on alpha blending
+	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	m_pD3d11DeviceContext -> OMSetBlendState(m_pBlendingEnabledBlendingState, blendFactor, 0xffffffff);
+
+	SetShaderGroup(Font);
+
+	m_shaderGroups[m_currentShaderGroup].Activate(m_pD3d11DeviceContext);
 }
+
 
 // Data access functions
+
+void Renderer::SetShaderGroup(ShaderType type)
+{
+	m_currentShaderGroup = type;
+}
 
 RenderContext& Renderer::GetRenderContext(void)
 {

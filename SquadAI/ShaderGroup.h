@@ -18,18 +18,8 @@
 enum ShaderType
 {
 	SimpleUnlit,
+	Font,
 	NumberOfShaderTypes
-};
-
-//--------------------------------------------------------------------------------------
-// Determines whether operations by the shader group class will be performed on only
-// certain associated shaders.
-//--------------------------------------------------------------------------------------
-enum ShaderRestriction
-{
-	OnlyBasic,
-	OnlyInstanced,
-	Both
 };
 
 class ShaderGroup
@@ -40,14 +30,12 @@ public:
 
 	bool Initialise(ID3D11Device* pDevice, ShaderType shaderType);
 	void Cleanup(void);
-	bool SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData, ShaderRestriction restriction = Both);
-	bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData, ShaderRestriction restriction = Both);
-	void Activate(ID3D11DeviceContext* pContext, bool doActivateInstancedVersion);
+	bool SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData);
+	bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
+	void Activate(ID3D11DeviceContext* pContext);
 private:
 	VertexShader* m_pVertexShader;
-	VertexShader* m_pInstancedVertexShader;
 	PixelShader*  m_pPixelShader;
-	PixelShader*  m_pInstancedPixelShader;
 
 	ShaderType    m_type;
 	bool		  m_isInitialised;

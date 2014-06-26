@@ -111,8 +111,8 @@ HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
     g_hInst = hInstance;
 
 	// Determine the resolution of the screen
-	//g_width  = GetSystemMetrics(SM_CXSCREEN);
-	//g_height = GetSystemMetrics(SM_CYSCREEN);
+	g_width  = GetSystemMetrics(SM_CXSCREEN);
+	g_height = GetSystemMetrics(SM_CYSCREEN);
 
 	// Setup screen settings for full screen
 	DEVMODE dmScreenSettings;
@@ -124,10 +124,10 @@ HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
 	dmScreenSettings.dmFields     = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 	// Change the display settings to full screen.
-	//ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
+	ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
 
     g_hWnd = CreateWindow(L"SquadAIWindowClass", L"Squad AI",
-                          WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_EX_OVERLAPPEDWINDOW, //last was WS_POPUP
+                          WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
 						  0, 0, g_width, g_height, NULL, NULL, hInstance,
                           NULL);
 

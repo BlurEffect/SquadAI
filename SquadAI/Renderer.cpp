@@ -81,7 +81,7 @@ bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
 	swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount			= 1;
 	swapChainDesc.OutputWindow			= hWnd; 
-	swapChainDesc.Windowed				= TRUE; // was FALSE use full screen
+	swapChainDesc.Windowed				= FALSE; // use full screen
 	swapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;
 
 	// Create the swap chain and the device

@@ -102,9 +102,6 @@
     <ClCompile Include="Font.cpp">
       <Filter>Source Files\TextRendering</Filter>
     </ClCompile>
-    <ClCompile Include="Sentence.cpp">
-      <Filter>Source Files\TextRendering</Filter>
-    </ClCompile>
     <ClCompile Include="OrthographicCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -113,6 +110,9 @@
     </ClCompile>
     <ClCompile Include="FontPixelShader.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="SentenceDrawable.cpp">
+      <Filter>Source Files\TextRendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -209,9 +209,6 @@
     <ClInclude Include="Font.h">
       <Filter>Header Files\TextRendering</Filter>
     </ClInclude>
-    <ClInclude Include="Sentence.h">
-      <Filter>Header Files\TextRendering</Filter>
-    </ClInclude>
     <ClInclude Include="TextDataStructures.h">
       <Filter>Header Files\TextRendering</Filter>
     </ClInclude>
@@ -229,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="PS_FontCompiled.h">
       <Filter>Header Files\ShaderFramework\Compiled Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="SentenceDrawable.h">
+      <Filter>Header Files\TextRendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

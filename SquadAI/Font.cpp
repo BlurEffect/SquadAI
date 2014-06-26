@@ -1,123 +1,119 @@
 /* 
-*  Kevin Meergans, Improved Lego Editor, 2014
-*  FontImplementation.cpp
-*  Contains the function definitions for the FontImplementation class.
+*  Kevin Meergans, SquadAI, 2014
+*  Font.cpp
+*  Encapsulates a font that is created by loading in a texture and an accompanying data file containing 
+*  information on the characters in the texture.
+*  The class is set up to read in font data created with "Codehead's Bitmap Font Generator", which is
+*  available from here: http://www.codehead.co.uk/cbfg/ 
 */
 
-#include "FontImplementation.h"
+// Includes
+#include "Font.h"
 
-FontImplementation::FontImplementation() : m_pCharacters( nullptr ),
-										   m_pTexture( nullptr ),
-										   m_startCharacter( 0 ),
-										   m_numberOfCharacters( 0 )
+Font::Font(void) : m_pCharacters(nullptr),
+				   m_pTexture(nullptr),
+				   m_startCharacter(0),
+				   m_numberOfCharacters(0),
+				   m_textHeight(0),
+				   m_distanceBetweenCharacters(1.0f)
 {
 }
 
+Font::~Font(void)
+{
+	Cleanup();
+}
+
 //--------------------------------------------------------------------------------------
-// Initialise the font.
+// Initialises the font.
+// Param1: The device that should be used to initialise the font.
+// Param2: The filename, or path, to the file containing the font data.
+// Param3: The filename, or path, to the font texture to be used with this font object.
+// Returns true if the font was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-HRESULT FontImplementation::Initialise( ID3D11Device* pDevice, const std::string& dataFileName, LPCWSTR textureFilename )
+bool Font::Initialise(ID3D11Device* pDevice, const std::string& dataFileName, LPCWSTR textureFilename)
 {
 	// Load the font data and texture
-
-	if( LoadFontData( dataFileName ) &&  LoadFontTexture( pDevice, textureFilename ) )
-	{
-		return S_OK;
-	}else
-	{
-		return E_FAIL;
-	}
-
+	return(LoadFontData(dataFileName) && LoadFontTexture(pDevice, textureFilename));
 }
 
 //--------------------------------------------------------------------------------------
 // Release all allocated resources.
 //--------------------------------------------------------------------------------------
-HRESULT FontImplementation::Cleanup( void )
+void Font::Cleanup(void)
 {
-	if( m_pCharacters )
+	if(m_pCharacters)
 	{
 		delete[] m_pCharacters;
 		m_pCharacters = nullptr;
 	}
 
-	if( m_pTexture )
+	if(m_pTexture)
 	{
-		m_pTexture -> Release();
+		m_pTexture->Release();
 		m_pTexture = nullptr;
 	}
-
-	return S_OK;
 }
 
 //--------------------------------------------------------------------------------------
-// Fill the passed in vertex array with vertices "containing" the text to display the text
-// described by the second parameter and positioned at the screen coordinates denoted by the 
-// last two parameters.
+// Fills the passed in vertex array with vertices forming quads to be textured with the
+// characters of the font.
+// Param1: A pointer to the destination, to which the vertex data will be written.
+// Param2: A pointer to the destination, to which the index data will be written.
+// Param3: The screen X-coordinate, at which the text should be placed.
+// Param4: The screen Y-coordinate, at which the text should be placed.
 //--------------------------------------------------------------------------------------
-void FontImplementation::BuildVertexArray( void* outVertices, const char* text, float screenX, float screenY)
+void Font::BuildVertexArray(void* outVertices, void* outIndices, const std::string& text, float screenX, float screenY)
 {
-	TextVertex* pVertices;
-
-	// Point to the passed in array 
-	pVertices = ( TextVertex* )outVertices;
+	TextVertex*    pVertices = static_cast<TextVertex*>(outVertices);
+	unsigned long* pIndices  = static_cast<unsigned long*>(outIndices);
 
 	// Get the length of the text
-	int numCharacters = ( int )strlen( text );
+	int numCharacters = text.length();
 
-	int index  = 0;
 	int letter = 0;
 
 	// Build the vertex array by creating a quad for every character in the given text
-	for(int i = 0; i < numCharacters; i++)
+	for(int i = 0; i < numCharacters; ++i)
 	{
-		letter = ( ( int )text[i] ) - m_startCharacter;
+		letter = (static_cast<int>(text[i])) - m_startCharacter;
 
-		// Create the first triangle
-		pVertices[index].m_position = XMFLOAT3(screenX, screenY, 0.0f);  // Top left.
-		pVertices[index].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_leftBound, 0.0f);
-		++index;
+		// Top left vertex
+		pVertices[4 * i].m_position = XMFLOAT3(screenX, screenY, 0.0f);  
+		pVertices[4 * i].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_leftBound, 0.0f);
+		pIndices[6 * i] = 4 * i;
 
-		pVertices[index].m_position = XMFLOAT3((screenX + m_pCharacters[letter].m_size), (screenY - m_textHeight), 0.0f);  // Bottom right.
-		pVertices[index].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_rightBound, 1.0f);
-		++index;
+		// Bottom right vertex
+		pVertices[4 * i + 1].m_position = XMFLOAT3((screenX + m_pCharacters[letter].m_size), (screenY - m_textHeight), 0.0f); 
+		pVertices[4 * i + 1].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_rightBound, 1.0f);
+		pIndices[6 * i + 1] = 4 * i + 1;
 
-		pVertices[index].m_position = XMFLOAT3(screenX, (screenY - m_textHeight), 0.0f);  // Bottom left.
-		pVertices[index].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_leftBound, 1.0f);
-		++index;
+		// Bottom left vertex
+		pVertices[4 * i + 2].m_position = XMFLOAT3(screenX, (screenY - m_textHeight), 0.0f);  
+		pVertices[4 * i + 2].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_leftBound, 1.0f);
+		pIndices[6 * i + 2] = 4 * i + 2;
 
-		// Create the second triangle
-		pVertices[index].m_position = XMFLOAT3(screenX, screenY, 0.0f);  // Top left.
-		pVertices[index].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_leftBound, 0.0f);
-		++index;
+		pIndices[6 * i + 3] = 4 * i; // top left vertex
 
-		pVertices[index].m_position = XMFLOAT3(screenX + m_pCharacters[letter].m_size, screenY, 0.0f);  // Top right.
-		pVertices[index].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_rightBound, 0.0f);
-		++index;
+		// Top right vertex
+		pVertices[4 * i + 3].m_position = XMFLOAT3(screenX + m_pCharacters[letter].m_size, screenY, 0.0f);  
+		pVertices[4 * i + 3].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_rightBound, 0.0f);
+		pIndices[6 * i + 4] = 4 * i + 3;
 
-		pVertices[index].m_position = XMFLOAT3((screenX + m_pCharacters[letter].m_size), (screenY - m_textHeight), 0.0f);  // Bottom right.
-		pVertices[index].m_texCoord = XMFLOAT2(m_pCharacters[letter].m_rightBound, 1.0f);
-		++index;
+		pIndices[6 * i + 5] = 4 * i + 1; // bottom right vertex
 
 		// Update the screen coordinate for the next letter, add a small gap in between
-		screenX = screenX + m_pCharacters[letter].m_size + 1.0f;
+		screenX = screenX + m_pCharacters[letter].m_size + m_distanceBetweenCharacters;
 	}
 }
 
 //--------------------------------------------------------------------------------------
-// Returns a pointer to the texture containing the font.
+// Load the font data from the given file describing properties of the font characters.
+// Param1: The filename, or path, of the file containing the font data.
+// Returns true if the data was loaded successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-ID3D11ShaderResourceView* FontImplementation::GetTexture() const
+bool Font::LoadFontData( const std::string& filename )
 {
-	return m_pTexture;
-}
-
-//--------------------------------------------------------------------------------------
-// Load the font data describing properties of the font characters from the given file.
-//--------------------------------------------------------------------------------------
-bool FontImplementation::LoadFontData( const std::string& filename )
-{
-
 	std::ifstream in;
 
 	// Open the file
@@ -130,6 +126,7 @@ bool FontImplementation::LoadFontData( const std::string& filename )
 	char temp = ' ';
 
 	// Information listed at the top of the font file. At the moment only a few are being used.
+
 	std::string fontName("");
 	int imageWidth  = 0;
 	int imageHeight = 0;
@@ -145,8 +142,8 @@ bool FontImplementation::LoadFontData( const std::string& filename )
 	}
 	in >> imageWidth;
 
-	// invalid file, prevent division by zero later on
-	if( imageWidth == 0 )
+	// Invalid file, prevent division by zero later on
+	if(imageWidth == 0)
 	{
 		in.close();
 		return false;
@@ -163,8 +160,9 @@ bool FontImplementation::LoadFontData( const std::string& filename )
 		in.get(temp);
 	}
 	in >> cellWidth;
-	// invalid file, prevent division by zero later on
-	if( cellWidth == 0 )
+
+	// Invalid file, prevent division by zero later on
+	if(cellWidth == 0)
 	{
 		in.close();
 		return false;
@@ -206,60 +204,35 @@ bool FontImplementation::LoadFontData( const std::string& filename )
 
 	// Create character array
 	m_pCharacters = new CharacterData[m_numberOfCharacters];
-	if( !m_pCharacters )
+	if(!m_pCharacters)
 	{
 		return false;
 	}
 
 	in.get(temp);
-	// read until the beginning of the start character, skip the ones before
+
+	// Read until the beginning of the start character, skip the ones before
 	int garbage = 0;
-	for( int i = 0; i < m_startCharacter + m_numberOfCharacters; ++i )
+	for(int i = 0; i < m_startCharacter + m_numberOfCharacters; ++i)
 	{
 		while(temp != ',')
 		{
 			in.get(temp);
 		}
 
-		if( i < m_startCharacter )
+		if(i < m_startCharacter)
 		{
 			in >> garbage;
 		}else
 		{
 			in >> m_pCharacters[i - m_startCharacter].m_size;
 
-			// calculate the texture coordinates
-			//m_pCharacters[i - m_startCharacter].m_leftBound  = static_cast<float>( (i - m_startCharacter) * cellWidth ) / imageWidth;
-			//m_pCharacters[i - m_startCharacter].m_rightBound = static_cast<float>( ( (i - m_startCharacter)+1 ) * cellWidth ) / imageWidth;
-			
-			m_pCharacters[i - m_startCharacter].m_leftBound  = static_cast<float>( (i - m_startCharacter) * cellWidth ) / imageWidth;
-			m_pCharacters[i - m_startCharacter].m_rightBound = static_cast<float>( (i - m_startCharacter ) * cellWidth + m_pCharacters[i - m_startCharacter].m_size) / imageWidth;
-		
-			
-		
+			m_pCharacters[i - m_startCharacter].m_leftBound  = static_cast<float>((i - m_startCharacter) * cellWidth) / imageWidth;
+			m_pCharacters[i - m_startCharacter].m_rightBound = static_cast<float>((i - m_startCharacter) * cellWidth + m_pCharacters[i - m_startCharacter].m_size) / imageWidth;
 		}
 		in.get(temp);
 	}
 
-	/*
-	int a = 0;
-
-	in.get(temp);
-	// Read in the number of characters contained in the file
-	for( int i = 0; i < m_numberOfCharacters; i++ )
-	{
-		while(temp != ',')
-		{
-			in.get(temp);
-		}
-		//in >> m_pCharacters[i].m_size;
-		in >> a;
-
-		// calculate the texture coordinates
-		m_pCharacters[i].m_leftBound  = static_cast<float>( i * cellWidth ) / imageWidth;
-		m_pCharacters[i].m_rightBound = static_cast<float>( ( i+1 ) * cellWidth ) / imageWidth;
-	}
-	*/
 	// Close the file
 	in.close();
 
@@ -267,12 +240,19 @@ bool FontImplementation::LoadFontData( const std::string& filename )
 }
 
 //--------------------------------------------------------------------------------------
-// Load the texture containing the font.
+// Loads the texture containing the font.
+// Param1: The filename, or path, of the file containing the font texture.
+// Returns true if the texture was loaded successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool FontImplementation::LoadFontTexture( ID3D11Device* pDevice, LPCWSTR filename )
+bool Font::LoadFontTexture(ID3D11Device* pDevice, LPCWSTR filename)
 {
 	// Create the texture
-	HRESULT result = D3DX11CreateShaderResourceViewFromFile( pDevice, filename, NULL, NULL, &m_pTexture, NULL );
+	return SUCCEEDED(D3DX11CreateShaderResourceViewFromFile(pDevice, filename, NULL, NULL, &m_pTexture, NULL));
+}
 
-	return SUCCEEDED( result );
+// Data access functions
+
+const ID3D11ShaderResourceView* Font::GetTexture() const
+{
+	return m_pTexture;
 }

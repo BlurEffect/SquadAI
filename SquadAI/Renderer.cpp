@@ -21,8 +21,16 @@ Renderer::Renderer() : m_pSwapChain(nullptr),
 					   m_pRasterStateCullBackfaces(nullptr),
 					   m_pBlendingEnabledBlendingState(nullptr),
 					   m_pBlendingDisabledBlendingState(nullptr),
-					   m_currentShaderGroup(ShaderType(0))
+					   m_currentShaderGroup(ShaderType(0)),
+					   m_pFontSamplerState(nullptr)
+
 {
+	XMStoreFloat4x4(&m_baseViewMatrix, XMMatrixIdentity());
+
+	for(int i = 0; i < NumberOfSentences; ++i)
+	{
+		m_pPermanentSentences[i] = nullptr;
+	}
 }
 
 Renderer::~Renderer()
@@ -37,9 +45,12 @@ Renderer::~Renderer()
 // Param3: The height of the window in pixels.
 // Returns true if the renderer was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::Initialise(HWND hWnd, int windowWidth, int windowHeight)
+bool Renderer::Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
 {
-	if(InitialiseD3D(hWnd, windowWidth, windowHeight) && InitialiseDrawables() && InitialiseShaders())
+	m_windowWidth  = windowWidth;
+	m_windowHeight = windowHeight;
+
+	if(InitialiseD3D(hWnd) && InitialiseDrawables() && InitialiseShaders() && InitialiseTextRendering(hWnd, viewMatrix, projectionMatrix))
 	{
 		// Set default render states and shaders
 		PrepareDefaultGeometryRendering();
@@ -53,18 +64,16 @@ bool Renderer::Initialise(HWND hWnd, int windowWidth, int windowHeight)
 // Initialises DirectX 11 by creating a device and other required components while also initialising 
 // all render states (such as blend and cull states) that will be used by the application.
 // Param1: A handle to the window that the application will run in.
-// Param2: The width of the window in pixels.
-// Param3: The height of the window in pixels.
 // Returns true if DirectX 11 was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
+bool Renderer::InitialiseD3D(HWND hWnd)
 {
 	// Description of the swap chain buffer
 	DXGI_MODE_DESC swapChainBufferDesc;
 	ZeroMemory(&swapChainBufferDesc, sizeof(DXGI_MODE_DESC));
 
-	swapChainBufferDesc.Width					= windowWidth;
-	swapChainBufferDesc.Height					= windowHeight;
+	swapChainBufferDesc.Width					= m_windowWidth;
+	swapChainBufferDesc.Height					= m_windowHeight;
 	swapChainBufferDesc.RefreshRate.Numerator	= 60;
 	swapChainBufferDesc.RefreshRate.Denominator	= 1;
 	swapChainBufferDesc.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -81,7 +90,7 @@ bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
 	swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount			= 1;
 	swapChainDesc.OutputWindow			= hWnd; 
-	swapChainDesc.Windowed				= FALSE; // use full screen
+	swapChainDesc.Windowed				= TRUE; // use full screen
 	swapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;
 
 	// Create the swap chain and the device
@@ -117,8 +126,8 @@ bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
 	ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
-	depthStencilBufferDesc.Width			  = windowWidth;
-	depthStencilBufferDesc.Height			  = windowHeight;
+	depthStencilBufferDesc.Width			  = m_windowWidth;
+	depthStencilBufferDesc.Height			  = m_windowHeight;
 	depthStencilBufferDesc.MipLevels		  = 1;
 	depthStencilBufferDesc.ArraySize		  = 1;
 	depthStencilBufferDesc.Format			  = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -154,8 +163,8 @@ bool Renderer::InitialiseD3D(HWND hWnd, int windowWidth, int windowHeight)
 
 	viewport.TopLeftX	= 0;
 	viewport.TopLeftY	= 0;
-	viewport.Width		= static_cast<float>(windowWidth);
-	viewport.Height		= static_cast<float>(windowHeight);
+	viewport.Width		= static_cast<float>(m_windowWidth);
+	viewport.Height		= static_cast<float>(m_windowHeight);
 	viewport.MinDepth	= 0.0f;
 	viewport.MaxDepth	= 1.0f;
 
@@ -357,6 +366,71 @@ bool Renderer::InitialiseShaders()
 //--------------------------------------------------------------------------------------
 // Cleanup renderer, free ressources.
 //--------------------------------------------------------------------------------------
+bool Renderer::InitialiseTextRendering(HWND hwnd, const XMFLOAT4X4& baseViewMatrix, const XMFLOAT4X4& baseProjectionMatrix)
+{
+	m_baseViewMatrix       = baseViewMatrix;
+	m_baseProjectionMatrix = baseProjectionMatrix;
+
+	// Initialise font object
+
+	if(!m_font.Initialise(m_pD3d11Device, "Font/FontData.csv", L"Font/ExportedFont.bmp"))
+	{
+		return false;
+	}
+
+	// Create sampler state for font texture
+
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
+
+	samplerDesc.Filter		   = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU	   = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV	   = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW	   = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MipLODBias	   = 0.0f;
+	samplerDesc.MaxAnisotropy  = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD		   = 0;
+	samplerDesc.MaxLOD		   = D3D11_FLOAT32_MAX;
+
+	if(FAILED(m_pD3d11Device->CreateSamplerState(&samplerDesc, &m_pFontSamplerState)))
+	{
+		return false;		
+	};
+
+	return InitialiseSentences();
+}
+
+bool Renderer::InitialiseSentences(void)
+{
+	// Create the sentences
+
+	m_pPermanentSentences[TxtHello] = new SentenceDrawable(10, &m_font, "Hello", 400, 400, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtHello])
+	{
+		return false;
+	}
+
+	// Initialise the sentences
+
+	for(int i = 0; i < NumberOfSentences; ++i)
+	{
+		if(!m_pPermanentSentences[i]->Initialise(m_pD3d11Device))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Cleanup renderer, free ressources.
+//--------------------------------------------------------------------------------------
 void Renderer::Cleanup( void )
 {
 	// Cleanup all drawables
@@ -373,6 +447,22 @@ void Renderer::Cleanup( void )
 	for(int i = 0; i < NumberOfShaderTypes; ++i)
 	{
 		m_shaderGroups[i].Cleanup();
+	}
+
+	for(int i = 0; i < NumberOfSentences; ++i)
+	{
+		if(m_pPermanentSentences[i])
+		{
+			m_pPermanentSentences[i]->Cleanup();
+			delete m_pPermanentSentences[i];
+			m_pPermanentSentences[i] = nullptr;
+		}
+	}
+
+	if(m_pFontSamplerState)
+	{
+		m_pFontSamplerState->Release();
+		m_pFontSamplerState = nullptr;
 	}
 
 	// Cleanup all the DirectX stuff
@@ -405,6 +495,9 @@ void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& proje
 	
 	// Render the test environment
 	RenderTestEnvironment(viewMatrix, projectionMatrix);
+
+	// Render the text (GUI)
+	RenderText(projectionMatrix);
 
 	// Present the backbuffer to the screen
 	m_pSwapChain->Present(0, 0);
@@ -442,6 +535,37 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 	}
 }
 
+void Renderer::RenderText(const XMFLOAT4X4& orthoMatrix)
+{
+	// Update the sentences
+	UpdateSentences();
+
+	PrepareTextRendering();
+
+	// Set the font texture to the font pixel shader
+	m_shaderGroups[m_currentShaderGroup].SetTexture(0, m_pD3d11DeviceContext, m_font.GetTexture(), m_pFontSamplerState, true);
+
+	// Set the per frame data for shaders
+	XMStoreFloat4x4(&m_perFrameData.m_viewProjectionText, XMLoadFloat4x4(&m_baseViewMatrix) * XMLoadFloat4x4(&m_baseProjectionMatrix));
+	m_shaderGroups[m_currentShaderGroup].SetFrameData(m_pD3d11DeviceContext, m_perFrameData);
+
+	// Render the sentences
+	for(int i = 0; i < NumberOfSentences; ++i)
+	{
+		// Set per object data for shaders
+		m_perObjectData.m_colour = m_pPermanentSentences[i]->GetColour();
+		m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
+
+		// Render the sentence
+		m_pPermanentSentences[i]->Draw(m_pD3d11DeviceContext);
+	}
+}
+
+void Renderer::UpdateSentences()
+{
+
+}
+
 //--------------------------------------------------------------------------------------
 // Sets the default render states and shaders for the default rendering of geometry.
 //--------------------------------------------------------------------------------------
@@ -477,7 +601,7 @@ void Renderer::PrepareTextRendering(void)
 	float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 	m_pD3d11DeviceContext -> OMSetBlendState(m_pBlendingEnabledBlendingState, blendFactor, 0xffffffff);
 
-	SetShaderGroup(Font);
+	SetShaderGroup(SimpleFont);
 
 	m_shaderGroups[m_currentShaderGroup].Activate(m_pD3d11DeviceContext);
 }

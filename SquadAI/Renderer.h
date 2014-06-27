@@ -24,6 +24,8 @@
 #include "ShaderGroup.h"
 #include "RenderContext.h"
 #include "RendererSettings.h"
+#include "Font.h"
+#include "SentenceDrawable.h"
 
 using namespace DirectX;
 
@@ -32,7 +34,7 @@ class Renderer
 public:
 	Renderer(void);
 	~Renderer(void);
-	bool Initialise(HWND hWnd, int windowWidth, int windowHeight);
+	bool Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
 	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
 	void Cleanup(void);
 	
@@ -41,14 +43,20 @@ public:
 	RenderContext& GetRenderContext(void);
 
 private:
-	bool		InitialiseD3D( HWND hwnd, int windowWidth, int windowHeight  );
+	bool		InitialiseD3D(HWND hwnd);
 	bool		InitialiseRenderStates();
 	bool		InitialiseDrawables(void);
-	bool		InitialiseShaders();
+	bool		InitialiseShaders(void);
+	bool        InitialiseTextRendering(HWND hwnd, const XMFLOAT4X4& baseViewMatrix, const XMFLOAT4X4& baseProjectionMatrix);
+	bool        InitialiseSentences(void);
+
 	void        RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
-	
+	void        RenderText(const XMFLOAT4X4& orthoMatrix);
+	void        UpdateSentences();
+
 	void	    PrepareDefaultGeometryRendering(void);
 	void	    PrepareTextRendering(void);
+
 	void        SetShaderGroup(ShaderType type);
 
 	// Initialise D3D
@@ -72,9 +80,18 @@ private:
 	PerFrameData			 m_perFrameData; 
 	PerObjectData			 m_perObjectData;
 
+	// Text rendering
+	ID3D11SamplerState*      m_pFontSamplerState;
+	XMFLOAT4X4				 m_baseViewMatrix;
+	XMFLOAT4X4				 m_baseProjectionMatrix;
+	Font					 m_font;
+	SentenceDrawable*		 m_pPermanentSentences[NumberOfSentences];
+
 	// Other
 	Drawable*				 m_drawableObjects[NumberOfDrawableTypes];
 	RenderContext            m_renderContext;
+	UINT                     m_windowWidth;
+	UINT                     m_windowHeight;
 
 };
 

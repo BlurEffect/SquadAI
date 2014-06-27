@@ -45,7 +45,7 @@ void Drawable::Draw(ID3D11DeviceContext* pDeviceContext)
 // Renders a part of the Drawable specified by the number of indices passed in.
 // Param1: The number of indices to draw for the Drawable.
 //--------------------------------------------------------------------------------------
-void Drawable::DrawPart(ID3D11DeviceContext* pDeviceContext, int indicesToDraw)
+void Drawable::DrawPart(ID3D11DeviceContext* pDeviceContext, UINT indicesToDraw)
 {
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	pDeviceContext->IASetVertexBuffers(0, 1, m_vertexBuffer.GetBuffer(), m_vertexBuffer.GetStride(), m_vertexBuffer.GetOffset());

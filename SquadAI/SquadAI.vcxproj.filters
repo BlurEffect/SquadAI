@@ -25,9 +25,6 @@
     <Filter Include="Header Files\ShaderFramework\Compiled Shaders">
       <UniqueIdentifier>{690cacdf-4fb7-4805-81f7-7724fc83747d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Drawables">
-      <UniqueIdentifier>{39e769f3-6cdc-4f56-9ca3-47438a1d08e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Drawables">
       <UniqueIdentifier>{5a6c4ef4-a026-4d9c-af49-6cf611ca4d60}</UniqueIdentifier>
     </Filter>
@@ -36,6 +33,9 @@
     </Filter>
     <Filter Include="Source Files\TextRendering">
       <UniqueIdentifier>{ec78f1eb-bdcb-47d4-8733-61b6b6304d97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Drawables">
+      <UniqueIdentifier>{39e769f3-6cdc-4f56-9ca3-47438a1d08e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -189,19 +189,19 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CircleDrawable.h">
-      <Filter>Drawables</Filter>
+      <Filter>Header Files\Drawables</Filter>
     </ClInclude>
     <ClInclude Include="Drawable.h">
-      <Filter>Drawables</Filter>
+      <Filter>Header Files\Drawables</Filter>
     </ClInclude>
     <ClInclude Include="TriangleDrawable.h">
-      <Filter>Drawables</Filter>
+      <Filter>Header Files\Drawables</Filter>
     </ClInclude>
     <ClInclude Include="SquareDrawable.h">
-      <Filter>Drawables</Filter>
+      <Filter>Header Files\Drawables</Filter>
     </ClInclude>
     <ClInclude Include="GridDrawable.h">
-      <Filter>Drawables</Filter>
+      <Filter>Header Files\Drawables</Filter>
     </ClInclude>
     <ClInclude Include="TextRenderer.h">
       <Filter>Header Files\TextRendering</Filter>

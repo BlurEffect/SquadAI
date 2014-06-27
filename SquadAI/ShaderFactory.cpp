@@ -22,7 +22,7 @@ VertexShader* ShaderFactory::CreateVertexShader(ShaderType type)
 	case SimpleUnlit:
 		return new SimpleVertexShader();
 		break;
-	case Font:
+	case SimpleFont:
 		return new FontVertexShader();
 		break;
 	}
@@ -44,7 +44,7 @@ PixelShader* ShaderFactory::CreatePixelShader(ShaderType type)
 	case SimpleUnlit:
 		return new SimplePixelShader();
 		break;
-	case Font:
+	case SimpleFont:
 		return new FontPixelShader();
 		break;
 	}

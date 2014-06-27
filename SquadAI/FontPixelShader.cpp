@@ -27,7 +27,12 @@ FontPixelShader::~FontPixelShader(void)
 bool FontPixelShader::Initialise(ID3D11Device* pDevice)
 {
 	// Create the shader
-	return(SUCCEEDED(pDevice->CreatePixelShader(g_PS_FontCompiled, sizeof(g_PS_FontCompiled), nullptr, &m_pPixelShader)));
+	if(FAILED(pDevice->CreatePixelShader(g_PS_FontCompiled, sizeof(g_PS_FontCompiled), nullptr, &m_pPixelShader)))
+	{
+		return false;
+	}
+
+	return m_cbPerObject.Initialise(ConstantBuffer, pDevice, D3D11_USAGE_DYNAMIC, nullptr, 1);
 }
 
 //--------------------------------------------------------------------------------------
@@ -56,6 +61,29 @@ bool FontPixelShader::SetObjectData(ID3D11DeviceContext* pContext, const PerObje
 	}
 
 	pContext -> PSSetConstantBuffers( 0, 1, m_cbPerObject.GetBuffer() );
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the textures and corresponding sampler states used by the shader.
+// Param1: The index of the texture resource of the shader that is to be updated.
+// Param2: The device context used to update the texture resource.
+// Param3: A pointer to the texture that should be set as resource for the shader.
+// Param4: A pointer to the sampler state that should be used with the passed in texture.
+// Returns true if the texture resource was set successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool FontPixelShader::SetTexture(UINT index, ID3D11DeviceContext* pContext, ID3D11ShaderResourceView* pTexture, ID3D11SamplerState* pSamplerState)
+{
+	// This shader only takes one texture resource at index 0.
+	if( index != 0 )
+	{
+		return false;
+	}
+
+	// Set the texture and sampler state
+	pContext->PSSetShaderResources(index, 1, &pTexture);
+	pContext->PSSetSamplers(index, 1, &pSamplerState);
 
 	return true;
 }

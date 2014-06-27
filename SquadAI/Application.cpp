@@ -33,9 +33,9 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 		return false;
 	}
 
-	if(!m_renderer.Initialise(hWnd, windowWidth, windowHeight))
+	if(!m_renderer.Initialise(hWnd, windowWidth, windowHeight, m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix()))
 	{
-				return false;
+		return false;
 	}
 
 	if(!m_testEnvironment.Initialise())

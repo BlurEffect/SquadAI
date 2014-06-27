@@ -30,7 +30,7 @@ public:
 	void BuildVertexArray(void* outVertices, void* outIndices, const std::string& text, float screenX, float screenY);
 
 	// Data access
-	const ID3D11ShaderResourceView* GetTexture() const;
+	ID3D11ShaderResourceView* GetTexture();
 
 private:
 	bool LoadFontData(const std::string& filename);
@@ -39,8 +39,8 @@ private:
 	CharacterData*			  m_pCharacters;			   // The character data for the font used by this class to build text
 	ID3D11ShaderResourceView* m_pTexture;				   // The texture containing the font
 	byte				      m_startCharacter;			   // The first character in the font, usually empty space char
-	int                       m_numberOfCharacters;		   // The number of characters in the font
-	int						  m_textHeight;				   // The height of the text
+	UINT                      m_numberOfCharacters;		   // The number of characters in the font
+	UINT					  m_textHeight;				   // The height of the text
 	float                     m_distanceBetweenCharacters; // The distance between single characters within a text
 };
 

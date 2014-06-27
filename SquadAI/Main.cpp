@@ -124,10 +124,10 @@ HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow)
 	dmScreenSettings.dmFields     = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 	// Change the display settings to full screen.
-	ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
+	//ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
 
     g_hWnd = CreateWindow(L"SquadAIWindowClass", L"Squad AI",
-                          WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+                          WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW,//  3rd item was WS_POPUP,
 						  0, 0, g_width, g_height, NULL, NULL, hInstance,
                           NULL);
 

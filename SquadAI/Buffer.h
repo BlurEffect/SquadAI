@@ -150,6 +150,12 @@ bool Buffer<BufferElementType>::Initialise(BufferType bufferType, ID3D11Device* 
 template <class BufferElementType>
 bool Buffer<BufferElementType>::Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements)
 {
+	if(m_pBuffer == nullptr)
+	{
+		bool a = true;
+	}
+
+
 	// Attempt to write more data to the buffer than it can hold
 	if(numberOfElements > m_maxNumberOfElements)
 	{

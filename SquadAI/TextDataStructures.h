@@ -20,14 +20,14 @@ using namespace DirectX;
 struct CharacterData
 {
 	CharacterData(void) : m_leftBound(0.0f), m_rightBound(0.0f), m_size(0){}
-	CharacterData(float leftBound, float rightBound, int size) : m_leftBound(leftBound), 
-																 m_rightBound(rightBound), 
-																 m_size(size)
+	CharacterData(float leftBound, float rightBound, UINT size) : m_leftBound(leftBound), 
+																  m_rightBound(rightBound), 
+																  m_size(size)
 	{}
 
 	float m_leftBound;	 // Texture U coordinate of the left bound of the part of the texture containing the character
 	float m_rightBound;	 // Texture U coordinate of the right bound of the part of the texture containing the character
-	int   m_size;		 // Actual width of the character in pixels
+	UINT  m_size;		 // Actual width of the character in pixels
 };
 
 //--------------------------------------------------------------------------------------
@@ -45,40 +45,12 @@ struct TextVertex
 };
 
 //--------------------------------------------------------------------------------------
-// Used to distinguish between different sentences(text parts) to be rendered onto the screen.
+// Used to distinguish between different permanent sentences(text parts) to be rendered 
+// onto the screen.
 //--------------------------------------------------------------------------------------
 enum SentenceIdentifiers
 {
-	// Static text
-	TxtCursorPosTemplate,
-	TxtCursorPosLabel, 
-	TxtBrickTypeLabel, 
-	TxtColourLabel, 
-	TxtRotationLabel, 
-	TxtRecModeLabel, 
-	TxtDelModeLabel, 
-	TxtBrickNumberLabel,
-	TxtBricksRenderedLabel,
-	TxtStudNumberLabel,
-	TxtStudsRenderedLabel,
-	TxtShaderLabel,
-	TxtFramerateLabel,
-
-	// Dynamic text
-	TxtCursorPosX, 
-	TxtCursorPosY,
-	TxtCursorPosZ,
-	TxtBrickType, 
-	TxtColour, 
-	TxtRotation, 
-	TxtRecMode, 
-	TxtDelMode, 
-	TxtBrickNumber,
-	TxtBricksRendered,
-	TxtStudNumber,
-	TxtStudsRendered,
-	TxtShader,
-	TxtFramerate,
+	TxtHello,
 	NumberOfSentences
 };
 

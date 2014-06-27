@@ -96,6 +96,25 @@ bool ShaderGroup::SetObjectData(ID3D11DeviceContext* pContext, const PerObjectDa
 		   (m_pPixelShader->SetObjectData(pContext, perObjectData));
 }
 
+//--------------------------------------------------------------------------------------
+// Updates the textures and corresponding sampler states used by the shaders of this group.
+// Param1: The index of the texture resource of the shader that is to be updated.
+// Param2: The device context used to update the texture resource.
+// Param3: A pointer to the texture that should be set as resource for the shader.
+// Param4: A pointer to the sampler state that should be used with the passed in texture.
+// Param5: Determines whether the texture resource will be set on the vertex or pixel shader.
+// Returns true if the texture resource was set successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool ShaderGroup::SetTexture(UINT index, ID3D11DeviceContext* pContext, ID3D11ShaderResourceView* pTexture, ID3D11SamplerState* pSamplerState, bool setOnPixelShader)
+{
+	if(setOnPixelShader)
+	{
+		return m_pPixelShader->SetTexture(index, pContext, pTexture, pSamplerState);
+	}else
+	{
+		return m_pVertexShader->SetTexture(index, pContext, pTexture, pSamplerState);
+	}
+}
 
 //--------------------------------------------------------------------------------------
 // Activate shaders associated to this group.

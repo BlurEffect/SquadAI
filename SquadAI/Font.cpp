@@ -65,11 +65,11 @@ void Font::Cleanup(void)
 //--------------------------------------------------------------------------------------
 void Font::BuildVertexArray(void* outVertices, void* outIndices, const std::string& text, float screenX, float screenY)
 {
-	TextVertex*    pVertices = static_cast<TextVertex*>(outVertices);
-	unsigned long* pIndices  = static_cast<unsigned long*>(outIndices);
+	TextVertex*    pVertices = reinterpret_cast<TextVertex*>(outVertices);
+	unsigned long* pIndices  = reinterpret_cast<unsigned long*>(outIndices);
 
 	// Get the length of the text
-	int numCharacters = text.length();
+	UINT numCharacters = text.length();
 
 	int letter = 0;
 
@@ -252,7 +252,7 @@ bool Font::LoadFontTexture(ID3D11Device* pDevice, LPCWSTR filename)
 
 // Data access functions
 
-const ID3D11ShaderResourceView* Font::GetTexture() const
+ID3D11ShaderResourceView* Font::GetTexture()
 {
 	return m_pTexture;
 }

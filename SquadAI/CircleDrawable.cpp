@@ -7,9 +7,9 @@
 // Includes
 #include "CircleDrawable.h"
 
-CircleDrawable::CircleDrawable(float radius, int segments) : Drawable(),
-															 m_radius(radius),
-															 m_segments(segments)
+CircleDrawable::CircleDrawable(float radius, UINT segments) : Drawable(),
+															  m_radius(radius),
+															  m_segments(segments)
 {
 	m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 }

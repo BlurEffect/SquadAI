@@ -25,6 +25,7 @@ public:
 	virtual void Cleanup(void) = 0;
 	virtual bool SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData);
 	virtual bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
+	virtual bool SetTexture(UINT index, ID3D11DeviceContext* pContext, ID3D11ShaderResourceView* pTexture, ID3D11SamplerState* pSamplerState);
 	virtual void Activate(ID3D11DeviceContext* pContext) = 0;
 };
 

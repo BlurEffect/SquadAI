@@ -20,7 +20,7 @@ using namespace DirectX;
 class SentenceDrawable : Drawable
 {
 public:
-	SentenceDrawable(int maxLength, Font* pFont, const std::string& text, int anchorX, int anchorY, const XMFLOAT3& colourRGB);
+	SentenceDrawable(UINT maxLength, Font* pFont, const std::string& text, int anchorX, int anchorY, const XMFLOAT3& colourRGB);
 	~SentenceDrawable(void);
 	bool Initialise(ID3D11Device* pDevice);
 	void Draw(ID3D11DeviceContext* pDeviceContext);
@@ -28,11 +28,13 @@ public:
 
 	// Data access
 
+	UINT			   GetMaxLength(void) const;
+	UINT			   GetCurrentLength(void) const;
 	const Font*        GetFont(void) const;
 	const std::string& GetText(void) const;
 	int                GetAnchorX(void) const;
 	int                GetAnchorY(void) const;
-	const XMFLOAT3&	   GetColourRGB(void) const;
+	const XMFLOAT4&	   GetColour(void) const;
 
 	void SetFont(Font* pFont);
 	void SetText(const std::string& text);
@@ -45,17 +47,17 @@ private:
 
 	Buffer<TextVertex>    m_vertexBuffer;  // The buffer holding the vertex data for the sentence
 	Buffer<unsigned long> m_indexBuffer;   // The buffer holding the index data for the sentence
-	int					  m_vertexCount;   // The number of vertices needed to render the sentence
-	int					  m_indexCount;	   // The number of indices needed to render the sentence
+	UINT				  m_vertexCount;   // The number of vertices needed to render the sentence
+	UINT				  m_indexCount;	   // The number of indices needed to render the sentence
 	
-	int				      m_maxLength;	   // The maximum length of the sentence in characters
-	int                   m_currentLength; // The length of the current content of the sentence in characters
+	UINT			      m_maxLength;	   // The maximum length of the sentence in characters
+	UINT                  m_currentLength; // The length of the current content of the sentence in characters
 
 	Font*                 m_pFont;         // The font used with this sentence
 	std::string		      m_text;		   // Content of the sentence, text to be drawn
 	int					  m_anchorX;	   // Pixel x coordinate, at which to start drawing the text
 	int					  m_anchorY;	   // Pixel y coordinate, at which to start drawing the text
-	XMFLOAT3		      m_colourRGB;	   // The colour, in which to render the content of the sentence
+	XMFLOAT4		      m_colour;	       // The colour, in which to render the content of the sentence
 
 	bool                  m_doUpdate;      // Tells whether the vertex data has to be updated before rendering
 };

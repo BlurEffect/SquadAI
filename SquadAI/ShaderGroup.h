@@ -18,7 +18,7 @@
 enum ShaderType
 {
 	SimpleUnlit,
-	Font,
+	SimpleFont,
 	NumberOfShaderTypes
 };
 
@@ -32,6 +32,7 @@ public:
 	void Cleanup(void);
 	bool SetFrameData(ID3D11DeviceContext* pContext, const PerFrameData& perFrameData);
 	bool SetObjectData(ID3D11DeviceContext* pContext, const PerObjectData& perObjectData);
+	bool SetTexture(UINT index, ID3D11DeviceContext* pContext, ID3D11ShaderResourceView* pTexture, ID3D11SamplerState* pSamplerState, bool setOnPixelShader);
 	void Activate(ID3D11DeviceContext* pContext);
 private:
 	VertexShader* m_pVertexShader;

@@ -14,7 +14,7 @@
 class CircleDrawable : public Drawable
 {
 public:
-	CircleDrawable(float radius, int segments);
+	CircleDrawable(float radius, UINT segments);
 	~CircleDrawable(void);
 	bool Initialise(ID3D11Device* pDevice);
 private:

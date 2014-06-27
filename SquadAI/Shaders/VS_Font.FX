@@ -19,7 +19,6 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 Position : SV_POSITION; // The position of the vertex in clip space
-	float4 Colour	: COLOUR;	   // The colour to use for this vertex
 	float2 TexCoord : TEXCOORD;    // The texture coordinates
 };
 

@@ -11,7 +11,7 @@
 #include <d3d11.h>
 #include "Drawable.h"
 
-class TriangleDrawable : public Drawable
+class TriangleDrawable : public Drawable<Vertex>
 {
 public:
 	TriangleDrawable(float base, float height);

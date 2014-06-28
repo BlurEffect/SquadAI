@@ -11,7 +11,7 @@
 #include <d3d11.h>
 #include "Drawable.h"
 
-class CircleDrawable : public Drawable
+class CircleDrawable : public Drawable<Vertex>
 {
 public:
 	CircleDrawable(float radius, UINT segments);

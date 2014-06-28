@@ -48,8 +48,12 @@ private:
 	UINT          m_maxNumberOfElements; // The maximum amount of elements the buffer can hold
 };
 
-// Implementations of the template class
 
+// Implementations of the template class functions
+
+//--------------------------------------------------------------------------------------
+// Default constructor.
+//--------------------------------------------------------------------------------------
 template <class BufferElementType>
 Buffer<BufferElementType>::Buffer() : m_pBuffer(nullptr),
 								      m_stride(sizeof(BufferElementType)),
@@ -57,6 +61,9 @@ Buffer<BufferElementType>::Buffer() : m_pBuffer(nullptr),
 {
 }
 
+//--------------------------------------------------------------------------------------
+// Destructor.
+//--------------------------------------------------------------------------------------
 template <class BufferElementType>
 Buffer<BufferElementType>::~Buffer() 	 
 {
@@ -150,12 +157,6 @@ bool Buffer<BufferElementType>::Initialise(BufferType bufferType, ID3D11Device* 
 template <class BufferElementType>
 bool Buffer<BufferElementType>::Update(ID3D11DeviceContext* pDeviceContext, BufferElementType* pElements, UINT numberOfElements)
 {
-	if(m_pBuffer == nullptr)
-	{
-		bool a = true;
-	}
-
-
 	// Attempt to write more data to the buffer than it can hold
 	if(numberOfElements > m_maxNumberOfElements)
 	{

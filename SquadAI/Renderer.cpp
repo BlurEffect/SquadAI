@@ -405,12 +405,50 @@ bool Renderer::InitialiseTextRendering(HWND hwnd, const XMFLOAT4X4& baseViewMatr
 	return InitialiseSentences();
 }
 
+//--------------------------------------------------------------------------------------
+// Creates and initialises the pieces of text that are permanently present on the screen.
+// Returns true if the sentences were created and initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
 bool Renderer::InitialiseSentences(void)
 {
 	// Create the sentences
 
-	m_pPermanentSentences[TxtHello] = new SentenceDrawable(10, &m_font, "Hello", 400, 400, XMFLOAT3(1.0f, 1.0f, 1.0f));
-	if(!m_pPermanentSentences[TxtHello])
+	// Calculate two reference points to make placement of sentences a bit more convenient
+	int right = static_cast<int>(m_windowWidth) / 2;
+	int top  = static_cast<int>(m_windowHeight) / 2;
+
+	m_pPermanentSentences[LabelCursorPos] = new SentenceDrawable(8, &m_font, "Cursor: ", right - 250, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelCursorPos])
+	{
+		return false;
+	}
+	m_pPermanentSentences[LabelCursorPosSeparators] = new SentenceDrawable(26, &m_font, "       |       |      ", right - 150, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelCursorPosSeparators])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtCursorPosX] = new SentenceDrawable(3, &m_font, "100", right - 150, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtCursorPosX])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtCursorPosY] = new SentenceDrawable(3, &m_font, "100", right - 100, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtCursorPosY])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtCursorPosZ] = new SentenceDrawable(3, &m_font, "100", right - 55, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtCursorPosZ])
+	{
+		return false;
+	}
+	m_pPermanentSentences[LabelEntityType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelEntityType])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtEntityType] = new SentenceDrawable(20, &m_font, "Cover Position", right - 150, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtEntityType])
 	{
 		return false;
 	}
@@ -497,7 +535,7 @@ void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& proje
 	RenderTestEnvironment(viewMatrix, projectionMatrix);
 
 	// Render the text (GUI)
-	RenderText(projectionMatrix);
+	RenderText();
 
 	// Present the backbuffer to the screen
 	m_pSwapChain->Present(0, 0);
@@ -535,7 +573,7 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 	}
 }
 
-void Renderer::RenderText(const XMFLOAT4X4& orthoMatrix)
+void Renderer::RenderText()
 {
 	// Update the sentences
 	UpdateSentences();
@@ -544,8 +582,8 @@ void Renderer::RenderText(const XMFLOAT4X4& orthoMatrix)
 
 	// Set the font texture to the font pixel shader
 	m_shaderGroups[m_currentShaderGroup].SetTexture(0, m_pD3d11DeviceContext, m_font.GetTexture(), m_pFontSamplerState, true);
-
-	// Set the per frame data for shaders
+	
+	// Set the per frame data for the shaders
 	XMStoreFloat4x4(&m_perFrameData.m_viewProjectionText, XMLoadFloat4x4(&m_baseViewMatrix) * XMLoadFloat4x4(&m_baseProjectionMatrix));
 	m_shaderGroups[m_currentShaderGroup].SetFrameData(m_pD3d11DeviceContext, m_perFrameData);
 
@@ -563,7 +601,7 @@ void Renderer::RenderText(const XMFLOAT4X4& orthoMatrix)
 
 void Renderer::UpdateSentences()
 {
-
+	// Placeholder
 }
 
 //--------------------------------------------------------------------------------------
@@ -605,7 +643,6 @@ void Renderer::PrepareTextRendering(void)
 
 	m_shaderGroups[m_currentShaderGroup].Activate(m_pD3d11DeviceContext);
 }
-
 
 // Data access functions
 

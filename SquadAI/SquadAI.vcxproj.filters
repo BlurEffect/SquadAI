@@ -81,9 +81,6 @@
     <ClCompile Include="RenderContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Drawable.cpp">
-      <Filter>Source Files\Drawables</Filter>
-    </ClCompile>
     <ClCompile Include="CircleDrawable.cpp">
       <Filter>Source Files\Drawables</Filter>
     </ClCompile>
@@ -95,9 +92,6 @@
     </ClCompile>
     <ClCompile Include="SquareDrawable.cpp">
       <Filter>Source Files\Drawables</Filter>
-    </ClCompile>
-    <ClCompile Include="TextRenderer.cpp">
-      <Filter>Source Files\TextRendering</Filter>
     </ClCompile>
     <ClCompile Include="Font.cpp">
       <Filter>Source Files\TextRendering</Filter>
@@ -202,9 +196,6 @@
     </ClInclude>
     <ClInclude Include="GridDrawable.h">
       <Filter>Header Files\Drawables</Filter>
-    </ClInclude>
-    <ClInclude Include="TextRenderer.h">
-      <Filter>Header Files\TextRendering</Filter>
     </ClInclude>
     <ClInclude Include="Font.h">
       <Filter>Header Files\TextRendering</Filter>

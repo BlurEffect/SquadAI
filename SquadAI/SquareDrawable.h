@@ -11,7 +11,7 @@
 #include <d3d11.h>
 #include "Drawable.h"
 
-class SquareDrawable : public Drawable
+class SquareDrawable : public Drawable<Vertex>
 {
 public:
 	SquareDrawable(float length);

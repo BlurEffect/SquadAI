@@ -89,7 +89,6 @@
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="CircleDrawable.cpp" />
-    <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="Font.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -110,9 +109,6 @@
     <ClCompile Include="SquareDrawable.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
-    <ClCompile Include="TextRenderer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="TriangleDrawable.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
@@ -153,9 +149,6 @@
     <ClInclude Include="TestEnvironment.h" />
     <ClInclude Include="TextDataStructures.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="TextRenderer.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="TriangleDrawable.h" />
     <ClInclude Include="Buffer.h" />

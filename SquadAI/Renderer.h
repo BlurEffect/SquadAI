@@ -51,7 +51,7 @@ private:
 	bool        InitialiseSentences(void);
 
 	void        RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
-	void        RenderText(const XMFLOAT4X4& orthoMatrix);
+	void        RenderText();
 	void        UpdateSentences();
 
 	void	    PrepareDefaultGeometryRendering(void);
@@ -60,38 +60,38 @@ private:
 	void        SetShaderGroup(ShaderType type);
 
 	// Initialise D3D
-	IDXGISwapChain*			m_pSwapChain;
-	ID3D11Device*			m_pD3d11Device;
-	ID3D11DeviceContext*	m_pD3d11DeviceContext;
-	ID3D11RenderTargetView* m_pRenderTargetView;
-	ID3D11DepthStencilView* m_pDepthStencilView;
-	ID3D11Texture2D*		m_pDepthStencilBuffer;
+	IDXGISwapChain*			 m_pSwapChain;							   // The swap chain used by the renderer 
+	ID3D11Device*			 m_pD3d11Device;						   // The device used by the renderer
+	ID3D11DeviceContext*	 m_pD3d11DeviceContext;					   // The device context used by the renderer
+	ID3D11RenderTargetView*  m_pRenderTargetView;					   // The render target view used by the renderer
+	ID3D11DepthStencilView*  m_pDepthStencilView;					   // The depth stencil view used by the renderer
+	ID3D11Texture2D*		 m_pDepthStencilBuffer;					   // The depth stencil buffer used by the renderer
 
 	// Render states
-	ID3D11DepthStencilState* m_pDepthEnabledStencilState;
-	ID3D11DepthStencilState* m_pDepthDisabledStencilState;
-	ID3D11RasterizerState*	 m_pRasterStateCullBackfaces;
-	ID3D11BlendState*		 m_pBlendingEnabledBlendingState;
-	ID3D11BlendState*		 m_pBlendingDisabledBlendingState;
+	ID3D11DepthStencilState* m_pDepthEnabledStencilState;              // Depth-Stencil state with enabled depth
+	ID3D11DepthStencilState* m_pDepthDisabledStencilState;             // Depth-Stencil state with disabled depth
+	ID3D11RasterizerState*	 m_pRasterStateCullBackfaces;              // Raster state with enabled backface culling
+	ID3D11BlendState*		 m_pBlendingEnabledBlendingState;          // Blending state with enabled blending
+	ID3D11BlendState*		 m_pBlendingDisabledBlendingState;         // Blending state with disabled blending
 
 	// Shader stuff
-	ShaderType               m_currentShaderGroup;
-	ShaderGroup			     m_shaderGroups[NumberOfShaderTypes];
-	PerFrameData			 m_perFrameData; 
-	PerObjectData			 m_perObjectData;
+	ShaderType               m_currentShaderGroup;					   // Identifies the currently active shader group
+	ShaderGroup			     m_shaderGroups[NumberOfShaderTypes];      // An array containing all shader groups available to the renderer
+	PerFrameData			 m_perFrameData;                           // Stores all shader parameters that have to be updated on a per-frame basis
+	PerObjectData			 m_perObjectData;                          // Stores all shader parameters that have to be updated on a per-object basis
 
 	// Text rendering
-	ID3D11SamplerState*      m_pFontSamplerState;
-	XMFLOAT4X4				 m_baseViewMatrix;
-	XMFLOAT4X4				 m_baseProjectionMatrix;
-	Font					 m_font;
-	SentenceDrawable*		 m_pPermanentSentences[NumberOfSentences];
+	ID3D11SamplerState*      m_pFontSamplerState;                      // The sampler state used to sample the font texture
+	XMFLOAT4X4				 m_baseViewMatrix;                         // The original view matrix, used to transform text vertices
+	XMFLOAT4X4				 m_baseProjectionMatrix;				   // The original projection matrix, used to transform text vertices
+	Font					 m_font;								   // The font used for text rendering
+	SentenceDrawable*		 m_pPermanentSentences[NumberOfSentences]; // An array of text drawables that are permanently displayed on the screen
 
 	// Other
-	Drawable*				 m_drawableObjects[NumberOfDrawableTypes];
-	RenderContext            m_renderContext;
-	UINT                     m_windowWidth;
-	UINT                     m_windowHeight;
+	Drawable<Vertex>*		 m_drawableObjects[NumberOfDrawableTypes]; // An array of simple drawables 
+	RenderContext            m_renderContext;                          // The render context is used collects render instance data of drawables to be rendered 
+	UINT                     m_windowWidth;                            // The width of the window the application is running in
+	UINT                     m_windowHeight;						   // The height of the window the application is running in
 
 };
 

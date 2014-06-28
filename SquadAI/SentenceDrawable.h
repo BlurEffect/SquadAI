@@ -17,7 +17,7 @@
 
 using namespace DirectX;
 
-class SentenceDrawable : Drawable
+class SentenceDrawable : Drawable<TextVertex>
 {
 public:
 	SentenceDrawable(UINT maxLength, Font* pFont, const std::string& text, int anchorX, int anchorY, const XMFLOAT3& colourRGB);
@@ -45,11 +45,6 @@ public:
 private:
 	bool Update(ID3D11DeviceContext* pDeviceContext);
 
-	Buffer<TextVertex>    m_vertexBuffer;  // The buffer holding the vertex data for the sentence
-	Buffer<unsigned long> m_indexBuffer;   // The buffer holding the index data for the sentence
-	UINT				  m_vertexCount;   // The number of vertices needed to render the sentence
-	UINT				  m_indexCount;	   // The number of indices needed to render the sentence
-	
 	UINT			      m_maxLength;	   // The maximum length of the sentence in characters
 	UINT                  m_currentLength; // The length of the current content of the sentence in characters
 

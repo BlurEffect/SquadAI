@@ -14,7 +14,7 @@
 #include <d3d11.h>
 #include "Drawable.h"
 
-class GridDrawable : public Drawable
+class GridDrawable : public Drawable<Vertex>
 {
 public:
 	GridDrawable(float width, float height, int horizontalPartitions, int verticalPartitions);

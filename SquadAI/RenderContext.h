@@ -9,7 +9,7 @@
 
 // Includes
 #include <vector>
-#include "RendererData.h"
+#include "EntityData.h"
 #include "VertexData.h"
 
 class RenderContext
@@ -23,12 +23,12 @@ public:
 
 	// Data access functions
 
-	int             GetDrawableCount(DrawableType type) const;
-	const Instance* GetInstances(DrawableType type) const;		
+	int             GetEntityCount(EntityType type) const;
+	const Instance* GetInstances(EntityType type) const;		
 
 private:
-	std::vector<Instance> m_drawableInstances[NumberOfDrawableTypes]; // Contains the instances for each drawable type to be
-																	  // rendered this frame
+	std::vector<Instance> m_entityInstances[NumberOfEntityTypes]; // Contains the instances for each drawable type to be
+																  // rendered this frame
 };
 
 #endif // RENDER_CONTEXT_H

@@ -11,6 +11,7 @@
 // Includes
 #include <DirectXMath.h>
 #include "RenderContext.h"
+#include "TestEnvironmentData.h"
 
 using namespace DirectX;
 
@@ -18,11 +19,12 @@ class TestEnvironment
 {
 public:
 	// Setup, load level data, init structure with number of soldiers start position etc
-	bool Initialise(void);
+	bool Initialise(const TestEnvironmentData& initData);
 	void Update(RenderContext& pRenderContext);
 	void Cleanup(void);
-private:
 
+private:
+	TestEnvironmentData m_data;
 };
 
 #endif // TEST_ENVIRONMENT_H

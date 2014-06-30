@@ -17,6 +17,9 @@
 #include "Renderer.h"
 #include "TestEnvironment.h"
 #include "ApplicationSettings.h"
+#include "AppData.h"
+#include "EntityData.h"
+#include "Helpers.h"
 
 using namespace DirectX;
 
@@ -27,10 +30,14 @@ public:
 	void Update(void);
 	void Cleanup(void);
 private:
+
+	void ProcessInput(void);
+
+	AppData            m_appData;          // The current state and properties of the app
 	OrthographicCamera m_camera;		   // The camera component of the application
 	InputManager	   m_inputManager;	   // The input component of the application
 	Renderer		   m_renderer;		   // The renderer component of the application
-	TestEnvironment    m_testEnvironment; // The test environment used ->could be array later on
+	TestEnvironment    m_testEnvironment;  // The test environment used ->could be array later on
 };
 
 #endif // APPLICATION_H

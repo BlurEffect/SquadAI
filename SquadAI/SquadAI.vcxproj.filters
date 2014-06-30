@@ -221,6 +221,12 @@
     <ClInclude Include="SentenceDrawable.h">
       <Filter>Header Files\TextRendering</Filter>
     </ClInclude>
+    <ClInclude Include="TestEnvironmentData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AppData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PS_Simple.FX">

@@ -43,14 +43,22 @@ Renderer::~Renderer()
 // Param1: A handle to the window that the application will run in.
 // Param2: The width of the window in pixels.
 // Param3: The height of the window in pixels.
+// Param4: The initial view matrix of the application camera. Needed for text rendering.
+// Param5: The initial projection matrix of the application camera. Needed for text rendering.
+// Param6: The data of the test environment. Needed to set things up properly in regard to the specific environment.
 // Returns true if the renderer was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
+bool Renderer::Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const TestEnvironmentData& testEnvData)
 {
 	m_windowWidth  = windowWidth;
 	m_windowHeight = windowHeight;
 
-	if(InitialiseD3D(hWnd) && InitialiseDrawables() && InitialiseShaders() && InitialiseTextRendering(hWnd, viewMatrix, projectionMatrix))
+	if(InitialiseD3D(hWnd) && 
+		InitialiseDrawables(testEnvData) && 
+		InitialiseEntityRenderData() &&
+		InitialiseShaders() && 
+		InitialiseTextRendering(hWnd, viewMatrix, projectionMatrix)
+	  )
 	{
 		// Set default render states and shaders
 		PrepareDefaultGeometryRendering();
@@ -304,9 +312,10 @@ bool Renderer::InitialiseRenderStates()
 
 //--------------------------------------------------------------------------------------
 // Creates and initialise the Drawables available to the renderer.
+// Param1: The test environment data that will be used to set up the grid according to the size of the environment.
 // Returns true if the drawables were created and intialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::InitialiseDrawables(void)
+bool Renderer::InitialiseDrawables(const TestEnvironmentData& testEnvData)
 {
 	// Create the Drawables
 
@@ -328,7 +337,7 @@ bool Renderer::InitialiseDrawables(void)
 		return false;
 	}
 
-	m_drawableObjects[GridType] = new GridDrawable(50, 50, 50, 50);
+	m_drawableObjects[GridType] = new GridDrawable(testEnvData.m_gridWidth, testEnvData.m_gridHeight, testEnvData.m_gridHorizontalPartitions, testEnvData.m_gridVerticalPartitions);
 	if(!m_drawableObjects[GridType])
 	{
 		return false;
@@ -342,6 +351,39 @@ bool Renderer::InitialiseDrawables(void)
 			return false;
 		}
 	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Initialises the entity render data for each possible entity.
+// Returns true if the entity render data was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Renderer::InitialiseEntityRenderData(void)
+{
+	m_entityRenderData[ASoldier].m_drawableType = TriangleType;
+	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_entityRenderData[ASoldier].m_name         = "A - Soldier";
+		
+	m_entityRenderData[ADeadSoldier].m_drawableType = TriangleType;
+	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
+	m_entityRenderData[ADeadSoldier].m_name         = "A - Dead Soldier";
+
+	m_entityRenderData[BSoldier].m_drawableType = TriangleType;
+	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	m_entityRenderData[BSoldier].m_name         = "B - Soldier";
+
+	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
+	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.2f, 0.0f, 1.0f);
+	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
+
+	m_entityRenderData[CoverPosition].m_drawableType = SquareType;
+	m_entityRenderData[CoverPosition].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	m_entityRenderData[CoverPosition].m_name         = "Cover Position";
+
+	m_entityRenderData[Projectile].m_drawableType = CircleType;
+	m_entityRenderData[Projectile].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_entityRenderData[Projectile].m_name         = "Projectile";
 
 	return true;
 }
@@ -558,17 +600,17 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 	XMStoreFloat4x4(&viewProjection, XMLoadFloat4x4(&viewMatrix) * XMLoadFloat4x4(&projectionMatrix));
 
 	// Render the objects collected by the render context
-	for(int i = 0; i < NumberOfDrawableTypes; ++i)
+	for(int i = 0; i < NumberOfEntityTypes; ++i)
 	{
-		for(int k = 0; k < m_renderContext.GetDrawableCount(DrawableType(i)); ++k)
+		for(int k = 0; k < m_renderContext.GetEntityCount(EntityType(i)); ++k)
 		{
 			// Update the per object data according to the current instance
-			m_perObjectData.m_colour = m_renderContext.GetInstances(DrawableType(i))[k].m_colour;
-			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMLoadFloat4x4(&m_renderContext.GetInstances(DrawableType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
+			m_perObjectData.m_colour = m_entityRenderData[i].m_colour;
+			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
 			// Update the shader's constant buffer
 			m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
 			// Draw the object
-			m_drawableObjects[i]->Draw(m_pD3d11DeviceContext);
+			m_drawableObjects[m_entityRenderData[i].m_drawableType]->Draw(m_pD3d11DeviceContext);
 		}
 	}
 }

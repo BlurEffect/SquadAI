@@ -27,29 +27,19 @@ enum DrawableType
 	NumberOfDrawableTypes
 };
 
-// Maps drawables to entities and thus determines which mesh
-// is used to display these objects.
-const DrawableType g_cDrawableMappings[NumberOfEntities] = 
+//--------------------------------------------------------------------------------------
+// Bundles information that is required to render a entity of the test application.
+//--------------------------------------------------------------------------------------
+struct EntityRenderData
 {
-	GridType,     // Grid
-	TriangleType, // SoldierTeamA
-	TriangleType, // DeadSoldierTeamA
-	TriangleType, // SoldierTeamB
-	TriangleType, // DeadSoldierTeamB
-	CircleType,   // Projectile
-	SquareType    // Cover
-};
+	EntityRenderData(void) : m_drawableType(DrawableType(0)),
+							 m_colour(1.0f, 1.0f, 1.0f, 1.0f),
+						     m_name("")
+	{}
 
-// Maps colour values to entities.
-const XMFLOAT4 g_cColourMappings[NumberOfEntities] = 
-{
-	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), // Grid
-	XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), // SoldierTeamA
-	XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f), // DeadSoldierTeamA
-	XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), // SoldierTeamB
-	XMFLOAT4(0.0f, 0.2f, 0.0f, 1.0f), // DeadSoldierTeamB
-	XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), // Projectile
-	XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), // Cover
+	DrawableType m_drawableType; // Identifies the drawable representing this entity
+	XMFLOAT4     m_colour;       // The colour, in which to render the entity
+	const char*  m_name;         // The name of the entity, for display on the GUI
 };
 
 #endif // RENDERER_DATA_H

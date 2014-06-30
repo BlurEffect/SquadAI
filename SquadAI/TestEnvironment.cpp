@@ -9,10 +9,12 @@
 
 //--------------------------------------------------------------------------------------
 // Initialise the test environment
+// Param1: A data structure containing the initialisation data required by the test environment for setup.
 // Returns true if the test environment was successfully initialised, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::Initialise()
+bool TestEnvironment::Initialise(const TestEnvironmentData& initData)
 {
+	m_data = initData;
 	return true;
 }
 
@@ -22,7 +24,7 @@ bool TestEnvironment::Initialise()
 //--------------------------------------------------------------------------------------
 void TestEnvironment::Update(RenderContext& pRenderContext)
 {
-	EntityType type(SoldierTeamB);
+	EntityType type(BSoldier);
 	XMFLOAT3 position(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 rotation(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 scale(10.0f, 10.0f, 10.0f);

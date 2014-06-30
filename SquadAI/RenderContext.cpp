@@ -22,7 +22,7 @@ RenderContext::~RenderContext(void)
 //--------------------------------------------------------------------------------------
 void RenderContext::AddInstance(EntityType type, const XMFLOAT4X4& transform)
 {
-	m_drawableInstances[g_cDrawableMappings[type]].push_back(Instance(transform, g_cColourMappings[type]));
+	m_entityInstances[type].push_back(Instance(transform));
 }
 
 //--------------------------------------------------------------------------------------
@@ -30,22 +30,22 @@ void RenderContext::AddInstance(EntityType type, const XMFLOAT4X4& transform)
 //--------------------------------------------------------------------------------------
 void RenderContext::Reset(void)
 {
-	for(int i = 0; i < NumberOfDrawableTypes; ++i)
+	for(int i = 0; i < NumberOfEntityTypes; ++i)
 	{
-		m_drawableInstances[i].clear();
+		m_entityInstances[i].clear();
 	}
 }
 
 // Data access functions
 
-int RenderContext::GetDrawableCount(DrawableType type) const
+int RenderContext::GetEntityCount(EntityType type) const
 {
-	return m_drawableInstances[type].size();
+	return m_entityInstances[type].size();
 }
 
-const Instance* RenderContext::GetInstances(DrawableType type) const
+const Instance* RenderContext::GetInstances(EntityType type) const
 {
-	return &m_drawableInstances[type][0];
+	return &m_entityInstances[type][0];
 }
 
 

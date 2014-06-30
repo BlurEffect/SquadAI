@@ -25,6 +25,7 @@ InputManager::~InputManager(void)
 //--------------------------------------------------------------------------------------
 bool InputManager::Initialise(HINSTANCE hInst, HWND hWnd)
 {
+	m_windowHandle = hWnd;
 	return m_input.Initialise(hInst, hWnd);
 }
 
@@ -35,6 +36,7 @@ void InputManager::Update()
 {
 	m_input.Update();
 	
+	// Update camera movement
 	if(m_input.MiddleMouseButtonPressed())
 	{
 		m_cameraMovement = m_input.GetMouseMovement();
@@ -42,6 +44,13 @@ void InputManager::Update()
 	{
 		m_cameraMovement = XMFLOAT3(0.0f, 0.0f, m_input.GetMouseMovement().z);
 	}
+
+	// Update cursor position
+	LPPOINT pCursorPosition = &m_cursorPosition;
+	GetCursorPos(pCursorPosition);
+	
+	// Convert screen coordinates to client area coordinates
+	ScreenToClient(m_windowHandle, pCursorPosition);
 }
 
 //--------------------------------------------------------------------------------------
@@ -54,7 +63,42 @@ void InputManager::Cleanup(void)
 
 // Data access functions
 
+//--------------------------------------------------------------------------------------
+// Returns a vector containing the camera movement along each axis for the current frame.
+//--------------------------------------------------------------------------------------
 const XMFLOAT3& InputManager::GetCameraMovement(void) const
 {
 	return m_cameraMovement;
+}
+
+//--------------------------------------------------------------------------------------
+// Returns the cursor position within the client area.
+//--------------------------------------------------------------------------------------
+const POINT& InputManager::GetCursorPosition(void) const
+{
+	return m_cursorPosition;
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user performed a left mouse click during the current frame.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetLeftClick(void) const
+{
+	return m_input.LeftMouseButtonReleased();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to browse left in a list of options.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetBrowseLeft(void) const
+{
+	return m_input.KeyLeftDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to browse right in a list of options.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetBrowseRight(void) const
+{
+	return m_input.KeyRightDown();
 }

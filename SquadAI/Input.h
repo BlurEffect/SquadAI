@@ -42,6 +42,21 @@ public:
 	bool RightMouseButtonReleased(void) const;
 	bool MiddleMouseButtonReleased(void) const;
 
+	bool KeyLeftDown(void) const;
+	bool KeyRightDown(void) const;
+	bool KeyUpDown(void) const;
+	bool KeyDownDown(void) const;
+
+	bool KeyLeftPressed(void) const;
+	bool KeyRightPressed(void) const;
+	bool KeyUpPressed(void) const;
+	bool KeyDownPressed(void) const;
+
+	bool KeyLeftReleased(void) const;
+	bool KeyRightReleased(void) const;
+	bool KeyUpReleased(void) const;
+	bool KeyDownReleased(void) const;
+
 private:
 	bool SetupDirectInput(HINSTANCE hInst, HWND hWnd);
 	void UpdateMouseInput(void);

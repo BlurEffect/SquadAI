@@ -113,6 +113,7 @@
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppData.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="FontPixelShader.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="SquareDrawable.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TestEnvironment.h" />
+    <ClInclude Include="TestEnvironmentData.h" />
     <ClInclude Include="TextDataStructures.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>

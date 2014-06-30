@@ -18,7 +18,7 @@ using namespace DirectX;
 // stores the result in the intersection parameter.
 // The code is mostly based on: http://www.mvps.org/directx/articles/rayproj.htm
 //--------------------------------------------------------------------------------------
-static void GetIntersection( const POINT& cursorPosition, const XMFLOAT4* const pPlane, int windowWidth, int windowHeight, const XMFLOAT4X4* const pViewMatrix, XMFLOAT3* pIntersection )
+static void GetIntersection( const POINT& cursorPosition, const XMFLOAT4& plane, int windowWidth, int windowHeight, const XMFLOAT4X4& viewMatrix, XMFLOAT3& intersection )
 {
 	// This code has to be tested yet
 
@@ -32,7 +32,7 @@ static void GetIntersection( const POINT& cursorPosition, const XMFLOAT4* const 
 	// Transform ray to world space
 
 	XMVECTOR determinant;
-	XMMATRIX matViewInverse = XMMatrixInverse(&determinant, XMLoadFloat4x4(pViewMatrix));
+	XMMATRIX matViewInverse = XMMatrixInverse(&determinant, XMLoadFloat4x4(&viewMatrix));
 
 	XMVECTOR ray = XMVector3TransformCoord(XMLoadFloat3(&pickingRay), matViewInverse);
 
@@ -43,7 +43,7 @@ static void GetIntersection( const POINT& cursorPosition, const XMFLOAT4* const 
 	XMStoreFloat3(&endPoint, ray);
 
 	// Determine the point where the line intersects the grid plane
-	XMStoreFloat3( pIntersection, XMPlaneIntersectLine( XMLoadFloat4( pPlane ), XMLoadFloat3(&startPoint), XMLoadFloat3(&endPoint) ) );
+	XMStoreFloat3( &intersection, XMPlaneIntersectLine( XMLoadFloat4( &plane ), XMLoadFloat3(&startPoint), XMLoadFloat3(&endPoint) ) );
 }
 
 #endif // HELPERS_H

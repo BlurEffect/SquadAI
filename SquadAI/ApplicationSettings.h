@@ -19,9 +19,7 @@ const XMFLOAT3 g_cInitialCameraPosition(0.0f, 0.0f, -500.0f);
 const XMFLOAT3 g_cInitialCameraLookAt(0.0f, 0.0f, 1.0f);
 const XMFLOAT3 g_cCameraUpVector(0.0f, 1.0f, 0.0f);
 const XMFLOAT3 g_cInitialCameraSpeed(0.1f, 0.1f, 0.001f);
-const float    g_cCameraFieldOfView        = XM_PI/4;
 const float    g_cCameraNearClippingPlane  = 1.0f;
 const float    g_cCameraFarClippingPlane   = 1000.0f;
-const bool     g_cCreateOrthographicCamera = true;
 
 #endif // APPLICATION_SETTINGS_H

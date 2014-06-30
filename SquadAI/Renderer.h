@@ -26,6 +26,7 @@
 #include "RendererSettings.h"
 #include "Font.h"
 #include "SentenceDrawable.h"
+#include "TestEnvironmentData.h"
 
 using namespace DirectX;
 
@@ -34,7 +35,7 @@ class Renderer
 public:
 	Renderer(void);
 	~Renderer(void);
-	bool Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
+	bool Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const TestEnvironmentData& testEnvData);
 	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
 	void Cleanup(void);
 	
@@ -45,7 +46,8 @@ public:
 private:
 	bool		InitialiseD3D(HWND hwnd);
 	bool		InitialiseRenderStates();
-	bool		InitialiseDrawables(void);
+	bool		InitialiseDrawables(const TestEnvironmentData& testEnvData);
+	bool        InitialiseEntityRenderData(void);
 	bool		InitialiseShaders(void);
 	bool        InitialiseTextRendering(HWND hwnd, const XMFLOAT4X4& baseViewMatrix, const XMFLOAT4X4& baseProjectionMatrix);
 	bool        InitialiseSentences(void);
@@ -92,7 +94,7 @@ private:
 	RenderContext            m_renderContext;                          // The render context is used collects render instance data of drawables to be rendered 
 	UINT                     m_windowWidth;                            // The width of the window the application is running in
 	UINT                     m_windowHeight;						   // The height of the window the application is running in
-
+	EntityRenderData         m_entityRenderData[NumberOfEntityTypes];  // Contains information on how to render the different entities
 };
 
 #endif // RENDERER_H

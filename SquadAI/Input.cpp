@@ -7,6 +7,9 @@
 // Includes
 #include "Input.h"
 
+// Defines
+#define KEYDOWN(name, key) (name[key] & 0x80) 
+
 Input::Input(void) : m_pDI(nullptr),
 					 m_pDIMouseDevice(nullptr),
 					 m_pDIKeyboardDevice(nullptr)							
@@ -316,4 +319,100 @@ bool Input::RightMouseButtonReleased(void) const
 bool Input::MiddleMouseButtonReleased(void) const
 {
 	return (!(m_mouseState.rgbButtons[2] & 0x80)) && (m_oldMouseState.rgbButtons[2] & 0x80);
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the left arrow key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyLeftDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_LEFT)) && (!KEYDOWN(m_oldKeyboardState, DIK_LEFT));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the right arrow key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyRightDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_RIGHT)) && (!KEYDOWN(m_oldKeyboardState, DIK_RIGHT));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the up arrow key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyUpDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_UP)) && (!KEYDOWN(m_oldKeyboardState, DIK_UP));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the down arrow key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyDownDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_DOWN)) && (!KEYDOWN(m_oldKeyboardState, DIK_DOWN));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the left arrow key is pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyLeftPressed(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_LEFT));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the right arrow key is pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyRightPressed(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_RIGHT));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the up arrow key is pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyUpPressed(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_UP));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the down arrow key is pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyDownPressed(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_DOWN));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the left arrow key was released in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyLeftReleased(void) const
+{
+	return (!KEYDOWN(m_keyboardState, DIK_LEFT)) && (KEYDOWN(m_oldKeyboardState, DIK_LEFT));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the right arrow key was released in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyRightReleased(void) const
+{
+	return (!KEYDOWN(m_keyboardState, DIK_RIGHT)) && (KEYDOWN(m_oldKeyboardState, DIK_RIGHT));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the up arrow key was released in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyUpReleased(void) const
+{
+	return (!KEYDOWN(m_keyboardState, DIK_UP)) && (KEYDOWN(m_oldKeyboardState, DIK_UP));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the down arrow key was released in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyDownReleased(void) const
+{
+	return (!KEYDOWN(m_keyboardState, DIK_DOWN)) && (KEYDOWN(m_oldKeyboardState, DIK_DOWN));
 }

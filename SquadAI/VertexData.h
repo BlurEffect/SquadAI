@@ -23,15 +23,5 @@ struct Vertex
 	XMFLOAT3 m_position;	// position of the vertex
 };
 
-//--------------------------------------------------------------------------------------
-// The structure of the instance data used when instancing is used to render objects.
-//--------------------------------------------------------------------------------------
-struct Instance
-{
-	Instance(const XMFLOAT4X4& world, const XMFLOAT4& colour) : m_world( world ), m_colour( colour ){}
-
-	XMFLOAT4X4 m_world;
-	XMFLOAT4   m_colour;
-};
 
 #endif // VERTEX_DATA_H

@@ -20,8 +20,8 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 	TestEnvironmentData initData;
 	initData.m_gridWidth			    = 50.0f;
 	initData.m_gridHeight			    = 50.0f;
-	initData.m_gridHorizontalPartitions = 10;
-	initData.m_gridVerticalPartitions   = 10;
+	initData.m_gridHorizontalPartitions = 50;
+	initData.m_gridVerticalPartitions   = 50;
 
 	return m_camera.Initialise(g_cInitialCameraPosition, g_cInitialCameraLookAt, g_cCameraUpVector, 
 							   windowWidth, windowHeight, g_cCameraNearClippingPlane, g_cCameraFarClippingPlane, 
@@ -39,6 +39,7 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 void Application::Update()
 {
 	m_inputManager.Update();
+	ProcessInput();
 	m_camera.Update(m_inputManager.GetCameraMovement());
 	m_testEnvironment.Update(m_renderer.GetRenderContext());
 	m_renderer.RenderScene(m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix());
@@ -71,8 +72,23 @@ void Application::ProcessInput(void)
 
 	if(m_inputManager.GetLeftClick())
 	{
-		XMFLOAT3 intersection(0.0f, 0.0f, 0.0f);
-		GetIntersection(m_inputManager.GetCursorPosition(), XMFLOAT4(0.0f, 0.0f, -1.0f, 0.0f), m_appData.m_windowWidth, m_appData.m_windowHeight, m_camera.GetViewMatrix(), intersection);
-		int a = 2;
+		// Translate the cursor position to world space
+		XMFLOAT2 cursorPos(m_inputManager.GetCursorPosition().x, m_inputManager.GetCursorPosition().y);
+
+		cursorPos.x -= m_appData.m_windowWidth/2;
+		cursorPos.y  = -cursorPos.y + m_appData.m_windowHeight/2;
+
+		XMStoreFloat2(&cursorPos, XMLoadFloat2(&cursorPos) * m_camera.m_zoomFactor);
+
+		XMFLOAT4X4 inverseViewMatrix;
+		XMVECTOR determinant;
+		XMStoreFloat4x4(&inverseViewMatrix, XMMatrixInverse(&determinant, XMLoadFloat4x4(&m_camera.GetViewMatrix())));
+
+		XMFLOAT3 cameraTranslation;
+		cameraTranslation.x = m_camera.GetViewMatrix()._41;
+		cameraTranslation.y = m_camera.GetViewMatrix()._42;
+		cameraTranslation.z = m_camera.GetViewMatrix()._43;
+		
+		XMStoreFloat2(&cursorPos, XMLoadFloat2(&cursorPos) - XMLoadFloat3(&cameraTranslation));
 	}
 }

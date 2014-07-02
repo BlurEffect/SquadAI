@@ -150,6 +150,11 @@ const XMFLOAT3& OrthographicCamera::GetCameraPosition(void) const
 	return m_position;
 }
 
+float OrthographicCamera::GetZoomFactor(void) const
+{
+	return m_zoomFactor;
+}
+
 void OrthographicCamera::SetMovementSpeed(const XMFLOAT3& newMovementSpeed)
 {
 	m_movementSpeed = newMovementSpeed;

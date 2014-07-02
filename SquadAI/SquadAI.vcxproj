@@ -85,6 +85,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="CoverPosition.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
@@ -106,6 +108,7 @@
     <ClCompile Include="ShaderGroup.cpp" />
     <ClCompile Include="SimplePixelShader.cpp" />
     <ClCompile Include="SimpleVertexShader.cpp" />
+    <ClCompile Include="Soldier.cpp" />
     <ClCompile Include="SquareDrawable.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
@@ -116,6 +119,8 @@
     <ClInclude Include="AppData.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />
+    <ClInclude Include="CoverPosition.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
     <ClInclude Include="OrthographicCamera.h" />
@@ -145,6 +150,7 @@
     <ClInclude Include="ShaderParameters.h" />
     <ClInclude Include="SimplePixelShader.h" />
     <ClInclude Include="SimpleVertexShader.h" />
+    <ClInclude Include="Soldier.h" />
     <ClInclude Include="SquareDrawable.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TestEnvironment.h" />

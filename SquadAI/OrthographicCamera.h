@@ -29,8 +29,11 @@ public:
 	const XMFLOAT4X4& GetViewMatrix(void) const;
 	const XMFLOAT4X4& GetProjectionMatrix(void) const;
 	const XMFLOAT3&   GetCameraPosition(void) const;
+	float             GetZoomFactor(void) const;
 
 	void SetMovementSpeed(const XMFLOAT3& newMovementSpeed);
+
+	float       m_zoomFactor;        // The current zoom factor
 private:
 	void Move(const XMFLOAT3& moveVector);
 
@@ -49,7 +52,7 @@ private:
 	float       m_nearClippingPlane; // The near clipping plane of the camera
 	float       m_farClippingPlane;  // The far clipping plane of the camera
 
-	float       m_zoomFactor;  // The current zoom factor
+	
 };
 
 #endif // ORTHOGRAPHIC_CAMERA_H

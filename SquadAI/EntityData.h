@@ -18,10 +18,10 @@ using namespace DirectX;
 enum EntityType
 {
 	ASoldier,
-	ADeadSoldier,
 	BSoldier,
+	CoverSpot,
+	ADeadSoldier,
 	BDeadSoldier,
-	CoverPosition,
 	Projectile,
 	NumberOfEntityTypes
 };

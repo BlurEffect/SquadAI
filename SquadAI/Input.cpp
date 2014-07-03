@@ -416,3 +416,27 @@ bool Input::KeyDownReleased(void) const
 {
 	return (!KEYDOWN(m_keyboardState, DIK_DOWN)) && (KEYDOWN(m_oldKeyboardState, DIK_DOWN));
 }
+
+//--------------------------------------------------------------------------------------
+// Returns true if the left control key is pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyLeftCtrlPressed(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_LCONTROL));
+}
+	
+//--------------------------------------------------------------------------------------
+// Returns true if the 's' key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyLDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_L)) && (!KEYDOWN(m_oldKeyboardState, DIK_L));
+}
+	
+//--------------------------------------------------------------------------------------
+// Returns true if the 'l' key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeySDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_S)) && (!KEYDOWN(m_oldKeyboardState, DIK_S));
+}

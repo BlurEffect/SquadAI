@@ -191,9 +191,6 @@
     <ClInclude Include="CameraSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CircleDrawable.h">
       <Filter>Header Files\Drawables</Filter>
     </ClInclude>

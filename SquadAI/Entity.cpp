@@ -23,3 +23,35 @@ Entity::Entity(EntityType type, const XMFLOAT3& position, float rotation) : m_ty
 Entity::~Entity(void)
 {
 }
+
+// Data access functions
+
+const XMFLOAT3& Entity::GetPosition(void) const
+{
+	return m_position;
+}
+
+float Entity::GetRotation(void) const
+{
+	return m_rotation;
+}
+
+EntityType Entity::GetType(void) const
+{
+	return m_type;
+}
+
+void Entity::SetPosition(const XMFLOAT3& position)
+{
+	m_position = position;
+}
+
+void Entity::SetRotation(float rotation)
+{
+	m_rotation = rotation;
+}
+
+void Entity::SetType(EntityType type)
+{
+	m_type = type;
+}

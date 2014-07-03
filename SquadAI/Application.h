@@ -11,6 +11,8 @@
 // Includes
 #include <Windows.h>
 #include <DirectXMath.h>
+#include <string>
+#include <iostream>
 
 #include "OrthographicCamera.h"
 #include "InputManager.h"
@@ -19,7 +21,6 @@
 #include "ApplicationSettings.h"
 #include "AppData.h"
 #include "EntityData.h"
-#include "Helpers.h"
 
 using namespace DirectX;
 
@@ -32,6 +33,8 @@ public:
 private:
 
 	void ProcessInput(void);
+	bool SaveTestEnvironment(void);
+	bool LoadTestEnvironment(void);
 
 	AppData            m_appData;          // The current state and properties of the app
 	OrthographicCamera m_camera;		   // The camera component of the application

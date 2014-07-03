@@ -129,7 +129,6 @@
     <ClInclude Include="Font.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Helpers.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="EntityData.h" />
     <ClInclude Include="PS_FontCompiled.h" />

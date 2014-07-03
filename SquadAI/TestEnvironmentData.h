@@ -21,10 +21,10 @@ struct TestEnvironmentData
 								m_gridVerticalPartitions(0)
 	{}
 
-	float m_gridWidth;
-	float m_gridHeight; 
-	int   m_gridHorizontalPartitions; 
-	int   m_gridVerticalPartitions;
+	float        m_gridWidth;
+	float        m_gridHeight; 
+	unsigned int m_gridHorizontalPartitions; 
+	unsigned int m_gridVerticalPartitions;
 };
 
 //--------------------------------------------------------------------------------------

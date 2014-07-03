@@ -27,6 +27,7 @@
 #include "Font.h"
 #include "SentenceDrawable.h"
 #include "TestEnvironmentData.h"
+#include "AppData.h"
 
 using namespace DirectX;
 
@@ -36,7 +37,7 @@ public:
 	Renderer(void);
 	~Renderer(void);
 	bool Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const TestEnvironmentData& testEnvData);
-	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
+	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData);
 	void Cleanup(void);
 	
 	// Data access functions
@@ -47,14 +48,14 @@ private:
 	bool		InitialiseD3D(HWND hwnd);
 	bool		InitialiseRenderStates();
 	bool		InitialiseDrawables(const TestEnvironmentData& testEnvData);
-	bool        InitialiseEntityRenderData(void);
+	bool        InitialiseEntityRenderData(const TestEnvironmentData& testEnvData);
 	bool		InitialiseShaders(void);
 	bool        InitialiseTextRendering(HWND hwnd, const XMFLOAT4X4& baseViewMatrix, const XMFLOAT4X4& baseProjectionMatrix);
 	bool        InitialiseSentences(void);
 
 	void        RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
-	void        RenderText();
-	void        UpdateSentences();
+	void        RenderText(const AppData& appData);
+	void        UpdateSentences(const AppData& appData);
 
 	void	    PrepareDefaultGeometryRendering(void);
 	void	    PrepareTextRendering(void);

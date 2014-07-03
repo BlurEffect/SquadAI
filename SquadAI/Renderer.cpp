@@ -55,7 +55,7 @@ bool Renderer::Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const 
 
 	if(InitialiseD3D(hWnd) && 
 		InitialiseDrawables(testEnvData) && 
-		InitialiseEntityRenderData() &&
+		InitialiseEntityRenderData(testEnvData) &&
 		InitialiseShaders() && 
 		InitialiseTextRendering(hWnd, viewMatrix, projectionMatrix)
 	  )
@@ -357,33 +357,46 @@ bool Renderer::InitialiseDrawables(const TestEnvironmentData& testEnvData)
 
 //--------------------------------------------------------------------------------------
 // Initialises the entity render data for each possible entity.
+// Param1: The test environment data that will be used to set up the grid according to the size of the environment.
 // Returns true if the entity render data was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::InitialiseEntityRenderData(void)
+bool Renderer::InitialiseEntityRenderData(const TestEnvironmentData& testEnvData)
 {
+	// The scale required to scale the entities to fill a grid field
+	XMFLOAT3 toGridScale;
+	toGridScale.x = testEnvData.m_gridWidth / testEnvData.m_gridHorizontalPartitions;
+	toGridScale.y = testEnvData.m_gridHeight / testEnvData.m_gridVerticalPartitions;
+	toGridScale.z = 1.0f;
+
 	m_entityRenderData[ASoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[ASoldier].m_name         = "A - Soldier";
+	m_entityRenderData[ASoldier].m_baseScale    = toGridScale;
 
 	m_entityRenderData[BSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[BSoldier].m_name         = "B - Soldier";
+	m_entityRenderData[BSoldier].m_baseScale    = toGridScale;
 
 	m_entityRenderData[CoverSpot].m_drawableType = SquareType;
 	m_entityRenderData[CoverSpot].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	m_entityRenderData[CoverSpot].m_name         = "Cover Spot";
+	m_entityRenderData[CoverSpot].m_baseScale    = toGridScale;
 			
 	m_entityRenderData[ADeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
 	m_entityRenderData[ADeadSoldier].m_name         = "A - Dead Soldier";
+	m_entityRenderData[ADeadSoldier].m_baseScale    = toGridScale;
 	
 	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.2f, 0.0f, 1.0f);
 	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
+	m_entityRenderData[BDeadSoldier].m_baseScale	= toGridScale;
 
 	m_entityRenderData[Projectile].m_drawableType = CircleType;
 	m_entityRenderData[Projectile].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[Projectile].m_name         = "Projectile";
+	m_entityRenderData[Projectile].m_baseScale    = toGridScale;
 
 	return true;
 }
@@ -464,7 +477,7 @@ bool Renderer::InitialiseSentences(void)
 	{
 		return false;
 	}
-	m_pPermanentSentences[LabelCursorPosSeparators] = new SentenceDrawable(26, &m_font, "       |       |      ", right - 150, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[LabelCursorPosSeparators] = new SentenceDrawable(26, &m_font, "       |       ", right - 150, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelCursorPosSeparators])
 	{
 		return false;
@@ -479,11 +492,7 @@ bool Renderer::InitialiseSentences(void)
 	{
 		return false;
 	}
-	m_pPermanentSentences[TxtCursorPosZ] = new SentenceDrawable(3, &m_font, "100", right - 55, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
-	if(!m_pPermanentSentences[TxtCursorPosZ])
-	{
-		return false;
-	}
+
 	m_pPermanentSentences[LabelEntityType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelEntityType])
 	{
@@ -564,8 +573,9 @@ void Renderer::Cleanup( void )
 // Render the current scene.
 // Param1: The view matrix of the camera for which to render the frame.
 // Param2: The projection matrix of the camera for which to render the frame.
+// Param3: The current application data, required for text rendering to provide information to the user.
 //--------------------------------------------------------------------------------------
-void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
+void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData)
 {
 	// Clear the backbuffer
 	m_pD3d11DeviceContext->ClearRenderTargetView(m_pRenderTargetView, g_cBackgroundColour);
@@ -577,7 +587,7 @@ void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& proje
 	RenderTestEnvironment(viewMatrix, projectionMatrix);
 
 	// Render the text (GUI)
-	RenderText();
+	RenderText(appData);
 
 	// Present the backbuffer to the screen
 	m_pSwapChain->Present(0, 0);
@@ -617,7 +627,10 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 		{
 			// Update the per object data according to the current instance
 			m_perObjectData.m_colour = m_entityRenderData[i].m_colour;
-			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
+
+			XMMATRIX scaleMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&m_entityRenderData[i].m_baseScale));
+
+			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, scaleMatrix * XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
 			// Update the shader's constant buffer
 			m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
 			// Draw the object
@@ -626,10 +639,14 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 	}
 }
 
-void Renderer::RenderText()
+//--------------------------------------------------------------------------------------
+// Renders all the text.
+// Param1: The current application data.
+//--------------------------------------------------------------------------------------
+void Renderer::RenderText(const AppData& appData)
 {
 	// Update the sentences
-	UpdateSentences();
+	UpdateSentences(appData);
 
 	PrepareTextRendering();
 
@@ -652,9 +669,33 @@ void Renderer::RenderText()
 	}
 }
 
-void Renderer::UpdateSentences()
+//--------------------------------------------------------------------------------------
+// Update the text on the screen.
+// Param1: The current application data.
+//--------------------------------------------------------------------------------------
+void Renderer::UpdateSentences(const AppData& appData)
 {
-	// Placeholder
+	char bufferCursorX[4];
+	if(appData.m_cursorGridPosX >= 0)
+	{
+		_itoa_s(appData.m_cursorGridPosX, bufferCursorX, 4, 10);
+		m_pPermanentSentences[TxtCursorPosX]->SetText(bufferCursorX);
+	}else
+	{
+		m_pPermanentSentences[TxtCursorPosX]->SetText("---");
+	}
+
+	char bufferCursorY[4];
+	if(appData.m_cursorGridPosY >= 0)
+	{
+		_itoa_s(appData.m_cursorGridPosY, bufferCursorY, 4, 10);
+		m_pPermanentSentences[TxtCursorPosY]->SetText(bufferCursorY);
+	}else
+	{
+		m_pPermanentSentences[TxtCursorPosY]->SetText("---");
+	}
+
+	m_pPermanentSentences[TxtEntityType]->SetText(m_entityRenderData[appData.m_selectedEntityType].m_name);
 }
 
 //--------------------------------------------------------------------------------------

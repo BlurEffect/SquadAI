@@ -54,7 +54,6 @@ enum SentenceIdentifiers
 	LabelCursorPosSeparators,
 	TxtCursorPosX,
 	TxtCursorPosY,
-	TxtCursorPosZ,
 	LabelEntityType,
 	TxtEntityType,
 	NumberOfSentences

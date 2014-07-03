@@ -29,6 +29,8 @@ public:
 	bool            GetLeftClick(void) const;
 	bool            GetBrowseLeft(void) const;
 	bool            GetBrowseRight(void) const;
+	bool            GetSave(void) const;
+	bool            GetLoad(void) const;
 
 private:
 	HWND     m_windowHandle;   // A handle to the window the application is running in

@@ -57,6 +57,10 @@ public:
 	bool KeyUpReleased(void) const;
 	bool KeyDownReleased(void) const;
 
+	bool KeyLeftCtrlPressed(void) const;
+	bool KeyLDown(void) const;
+	bool KeySDown(void) const;
+
 private:
 	bool SetupDirectInput(HINSTANCE hInst, HWND hWnd);
 	void UpdateMouseInput(void);

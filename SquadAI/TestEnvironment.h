@@ -11,6 +11,8 @@
 // Includes
 #include <DirectXMath.h>
 #include <vector>
+#include <string>
+
 #include "RenderContext.h"
 #include "TestEnvironmentData.h"
 #include "Soldier.h"
@@ -29,6 +31,9 @@ public:
 	void Cleanup(void);
 
 	void AddEntity(EntityType type, const XMFLOAT3& position, float rotation);
+
+	bool Save(std::string filename);
+	bool Load(std::string filename);
 
 	void GetGridPosition(const XMFLOAT3& worldPos, XMFLOAT3& gridPos);
 private:

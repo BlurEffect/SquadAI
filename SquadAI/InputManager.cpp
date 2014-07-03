@@ -102,3 +102,19 @@ bool InputManager::GetBrowseRight(void) const
 {
 	return m_input.KeyRightDown();
 }
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to save a test environment.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetSave(void) const
+{
+	return m_input.KeyLeftCtrlPressed() && m_input.KeySDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to load a test environment.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetLoad(void) const
+{
+	return m_input.KeyLeftCtrlPressed() && m_input.KeyLDown();
+}

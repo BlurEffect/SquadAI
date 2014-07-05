@@ -88,19 +88,35 @@ bool InputManager::GetLeftClick(void) const
 }
 
 //--------------------------------------------------------------------------------------
-// Returns true if the user issued input to browse left in a list of options.
+// Returns true if the user issued input to select the next entity type available in the list.
 //--------------------------------------------------------------------------------------
-bool InputManager::GetBrowseLeft(void) const
+bool InputManager::GetNextEntityType(void) const
 {
-	return m_input.KeyLeftDown();
+	return m_input.KeyDownDown();
 }
 
 //--------------------------------------------------------------------------------------
-// Returns true if the user issued input to browse right in a list of options.
+// Returns true if the user issued input to select the previous entity type available in the list.
 //--------------------------------------------------------------------------------------
-bool InputManager::GetBrowseRight(void) const
+bool InputManager::GetPreviousEntityType(void) const
+{
+	return m_input.KeyUpDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to rotate the entities to be placed clockwise.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetRotateRight(void) const
 {
 	return m_input.KeyRightDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to rotate the entities to be placed counter-clockwise.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetRotateLeft(void) const
+{
+	return m_input.KeyLeftDown();
 }
 
 //--------------------------------------------------------------------------------------
@@ -117,4 +133,12 @@ bool InputManager::GetSave(void) const
 bool InputManager::GetLoad(void) const
 {
 	return m_input.KeyLeftCtrlPressed() && m_input.KeyLDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to delete an entity from the test environment.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetDelete(void) const
+{
+	return m_input.KeyDeleteDown();
 }

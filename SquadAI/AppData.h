@@ -19,7 +19,8 @@ struct AppData
 					m_windowHeight(0),
 					m_cursorGridPosX(0), 
 					m_cursorGridPosY(0), 
-					m_selectedEntityType(EntityType(0))
+					m_selectedEntityType(EntityType(0)),
+					m_currentRotation(0.0f)
 	{}
 
 	int        m_windowWidth;		 // The width in pixels of the application window
@@ -27,6 +28,7 @@ struct AppData
 	int        m_cursorGridPosX;     // The x-coordinate of the grid field that the cursor is placed at
 	int        m_cursorGridPosY;     // The y-coordinate of the grid field that the cursor is placed at
 	EntityType m_selectedEntityType; // The entity type currently selected for placement in the test environment
+	float      m_currentRotation;    // The rotation that will be applied to placed entities
 };
 
 #endif // APP_DATA_STRUCTURES_H

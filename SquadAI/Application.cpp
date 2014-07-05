@@ -20,8 +20,8 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 	TestEnvironmentData initData;
 	initData.m_gridWidth			    = 50.0f;
 	initData.m_gridHeight			    = 50.0f;
-	initData.m_gridHorizontalPartitions = 10;
-	initData.m_gridVerticalPartitions   = 10;
+	initData.m_gridHorizontalPartitions = 20;
+	initData.m_gridVerticalPartitions   = 20;
 
 	return m_camera.Initialise(g_cInitialCameraPosition, g_cInitialCameraLookAt, g_cCameraUpVector, 
 							   windowWidth, windowHeight, g_cCameraNearClippingPlane, g_cCameraFarClippingPlane, 
@@ -62,14 +62,14 @@ void Application::Cleanup()
 //--------------------------------------------------------------------------------------
 void Application::ProcessInput(void)
 {
-	if(m_inputManager.GetBrowseRight())
+	if(m_inputManager.GetNextEntityType())
 	{
 		m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType + 1);
 		if(m_appData.m_selectedEntityType > CoverSpot)
 		{
 			m_appData.m_selectedEntityType = EntityType(0);
 		}
-	}else if(m_inputManager.GetBrowseLeft())
+	}else if(m_inputManager.GetPreviousEntityType())
 	{
 		m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType - 1);
 		if(m_appData.m_selectedEntityType < 0)
@@ -78,12 +78,29 @@ void Application::ProcessInput(void)
 		}
 	}
 
+	if(m_inputManager.GetRotateLeft())
+	{
+		m_appData.m_currentRotation -= 90.0f;
+		if(m_appData.m_currentRotation < 0.0f)
+		{
+			m_appData.m_currentRotation = 270.0f;
+		}
+	}else if(m_inputManager.GetRotateRight())
+	{
+		m_appData.m_currentRotation += 90.0f;
+		if(m_appData.m_currentRotation >= 360.0f)
+		{
+			m_appData.m_currentRotation = 0.0f;
+		}
+	}
+
 	// Translate the cursor position from screen space to world space
 
-	XMFLOAT3 cursorPos(m_inputManager.GetCursorPosition().x, m_inputManager.GetCursorPosition().y, 0.0f);
+	XMFLOAT3 cursorPos(static_cast<float>(m_inputManager.GetCursorPosition().x), static_cast<float>(m_inputManager.GetCursorPosition().y), 0.0f);
 
 	cursorPos.x -= m_appData.m_windowWidth/2;
 	cursorPos.y  = -cursorPos.y + m_appData.m_windowHeight/2;
+	cursorPos.z  = 0.0f;
 
 	XMStoreFloat3(&cursorPos, XMLoadFloat3(&cursorPos) * m_camera.m_zoomFactor);
 
@@ -101,7 +118,7 @@ void Application::ProcessInput(void)
 	if(m_inputManager.GetLeftClick())
 	{
 		// Add a new entity to the test environment
-		m_testEnvironment.AddEntity(m_appData.m_selectedEntityType, cursorPos, 0);
+		m_testEnvironment.AddEntity(m_appData.m_selectedEntityType, cursorPos, m_appData.m_currentRotation);
 	}
 
 	// Update the cursor position in grid fields within the app data structure
@@ -120,6 +137,10 @@ void Application::ProcessInput(void)
 		LoadTestEnvironment();
 	}
 
+	if(m_inputManager.GetDelete())
+	{
+		m_testEnvironment.RemoveEntity(cursorPos);
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -190,6 +211,12 @@ bool Application::LoadTestEnvironment(void)
 		std::cout << "\nLoading...";
 		m_testEnvironment.Load(filename);		
 		std::cout << "\nLoading completed.";
+
+		// Prepare the renderer for the loaded environment
+		if(!m_renderer.SetupGrid(m_testEnvironment.GetData()))
+		{
+			return false;
+		}
 	}
 
 	// Loading operation finished, get rid of console

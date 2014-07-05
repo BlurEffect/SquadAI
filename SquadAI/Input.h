@@ -60,6 +60,7 @@ public:
 	bool KeyLeftCtrlPressed(void) const;
 	bool KeyLDown(void) const;
 	bool KeySDown(void) const;
+	bool KeyDeleteDown(void) const;
 
 private:
 	bool SetupDirectInput(HINSTANCE hInst, HWND hWnd);

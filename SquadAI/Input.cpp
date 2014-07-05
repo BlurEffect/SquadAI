@@ -440,3 +440,11 @@ bool Input::KeySDown(void) const
 {
 	return (KEYDOWN(m_keyboardState, DIK_S)) && (!KEYDOWN(m_oldKeyboardState, DIK_S));
 }
+
+//--------------------------------------------------------------------------------------
+// Returns true if the 'delete' key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyDeleteDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_DELETE)) && (!KEYDOWN(m_oldKeyboardState, DIK_DELETE));
+}

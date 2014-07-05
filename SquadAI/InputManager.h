@@ -27,10 +27,13 @@ public:
 	const XMFLOAT3& GetCameraMovement(void) const;
 	const POINT&    GetCursorPosition(void) const;
 	bool            GetLeftClick(void) const;
-	bool            GetBrowseLeft(void) const;
-	bool            GetBrowseRight(void) const;
+	bool            GetNextEntityType(void) const;
+	bool            GetPreviousEntityType(void) const;
+	bool            GetRotateRight(void) const;
+	bool            GetRotateLeft(void) const;
 	bool            GetSave(void) const;
 	bool            GetLoad(void) const;
+	bool            GetDelete(void) const;
 
 private:
 	HWND     m_windowHandle;   // A handle to the window the application is running in

@@ -317,10 +317,13 @@ bool Renderer::InitialiseRenderStates()
 //--------------------------------------------------------------------------------------
 bool Renderer::InitialiseDrawables(const TestEnvironmentData& testEnvData)
 {
-	// Create the Drawables
+	// Create and initialise the Drawables
 
 	m_drawableObjects[TriangleType] = new TriangleDrawable(1.0f, 1.0f);
 	if(!m_drawableObjects[TriangleType])
+	{
+		return false;
+	}else if(!m_drawableObjects[TriangleType]->Initialise(m_pD3d11Device))
 	{
 		return false;
 	}
@@ -329,27 +332,24 @@ bool Renderer::InitialiseDrawables(const TestEnvironmentData& testEnvData)
 	if(!m_drawableObjects[SquareType])
 	{
 		return false;
+	}else if(!m_drawableObjects[SquareType]->Initialise(m_pD3d11Device))
+	{
+		return false;
 	}
 
 	m_drawableObjects[CircleType] = new CircleDrawable(0.5f, 24);
 	if(!m_drawableObjects[CircleType])
 	{
 		return false;
-	}
-
-	m_drawableObjects[GridType] = new GridDrawable(testEnvData.m_gridWidth, testEnvData.m_gridHeight, testEnvData.m_gridHorizontalPartitions, testEnvData.m_gridVerticalPartitions);
-	if(!m_drawableObjects[GridType])
+	}else if(!m_drawableObjects[CircleType]->Initialise(m_pD3d11Device))
 	{
 		return false;
 	}
 
-	// Initialise the Drawables
-	for(int i = 0; i < NumberOfDrawableTypes; ++i)
+	// Setup the grid drawable
+	if(!SetupGrid(testEnvData))
 	{
-		if(!m_drawableObjects[i]->Initialise(m_pD3d11Device))
-		{
-			return false;
-		}
+		return false;
 	}
 
 	return true;
@@ -371,31 +371,37 @@ bool Renderer::InitialiseEntityRenderData(const TestEnvironmentData& testEnvData
 	m_entityRenderData[ASoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[ASoldier].m_name         = "A - Soldier";
+	m_entityRenderData[ASoldier].m_baseZ        = 1.0f;
 	m_entityRenderData[ASoldier].m_baseScale    = toGridScale;
 
 	m_entityRenderData[BSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[BSoldier].m_name         = "B - Soldier";
+	m_entityRenderData[BSoldier].m_baseZ        = 1.0f;
 	m_entityRenderData[BSoldier].m_baseScale    = toGridScale;
 
 	m_entityRenderData[CoverSpot].m_drawableType = SquareType;
 	m_entityRenderData[CoverSpot].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	m_entityRenderData[CoverSpot].m_name         = "Cover Spot";
+	m_entityRenderData[CoverSpot].m_baseZ        = 0.0f;
 	m_entityRenderData[CoverSpot].m_baseScale    = toGridScale;
 			
 	m_entityRenderData[ADeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
 	m_entityRenderData[ADeadSoldier].m_name         = "A - Dead Soldier";
+	m_entityRenderData[ADeadSoldier].m_baseZ        = -2.0f;
 	m_entityRenderData[ADeadSoldier].m_baseScale    = toGridScale;
 	
 	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.2f, 0.0f, 1.0f);
 	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
+	m_entityRenderData[BDeadSoldier].m_baseZ        = -2.0f;
 	m_entityRenderData[BDeadSoldier].m_baseScale	= toGridScale;
 
 	m_entityRenderData[Projectile].m_drawableType = CircleType;
 	m_entityRenderData[Projectile].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[Projectile].m_name         = "Projectile";
+	m_entityRenderData[Projectile].m_baseZ        = -1.0f;
 	m_entityRenderData[Projectile].m_baseScale    = toGridScale;
 
 	return true;
@@ -493,12 +499,23 @@ bool Renderer::InitialiseSentences(void)
 		return false;
 	}
 
-	m_pPermanentSentences[LabelEntityType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[LabelRotation] = new SentenceDrawable(10, &m_font, "Rotation: ", right - 250, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelRotation])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtRotation] = new SentenceDrawable(3, &m_font, "180", right - 150, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtRotation])
+	{
+		return false;
+	}
+
+	m_pPermanentSentences[LabelEntityType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -60, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelEntityType])
 	{
 		return false;
 	}
-	m_pPermanentSentences[TxtEntityType] = new SentenceDrawable(20, &m_font, "Cover Position", right - 150, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[TxtEntityType] = new SentenceDrawable(20, &m_font, "Cover Position", right - 150, top -60, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[TxtEntityType])
 	{
 		return false;
@@ -629,8 +646,9 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 			m_perObjectData.m_colour = m_entityRenderData[i].m_colour;
 
 			XMMATRIX scaleMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&m_entityRenderData[i].m_baseScale));
+			XMMATRIX zTranslationMatrix = XMMatrixTranslation(0.0f, 0.0f, m_entityRenderData[i].m_baseZ);
 
-			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, scaleMatrix * XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
+			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, scaleMatrix * zTranslationMatrix * XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
 			// Update the shader's constant buffer
 			m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
 			// Draw the object
@@ -695,7 +713,38 @@ void Renderer::UpdateSentences(const AppData& appData)
 		m_pPermanentSentences[TxtCursorPosY]->SetText("---");
 	}
 
+	char bufferRotation[4];
+	_itoa_s(static_cast<int>(appData.m_currentRotation), bufferRotation, 4, 10);
+	m_pPermanentSentences[TxtRotation]->SetText(bufferRotation);
+
 	m_pPermanentSentences[TxtEntityType]->SetText(m_entityRenderData[appData.m_selectedEntityType].m_name);
+}
+
+//--------------------------------------------------------------------------------------
+// Prepares the renderer for a new test environment by changing the grid's extents accordingly.
+// Param1: The test environment data containing information on the grid required.
+// Returns true if the new grid was set up successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Renderer::SetupGrid(const TestEnvironmentData& data)
+{
+	// Delete the old grid
+	if(m_drawableObjects[GridType])
+	{
+		m_drawableObjects[GridType]->Cleanup();
+		delete m_drawableObjects[GridType];
+		m_drawableObjects[GridType] = nullptr;
+	}
+
+	m_drawableObjects[GridType] = new GridDrawable(data.m_gridWidth, data.m_gridHeight, data.m_gridHorizontalPartitions, data.m_gridVerticalPartitions);
+	if(!m_drawableObjects[GridType])
+	{
+		return false;
+	}else if(!m_drawableObjects[GridType]->Initialise(m_pD3d11Device))
+	{
+		return false;
+	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------

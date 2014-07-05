@@ -32,9 +32,12 @@ struct TestEnvironmentData
 //--------------------------------------------------------------------------------------
 struct GridField
 {
-	GridField(void) : m_pEntity(nullptr) {}
+	GridField(void) : m_id(0),
+					  m_type(EntityType(0)) 
+	{}
 
-	Entity* m_pEntity;
+	unsigned long m_id;   // The id of the object associated associated to this grid field, 0 if the field is empty
+	EntityType    m_type; // The type of the object associated to this grid field
 };
 
 #endif // TEST_ENVIRONMENT_DATA_H

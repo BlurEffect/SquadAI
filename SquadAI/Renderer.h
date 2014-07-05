@@ -40,6 +40,8 @@ public:
 	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData);
 	void Cleanup(void);
 	
+	bool SetupGrid(const TestEnvironmentData& data);
+
 	// Data access functions
 
 	RenderContext& GetRenderContext(void);

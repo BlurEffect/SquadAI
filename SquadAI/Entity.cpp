@@ -8,15 +8,17 @@
 // Includes
 #include "Entity.h"
 
-Entity::Entity(void) : m_type(EntityType(0)),
+Entity::Entity(void) : m_id(0),
+					   m_type(EntityType(0)),
 					   m_position(0.0f, 0.0f, 0.0f),
 					   m_rotation(0.0f)
 {
 }
 
-Entity::Entity(EntityType type, const XMFLOAT3& position, float rotation) : m_type(type),
-																			m_position(position),
-																			m_rotation(rotation)
+Entity::Entity(unsigned long id, EntityType type, const XMFLOAT3& position, float rotation) : m_id(id), 
+																							  m_type(type),
+																						      m_position(position),
+																							  m_rotation(rotation)
 {
 }
 
@@ -25,6 +27,11 @@ Entity::~Entity(void)
 }
 
 // Data access functions
+
+unsigned long Entity::GetId(void) const
+{
+	return m_id;
+}
 
 const XMFLOAT3& Entity::GetPosition(void) const
 {
@@ -39,6 +46,12 @@ float Entity::GetRotation(void) const
 EntityType Entity::GetType(void) const
 {
 	return m_type;
+}
+
+
+void Entity::SetId(unsigned long id)
+{
+	m_id = id;
 }
 
 void Entity::SetPosition(const XMFLOAT3& position)

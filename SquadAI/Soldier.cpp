@@ -11,7 +11,7 @@ Soldier::Soldier(void) : Entity()
 {
 }
 
-Soldier::Soldier(EntityType type, const XMFLOAT3& position, float rotation) : Entity(type, position, rotation)
+Soldier::Soldier(unsigned long id, EntityType type, const XMFLOAT3& position, float rotation) : Entity(id, type, position, rotation)
 {
 }
 

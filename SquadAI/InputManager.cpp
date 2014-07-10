@@ -142,3 +142,27 @@ bool InputManager::GetDelete(void) const
 {
 	return m_input.KeyDeleteDown();
 }
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to toggle between edit and simulation mode.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetToggleMode(void) const
+{
+	return m_input.KeyReturnDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to pause/resume the game.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetTogglePaused(void) const
+{
+	return m_input.KeySpaceDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to exit the application.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetExitApplication(void) const
+{
+	return m_input.KeyEscapeDown();
+}

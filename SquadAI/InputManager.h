@@ -34,7 +34,10 @@ public:
 	bool            GetSave(void) const;
 	bool            GetLoad(void) const;
 	bool            GetDelete(void) const;
-
+	bool			GetToggleMode(void) const;
+	bool			GetTogglePaused(void) const;
+	bool			GetExitApplication(void) const;
+	
 private:
 	HWND     m_windowHandle;   // A handle to the window the application is running in
 	Input    m_input;          // The input object that is queried for key and mouse states

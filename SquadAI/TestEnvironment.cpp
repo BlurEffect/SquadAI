@@ -29,28 +29,7 @@ TestEnvironment::~TestEnvironment(void)
 bool TestEnvironment::Initialise(const TestEnvironmentData& initData)
 {
 	m_data = initData;
-
-	m_horizontalSpacing = m_data.m_gridWidth / static_cast<float>(m_data.m_gridHorizontalPartitions);
-	m_verticalSpacing   = m_data.m_gridHeight / static_cast<float>(m_data.m_gridVerticalPartitions);
-
-	m_pGrid = new GridField*[m_data.m_gridVerticalPartitions];
-
-	if(!m_pGrid)
-	{
-		return false;
-	}
-
-	for(int i = 0; i < m_data.m_gridVerticalPartitions; ++i)
-	{
-		m_pGrid[i] = new GridField[m_data.m_gridHorizontalPartitions];
-		
-		if(!m_pGrid[i])
-		{
-			return false;
-		}
-	}
-
-	return true;
+	return InitialiseGrid();
 }
 
 //--------------------------------------------------------------------------------------
@@ -63,7 +42,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 
 	for(std::vector<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
-		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, it->GetPosition().z);
+		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
 
 		XMFLOAT4X4 transform;
@@ -73,7 +52,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 
 	for(std::vector<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 	{
-		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, it->GetPosition().z);
+		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
 
 		XMFLOAT4X4 transform;
@@ -83,7 +62,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 	
 	for(std::vector<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
 	{
-		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, it->GetPosition().z);
+		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f -it->GetRotation()));
 
 		XMFLOAT4X4 transform;
@@ -97,17 +76,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::Cleanup()
 {
-	if(m_pGrid)
-	{
-		for(int i = 0; i < m_data.m_gridVerticalPartitions; ++i)
-		{
-			delete[] m_pGrid[i];
-			m_pGrid[i] = nullptr;
-		}
-
-		delete[] m_pGrid;
-		m_pGrid = nullptr;
-	}
+	CleanupGrid();
 }
 
 //--------------------------------------------------------------------------------------
@@ -117,13 +86,13 @@ void TestEnvironment::Cleanup()
 // Param3: The rotation to apply to the new entity.
 // Returns true if the entity was successfully added, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT3& position, float rotation)
+bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float rotation)
 {
 	// Set the entity to the centre of the grid field denoted by the passed in coordinates
-	XMFLOAT3 updatedPosition;
-	XMFLOAT3 gridPosition;
+	XMFLOAT2 updatedPosition;
+	XMFLOAT2 gridPosition;
 
-	GetGridPosition(position, gridPosition);
+	WorldToGridPosition(position, gridPosition);
 
 	if(gridPosition.x < 0)
 	{
@@ -131,15 +100,13 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT3& position, float
 		return false;
 	}
 
-	if(m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id != 0)
+	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty)
 	{
 		// Field is not empty, do not place entity on top of others
 		return false;
 	}
 
-	updatedPosition.x = gridPosition.x * m_horizontalSpacing + m_horizontalSpacing * 0.5f - m_data.m_gridWidth * 0.5f;
-	updatedPosition.y = gridPosition.y  * m_verticalSpacing + m_verticalSpacing * 0.5f - m_data.m_gridHeight * 0.5f;
-	updatedPosition.z = 0.0f;
+	GridToWorldPosition(gridPosition, updatedPosition);
 
 	switch(type)
 	{
@@ -155,8 +122,10 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT3& position, float
 	}
 
 	// Update the grid field
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id   = m_id;
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type = type;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty  = false;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_id       = m_id;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_type     = type;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_rotation = rotation;
 
 	return true;
 }
@@ -166,10 +135,10 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT3& position, float
 // Param1: The world position, the corresponding grid field of which holds the entity to be deleted.
 // Returns true if the entity was successfully removed, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::RemoveEntity(const XMFLOAT3& position)
+bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 {
-	XMFLOAT3 gridPosition;
-	GetGridPosition(position, gridPosition);
+	XMFLOAT2 gridPosition;
+	WorldToGridPosition(position, gridPosition);
 
 	if(gridPosition.x < 0)
 	{
@@ -177,12 +146,11 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT3& position)
 		return false;
 	}
 
-	unsigned long deleteId = m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id;
-
-	if(deleteId > 0)
+	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty)
 	{
-		
-		switch(m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type)
+		unsigned long deleteId = m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_id;
+
+		switch(m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_type)
 		{
 		case ASoldier:
 			{
@@ -220,7 +188,8 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT3& position)
 		}
 
 		// Mark grid field as empty
-		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id = 0;
+		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_id = 0;
+		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty = true;
 
 		return true;
 	}else
@@ -236,7 +205,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT3& position)
 // Param2: Out parameter that will hold the grid position in (grid fields). Negative values indicate
 //         that the passed in world position does not lie within the grid. The z-value is simply passed through.
 //--------------------------------------------------------------------------------------
-void TestEnvironment::GetGridPosition(const XMFLOAT3& worldPos, XMFLOAT3& gridPos) const
+void TestEnvironment::WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gridPos) const
 {
 	// Assumes that the grid centre is at (0,0)
 
@@ -245,15 +214,24 @@ void TestEnvironment::GetGridPosition(const XMFLOAT3& worldPos, XMFLOAT3& gridPo
 	{
 		gridPos.x = -1.0f;
 		gridPos.y = -1.0f;
-		gridPos.z = worldPos.z;
 	}else
 	{
 		// World position lies within the grid
 
 		gridPos.x = static_cast<float>(static_cast<int>((worldPos.x + m_data.m_gridWidth * 0.5f) / m_horizontalSpacing));
 		gridPos.y = static_cast<float>(static_cast<int>((worldPos.y + m_data.m_gridHeight * 0.5f) / m_verticalSpacing));
-		gridPos.z = worldPos.z;
 	}
+}
+
+//--------------------------------------------------------------------------------------
+// Calculates the grid field corresponding to a given point in world space.
+// Param1: The grid position to convert into world space.
+// Param2: Out parameter that will hold he world position corresponding to the centre of the grid field.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const
+{
+	worldPos.x = gridPos.x * m_horizontalSpacing + m_horizontalSpacing * 0.5f - m_data.m_gridWidth * 0.5f;
+	worldPos.y = gridPos.y * m_verticalSpacing + m_verticalSpacing * 0.5f - m_data.m_gridHeight * 0.5f;
 }
 
 //--------------------------------------------------------------------------------------
@@ -276,19 +254,19 @@ bool TestEnvironment::Save(std::string filename)
 		// Save soldiers of team A
 		for(std::vector<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 		{
-			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetPosition().z << " " << it->GetRotation() << "\n";
+			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
 		}
 
 		// Save soldiers of team B
 		for(std::vector<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 		{
-			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetPosition().z << " " << it->GetRotation() << "\n";
+			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
 		}
 
 		// Save cover spots
 		for(std::vector<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
 		{
-			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetPosition().z << " " << it->GetRotation() << "\n";
+			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
 		}
 
 		out.close();
@@ -313,6 +291,8 @@ bool TestEnvironment::Load(std::string filename)
 		// Delete the old test environment data
 		// Note: Make a safety copy to be able to revert in case the loading fails.
 
+		CleanupGrid();
+
 		m_teamA.clear();
 		m_teamB.clear();
 		m_coverSpots.clear();
@@ -327,9 +307,8 @@ bool TestEnvironment::Load(std::string filename)
 
 		iss >> m_data.m_gridWidth >> m_data.m_gridHeight >> m_data.m_gridHorizontalPartitions >> m_data.m_gridVerticalPartitions;
 
-		// Recalculate grid spacing
-		m_horizontalSpacing = m_data.m_gridWidth / static_cast<float>(m_data.m_gridHorizontalPartitions);
-		m_verticalSpacing   = m_data.m_gridHeight / static_cast<float>(m_data.m_gridVerticalPartitions);
+		// Initialise a new grid with the new data
+		InitialiseGrid();
 
 		// Load the entities
 
@@ -339,23 +318,12 @@ bool TestEnvironment::Load(std::string filename)
 			std::istringstream iss(lineOfFile);
 
 			int        type;
-			XMFLOAT3   position;
+			XMFLOAT2   position;
 			float      rotation;
 
-			iss >> type >> position.x >> position.y >> position.z >> rotation;
+			iss >> type >> position.x >> position.y >> rotation;
 
-			switch(EntityType(type))
-			{
-			case ASoldier:
-				m_teamA.push_back(Soldier(++m_id, ASoldier, position, rotation));
-				break;
-			case BSoldier:
-				m_teamB.push_back(Soldier(++m_id, BSoldier, position, rotation));
-				break;
-			case CoverSpot:
-				m_coverSpots.push_back(CoverPosition(++m_id, CoverSpot, position, rotation));
-				break;
-			}
+			AddEntity(EntityType(type), position, rotation);
 		}
 
 		in.close();
@@ -365,6 +333,89 @@ bool TestEnvironment::Load(std::string filename)
 	// Opening of the file failed
 	return false;
 }
+
+//--------------------------------------------------------------------------------------
+// Starts the simulation, switches from edit to simulation mode.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::StartSimulation(void)
+{
+
+}
+
+//--------------------------------------------------------------------------------------
+// Stops the simulation and resets the test environment into its starting state.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::EndSimulation(void)
+{
+
+}
+
+//--------------------------------------------------------------------------------------
+// Pauses the simulation.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::PauseSimulation(void)
+{
+
+}
+
+//--------------------------------------------------------------------------------------
+// Resumes the simulation from paused state.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::ResumeSimulation(void)
+{
+
+}
+
+//--------------------------------------------------------------------------------------
+// Initialise the grid containing the test environment
+// Returns true if the grid was successfully initialised, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::InitialiseGrid()
+{
+	m_horizontalSpacing = m_data.m_gridWidth / static_cast<float>(m_data.m_gridHorizontalPartitions);
+	m_verticalSpacing   = m_data.m_gridHeight / static_cast<float>(m_data.m_gridVerticalPartitions);
+
+	m_pGrid = new GridField*[m_data.m_gridVerticalPartitions];
+
+	if(!m_pGrid)
+	{
+		return false;
+	}
+
+	for(unsigned int i = 0; i < m_data.m_gridVerticalPartitions; ++i)
+	{
+		m_pGrid[i] = new GridField[m_data.m_gridHorizontalPartitions];
+		
+		if(!m_pGrid[i])
+		{
+			return false;
+		}
+
+		// All grid fields are initially empty
+		m_pGrid[i]->m_editData.m_isEmpty = true;
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Releases resources allocated for the grid of the test environment.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::CleanupGrid()
+{
+	if(m_pGrid)
+	{
+		for(unsigned int i = 0; i < m_data.m_gridVerticalPartitions; ++i)
+		{
+			delete[] m_pGrid[i];
+			m_pGrid[i] = nullptr;
+		}
+
+		delete[] m_pGrid;
+		m_pGrid = nullptr;
+	}
+}
+
 
 // Data access functions
 	

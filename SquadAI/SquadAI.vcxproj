@@ -89,6 +89,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
+    <ClCompile Include="MovingEntity.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="CircleDrawable.cpp" />
     <ClCompile Include="Font.cpp">
@@ -123,6 +124,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
+    <ClInclude Include="MovingEntity.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="CameraSettings.h" />
     <ClInclude Include="CircleDrawable.h" />

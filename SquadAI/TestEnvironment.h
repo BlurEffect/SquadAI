@@ -33,18 +33,28 @@ public:
 	void Update(RenderContext& pRenderContext);
 	void Cleanup(void);
 
-	bool AddEntity(EntityType type, const XMFLOAT3& position, float rotation);
-	bool RemoveEntity(const XMFLOAT3& position);
+	bool AddEntity(EntityType type, const XMFLOAT2& position, float rotation);
+	bool RemoveEntity(const XMFLOAT2& position);
 
 	bool Save(std::string filename);
 	bool Load(std::string filename);
 
-	void GetGridPosition(const XMFLOAT3& worldPos, XMFLOAT3& gridPos) const;
-	
+	void StartSimulation(void);
+	void EndSimulation(void);
+	void PauseSimulation(void);
+	void ResumeSimulation(void);
+
+	void WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gridPos) const;
+	void GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const;
+
 	// Data access functions
 	const TestEnvironmentData& GetData(void) const;
 
 private:
+
+	bool InitialiseGrid(void);
+	void CleanupGrid(void);
+
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
 
 	TestEnvironmentData m_data;  // Contains initialisation data for the environment, especially the grid to be created

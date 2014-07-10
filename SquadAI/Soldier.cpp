@@ -7,11 +7,11 @@
 // Includes
 #include "Soldier.h"
 
-Soldier::Soldier(void) : Entity()
+Soldier::Soldier(void) : MovingEntity()
 {
 }
 
-Soldier::Soldier(unsigned long id, EntityType type, const XMFLOAT3& position, float rotation) : Entity(id, type, position, rotation)
+Soldier::Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation) : MovingEntity(id, type, position, rotation)
 {
 }
 

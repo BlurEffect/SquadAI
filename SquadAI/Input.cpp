@@ -448,3 +448,27 @@ bool Input::KeyDeleteDown(void) const
 {
 	return (KEYDOWN(m_keyboardState, DIK_DELETE)) && (!KEYDOWN(m_oldKeyboardState, DIK_DELETE));
 }
+
+//--------------------------------------------------------------------------------------
+// Returns true if the return key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyReturnDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_RETURN)) && (!KEYDOWN(m_oldKeyboardState, DIK_RETURN));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the space bar was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeySpaceDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_SPACE)) && (!KEYDOWN(m_oldKeyboardState, DIK_SPACE));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the escape key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyEscapeDown(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_ESCAPE)) && (!KEYDOWN(m_oldKeyboardState, DIK_ESCAPE));
+}

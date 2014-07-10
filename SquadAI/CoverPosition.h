@@ -14,7 +14,7 @@ class CoverPosition : public Entity
 {
 public:
 	CoverPosition(void);
-	CoverPosition(unsigned long id, EntityType type, const XMFLOAT3& position, float rotation);
+	CoverPosition(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation);
 	~CoverPosition(void);
 private:
 };

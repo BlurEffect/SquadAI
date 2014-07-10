@@ -478,44 +478,57 @@ bool Renderer::InitialiseSentences(void)
 	int right = static_cast<int>(m_windowWidth) / 2;
 	int top  = static_cast<int>(m_windowHeight) / 2;
 
-	m_pPermanentSentences[LabelCursorPos] = new SentenceDrawable(8, &m_font, "Cursor: ", right - 250, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	
+	m_pPermanentSentences[LabelState] = new SentenceDrawable(7, &m_font, "State: ", right - 250, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelState])
+	{
+		return false;
+	}
+
+	m_pPermanentSentences[TxtState] = new SentenceDrawable(10, &m_font, "Edit", right - 150, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtState])
+	{
+		return false;
+	}
+
+	m_pPermanentSentences[LabelCursorPos] = new SentenceDrawable(8, &m_font, "Cursor: ", right - 250, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelCursorPos])
 	{
 		return false;
 	}
-	m_pPermanentSentences[LabelCursorPosSeparators] = new SentenceDrawable(26, &m_font, "       |       ", right - 150, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[LabelCursorPosSeparators] = new SentenceDrawable(26, &m_font, "       |       ", right - 150, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelCursorPosSeparators])
 	{
 		return false;
 	}
-	m_pPermanentSentences[TxtCursorPosX] = new SentenceDrawable(3, &m_font, "100", right - 150, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[TxtCursorPosX] = new SentenceDrawable(3, &m_font, "100", right - 150, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[TxtCursorPosX])
 	{
 		return false;
 	}
-	m_pPermanentSentences[TxtCursorPosY] = new SentenceDrawable(3, &m_font, "100", right - 100, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[TxtCursorPosY] = new SentenceDrawable(3, &m_font, "100", right - 100, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[TxtCursorPosY])
 	{
 		return false;
 	}
 
-	m_pPermanentSentences[LabelRotation] = new SentenceDrawable(10, &m_font, "Rotation: ", right - 250, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[LabelRotation] = new SentenceDrawable(10, &m_font, "Rotation: ", right - 250, top -60, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelRotation])
 	{
 		return false;
 	}
-	m_pPermanentSentences[TxtRotation] = new SentenceDrawable(3, &m_font, "180", right - 150, top -40, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[TxtRotation] = new SentenceDrawable(3, &m_font, "180", right - 150, top -60, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[TxtRotation])
 	{
 		return false;
 	}
 
-	m_pPermanentSentences[LabelEntityType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -60, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[LabelEntityType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -80, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelEntityType])
 	{
 		return false;
 	}
-	m_pPermanentSentences[TxtEntityType] = new SentenceDrawable(20, &m_font, "Cover Position", right - 150, top -60, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	m_pPermanentSentences[TxtEntityType] = new SentenceDrawable(20, &m_font, "Cover Position", right - 150, top -80, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[TxtEntityType])
 	{
 		return false;
@@ -693,6 +706,21 @@ void Renderer::RenderText(const AppData& appData)
 //--------------------------------------------------------------------------------------
 void Renderer::UpdateSentences(const AppData& appData)
 {
+	// Note: Only update sentences when their content changed.
+
+	switch(appData.m_applicationState)
+	{
+	case EditMode:
+		m_pPermanentSentences[TxtState]->SetText("Edit");
+		break;
+	case SimulationRunning:
+		m_pPermanentSentences[TxtState]->SetText("Simulation");
+		break;
+	case SimulationPaused:
+		m_pPermanentSentences[TxtState]->SetText("Paused");
+		break;
+	}
+
 	char bufferCursorX[4];
 	if(appData.m_cursorGridPosX >= 0)
 	{

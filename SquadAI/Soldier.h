@@ -9,15 +9,15 @@
 
 // Includes
 #include <DirectXMath.h>
-#include "Entity.h"
+#include "MovingEntity.h"
 
 using namespace DirectX;
 
-class Soldier : public Entity
+class Soldier : public MovingEntity
 {
 public:
 	Soldier(void);
-	Soldier(unsigned long id, EntityType type, const XMFLOAT3& position, float rotation);
+	Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation);
 	~Soldier(void);
 private:
 };

@@ -50,6 +50,8 @@ struct TextVertex
 //--------------------------------------------------------------------------------------
 enum SentenceIdentifiers
 {
+	LabelState,
+	TxtState,
 	LabelCursorPos,
 	LabelCursorPosSeparators,
 	TxtCursorPosX,

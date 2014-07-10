@@ -62,84 +62,116 @@ void Application::Cleanup()
 //--------------------------------------------------------------------------------------
 void Application::ProcessInput(void)
 {
-	if(m_inputManager.GetNextEntityType())
+	// If desired by the user, quit the application.
+	if(m_inputManager.GetExitApplication())
 	{
-		m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType + 1);
-		if(m_appData.m_selectedEntityType > CoverSpot)
-		{
-			m_appData.m_selectedEntityType = EntityType(0);
-		}
-	}else if(m_inputManager.GetPreviousEntityType())
+		PostQuitMessage(0);
+		return;
+	}
+
+	// Update the state of the application.
+
+	if(m_inputManager.GetToggleMode())
 	{
-		m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType - 1);
-		if(m_appData.m_selectedEntityType < 0)
+		if(m_appData.m_applicationState == EditMode)
 		{
-			m_appData.m_selectedEntityType = EntityType(CoverSpot);
+			m_appData.m_applicationState = SimulationRunning;
+		}else
+		{
+			m_appData.m_applicationState = EditMode;
 		}
 	}
 
-	if(m_inputManager.GetRotateLeft())
+	if((m_appData.m_applicationState != EditMode) && (m_inputManager.GetTogglePaused()))
 	{
-		m_appData.m_currentRotation -= 90.0f;
-		if(m_appData.m_currentRotation < 0.0f)
+		if(m_appData.m_applicationState == SimulationRunning)
 		{
-			m_appData.m_currentRotation = 270.0f;
-		}
-	}else if(m_inputManager.GetRotateRight())
-	{
-		m_appData.m_currentRotation += 90.0f;
-		if(m_appData.m_currentRotation >= 360.0f)
+			m_appData.m_applicationState = SimulationPaused;
+		}else
 		{
-			m_appData.m_currentRotation = 0.0f;
+			m_appData.m_applicationState = SimulationRunning;
 		}
 	}
 
 	// Translate the cursor position from screen space to world space
 
-	XMFLOAT3 cursorPos(static_cast<float>(m_inputManager.GetCursorPosition().x), static_cast<float>(m_inputManager.GetCursorPosition().y), 0.0f);
+	XMFLOAT2 cursorPos(static_cast<float>(m_inputManager.GetCursorPosition().x), static_cast<float>(m_inputManager.GetCursorPosition().y));
 
 	cursorPos.x -= m_appData.m_windowWidth/2;
 	cursorPos.y  = -cursorPos.y + m_appData.m_windowHeight/2;
-	cursorPos.z  = 0.0f;
 
-	XMStoreFloat3(&cursorPos, XMLoadFloat3(&cursorPos) * m_camera.m_zoomFactor);
+	XMStoreFloat2(&cursorPos, XMLoadFloat2(&cursorPos) * m_camera.m_zoomFactor);
 
 	XMFLOAT4X4 inverseViewMatrix;
 	XMVECTOR determinant;
 	XMStoreFloat4x4(&inverseViewMatrix, XMMatrixInverse(&determinant, XMLoadFloat4x4(&m_camera.GetViewMatrix())));
 
-	XMFLOAT3 cameraTranslation;
+	XMFLOAT2 cameraTranslation;
 	cameraTranslation.x = m_camera.GetViewMatrix()._41;
 	cameraTranslation.y = m_camera.GetViewMatrix()._42;
-	cameraTranslation.z = 0.0f;
 		
-	XMStoreFloat3(&cursorPos, XMLoadFloat3(&cursorPos) - XMLoadFloat3(&cameraTranslation));
-
-	if(m_inputManager.GetLeftClick())
-	{
-		// Add a new entity to the test environment
-		m_testEnvironment.AddEntity(m_appData.m_selectedEntityType, cursorPos, m_appData.m_currentRotation);
-	}
+	XMStoreFloat2(&cursorPos, XMLoadFloat2(&cursorPos) - XMLoadFloat2(&cameraTranslation));
 
 	// Update the cursor position in grid fields within the app data structure
-	XMFLOAT3 gridPosition;
-	m_testEnvironment.GetGridPosition(cursorPos, gridPosition);
+	XMFLOAT2 gridPosition;
+	m_testEnvironment.WorldToGridPosition(cursorPos, gridPosition);
 	m_appData.m_cursorGridPosX = static_cast<int>(gridPosition.x);
 	m_appData.m_cursorGridPosY = static_cast<int>(gridPosition.y);
 
-	if(m_inputManager.GetSave())
+	if(m_appData.m_applicationState == EditMode)
 	{
-		SaveTestEnvironment();
-	}
+		if(m_inputManager.GetLeftClick())
+		{
+			// Add a new entity to the test environment
+			m_testEnvironment.AddEntity(m_appData.m_selectedEntityType, cursorPos, m_appData.m_currentRotation);
+		}
 
-	if(m_inputManager.GetLoad())
-	{
-		LoadTestEnvironment();
-	}
+		if(m_inputManager.GetNextEntityType())
+		{
+			m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType + 1);
+			if(m_appData.m_selectedEntityType > CoverSpot)
+			{
+				m_appData.m_selectedEntityType = EntityType(0);
+			}
+		}else if(m_inputManager.GetPreviousEntityType())
+		{
+			m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType - 1);
+			if(m_appData.m_selectedEntityType < 0)
+			{
+				m_appData.m_selectedEntityType = EntityType(CoverSpot);
+			}
+		}
 
-	if(m_inputManager.GetDelete())
-	{
-		m_testEnvironment.RemoveEntity(cursorPos);
+		if(m_inputManager.GetRotateLeft())
+		{
+			m_appData.m_currentRotation -= 90.0f;
+			if(m_appData.m_currentRotation < 0.0f)
+			{
+				m_appData.m_currentRotation = 270.0f;
+			}
+		}else if(m_inputManager.GetRotateRight())
+		{
+			m_appData.m_currentRotation += 90.0f;
+			if(m_appData.m_currentRotation >= 360.0f)
+			{
+				m_appData.m_currentRotation = 0.0f;
+			}
+		}
+
+		if(m_inputManager.GetSave())
+		{
+			SaveTestEnvironment();
+		}
+
+		if(m_inputManager.GetLoad())
+		{
+			LoadTestEnvironment();
+		}
+
+		if(m_inputManager.GetDelete())
+		{
+			m_testEnvironment.RemoveEntity(cursorPos);
+		}
 	}
 }
 

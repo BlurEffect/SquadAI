@@ -12,7 +12,9 @@ Node::Node() : m_nodeId(0),
 			   m_pParentNode(nullptr),
 			   m_gridPos(0.0f, 0.0f),
 			   m_worldPos(0.0f, 0.0f),
-			   m_isObstacle(false)
+			   m_isObstacle(false),
+			   m_movementCost(0.0f),
+			   m_heuristicValue(0.0f)
 {
 	for(unsigned int i = 0; i < NumberOfDirections; ++i)
 	{
@@ -101,6 +103,16 @@ const std::vector<Node*>& Node::GetAdjacentNodes(void) const
 	return m_adjacentNodes;
 }
 
+float Node::GetMovementCost(void) const
+{
+	return m_movementCost;
+}
+	
+float Node::GetHeurisitcValue(void) const
+{
+	return m_heuristicValue;
+}
+
 void Node::SetId(unsigned long id)
 {
 	m_nodeId = id;
@@ -129,4 +141,14 @@ void Node::SetObstacle(bool isObstacle)
 void Node::SetCovered(Direction direction, bool isCovered)
 {
 	m_coverProvided[direction] = isCovered;
+}
+
+void Node::SetMovementCost(float cost) 
+{
+	m_movementCost = cost;
+}
+	
+void Node::SetHeurisitcValue(float heuristicValue) 
+{
+	m_heuristicValue = heuristicValue;
 }

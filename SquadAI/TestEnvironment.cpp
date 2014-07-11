@@ -8,9 +8,9 @@
 #include "TestEnvironment.h"
 
 
-
 TestEnvironment::TestEnvironment(void) : m_id(0),
 										 m_pGrid(nullptr),
+										 m_pNodes(nullptr),
 										 m_horizontalSpacing(0.0f),
 										 m_verticalSpacing(0.0f)
 {
@@ -29,7 +29,7 @@ TestEnvironment::~TestEnvironment(void)
 bool TestEnvironment::Initialise(const TestEnvironmentData& initData)
 {
 	m_data = initData;
-	return InitialiseGrid();
+	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
 
 //--------------------------------------------------------------------------------------

@@ -100,6 +100,7 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Pathfinder.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="SentenceDrawable.cpp">
@@ -135,6 +136,7 @@
     </ClInclude>
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="EntityData.h" />
+    <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="PS_FontCompiled.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />
     <ClInclude Include="Drawable.h" />

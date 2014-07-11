@@ -21,6 +21,8 @@
 #include "Soldier.h"
 #include "CoverPosition.h"
 #include "Node.h"
+#include "Pathfinder.h"
+
 
 using namespace DirectX;
 
@@ -64,6 +66,8 @@ private:
 
 	GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
 	Node**              m_pNodes; // The graph made up of nodes representing the test environment when in simulation mode
+
+	Pathfinder          m_pathfinder; // The pathfinder associated to this environment.
 
 	float               m_horizontalSpacing;
 	float               m_verticalSpacing;

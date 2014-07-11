@@ -33,6 +33,8 @@ public:
 	bool			IsObstacle(void) const;
 	bool            IsCovered(Direction direction) const;
 	const std::vector<Node*>& GetAdjacentNodes(void) const;
+	float			GetMovementCost(void) const;
+	float           GetHeurisitcValue(void) const;
 
 	void SetId(unsigned long id);
 	void SetParent(Node* node);
@@ -40,6 +42,8 @@ public:
 	void SetWorldPosition(const XMFLOAT2& worldPos);
 	void SetObstacle(bool isObstacle);
 	void SetCovered(Direction direction, bool isCovered);
+	void SetMovementCost(float cost);
+	void SetHeurisitcValue(float heuristicValue);
 
 private:
 	unsigned long m_nodeId;							   // Each node has a unique identifier associated to it for quick comparsion
@@ -50,6 +54,8 @@ private:
 	bool		  m_coverProvided[NumberOfDirections]; // Tells whether this node is covered from some directions or is all in the open
 
 	std::vector<Node*> m_adjacentNodes;				   // The nodes in the graph that can be directly reached from this one
+	float			   m_movementCost;				   // The cost of a path from the start position to this node
+	float			   m_heuristicValue;			   // A heuristic value used as an estimate of the cost from this node to the target
 };
 
 #endif // NODE_H

@@ -100,7 +100,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		return false;
 	}
 
-	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty)
+	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty)
 	{
 		// Field is not empty, do not place entity on top of others
 		return false;
@@ -118,14 +118,16 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		break;
 	case CoverSpot:
 		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation));
+		// Update the graph
+		UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], false);
 		break;
 	}
 
 	// Update the grid field
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty  = false;
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_id       = m_id;
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_type     = type;
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_rotation = rotation;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty  = false;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id       = m_id;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type     = type;
+	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_rotation = rotation;
 
 	return true;
 }
@@ -146,11 +148,11 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 		return false;
 	}
 
-	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty)
+	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty)
 	{
-		unsigned long deleteId = m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_id;
+		unsigned long deleteId = m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id;
 
-		switch(m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_type)
+		switch(m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type)
 		{
 		case ASoldier:
 			{
@@ -180,6 +182,9 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 
 				if(deleteIterator != m_coverSpots.end())
 				{
+					// Update the test environment graph
+					UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], true);
+
 					// Delete the entity
 					m_coverSpots.erase(deleteIterator);
 				}
@@ -188,8 +193,8 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 		}
 
 		// Mark grid field as empty
-		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_id = 0;
-		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_editData.m_isEmpty = true;
+		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id = 0;
+		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty = true;
 
 		return true;
 	}else
@@ -210,7 +215,7 @@ void TestEnvironment::WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gr
 	// Assumes that the grid centre is at (0,0)
 
 	// Check for invalid world positions that don't lie within the grid
-	if(abs(worldPos.x) > (m_data.m_gridWidth * 0.5f) || abs(worldPos.x) > (m_data.m_gridWidth * 0.5f))
+	if(abs(worldPos.x) > (m_data.m_gridWidth * 0.5f) || abs(worldPos.y) > (m_data.m_gridHeight * 0.5f))
 	{
 		gridPos.x = -1.0f;
 		gridPos.y = -1.0f;
@@ -375,16 +380,18 @@ bool TestEnvironment::InitialiseGrid()
 	m_horizontalSpacing = m_data.m_gridWidth / static_cast<float>(m_data.m_gridHorizontalPartitions);
 	m_verticalSpacing   = m_data.m_gridHeight / static_cast<float>(m_data.m_gridVerticalPartitions);
 
-	m_pGrid = new GridField*[m_data.m_gridVerticalPartitions];
+	// Initialise the grid
+
+	m_pGrid = new GridField*[m_data.m_gridHorizontalPartitions];
 
 	if(!m_pGrid)
 	{
 		return false;
 	}
 
-	for(unsigned int i = 0; i < m_data.m_gridVerticalPartitions; ++i)
+	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
 	{
-		m_pGrid[i] = new GridField[m_data.m_gridHorizontalPartitions];
+		m_pGrid[i] = new GridField[m_data.m_gridVerticalPartitions];
 		
 		if(!m_pGrid[i])
 		{
@@ -392,7 +399,80 @@ bool TestEnvironment::InitialiseGrid()
 		}
 
 		// All grid fields are initially empty
-		m_pGrid[i]->m_editData.m_isEmpty = true;
+		m_pGrid[i]->m_isEmpty = true;
+	}
+
+	// Initialise the nodes
+
+	m_pNodes = new Node*[m_data.m_gridHorizontalPartitions];
+
+	if(!m_pNodes)
+	{
+		return false;
+	}
+
+	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+	{
+		m_pNodes[i] = new Node[m_data.m_gridVerticalPartitions];
+		
+		if(!m_pNodes[i])
+		{
+			return false;
+		}
+	}
+
+	// Initialise the nodes
+
+	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+	{
+		for(unsigned int k = 0; k < m_data.m_gridVerticalPartitions; ++k)
+		{
+			XMFLOAT2 gridPos(static_cast<float>(i), static_cast<float>(k));
+			XMFLOAT2 worldPos;
+
+			GridToWorldPosition(gridPos, worldPos);
+
+			// Use the array position as node ID
+			m_pNodes[i][k].Initialise(i * m_data.m_gridHorizontalPartitions + k, gridPos, worldPos, false);
+
+			// Set up adjacency information for the node
+
+			if(i > 0)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k]);
+				if(k > 0)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k-1]);
+				}
+				if(k < m_data.m_gridVerticalPartitions-1)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k+1]);
+				}
+			}
+
+			if(i < m_data.m_gridHorizontalPartitions-1)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k]);
+				if(k > 0)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k-1]);
+				}
+				if(k < m_data.m_gridVerticalPartitions-1)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k+1]);
+				}
+			}
+
+			if(k > 0)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k-1]);
+			}
+
+			if(k < m_data.m_gridVerticalPartitions-1)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k+1]);
+			}
+		}
 	}
 
 	return true;
@@ -405,7 +485,7 @@ void TestEnvironment::CleanupGrid()
 {
 	if(m_pGrid)
 	{
-		for(unsigned int i = 0; i < m_data.m_gridVerticalPartitions; ++i)
+		for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
 		{
 			delete[] m_pGrid[i];
 			m_pGrid[i] = nullptr;
@@ -414,8 +494,71 @@ void TestEnvironment::CleanupGrid()
 		delete[] m_pGrid;
 		m_pGrid = nullptr;
 	}
+
+	if(m_pNodes)
+	{
+		for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+		{
+			delete[] m_pNodes[i];
+			m_pNodes[i] = nullptr;
+		}
+
+		delete[] m_pNodes;
+		m_pNodes = nullptr;
+	}
 }
 
+//--------------------------------------------------------------------------------------
+// Updates the nodes of the graph according to the new cover spot added to the envrionment
+// or a cover spot deleted from it.
+// Param1: The node with the new cover position.
+// Param2: Tells whether the cover position is added or deleted.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::UpdateCoverMap(Node& coverNode, bool doDelete)
+{
+	coverNode.SetObstacle(!doDelete);
+
+	int gridX = static_cast<int>(coverNode.GetGridPosition().x);
+	int gridY = static_cast<int>(coverNode.GetGridPosition().y);
+
+	// Update the adjacent nodes with regard to the added/deleted cover spot
+
+	if(gridX > 0)
+	{
+		m_pNodes[gridX-1][gridY].SetCovered(East, !doDelete);
+		if(gridY > 0)
+		{
+			m_pNodes[gridX-1][gridY-1].SetCovered(NorthEast, !doDelete);
+		}
+		if(gridY < m_data.m_gridVerticalPartitions-1)
+		{
+			m_pNodes[gridX-1][gridY+1].SetCovered(SouthEast, !doDelete);
+		}
+	}
+
+	if(gridX < m_data.m_gridHorizontalPartitions-1)
+	{
+		m_pNodes[gridX+1][gridY].SetCovered(West, !doDelete);
+		if(gridY > 0)
+		{
+			m_pNodes[gridX+1][gridY-1].SetCovered(NorthWest, !doDelete);
+		}
+		if(gridY < m_data.m_gridVerticalPartitions-1)
+		{
+			m_pNodes[gridX+1][gridY+1].SetCovered(SouthWest, !doDelete);
+		}
+	}
+
+	if(gridY > 0)
+	{
+		m_pNodes[gridX][gridY-1].SetCovered(North, !doDelete);
+	}
+
+	if(gridY < m_data.m_gridVerticalPartitions-1)
+	{
+		m_pNodes[gridX][gridY+1].SetCovered(South, !doDelete);
+	}
+}
 
 // Data access functions
 	

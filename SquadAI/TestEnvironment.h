@@ -20,6 +20,7 @@
 #include "TestEnvironmentData.h"
 #include "Soldier.h"
 #include "CoverPosition.h"
+#include "Node.h"
 
 using namespace DirectX;
 
@@ -54,11 +55,15 @@ private:
 
 	bool InitialiseGrid(void);
 	void CleanupGrid(void);
+	void UpdateCoverMap(Node& coverNode, bool doDelete);
+
 
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
 
 	TestEnvironmentData m_data;  // Contains initialisation data for the environment, especially the grid to be created
-	GridField**         m_pGrid; // The grid the test application is using and on which entities are placed and moved around
+
+	GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
+	Node**              m_pNodes; // The graph made up of nodes representing the test environment when in simulation mode
 
 	float               m_horizontalSpacing;
 	float               m_verticalSpacing;

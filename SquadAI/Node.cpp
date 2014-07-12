@@ -113,6 +113,11 @@ float Node::GetHeurisitcValue(void) const
 	return m_heuristicValue;
 }
 
+float Node::GetTotalEstimate(void) const
+{
+	return m_movementCost + m_heuristicValue;
+}
+
 void Node::SetId(unsigned long id)
 {
 	m_nodeId = id;

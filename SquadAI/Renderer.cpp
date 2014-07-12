@@ -608,7 +608,7 @@ void Renderer::Cleanup( void )
 void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData)
 {
 	// Clear the backbuffer
-	m_pD3d11DeviceContext->ClearRenderTargetView(m_pRenderTargetView, g_cBackgroundColour);
+	m_pD3d11DeviceContext->ClearRenderTargetView(m_pRenderTargetView, g_kBackgroundColour);
 
 	// Refresh the Depth/Stencil view
 	m_pD3d11DeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -642,7 +642,7 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 	// Render the grid
 
 	// Update the per object data according to the current instance
-	m_perObjectData.m_colour = g_cGridColour;
+	m_perObjectData.m_colour = g_kGridColour;
 	XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMMatrixIdentity() * XMLoadFloat4x4(&viewProjection));
 	// Update the shader's constant buffer
 	m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);

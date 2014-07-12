@@ -11,7 +11,7 @@ CoverPosition::CoverPosition(void) : Entity()
 {
 }
 
-CoverPosition::CoverPosition(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation) : Entity(id, type, position, rotation)
+CoverPosition::CoverPosition(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, TestEnvironment* pEnvironment) : Entity(id, type, position, rotation, pEnvironment)
 {
 }
 

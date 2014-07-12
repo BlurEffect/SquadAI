@@ -35,6 +35,7 @@ public:
 	const std::vector<Node*>& GetAdjacentNodes(void) const;
 	float			GetMovementCost(void) const;
 	float           GetHeurisitcValue(void) const;
+	float           GetTotalEstimate(void) const;
 
 	void SetId(unsigned long id);
 	void SetParent(Node* node);
@@ -56,6 +57,7 @@ private:
 	std::vector<Node*> m_adjacentNodes;				   // The nodes in the graph that can be directly reached from this one
 	float			   m_movementCost;				   // The cost of a path from the start position to this node
 	float			   m_heuristicValue;			   // A heuristic value used as an estimate of the cost from this node to the target
+	float              m_totalEstimate;				   // The movement cost and heuristic value combined
 };
 
 #endif // NODE_H

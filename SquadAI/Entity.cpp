@@ -7,18 +7,21 @@
 
 // Includes
 #include "Entity.h"
+#include "TestEnvironment.h"
 
 Entity::Entity(void) : m_id(0),
 					   m_type(EntityType(0)),
 					   m_position(0.0f, 0.0f),
-					   m_rotation(0.0f)
+					   m_rotation(0.0f),
+					   m_pEnvironment(nullptr)
 {
 }
 
-Entity::Entity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation) : m_id(id), 
-																							  m_type(type),
-																						      m_position(position),
-																							  m_rotation(rotation)
+Entity::Entity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, TestEnvironment* pEnvironment) : m_id(id), 
+																															 m_type(type),
+																															 m_position(position),
+																															 m_rotation(rotation),
+																															 m_pEnvironment(pEnvironment)
 {
 }
 
@@ -48,6 +51,10 @@ EntityType Entity::GetType(void) const
 	return m_type;
 }
 
+TestEnvironment* Entity::GetTestEnvironment(void)
+{
+	return m_pEnvironment;
+}
 
 void Entity::SetId(unsigned long id)
 {
@@ -67,4 +74,9 @@ void Entity::SetRotation(float rotation)
 void Entity::SetType(EntityType type)
 {
 	m_type = type;
+}
+
+void Entity::SetTestEnvironment(TestEnvironment* pEnvironment)
+{
+	m_pEnvironment = pEnvironment;
 }

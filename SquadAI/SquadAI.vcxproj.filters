@@ -132,6 +132,9 @@
     <ClCompile Include="Pathfinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MovementManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -192,12 +195,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RendererSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CameraSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CircleDrawable.h">
@@ -264,6 +261,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Pathfinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MovementManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -11,7 +11,7 @@ Soldier::Soldier(void) : MovingEntity()
 {
 }
 
-Soldier::Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation) : MovingEntity(id, type, position, rotation)
+Soldier::Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, TestEnvironment* pEnvironment, float maxVelocity, float maxForce) : MovingEntity(id, type, position, rotation, pEnvironment, maxVelocity, maxForce)
 {
 }
 

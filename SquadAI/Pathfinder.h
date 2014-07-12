@@ -10,6 +10,7 @@
 // Includes
 #include <DirectXMath.h>
 #include <vector>
+#include <algorithm>
 #include "Node.h"
 
 // Forward Declaration
@@ -23,6 +24,14 @@ using namespace DirectX;
 enum PathfindingAlgorithm
 {
 	AStar // A* pathfinding algorithm
+};
+
+//--------------------------------------------------------------------------------------
+// Defines available heuristic functions to estimate costs from a node to the target.
+//--------------------------------------------------------------------------------------
+enum Heuristic
+{
+	EuclideanDistance // Euclidean distance heuristic, length of the straight line between the node and the target used as estimate
 };
 
 //--------------------------------------------------------------------------------------
@@ -47,11 +56,15 @@ public:
 	~Pathfinder(void);
 
 	bool Initialise(TestEnvironment* pTestEnvironment);
-	bool CalculatePath(PathfindingAlgorithm algorithm, const XMFLOAT2& startGridPosition, const XMFLOAT2& targetGridPosition, std::vector<XMFLOAT2>& path);
+	bool CalculatePath(PathfindingAlgorithm algorithm, Heuristic heuristic, const XMFLOAT2& startPosition, const XMFLOAT2& targetPosition, std::vector<XMFLOAT2>& path);
 
 private:
 
-	bool CalculatePathAStar(const XMFLOAT2& startGridPosition, const XMFLOAT2& targetGridPosition, std::vector<XMFLOAT2>& path);
+	bool CalculatePathAStar(Heuristic heuristic, const XMFLOAT2& startGridPosition, const XMFLOAT2& targetGridPosition, std::vector<XMFLOAT2>& path);
+	void UpdateCosts(Heuristic heuristic, Node* pStartNode, Node* pTargetNode);
+	float GetTraversalCost(const Node* pStartNode, const Node* pTargetNode);
+	float CalculateEuclideanDistance(const XMFLOAT2& startPosition, const XMFLOAT2& targetPosition);
+	void ConstructPath(Node* pTargetNode, std::vector<XMFLOAT2>& path);
 
 	TestEnvironment* m_pEnvironment; // A pointer to the test environment this pathfinder belongs to
 	TraversalWeights m_weights;      // The weights used to calculate distances in the graph
@@ -66,10 +79,27 @@ private:
 	//--------------------------------------------------------------------------------------
 	class CompareNodeCosts
 	{
+	public:
 		bool operator()(const Node* pNode1, const Node* pNode2) 
 		{
 			return pNode1->GetMovementCost() + pNode1->GetHeurisitcValue() > pNode2->GetMovementCost() + pNode2->GetHeurisitcValue();
 		}
+    };
+
+	//--------------------------------------------------------------------------------------
+	// Private comparator class used to find a node with a certain id within a container.
+	//--------------------------------------------------------------------------------------
+	class FindNodeWithId
+	{
+	public:
+		FindNodeWithId(unsigned long id) : m_id(id){}
+		bool operator()(const Node* pNode) 
+		{
+			return pNode->GetId() == m_id;
+		}
+
+	private:
+		unsigned long m_id;
     };
 };
 

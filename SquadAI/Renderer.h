@@ -23,7 +23,7 @@
 #include "ShaderParameters.h"
 #include "ShaderGroup.h"
 #include "RenderContext.h"
-#include "RendererSettings.h"
+#include "ApplicationSettings.h"
 #include "Font.h"
 #include "SentenceDrawable.h"
 #include "TestEnvironmentData.h"

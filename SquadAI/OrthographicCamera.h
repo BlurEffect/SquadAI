@@ -12,7 +12,7 @@
 
 // Includes
 #include <DirectXMath.h>
-#include "CameraSettings.h"
+#include "ApplicationSettings.h"
 
 using namespace DirectX;
 

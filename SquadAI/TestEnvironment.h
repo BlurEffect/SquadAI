@@ -22,6 +22,7 @@
 #include "CoverPosition.h"
 #include "Node.h"
 #include "Pathfinder.h"
+#include "ApplicationSettings.h"
 
 
 using namespace DirectX;
@@ -52,6 +53,8 @@ public:
 
 	// Data access functions
 	const TestEnvironmentData& GetData(void) const;
+	Pathfinder& GetPathfinder(void);
+	Node** GetNodes(void);
 
 private:
 

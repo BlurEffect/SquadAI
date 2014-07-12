@@ -114,12 +114,12 @@ void OrthographicCamera::Move(const XMFLOAT3& moveVector)
 										);
 
 	m_zoomFactor -= moveVector.z * m_movementSpeed.z;
-	if(m_zoomFactor < g_cOrthoMinimalZoomFactor)
+	if(m_zoomFactor < g_kOrthoMinimalZoomFactor)
 	{
-		m_zoomFactor = g_cOrthoMinimalZoomFactor;
-	}else if(m_zoomFactor > g_cOrthoMaximalZoomFactor)
+		m_zoomFactor = g_kOrthoMinimalZoomFactor;
+	}else if(m_zoomFactor > g_kOrthoMaximalZoomFactor)
 	{
-		m_zoomFactor = g_cOrthoMaximalZoomFactor;
+		m_zoomFactor = g_kOrthoMaximalZoomFactor;
 	}
 
 	XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_zoomFactor, m_windowHeight * m_zoomFactor, m_nearClippingPlane, m_farClippingPlane));

@@ -111,13 +111,13 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 	switch(type)
 	{
 	case ASoldier:
-		m_teamA.push_back(Soldier(++m_id, type, updatedPosition, rotation));
+		m_teamA.push_back(Soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce));
 		break;
 	case BSoldier:
-		m_teamB.push_back(Soldier(++m_id, type, updatedPosition, rotation));
+		m_teamB.push_back(Soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce));
 		break;
 	case CoverSpot:
-		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation));
+		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, this));
 		// Update the graph
 		UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], false);
 		break;
@@ -565,4 +565,14 @@ void TestEnvironment::UpdateCoverMap(Node& coverNode, bool doDelete)
 const TestEnvironmentData& TestEnvironment::GetData(void) const
 {
 	return m_data;
+}
+
+Pathfinder& TestEnvironment::GetPathfinder(void) 
+{
+	return m_pathfinder;
+}
+
+Node** TestEnvironment::GetNodes(void)
+{
+	return m_pNodes;
 }

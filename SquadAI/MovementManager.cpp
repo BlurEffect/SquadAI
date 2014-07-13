@@ -38,6 +38,8 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 
 	m_pEntity = pEntity;
 
+	SetPathTo(XMFLOAT2(20.0f, 20.0f));
+
 	return true;
 }
 
@@ -47,6 +49,8 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 //--------------------------------------------------------------------------------------
 void MovementManager::Update(void)
 {
+	FollowPath(1.0f);
+
 	// Truncate steering force to not be greater than the maximal allowed force
 	float magnitude = 0.0f;
 	XMStoreFloat(&magnitude, XMVector2Length(XMLoadFloat2(&m_steeringForce)));
@@ -109,7 +113,29 @@ bool MovementManager::SetPathTo(const XMFLOAT2& targetPosition)
 //--------------------------------------------------------------------------------------
 void MovementManager::Seek(const XMFLOAT2& targetPosition, float slowArrivalRadius)
 {
+	XMFLOAT2 desiredVelocity;
+	XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&targetPosition) - XMLoadFloat2(&m_pEntity->GetPosition()));
 
+	// Get the distance from the current position of the entity to the target
+	float distance;
+	XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&desiredVelocity)));
+
+	// Normalise the desired velocity
+	XMStoreFloat2(&desiredVelocity, XMVector2Normalize(XMLoadFloat2(&desiredVelocity)));
+
+	if(distance <= slowArrivalRadius)
+	{
+		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_pEntity->GetMaxVelocity() * distance/slowArrivalRadius);
+	}else
+	{
+		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_pEntity->GetMaxVelocity());
+	}
+
+	XMFLOAT2 force;
+	XMStoreFloat2(&force, XMLoadFloat2(&desiredVelocity) - XMLoadFloat2(&m_pEntity->GetVelocity()));
+
+	// Add the seek force to the accumulated steering force
+	XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&force));
 }
 
 //--------------------------------------------------------------------------------------
@@ -125,7 +151,7 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 	
 		// Calculate the distance between the current position of the entity and the target
 		float distance = 0.0f;
-		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&target)));
+		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&target) - XMLoadFloat2(&m_pEntity->GetPosition())));
 
 		if(distance <= nodeReachedRadius)
 		{
@@ -134,8 +160,8 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 
 			if(m_currentNode >= m_path.size())
 			{
-				// final destination reached
-				// clear path?
+				// Final destination reached, clear the path
+				m_path.clear();
 			}else
 			{
 				if(m_currentNode < m_path.size() - 1)
@@ -150,29 +176,3 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 		}
 	}
 }
-/*
-//--------------------------------------------------------------------------------------
-// Calculate the seek force and add it to the total force.
-//--------------------------------------------------------------------------------------
-void MovementManager::UpdateSeekForce(void)
-{
-	/*
-	var force :Vector3D;
-    var distance :Number;
- 
-    desired = target.subtract(host.getPosition());
- 
-    distance = desired.length;
-    desired.normalize();
- 
-    if (distance <= slowingRadius) {
-        desired.scaleBy(host.getMaxVelocity() * distance/slowingRadius);
-    } else {
-        desired.scaleBy(host.getMaxVelocity());
-    }
- 
-    force = desired.subtract(host.getVelocity());
- 
-    return force;
-	*/
-//}

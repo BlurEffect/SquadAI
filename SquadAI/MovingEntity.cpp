@@ -26,6 +26,23 @@ MovingEntity::~MovingEntity(void)
 {
 }
 
+//--------------------------------------------------------------------------------------
+// Initialises the moving entity.
+// Returns true if the moving entity was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool MovingEntity::Initialise(void)
+{
+	return m_movementManager.Initialise(this);
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the moving entity.
+//--------------------------------------------------------------------------------------
+void MovingEntity::Update(void)
+{
+	m_movementManager.Update();
+}
+
 // Data access functions
 
 const XMFLOAT2& MovingEntity::GetVelocity(void) const

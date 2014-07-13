@@ -30,6 +30,8 @@ bool Pathfinder::Initialise(TestEnvironment* pTestEnvironment)
 		return false;
 	}
 
+	m_pEnvironment = pTestEnvironment;
+
 	m_weights.m_horizontalCost = pTestEnvironment->GetData().m_gridWidth / pTestEnvironment->GetData().m_gridHorizontalPartitions;
 	m_weights.m_verticalCost   = pTestEnvironment->GetData().m_gridHeight / pTestEnvironment->GetData().m_gridVerticalPartitions;
 	m_weights.m_diagonalCost   = sqrtf(m_weights.m_horizontalCost * m_weights.m_horizontalCost + m_weights.m_verticalCost * m_weights.m_verticalCost);
@@ -99,8 +101,9 @@ bool Pathfinder::CalculatePathAStar(Heuristic heuristic, const XMFLOAT2& startGr
 	// Get the id of the target node
 	unsigned long targetId = m_pEnvironment->GetNodes()[static_cast<int>(targetGridPosition.x)][static_cast<int>(targetGridPosition.y)].GetId();
 
-	// Prepare th start node
+	// Prepare the start node
 	m_pEnvironment->GetNodes()[static_cast<int>(startGridPosition.x)][static_cast<int>(startGridPosition.y)].SetParent(nullptr);
+	UpdateCosts(heuristic, &m_pEnvironment->GetNodes()[static_cast<int>(startGridPosition.x)][static_cast<int>(startGridPosition.y)], &m_pEnvironment->GetNodes()[static_cast<int>(targetGridPosition.x)][static_cast<int>(targetGridPosition.y)]);
 
 	// Add the start node to the open list
 	m_openList.push_back(&m_pEnvironment->GetNodes()[static_cast<int>(startGridPosition.x)][static_cast<int>(startGridPosition.y)]);
@@ -135,11 +138,11 @@ bool Pathfinder::CalculatePathAStar(Heuristic heuristic, const XMFLOAT2& startGr
 			{
 				// Check if the node is already placed in the closed list
 				std::vector<Node*>::iterator closedIt = std::find_if(m_closedList.begin(), m_closedList.end(), FindNodeWithId((*it)->GetId()));
-				if(closedIt != m_closedList.end())
+				if(closedIt == m_closedList.end())
 				{
 					// Only consider node if it is not already on the closed list
 					std::vector<Node*>::iterator openIt = std::find_if(m_openList.begin(), m_openList.end(), FindNodeWithId((*it)->GetId()));
-					if(openIt != m_openList.end())
+					if(openIt == m_openList.end())
 					{
 						// If the node is not in the open list, add it to it
 						m_openList.push_back(*it);

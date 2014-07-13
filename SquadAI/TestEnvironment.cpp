@@ -38,10 +38,12 @@ bool TestEnvironment::Initialise(const TestEnvironmentData& initData)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::Update(RenderContext& pRenderContext)
 {
-	// Add entities to the render context and calculate their transforms
+	// Update entities and add them to the render context after calculating their transforms
 
-	for(std::vector<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
+		it->Update();
+
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
 
@@ -50,8 +52,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 		pRenderContext.AddInstance(ASoldier, transform);
 	}
 
-	for(std::vector<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 	{
+		it->Update();
+
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
 
@@ -60,7 +64,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 		pRenderContext.AddInstance(BSoldier, transform);
 	}
 	
-	for(std::vector<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
+	for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
 	{
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f -it->GetRotation()));
@@ -84,7 +88,7 @@ void TestEnvironment::Cleanup()
 // Param1: The type of the entity that should be added.
 // Param2: The world position, at which the entity should be added (that is a the correspondign grid field).
 // Param3: The rotation to apply to the new entity.
-// Returns true if the entity was successfully added, false otherwise.
+// Returns true if the entity was successfully added and initialised, false otherwise.
 //--------------------------------------------------------------------------------------
 bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float rotation)
 {
@@ -111,10 +115,26 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 	switch(type)
 	{
 	case ASoldier:
-		m_teamA.push_back(Soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce));
+		{
+			Soldier soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce);
+			m_teamA.push_back(soldier);
+			if(!m_teamA.back().Initialise())
+			{
+				m_teamA.pop_back();
+				return false;
+			}
+		}
 		break;
 	case BSoldier:
-		m_teamB.push_back(Soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce));
+		{
+			Soldier soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce);
+			m_teamB.push_back(soldier);
+			if(!m_teamB.back().Initialise())
+			{
+				m_teamA.pop_back();
+				return false;
+			}
+		}
 		break;
 	case CoverSpot:
 		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, this));
@@ -156,7 +176,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 		{
 		case ASoldier:
 			{
-				std::vector<Soldier>::iterator deleteIterator = std::find_if(m_teamA.begin(), m_teamA.end(), FindEntityById<Soldier>(deleteId));
+				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamA.begin(), m_teamA.end(), FindEntityById<Soldier>(deleteId));
 
 				if(deleteIterator != m_teamA.end())
 				{
@@ -167,7 +187,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 			break;
 		case BSoldier:
 			{
-				std::vector<Soldier>::iterator deleteIterator = std::find_if(m_teamB.begin(), m_teamB.end(), FindEntityById<Soldier>(deleteId));
+				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamB.begin(), m_teamB.end(), FindEntityById<Soldier>(deleteId));
 
 				if(deleteIterator != m_teamB.end())
 				{
@@ -178,7 +198,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 			break;
 		case CoverSpot:
 			{
-				std::vector<CoverPosition>::iterator deleteIterator = std::find_if(m_coverSpots.begin(), m_coverSpots.end(), FindEntityById<CoverPosition>(deleteId));
+				std::list<CoverPosition>::iterator deleteIterator = std::find_if(m_coverSpots.begin(), m_coverSpots.end(), FindEntityById<CoverPosition>(deleteId));
 
 				if(deleteIterator != m_coverSpots.end())
 				{
@@ -257,19 +277,19 @@ bool TestEnvironment::Save(std::string filename)
 		// Save the entities
 
 		// Save soldiers of team A
-		for(std::vector<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 		{
 			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
 		}
 
 		// Save soldiers of team B
-		for(std::vector<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 		{
 			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
 		}
 
 		// Save cover spots
-		for(std::vector<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
+		for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
 		{
 			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
 		}
@@ -434,9 +454,14 @@ bool TestEnvironment::InitialiseGrid()
 
 			// Use the array position as node ID
 			m_pNodes[i][k].Initialise(i * m_data.m_gridHorizontalPartitions + k, gridPos, worldPos, false);
+		}
+	}
 
-			// Set up adjacency information for the node
-
+	// Set up adjacency information for the nodes
+	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+	{
+		for(unsigned int k = 0; k < m_data.m_gridVerticalPartitions; ++k)
+		{
 			if(i > 0)
 			{
 				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k]);

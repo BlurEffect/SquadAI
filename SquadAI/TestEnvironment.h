@@ -10,7 +10,7 @@
 
 // Includes
 #include <DirectXMath.h>
-#include <vector>
+#include <list>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -72,12 +72,12 @@ private:
 
 	Pathfinder          m_pathfinder; // The pathfinder associated to this environment.
 
-	float               m_horizontalSpacing;
-	float               m_verticalSpacing;
+	float               m_horizontalSpacing; // The size of a grid field along the x-axis
+	float               m_verticalSpacing;   // The size of a grid field along the y-axis
 
-	std::vector<Soldier>	   m_teamA;
-	std::vector<Soldier>	   m_teamB;
-	std::vector<CoverPosition> m_coverSpots;
+	std::list<Soldier>	     m_teamA;      // Holds the soldier entities associated to Team A
+	std::list<Soldier>	     m_teamB;      // Holds the soldier entities associated to Team B
+	std::list<CoverPosition> m_coverSpots; // Holds the cover objects that were placed in the environment
 
 
 	//--------------------------------------------------------------------------------------
@@ -90,8 +90,6 @@ private:
 		FindEntityById(unsigned long id) : m_id(id){}
 		bool operator()(EntityTypeName entity)
 		{
-			//Entity* pEntity = &entity;
-
 			return entity.GetId() == m_id;
 		}
 	private:

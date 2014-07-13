@@ -33,7 +33,7 @@ const float    g_kBackgroundColour[4] = {0.0f, 0.0f, 0.0f, 1.0f}; // The colour 
 const XMFLOAT4 g_kGridColour(1.0f, 1.0f, 1.0f, 1.0f);			  // The colour of the grid representing the test environment
 
 // Entity properties
-const float g_kSoldierMaxVelocity(1.0f); // Determines how fast soldiers can move within the test environment
+const float g_kSoldierMaxVelocity(0.01f); // Determines how fast soldiers can move within the test environment
 const float g_kSoldierMaxForce(1.0f);    // Determines the maximum amount of forces that can impact the character
 
 #endif // APPLICATION_SETTINGS_H

@@ -21,6 +21,9 @@ public:
 	MovingEntity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, TestEnvironment* pEnvironment, float maxVelocity, float maxForce);
 	~MovingEntity(void);
 
+	bool Initialise(void);
+	void Update(void);
+
 	// Data access functions
 	const XMFLOAT2& GetVelocity(void) const;
 	float           GetMaxVelocity(void) const;

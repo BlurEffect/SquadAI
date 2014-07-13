@@ -63,6 +63,7 @@ private:
 	bool CalculatePathAStar(Heuristic heuristic, const XMFLOAT2& startGridPosition, const XMFLOAT2& targetGridPosition, std::vector<XMFLOAT2>& path);
 	void UpdateCosts(Heuristic heuristic, Node* pStartNode, Node* pTargetNode);
 	float GetTraversalCost(const Node* pStartNode, const Node* pTargetNode);
+	float CalculateEstimate(Node* pStartNode, Node* pTargetNode);
 	float CalculateEuclideanDistance(const XMFLOAT2& startPosition, const XMFLOAT2& targetPosition);
 	void ConstructPath(Node* pTargetNode, std::vector<XMFLOAT2>& path);
 
@@ -82,7 +83,7 @@ private:
 	public:
 		bool operator()(const Node* pNode1, const Node* pNode2) 
 		{
-			return pNode1->GetMovementCost() + pNode1->GetHeurisitcValue() > pNode2->GetMovementCost() + pNode2->GetHeurisitcValue();
+			return pNode1->GetTotalEstimate() < pNode2->GetTotalEstimate();
 		}
     };
 

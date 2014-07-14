@@ -187,5 +187,7 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 //--------------------------------------------------------------------------------------s
 void MovementManager::AvoidCollisions()
 {
-
+	const Entity& pCollisionObject = m_pEntity->GetTestEnvironment()->GetCollisionObject(*m_pEntity);
+	
+	
 }

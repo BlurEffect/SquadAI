@@ -5,6 +5,8 @@
 *  that are part of it.
 */
 
+// Note: The test environments are currently limited to square grids.
+
 #ifndef TEST_ENVIRONMENT_H
 #define TEST_ENVIRONMENT_H
 
@@ -50,6 +52,8 @@ public:
 
 	void WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gridPos) const;
 	void GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const;
+
+	const Entity& GetCollisionObject(const MovingEntity& entity);
 
 	// Data access functions
 	float		 GetGridSize(void) const;

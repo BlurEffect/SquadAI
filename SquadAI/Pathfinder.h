@@ -56,16 +56,28 @@ public:
 	~Pathfinder(void);
 
 	bool Initialise(TestEnvironment* pTestEnvironment);
+	void UpdateWeights(void);
 	bool CalculatePath(PathfindingAlgorithm algorithm, Heuristic heuristic, const XMFLOAT2& startPosition, const XMFLOAT2& targetPosition, std::vector<XMFLOAT2>& path);
+
+	// Data access functions
+
+	float GetWeightHorizontal(void) const;
+	float GetWeightVertical(void) const;
+	float GetWeightDiagonal(void) const;
+
+	void SetWeightHorizontal(float weight);
+	void SetWeightVertical(float weight);
+	void SetWeightDiagonal(float weight);
 
 private:
 
-	bool CalculatePathAStar(Heuristic heuristic, const XMFLOAT2& startGridPosition, const XMFLOAT2& targetGridPosition, std::vector<XMFLOAT2>& path);
-	void UpdateCosts(Heuristic heuristic, Node* pStartNode, Node* pTargetNode);
+	bool  CalculatePathAStar(Heuristic heuristic, const XMFLOAT2& startGridPosition, const XMFLOAT2& targetGridPosition, std::vector<XMFLOAT2>& path);
+	void  UpdateCosts(Heuristic heuristic, Node* pStartNode, Node* pTargetNode);
 	float GetTraversalCost(const Node* pStartNode, const Node* pTargetNode);
 	float CalculateEstimate(Node* pStartNode, Node* pTargetNode);
 	float CalculateEuclideanDistance(const XMFLOAT2& startPosition, const XMFLOAT2& targetPosition);
-	void ConstructPath(Node* pTargetNode, std::vector<XMFLOAT2>& path);
+	void  ConstructPath(Node* pTargetNode, std::vector<XMFLOAT2>& path);
+	bool  IsCuttingCorner(Node* pStartNode, Node* pTargetNode);
 
 	TestEnvironment* m_pEnvironment; // A pointer to the test environment this pathfinder belongs to
 	TraversalWeights m_weights;      // The weights used to calculate distances in the graph

@@ -32,11 +32,20 @@ bool Pathfinder::Initialise(TestEnvironment* pTestEnvironment)
 
 	m_pEnvironment = pTestEnvironment;
 
-	m_weights.m_horizontalCost = pTestEnvironment->GetData().m_gridWidth / pTestEnvironment->GetData().m_gridHorizontalPartitions;
-	m_weights.m_verticalCost   = pTestEnvironment->GetData().m_gridHeight / pTestEnvironment->GetData().m_gridVerticalPartitions;
-	m_weights.m_diagonalCost   = sqrtf(m_weights.m_horizontalCost * m_weights.m_horizontalCost + m_weights.m_verticalCost * m_weights.m_verticalCost);
+	UpdateWeights();
 
 	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Update the node traversal weights/costs according to the current properties of the
+// test environment.
+//--------------------------------------------------------------------------------------
+void Pathfinder::UpdateWeights()
+{
+	m_weights.m_horizontalCost = m_pEnvironment->GetGridSpacing();
+	m_weights.m_verticalCost   = m_pEnvironment->GetGridSpacing();
+	m_weights.m_diagonalCost   = sqrtf(m_weights.m_horizontalCost * m_weights.m_horizontalCost + m_weights.m_verticalCost * m_weights.m_verticalCost);
 }
 
 //--------------------------------------------------------------------------------------
@@ -64,9 +73,9 @@ bool Pathfinder::CalculatePath(PathfindingAlgorithm algorithm, Heuristic heurist
 	}
 
 	if((startGridPosition.x < 0) || (targetGridPosition.x < 0) && 
-	   (startGridPosition.x >= m_pEnvironment->GetData().m_gridHorizontalPartitions) || (targetGridPosition.x >= m_pEnvironment->GetData().m_gridHorizontalPartitions) &&
+	   (startGridPosition.x >= m_pEnvironment->GetNumberOfGridPartitions()) || (targetGridPosition.x >= m_pEnvironment->GetNumberOfGridPartitions()) &&
 	   (startGridPosition.y < 0) || (targetGridPosition.y < 0) && 
-	   (startGridPosition.y >= m_pEnvironment->GetData().m_gridVerticalPartitions) || (targetGridPosition.y >= m_pEnvironment->GetData().m_gridVerticalPartitions))
+	   (startGridPosition.y >= m_pEnvironment->GetNumberOfGridPartitions()) || (targetGridPosition.y >= m_pEnvironment->GetNumberOfGridPartitions()))
 	{
 		// Start or target position lies outside of the test environment.
 		return false;
@@ -133,8 +142,8 @@ bool Pathfinder::CalculatePathAStar(Heuristic heuristic, const XMFLOAT2& startGr
 		// Process the nodes adjacent to the current node
 		for(std::vector<Node*>::const_iterator it = pCurrentNode->GetAdjacentNodes().begin(); it != pCurrentNode->GetAdjacentNodes().end(); ++it)
 		{
-			// Only consider the node if it is traversable
-			if(!(*it)->IsObstacle())
+			// Only consider the node if it is traversable without cutting corners
+			if(!(*it)->IsObstacle() && !IsCuttingCorner(pCurrentNode, *it))
 			{
 				// Check if the node is already placed in the closed list
 				std::vector<Node*>::iterator closedIt = std::find_if(m_closedList.begin(), m_closedList.end(), FindNodeWithId((*it)->GetId()));
@@ -286,4 +295,62 @@ float Pathfinder::CalculateEuclideanDistance(const XMFLOAT2& startPosition, cons
 	XMStoreFloat(&magnitude, XMVector2Length(targetVector));
 
 	return magnitude;
+}
+
+//--------------------------------------------------------------------------------------
+// Checks for a pair of adjacent nodes whether an entity would cut the corner of an 
+// obstacle when moving from one node to the other.
+// Param1: The start node.
+// Param2: The adjacent target node.
+// Returns true if the path from the start to the target node would cut a corner.
+//--------------------------------------------------------------------------------------
+bool Pathfinder::IsCuttingCorner(Node* pStartNode, Node* pTargetNode)
+{
+	// The corner of an obstacle will only be cut if the nodes are placed diagonally, check that first
+	if((pStartNode->GetGridPosition().x != pTargetNode->GetGridPosition().x) && (pStartNode->GetGridPosition().y != pTargetNode->GetGridPosition().y))
+	{
+		// Determine the difference in grid fields between the two nodes
+		int x = static_cast<int>(pTargetNode->GetGridPosition().x - pStartNode->GetGridPosition().x);
+		int y = static_cast<int>(pTargetNode->GetGridPosition().y - pStartNode->GetGridPosition().y);
+
+		if((m_pEnvironment->GetNodes()[static_cast<int>(pStartNode->GetGridPosition().x) + x][static_cast<int>(pStartNode->GetGridPosition().y)].IsObstacle()) ||
+		   (m_pEnvironment->GetNodes()[static_cast<int>(pStartNode->GetGridPosition().x)][static_cast<int>(pStartNode->GetGridPosition().y) + y].IsObstacle()))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// Data access functions
+
+float Pathfinder::GetWeightHorizontal(void) const
+{
+	return m_weights.m_horizontalCost;
+}
+
+float Pathfinder::GetWeightVertical(void) const
+{
+	return m_weights.m_verticalCost;
+}
+
+float Pathfinder::GetWeightDiagonal(void) const
+{
+	return m_weights.m_diagonalCost;
+}
+
+void Pathfinder::SetWeightHorizontal(float weight)
+{
+	m_weights.m_horizontalCost = weight;
+}
+
+void Pathfinder::SetWeightVertical(float weight)
+{
+	m_weights.m_verticalCost = weight;
+}
+
+void Pathfinder::SetWeightDiagonal(float weight)
+{
+	m_weights.m_diagonalCost = weight;
 }

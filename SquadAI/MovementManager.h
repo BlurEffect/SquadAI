@@ -28,11 +28,11 @@ public:
 	void Update(void);
 
 	bool SetPathTo(const XMFLOAT2& targetPosition);
-	
+
+private:
 	void FollowPath(float nodeReachedRadius);
 	void Seek(const XMFLOAT2& targetPosition, float slowArrivalRadius);
-	
-private:
+	void AvoidCollisions();
 
 	MovingEntity* m_pEntity;     // The entity that this movement manager is associated to
 

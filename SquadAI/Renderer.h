@@ -36,11 +36,11 @@ class Renderer
 public:
 	Renderer(void);
 	~Renderer(void);
-	bool Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const TestEnvironmentData& testEnvData);
+	bool Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
 	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData);
 	void Cleanup(void);
 	
-	bool SetupGrid(const TestEnvironmentData& data);
+	bool SetupGrid(float gridSize, unsigned int numberOfGridPartitions);
 
 	// Data access functions
 
@@ -48,9 +48,9 @@ public:
 
 private:
 	bool		InitialiseD3D(HWND hwnd);
-	bool		InitialiseRenderStates();
-	bool		InitialiseDrawables(const TestEnvironmentData& testEnvData);
-	bool        InitialiseEntityRenderData(const TestEnvironmentData& testEnvData);
+	bool		InitialiseRenderStates(void);
+	bool		InitialiseDrawables(void);
+	bool        InitialiseEntityRenderData(void);
 	bool		InitialiseShaders(void);
 	bool        InitialiseTextRendering(HWND hwnd, const XMFLOAT4X4& baseViewMatrix, const XMFLOAT4X4& baseProjectionMatrix);
 	bool        InitialiseSentences(void);

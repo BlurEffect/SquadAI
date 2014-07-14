@@ -7,18 +7,13 @@
 // Includes
 #include "MovingEntity.h"
 
-MovingEntity::MovingEntity(void) : Entity(),
-								   m_velocity(0.0f, 0.0f),
-								   m_maxVelocity(0.0f),
-								   m_maxForce(0.0f)
+MovingEntity::MovingEntity(void) : Entity()
 {
 }
 
-MovingEntity::MovingEntity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, TestEnvironment* pEnvironment, float maxVelocity, float maxForce) 
-	: Entity(id, type, position, rotation, pEnvironment),																																						
-	  m_velocity(0.0f, 0.0f),																																			
-	  m_maxVelocity(maxVelocity),
-	  m_maxForce(maxForce)
+MovingEntity::MovingEntity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment, const EntityMovementData& movementData) 
+	: Entity(id, type, position, rotation, scale, radius, pEnvironment),																																						
+	  m_movementData(movementData)
 {
 }
 
@@ -47,30 +42,40 @@ void MovingEntity::Update(void)
 
 const XMFLOAT2& MovingEntity::GetVelocity(void) const
 {
-	return m_velocity;
+	return m_movementData.m_velocity;
 }
 
 float MovingEntity::GetMaxVelocity(void) const
 {
-	return m_maxVelocity;
+	return m_movementData.m_maxVelocity;
 }
 
 float MovingEntity::GetMaxForce(void) const
 {
-	return m_maxForce;
+	return m_movementData.m_maxForce;
+}
+
+float MovingEntity::GetMaxSeeAhead(void) const
+{
+	return m_movementData.m_maxSeeAhead;
 }
 
 void MovingEntity::SetVelocity(const XMFLOAT2& velocity)
 {
-	m_velocity = velocity;
+	m_movementData.m_velocity = velocity;
 }
 
 void MovingEntity::SetMaxVelocity(float maxVelocity)
 {
-	m_maxVelocity = maxVelocity;
+	m_movementData.m_maxVelocity = maxVelocity;
 }
 
 void MovingEntity::SetMaxForce(float maxForce)
 {
-	m_maxForce = maxForce;
+	m_movementData.m_maxForce = maxForce;
+}
+
+void MovingEntity::SetMaxSeeAhead(float maxSeeAhead)
+{
+	m_movementData.m_maxSeeAhead = maxSeeAhead;
 }

@@ -33,7 +33,7 @@ public:
 	TestEnvironment(void);
 	~TestEnvironment(void);
 
-	bool Initialise(const TestEnvironmentData& initData);
+	bool Initialise(float gridSize, unsigned int numberOfGridPartitions);
 	void Update(RenderContext& pRenderContext);
 	void Cleanup(void);
 
@@ -52,9 +52,12 @@ public:
 	void GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const;
 
 	// Data access functions
-	const TestEnvironmentData& GetData(void) const;
-	Pathfinder& GetPathfinder(void);
-	Node** GetNodes(void);
+	float		 GetGridSize(void) const;
+	unsigned int GetNumberOfGridPartitions(void) const;
+	float	     GetGridSpacing(void) const;
+
+	Pathfinder&  GetPathfinder(void);
+	Node**	     GetNodes(void);
 
 private:
 
@@ -65,15 +68,14 @@ private:
 
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
 
-	TestEnvironmentData m_data;  // Contains initialisation data for the environment, especially the grid to be created
-
 	GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
 	Node**              m_pNodes; // The graph made up of nodes representing the test environment when in simulation mode
 
 	Pathfinder          m_pathfinder; // The pathfinder associated to this environment.
 
-	float               m_horizontalSpacing; // The size of a grid field along the x-axis
-	float               m_verticalSpacing;   // The size of a grid field along the y-axis
+	float               m_gridSize;               // The size of the grid along x and y axis
+	unsigned int        m_numberOfGridPartitions; // The number of grid fields along x and y axis
+	float               m_gridSpacing;			  // The size of a grid field along x and y axis
 
 	std::list<Soldier>	     m_teamA;      // Holds the soldier entities associated to Team A
 	std::list<Soldier>	     m_teamB;      // Holds the soldier entities associated to Team B

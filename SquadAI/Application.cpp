@@ -17,18 +17,16 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 	m_appData.m_windowWidth  = windowWidth;
 	m_appData.m_windowHeight = windowHeight;
 
-	TestEnvironmentData initData;
-	initData.m_gridWidth			    = 50.0f;
-	initData.m_gridHeight			    = 50.0f;
-	initData.m_gridHorizontalPartitions = 20;
-	initData.m_gridVerticalPartitions   = 20;
+	float        gridSize	            = 50.0f;
+	unsigned int numberOfGridPartitions = 20;
 
 	return m_camera.Initialise(g_kInitialCameraPosition, g_kInitialCameraLookAt, g_kCameraUpVector, 
 							   windowWidth, windowHeight, g_kCameraNearClippingPlane, g_kCameraFarClippingPlane, 
 		                       g_kInitialCameraSpeed) &&
 		   m_inputManager.Initialise(hInst, hWnd) &&
-		   m_renderer.Initialise(hWnd, windowWidth, windowHeight, m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix(), initData) &&
-		   m_testEnvironment.Initialise(initData);
+		   m_renderer.Initialise(hWnd, windowWidth, windowHeight, m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix()) &&
+		   m_renderer.SetupGrid(gridSize, numberOfGridPartitions) &&
+		   m_testEnvironment.Initialise(gridSize, numberOfGridPartitions);
 
 	return true;
 }
@@ -245,7 +243,7 @@ bool Application::LoadTestEnvironment(void)
 		std::cout << "\nLoading completed.";
 
 		// Prepare the renderer for the loaded environment
-		if(!m_renderer.SetupGrid(m_testEnvironment.GetData()))
+		if(!m_renderer.SetupGrid(m_testEnvironment.GetGridSize(), m_testEnvironment.GetNumberOfGridPartitions()))
 		{
 			return false;
 		}

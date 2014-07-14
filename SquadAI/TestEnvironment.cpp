@@ -11,8 +11,9 @@
 TestEnvironment::TestEnvironment(void) : m_id(0),
 										 m_pGrid(nullptr),
 										 m_pNodes(nullptr),
-										 m_horizontalSpacing(0.0f),
-										 m_verticalSpacing(0.0f)
+										 m_gridSize(0.0f),
+										 m_numberOfGridPartitions(0),
+										 m_gridSpacing(0.0f)
 {
 }
 
@@ -23,12 +24,15 @@ TestEnvironment::~TestEnvironment(void)
 
 //--------------------------------------------------------------------------------------
 // Initialise the test environment
-// Param1: A data structure containing the initialisation data required by the test environment for setup.
+// Param1: The size of a side of the square grid.
+// Param2: The number of grid fields along one axis of the square grid
 // Returns true if the test environment was successfully initialised, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::Initialise(const TestEnvironmentData& initData)
+bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartitions)
 {
-	m_data = initData;
+	m_gridSize			     = gridSize;
+	m_numberOfGridPartitions = numberOfGridPartitions;
+
 	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
 
@@ -46,9 +50,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
+		XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
 
 		XMFLOAT4X4 transform;
-		XMStoreFloat4x4(&transform, rotationMatrix * translationMatrix);
+		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
 		pRenderContext.AddInstance(ASoldier, transform);
 	}
 
@@ -58,9 +63,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
+		XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
 
 		XMFLOAT4X4 transform;
-		XMStoreFloat4x4(&transform, rotationMatrix * translationMatrix);
+		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
 		pRenderContext.AddInstance(BSoldier, transform);
 	}
 	
@@ -68,9 +74,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 	{
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f -it->GetRotation()));
+		XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
 
 		XMFLOAT4X4 transform;
-		XMStoreFloat4x4(&transform, rotationMatrix * translationMatrix);
+		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
 		pRenderContext.AddInstance(CoverSpot, transform);
 	}
 }
@@ -116,7 +123,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 	{
 	case ASoldier:
 		{
-			Soldier soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce);
+			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead));
 			m_teamA.push_back(soldier);
 			if(!m_teamA.back().Initialise())
 			{
@@ -127,7 +134,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		break;
 	case BSoldier:
 		{
-			Soldier soldier(++m_id, type, updatedPosition, rotation, this, g_kSoldierMaxVelocity, g_kSoldierMaxForce);
+			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead));
 			m_teamB.push_back(soldier);
 			if(!m_teamB.back().Initialise())
 			{
@@ -137,7 +144,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		}
 		break;
 	case CoverSpot:
-		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, this));
+		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this));
 		// Update the graph
 		UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], false);
 		break;
@@ -235,7 +242,7 @@ void TestEnvironment::WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gr
 	// Assumes that the grid centre is at (0,0)
 
 	// Check for invalid world positions that don't lie within the grid
-	if(abs(worldPos.x) > (m_data.m_gridWidth * 0.5f) || abs(worldPos.y) > (m_data.m_gridHeight * 0.5f))
+	if(abs(worldPos.x) > (m_gridSize * 0.5f) || abs(worldPos.y) > (m_gridSize * 0.5f))
 	{
 		gridPos.x = -1.0f;
 		gridPos.y = -1.0f;
@@ -243,8 +250,8 @@ void TestEnvironment::WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gr
 	{
 		// World position lies within the grid
 
-		gridPos.x = static_cast<float>(static_cast<int>((worldPos.x + m_data.m_gridWidth * 0.5f) / m_horizontalSpacing));
-		gridPos.y = static_cast<float>(static_cast<int>((worldPos.y + m_data.m_gridHeight * 0.5f) / m_verticalSpacing));
+		gridPos.x = static_cast<float>(static_cast<int>((worldPos.x + m_gridSize * 0.5f) / m_gridSpacing));
+		gridPos.y = static_cast<float>(static_cast<int>((worldPos.y + m_gridSize * 0.5f) / m_gridSpacing));
 	}
 }
 
@@ -255,8 +262,8 @@ void TestEnvironment::WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gr
 //--------------------------------------------------------------------------------------
 void TestEnvironment::GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const
 {
-	worldPos.x = gridPos.x * m_horizontalSpacing + m_horizontalSpacing * 0.5f - m_data.m_gridWidth * 0.5f;
-	worldPos.y = gridPos.y * m_verticalSpacing + m_verticalSpacing * 0.5f - m_data.m_gridHeight * 0.5f;
+	worldPos.x = gridPos.x * m_gridSpacing + m_gridSpacing * 0.5f - m_gridSize * 0.5f;
+	worldPos.y = gridPos.y * m_gridSpacing + m_gridSpacing * 0.5f - m_gridSize * 0.5f;
 }
 
 //--------------------------------------------------------------------------------------
@@ -272,7 +279,7 @@ bool TestEnvironment::Save(std::string filename)
 	{
 		// Save the test environment data
 
-		out << m_data.m_gridWidth << " " << m_data.m_gridHeight << " " << m_data.m_gridHorizontalPartitions << " " << m_data.m_gridVerticalPartitions << "\n";
+		out << m_gridSize << " " << m_numberOfGridPartitions << "\n";
 
 		// Save the entities
 
@@ -330,10 +337,12 @@ bool TestEnvironment::Load(std::string filename)
 		getline(in, lineOfFile);
 		std::istringstream iss(lineOfFile);
 
-		iss >> m_data.m_gridWidth >> m_data.m_gridHeight >> m_data.m_gridHorizontalPartitions >> m_data.m_gridVerticalPartitions;
+		iss >> m_gridSize >> m_numberOfGridPartitions;
 
 		// Initialise a new grid with the new data
 		InitialiseGrid();
+		// Update the pathfinder
+		m_pathfinder.UpdateWeights();
 
 		// Load the entities
 
@@ -397,21 +406,20 @@ void TestEnvironment::ResumeSimulation(void)
 //--------------------------------------------------------------------------------------
 bool TestEnvironment::InitialiseGrid()
 {
-	m_horizontalSpacing = m_data.m_gridWidth / static_cast<float>(m_data.m_gridHorizontalPartitions);
-	m_verticalSpacing   = m_data.m_gridHeight / static_cast<float>(m_data.m_gridVerticalPartitions);
+	m_gridSpacing = m_gridSize / static_cast<float>(m_numberOfGridPartitions);
 
 	// Initialise the grid
 
-	m_pGrid = new GridField*[m_data.m_gridHorizontalPartitions];
+	m_pGrid = new GridField*[m_numberOfGridPartitions];
 
 	if(!m_pGrid)
 	{
 		return false;
 	}
 
-	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
 	{
-		m_pGrid[i] = new GridField[m_data.m_gridVerticalPartitions];
+		m_pGrid[i] = new GridField[m_numberOfGridPartitions];
 		
 		if(!m_pGrid[i])
 		{
@@ -424,16 +432,16 @@ bool TestEnvironment::InitialiseGrid()
 
 	// Initialise the nodes
 
-	m_pNodes = new Node*[m_data.m_gridHorizontalPartitions];
+	m_pNodes = new Node*[m_numberOfGridPartitions];
 
 	if(!m_pNodes)
 	{
 		return false;
 	}
 
-	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
 	{
-		m_pNodes[i] = new Node[m_data.m_gridVerticalPartitions];
+		m_pNodes[i] = new Node[m_numberOfGridPartitions];
 		
 		if(!m_pNodes[i])
 		{
@@ -443,9 +451,9 @@ bool TestEnvironment::InitialiseGrid()
 
 	// Initialise the nodes
 
-	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
 	{
-		for(unsigned int k = 0; k < m_data.m_gridVerticalPartitions; ++k)
+		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
 		{
 			XMFLOAT2 gridPos(static_cast<float>(i), static_cast<float>(k));
 			XMFLOAT2 worldPos;
@@ -453,14 +461,14 @@ bool TestEnvironment::InitialiseGrid()
 			GridToWorldPosition(gridPos, worldPos);
 
 			// Use the array position as node ID
-			m_pNodes[i][k].Initialise(i * m_data.m_gridHorizontalPartitions + k, gridPos, worldPos, false);
+			m_pNodes[i][k].Initialise(i * m_numberOfGridPartitions + k, gridPos, worldPos, false);
 		}
 	}
 
 	// Set up adjacency information for the nodes
-	for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
 	{
-		for(unsigned int k = 0; k < m_data.m_gridVerticalPartitions; ++k)
+		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
 		{
 			if(i > 0)
 			{
@@ -469,20 +477,20 @@ bool TestEnvironment::InitialiseGrid()
 				{
 					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k-1]);
 				}
-				if(k < m_data.m_gridVerticalPartitions-1)
+				if(k < m_numberOfGridPartitions-1)
 				{
 					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k+1]);
 				}
 			}
 
-			if(i < m_data.m_gridHorizontalPartitions-1)
+			if(i < m_numberOfGridPartitions-1)
 			{
 				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k]);
 				if(k > 0)
 				{
 					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k-1]);
 				}
-				if(k < m_data.m_gridVerticalPartitions-1)
+				if(k < m_numberOfGridPartitions-1)
 				{
 					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k+1]);
 				}
@@ -493,7 +501,7 @@ bool TestEnvironment::InitialiseGrid()
 				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k-1]);
 			}
 
-			if(k < m_data.m_gridVerticalPartitions-1)
+			if(k < m_numberOfGridPartitions-1)
 			{
 				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k+1]);
 			}
@@ -510,7 +518,7 @@ void TestEnvironment::CleanupGrid()
 {
 	if(m_pGrid)
 	{
-		for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+		for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
 		{
 			delete[] m_pGrid[i];
 			m_pGrid[i] = nullptr;
@@ -522,7 +530,7 @@ void TestEnvironment::CleanupGrid()
 
 	if(m_pNodes)
 	{
-		for(unsigned int i = 0; i < m_data.m_gridHorizontalPartitions; ++i)
+		for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
 		{
 			delete[] m_pNodes[i];
 			m_pNodes[i] = nullptr;
@@ -555,20 +563,20 @@ void TestEnvironment::UpdateCoverMap(Node& coverNode, bool doDelete)
 		{
 			m_pNodes[gridX-1][gridY-1].SetCovered(NorthEast, !doDelete);
 		}
-		if(gridY < m_data.m_gridVerticalPartitions-1)
+		if(gridY < m_numberOfGridPartitions-1)
 		{
 			m_pNodes[gridX-1][gridY+1].SetCovered(SouthEast, !doDelete);
 		}
 	}
 
-	if(gridX < m_data.m_gridHorizontalPartitions-1)
+	if(gridX < m_numberOfGridPartitions-1)
 	{
 		m_pNodes[gridX+1][gridY].SetCovered(West, !doDelete);
 		if(gridY > 0)
 		{
 			m_pNodes[gridX+1][gridY-1].SetCovered(NorthWest, !doDelete);
 		}
-		if(gridY < m_data.m_gridVerticalPartitions-1)
+		if(gridY < m_numberOfGridPartitions-1)
 		{
 			m_pNodes[gridX+1][gridY+1].SetCovered(SouthWest, !doDelete);
 		}
@@ -579,7 +587,7 @@ void TestEnvironment::UpdateCoverMap(Node& coverNode, bool doDelete)
 		m_pNodes[gridX][gridY-1].SetCovered(North, !doDelete);
 	}
 
-	if(gridY < m_data.m_gridVerticalPartitions-1)
+	if(gridY < m_numberOfGridPartitions-1)
 	{
 		m_pNodes[gridX][gridY+1].SetCovered(South, !doDelete);
 	}
@@ -587,9 +595,19 @@ void TestEnvironment::UpdateCoverMap(Node& coverNode, bool doDelete)
 
 // Data access functions
 	
-const TestEnvironmentData& TestEnvironment::GetData(void) const
+float TestEnvironment::GetGridSize(void) const
 {
-	return m_data;
+	return m_gridSize;
+}
+	
+unsigned int TestEnvironment::GetNumberOfGridPartitions(void) const
+{
+	return m_numberOfGridPartitions;
+}
+	
+float TestEnvironment::GetGridSpacing(void) const
+{
+	return m_gridSpacing;
 }
 
 Pathfinder& TestEnvironment::GetPathfinder(void) 

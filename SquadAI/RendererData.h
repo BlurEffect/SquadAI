@@ -35,14 +35,13 @@ struct EntityRenderData
 	EntityRenderData(void) : m_drawableType(DrawableType(0)),
 							 m_colour(1.0f, 1.0f, 1.0f, 1.0f),
 						     m_name(""),
-							 m_baseScale(1.0f, 1.0f, 1.0f)
+							 m_baseZ(0.0f)
 	{}
 
 	DrawableType m_drawableType; // Identifies the drawable representing this entity
 	XMFLOAT4     m_colour;       // The colour, in which to render the entity
 	const char*  m_name;         // The name of the entity, for display on the GUI
 	float        m_baseZ;        // Used to place some entities above other when it comes to intersections
-	XMFLOAT3     m_baseScale;    // Used to scale entities to have the desired size in relation to the grid
 };
 
 #endif // RENDERER_DATA_H

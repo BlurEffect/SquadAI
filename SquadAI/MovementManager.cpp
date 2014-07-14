@@ -50,6 +50,7 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 void MovementManager::Update(void)
 {
 	FollowPath(1.0f);
+	AvoidCollisions();
 
 	// Truncate steering force to not be greater than the maximal allowed force
 	float magnitude = 0.0f;
@@ -82,6 +83,10 @@ void MovementManager::Update(void)
 	XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity));
 
 	m_pEntity->SetPosition(newPosition);
+
+	// Update the rotation to make the entity face the direction, in which it is moving
+	float rotation = (atan2(newVelocity.x, newVelocity.y)) * 180 / XM_PI;
+	m_pEntity->SetRotation(rotation);
 
 	// Reset the steering force for the next frame
 	m_steeringForce.x = 0.0f;
@@ -175,4 +180,12 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 			}
 		}
 	}
+}
+
+//--------------------------------------------------------------------------------------
+// Calculate the collision avoidance force and add it to the total force.
+//--------------------------------------------------------------------------------------s
+void MovementManager::AvoidCollisions()
+{
+
 }

@@ -45,17 +45,16 @@ Renderer::~Renderer()
 // Param3: The height of the window in pixels.
 // Param4: The initial view matrix of the application camera. Needed for text rendering.
 // Param5: The initial projection matrix of the application camera. Needed for text rendering.
-// Param6: The data of the test environment. Needed to set things up properly in regard to the specific environment.
 // Returns true if the renderer was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const TestEnvironmentData& testEnvData)
+bool Renderer::Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix)
 {
 	m_windowWidth  = windowWidth;
 	m_windowHeight = windowHeight;
 
 	if(InitialiseD3D(hWnd) && 
-		InitialiseDrawables(testEnvData) && 
-		InitialiseEntityRenderData(testEnvData) &&
+		InitialiseDrawables() && 
+		InitialiseEntityRenderData() &&
 		InitialiseShaders() && 
 		InitialiseTextRendering(hWnd, viewMatrix, projectionMatrix)
 	  )
@@ -312,10 +311,9 @@ bool Renderer::InitialiseRenderStates()
 
 //--------------------------------------------------------------------------------------
 // Creates and initialise the Drawables available to the renderer.
-// Param1: The test environment data that will be used to set up the grid according to the size of the environment.
 // Returns true if the drawables were created and intialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::InitialiseDrawables(const TestEnvironmentData& testEnvData)
+bool Renderer::InitialiseDrawables()
 {
 	// Create and initialise the Drawables
 
@@ -346,8 +344,8 @@ bool Renderer::InitialiseDrawables(const TestEnvironmentData& testEnvData)
 		return false;
 	}
 
-	// Setup the grid drawable
-	if(!SetupGrid(testEnvData))
+	// Initialise a default grid
+	if(!SetupGrid(10.0f, 10))
 	{
 		return false;
 	}
@@ -357,52 +355,39 @@ bool Renderer::InitialiseDrawables(const TestEnvironmentData& testEnvData)
 
 //--------------------------------------------------------------------------------------
 // Initialises the entity render data for each possible entity.
-// Param1: The test environment data that will be used to set up the grid according to the size of the environment.
 // Returns true if the entity render data was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::InitialiseEntityRenderData(const TestEnvironmentData& testEnvData)
+bool Renderer::InitialiseEntityRenderData()
 {
-	// The scale required to scale the entities to fill a grid field
-	XMFLOAT3 toGridScale;
-	toGridScale.x = testEnvData.m_gridWidth / testEnvData.m_gridHorizontalPartitions;
-	toGridScale.y = testEnvData.m_gridHeight / testEnvData.m_gridVerticalPartitions;
-	toGridScale.z = 1.0f;
-
 	m_entityRenderData[ASoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[ASoldier].m_name         = "A - Soldier";
 	m_entityRenderData[ASoldier].m_baseZ        = 1.0f;
-	m_entityRenderData[ASoldier].m_baseScale    = toGridScale;
 
 	m_entityRenderData[BSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[BSoldier].m_name         = "B - Soldier";
 	m_entityRenderData[BSoldier].m_baseZ        = 1.0f;
-	m_entityRenderData[BSoldier].m_baseScale    = toGridScale;
 
 	m_entityRenderData[CoverSpot].m_drawableType = SquareType;
 	m_entityRenderData[CoverSpot].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	m_entityRenderData[CoverSpot].m_name         = "Cover Spot";
 	m_entityRenderData[CoverSpot].m_baseZ        = 0.0f;
-	m_entityRenderData[CoverSpot].m_baseScale    = toGridScale;
 			
 	m_entityRenderData[ADeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
 	m_entityRenderData[ADeadSoldier].m_name         = "A - Dead Soldier";
 	m_entityRenderData[ADeadSoldier].m_baseZ        = -2.0f;
-	m_entityRenderData[ADeadSoldier].m_baseScale    = toGridScale;
 	
 	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.2f, 0.0f, 1.0f);
 	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
 	m_entityRenderData[BDeadSoldier].m_baseZ        = -2.0f;
-	m_entityRenderData[BDeadSoldier].m_baseScale	= toGridScale;
 
 	m_entityRenderData[Projectile].m_drawableType = CircleType;
 	m_entityRenderData[Projectile].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[Projectile].m_name         = "Projectile";
 	m_entityRenderData[Projectile].m_baseZ        = -1.0f;
-	m_entityRenderData[Projectile].m_baseScale    = toGridScale;
 
 	return true;
 }
@@ -658,10 +643,9 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 			// Update the per object data according to the current instance
 			m_perObjectData.m_colour = m_entityRenderData[i].m_colour;
 
-			XMMATRIX scaleMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&m_entityRenderData[i].m_baseScale));
 			XMMATRIX zTranslationMatrix = XMMatrixTranslation(0.0f, 0.0f, m_entityRenderData[i].m_baseZ);
 
-			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, scaleMatrix * zTranslationMatrix * XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
+			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, zTranslationMatrix * XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
 			// Update the shader's constant buffer
 			m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
 			// Draw the object
@@ -750,10 +734,11 @@ void Renderer::UpdateSentences(const AppData& appData)
 
 //--------------------------------------------------------------------------------------
 // Prepares the renderer for a new test environment by changing the grid's extents accordingly.
-// Param1: The test environment data containing information on the grid required.
+// Param1: The size of a side of the square grid.
+// Param2: The number of grid fields along one axis of the square grid
 // Returns true if the new grid was set up successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::SetupGrid(const TestEnvironmentData& data)
+bool Renderer::SetupGrid(float gridSize, unsigned int numberOfGridPartitions)
 {
 	// Delete the old grid
 	if(m_drawableObjects[GridType])
@@ -763,7 +748,7 @@ bool Renderer::SetupGrid(const TestEnvironmentData& data)
 		m_drawableObjects[GridType] = nullptr;
 	}
 
-	m_drawableObjects[GridType] = new GridDrawable(data.m_gridWidth, data.m_gridHeight, data.m_gridHorizontalPartitions, data.m_gridVerticalPartitions);
+	m_drawableObjects[GridType] = new GridDrawable(gridSize, gridSize, numberOfGridPartitions, numberOfGridPartitions);
 	if(!m_drawableObjects[GridType])
 	{
 		return false;

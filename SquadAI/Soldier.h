@@ -17,7 +17,7 @@ class Soldier : public MovingEntity
 {
 public:
 	Soldier(void);
-	Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, TestEnvironment* pEnvironment, float maxVelocity, float maxForce);
+	Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment, const EntityMovementData& movementData);
 	~Soldier(void);
 private:
 };

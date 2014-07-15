@@ -376,7 +376,7 @@ bool TestEnvironment::Load(std::string filename)
 // keeps moving in the current direction. Returns a nullpointer if there is no collision
 // object in sight.
 //--------------------------------------------------------------------------------------
-const Entity& TestEnvironment::GetCollisionObject(const MovingEntity& entity)
+const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 {
 	// Use square distances throughout to save on using square root.
 	// Make sure that colliding objects are within the see ahead range
@@ -431,7 +431,90 @@ const Entity& TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 		}
 	}
 
-	return (*pCollisionObject);
+	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+	{
+		// Don't check for collision of the entity with itself
+		if(it->GetId() != entity.GetId())
+		{
+			// The vector from the centre of the radius surrounding the possible collision object to the start of the 
+			// direction vector of the entity. This equals the vector from the centre of the collision object to the
+			// centre of the entity.
+			XMVECTOR colObjectToEntity = XMLoadFloat2(&entity.GetPosition()) - XMLoadFloat2(&it->GetPosition());
+
+			float a;
+			float b;
+			float c;
+
+			float radiusSquare = it->GetRadius() * it->GetRadius();
+
+			XMStoreFloat(&a, XMVector2Dot(normDirection, normDirection));
+			XMStoreFloat(&b, 2.0f * XMVector2Dot(colObjectToEntity, normDirection));
+			XMStoreFloat(&c, XMVector2Dot(colObjectToEntity, colObjectToEntity) - XMLoadFloat(&radiusSquare));
+
+			float discriminant = b * b - 4 * a * c;
+
+			// If discriminant is smaller than 0, there is no intersection
+			if(discriminant >= 0)
+			{
+				// There is an intersection of the movement vector and the object. 
+
+				// Note: The intersection points could now be deduced but for the moment it is sufficient
+				//       to simply know that an object intersects and to determine the closest colliding object.
+
+				// Get the square distance between the object and the entity
+				float distance; 
+				XMStoreFloat(&distance, XMVector2Dot(colObjectToEntity, colObjectToEntity));
+
+				if(distance <= shortestCollisionDistance)
+				{
+					pCollisionObject = &(*it);
+					shortestCollisionDistance = distance;
+				}
+			}
+		}
+	}
+
+	for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
+	{
+		// The vector from the centre of the radius surrounding the possible collision object to the start of the 
+		// direction vector of the entity. This equals the vector from the centre of the collision object to the
+		// centre of the entity.
+		XMVECTOR colObjectToEntity = XMLoadFloat2(&entity.GetPosition()) - XMLoadFloat2(&it->GetPosition());
+
+		float a;
+		float b;
+		float c;
+
+		float radiusSquare = it->GetRadius() * it->GetRadius();
+
+		XMStoreFloat(&a, XMVector2Dot(normDirection, normDirection));
+		XMStoreFloat(&b, 2.0f * XMVector2Dot(colObjectToEntity, normDirection));
+		XMStoreFloat(&c, XMVector2Dot(colObjectToEntity, colObjectToEntity) - XMLoadFloat(&radiusSquare));
+
+		float discriminant = b * b - 4 * a * c;
+
+		// If discriminant is smaller than 0, there is no intersection
+		if(discriminant >= 0)
+		{
+			// There is an intersection of the movement vector and the object. 
+
+			// Note: The intersection points could now be deduced but for the moment it is sufficient
+			//       to simply know that an object intersects and to determine the closest colliding object.
+
+			// Get the square distance between the object and the entity
+			float distance; 
+			XMStoreFloat(&distance, XMVector2Dot(colObjectToEntity, colObjectToEntity));
+
+			if(distance <= shortestCollisionDistance)
+			{
+				pCollisionObject = &(*it);
+				shortestCollisionDistance = distance;
+			}
+		}
+		
+	}
+
+	return pCollisionObject;
 }
 
 //--------------------------------------------------------------------------------------

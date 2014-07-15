@@ -167,16 +167,16 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 			{
 				// Final destination reached, clear the path
 				m_path.clear();
+			}
+		}else
+		{
+			if(m_currentNode < m_path.size() - 1)
+			{
+				Seek(m_path[m_currentNode], 0.0f);
 			}else
 			{
-				if(m_currentNode < m_path.size() - 1)
-				{
-					Seek(m_path[m_currentNode], 0.0f);
-				}else
-				{
-					// Slow arrival for the last node
-					Seek(m_path[m_currentNode], 2.0f);
-				}
+				// Slow arrival for the last node
+				Seek(m_path[m_currentNode], 2.0f);
 			}
 		}
 	}
@@ -187,7 +187,27 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 //--------------------------------------------------------------------------------------s
 void MovementManager::AvoidCollisions()
 {
-	const Entity& pCollisionObject = m_pEntity->GetTestEnvironment()->GetCollisionObject(*m_pEntity);
+	const Entity* pCollisionObject = m_pEntity->GetTestEnvironment()->GetCollisionObject(*m_pEntity);
 	
-	
+	if(pCollisionObject != nullptr)
+	{
+		XMVECTOR ahead = XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_pEntity->GetVelocity())) * m_pEntity->GetMaxSeeAhead();
+
+		XMFLOAT2 avoidanceForce;
+		//
+		/*XMFLOAT3 toCamera(0.0f, 0.0f, 1.0f);
+		XMFLOAT3 avoidDirection;
+		XMStoreFloat3(&avoidDirection, XMVector3Cross(ahead, XMLoadFloat3(&toCamera)));
+
+		avoidanceForce.x = avoidDirection.x;
+		avoidanceForce.y = avoidDirection.y;
+		
+		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * g_kMaxCollisionAvoidanceForce);*/
+		//
+
+		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce);
+
+		// Add the collision avoidance force to the accumulated steering force
+		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&avoidanceForce));
+	}
 }

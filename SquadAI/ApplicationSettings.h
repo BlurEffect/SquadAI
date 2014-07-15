@@ -32,9 +32,12 @@ const float g_kOrthoMaximalZoomFactor = 100.0f; // Determines the maximal zoom f
 const float    g_kBackgroundColour[4] = {0.0f, 0.0f, 0.0f, 1.0f}; // The colour to which the backbuffer is cleared
 const XMFLOAT4 g_kGridColour(1.0f, 1.0f, 1.0f, 1.0f);			  // The colour of the grid representing the test environment
 
+// Movement Manager
+const float g_kMaxCollisionAvoidanceForce(0.05f); // The maximal force that can result from avoiding collisions
+
 // Entity properties
-const float g_kSoldierMaxVelocity(0.01f); // Determines how fast soldiers can move within the test environment
-const float g_kSoldierMaxForce(1.0f);     // Determines the maximum amount of forces that can impact the character
+const float g_kSoldierMaxVelocity(0.05f); // Determines how fast soldiers can move within the test environment
+const float g_kSoldierMaxForce(0.002f);     // Determines the maximum amount of forces that can impact the character
 const float g_kSoldierMaxSeeAhead(3.0f);  // Determines how far the soldier can look ahead in order to check for collisions
 
 #endif // APPLICATION_SETTINGS_H

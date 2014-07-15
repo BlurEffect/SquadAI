@@ -53,7 +53,7 @@ public:
 	void WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gridPos) const;
 	void GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const;
 
-	const Entity& GetCollisionObject(const MovingEntity& entity);
+	const Entity* GetCollisionObject(const MovingEntity& entity);
 
 	// Data access functions
 	float		 GetGridSize(void) const;

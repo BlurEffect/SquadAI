@@ -37,6 +37,7 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 	}
 
 	m_pEntity = pEntity;
+	m_pEntity->SetVelocity(XMFLOAT2(0.0f, 0.0f));
 
 	SetPathTo(XMFLOAT2(20.0f, 20.0f));
 
@@ -49,7 +50,7 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 //--------------------------------------------------------------------------------------
 void MovementManager::Update(void)
 {
-	FollowPath(1.0f);
+	FollowPath(2.0f); // 1.5f
 	AvoidCollisions();
 
 	// Truncate steering force to not be greater than the maximal allowed force
@@ -167,6 +168,7 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 			{
 				// Final destination reached, clear the path
 				m_path.clear();
+				m_pEntity->SetVelocity(XMFLOAT2(0.0f, 0.0f));
 			}
 		}else
 		{
@@ -205,8 +207,13 @@ void MovementManager::AvoidCollisions()
 		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * g_kMaxCollisionAvoidanceForce);*/
 		//
 
-		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce);
-
+		if(pCollisionObject->GetType() == CoverSpot)
+		{
+			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce);
+		}else
+		{
+			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce * 2.0f);
+		}
 		// Add the collision avoidance force to the accumulated steering force
 		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&avoidanceForce));
 	}

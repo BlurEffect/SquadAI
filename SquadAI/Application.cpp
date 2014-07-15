@@ -74,9 +74,11 @@ void Application::ProcessInput(void)
 		if(m_appData.m_applicationState == EditMode)
 		{
 			m_appData.m_applicationState = SimulationRunning;
+			m_testEnvironment.StartSimulation();
 		}else
 		{
 			m_appData.m_applicationState = EditMode;
+			m_testEnvironment.EndSimulation();
 		}
 	}
 
@@ -85,9 +87,11 @@ void Application::ProcessInput(void)
 		if(m_appData.m_applicationState == SimulationRunning)
 		{
 			m_appData.m_applicationState = SimulationPaused;
+			m_testEnvironment.PauseSimulation();
 		}else
 		{
 			m_appData.m_applicationState = SimulationRunning;
+			m_testEnvironment.ResumeSimulation();
 		}
 	}
 

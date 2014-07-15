@@ -13,7 +13,8 @@ TestEnvironment::TestEnvironment(void) : m_id(0),
 										 m_pNodes(nullptr),
 										 m_gridSize(0.0f),
 										 m_numberOfGridPartitions(0),
-										 m_gridSpacing(0.0f)
+										 m_gridSpacing(0.0f),
+										 m_isPaused(true)
 {
 }
 
@@ -42,11 +43,15 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 //--------------------------------------------------------------------------------------
 void TestEnvironment::Update(RenderContext& pRenderContext)
 {
+
 	// Update entities and add them to the render context after calculating their transforms
 
 	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
-		it->Update();
+		if(!m_isPaused)
+		{
+			it->Update();
+		}
 
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
@@ -59,7 +64,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 
 	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 	{
-		it->Update();
+		if(!m_isPaused)
+		{
+			it->Update();
+		}
 
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
@@ -125,28 +133,21 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		{
 			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead));
 			m_teamA.push_back(soldier);
-			if(!m_teamA.back().Initialise())
-			{
-				m_teamA.pop_back();
-				return false;
-			}
+			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamA.back();
 		}
 		break;
 	case BSoldier:
 		{
 			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead));
 			m_teamB.push_back(soldier);
-			if(!m_teamB.back().Initialise())
-			{
-				m_teamA.pop_back();
-				return false;
-			}
+			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamB.back();
 		}
 		break;
 	case CoverSpot:
 		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this));
 		// Update the graph
 		UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], false);
+		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_coverSpots.back();
 		break;
 	}
 
@@ -522,7 +523,17 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::StartSimulation(void)
 {
+	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+	{
+		it->Initialise();
+	}
 
+	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+	{
+		it->Initialise();
+	}
+
+	m_isPaused = false;
 }
 
 //--------------------------------------------------------------------------------------
@@ -530,7 +541,24 @@ void TestEnvironment::StartSimulation(void)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::EndSimulation(void)
 {
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
+	{
+		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
+		{
+			if(!m_pGrid[i][k].m_isEmpty)
+			{
+				if(m_pGrid[i][k].m_type == ASoldier || m_pGrid[i][k].m_type == BSoldier)
+				{
+					XMFLOAT2 position;
+					GridToWorldPosition(XMFLOAT2(i, k), position);
+					m_pGrid[i][k].m_pEntity->SetPosition(position);
+					m_pGrid[i][k].m_pEntity->SetRotation(m_pGrid[i][k].m_rotation);
+				}
+			}
+		}
+	}
 
+	m_isPaused = true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -538,7 +566,7 @@ void TestEnvironment::EndSimulation(void)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::PauseSimulation(void)
 {
-
+	m_isPaused = true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -546,7 +574,7 @@ void TestEnvironment::PauseSimulation(void)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::ResumeSimulation(void)
 {
-
+	m_isPaused = false;
 }
 
 //--------------------------------------------------------------------------------------
@@ -744,6 +772,11 @@ void TestEnvironment::UpdateCoverMap(Node& coverNode, bool doDelete)
 
 // Data access functions
 	
+bool TestEnvironment::IsPaused(void) const
+{
+	return m_isPaused;
+}
+
 float TestEnvironment::GetGridSize(void) const
 {
 	return m_gridSize;

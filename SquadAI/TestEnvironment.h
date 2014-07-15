@@ -59,6 +59,7 @@ public:
 	float		 GetGridSize(void) const;
 	unsigned int GetNumberOfGridPartitions(void) const;
 	float	     GetGridSpacing(void) const;
+	bool         IsPaused(void) const;
 
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);
@@ -85,6 +86,7 @@ private:
 	std::list<Soldier>	     m_teamB;      // Holds the soldier entities associated to Team B
 	std::list<CoverPosition> m_coverSpots; // Holds the cover objects that were placed in the environment
 
+	bool m_isPaused; // Tells whether the simulation running in the environment is currently paused
 
 	//--------------------------------------------------------------------------------------
 	// Private functor used to find an entity within a container based on its id.

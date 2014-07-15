@@ -37,7 +37,11 @@ const float g_kMaxCollisionAvoidanceForce(0.05f); // The maximal force that can 
 
 // Entity properties
 const float g_kSoldierMaxVelocity(0.05f); // Determines how fast soldiers can move within the test environment
-const float g_kSoldierMaxForce(0.002f);     // Determines the maximum amount of forces that can impact the character
-const float g_kSoldierMaxSeeAhead(3.0f);  // Determines how far the soldier can look ahead in order to check for collisions
+const float g_kSoldierMaxForce(0.05f);     // Determines the maximum amount of forces that can impact the character
+const float g_kSoldierMaxSeeAhead(5.0f);  // Determines how far the soldier can look ahead in order to check for collisions
 
+// 0.1
+// 0.05f
+// 0.001f
+// 3.0f
 #endif // APPLICATION_SETTINGS_H

@@ -46,7 +46,7 @@ public:
 	~MovingEntity(void);
 
 	bool Initialise(void);
-	void Update(void);
+	void Update(float deltaTime);
 
 	// Data access functions
 	const XMFLOAT2& GetVelocity(void) const;

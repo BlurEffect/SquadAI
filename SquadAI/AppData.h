@@ -32,7 +32,8 @@ struct AppData
 					m_cursorGridPosX(0), 
 					m_cursorGridPosY(0), 
 					m_selectedEntityType(EntityType(0)),
-					m_currentRotation(0.0f)
+					m_currentRotation(0.0f),
+					m_framesPerSecond(0)
 	{}
 
 	ApplicationState m_applicationState;     // The current state of the application
@@ -42,6 +43,7 @@ struct AppData
 	int				 m_cursorGridPosY;       // The y-coordinate of the grid field that the cursor is placed at
 	EntityType	     m_selectedEntityType;   // The entity type currently selected for placement in the test environment
 	float			 m_currentRotation;      // The rotation that will be applied to placed entities
+	unsigned int     m_framesPerSecond;       // The current framerate
 };
 
 #endif // APP_DATA_STRUCTURES_H

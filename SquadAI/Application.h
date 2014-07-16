@@ -21,6 +21,7 @@
 #include "ApplicationSettings.h"
 #include "AppData.h"
 #include "EntityData.h"
+#include "PerformanceTimer.h"
 
 using namespace DirectX;
 
@@ -41,6 +42,7 @@ private:
 	InputManager	   m_inputManager;	   // The input component of the application
 	Renderer		   m_renderer;		   // The renderer component of the application
 	TestEnvironment    m_testEnvironment;  // The test environment used ->could be array later on
+	PerformanceTimer   m_performanceTimer; // The timer object used to get the current FPS and delta time
 };
 
 #endif // APPLICATION_H

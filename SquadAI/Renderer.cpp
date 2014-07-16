@@ -519,6 +519,17 @@ bool Renderer::InitialiseSentences(void)
 		return false;
 	}
 
+	m_pPermanentSentences[LabelFramerate] = new SentenceDrawable(12, &m_font, "Framerate: ", right - 250, top -100, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelFramerate])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtFramerate] = new SentenceDrawable(4, &m_font, "1000", right - 150, top -100, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtFramerate])
+	{
+		return false;
+	}
+
 	// Initialise the sentences
 
 	for(int i = 0; i < NumberOfSentences; ++i)
@@ -730,6 +741,16 @@ void Renderer::UpdateSentences(const AppData& appData)
 	m_pPermanentSentences[TxtRotation]->SetText(bufferRotation);
 
 	m_pPermanentSentences[TxtEntityType]->SetText(m_entityRenderData[appData.m_selectedEntityType].m_name);
+
+	char bufferFramerate[5];
+	if(appData.m_framesPerSecond <= 9999)
+	{
+		_itoa_s(appData.m_framesPerSecond, bufferFramerate, 5, 10);
+		m_pPermanentSentences[TxtFramerate]->SetText(bufferFramerate);
+	}else
+	{
+		m_pPermanentSentences[TxtFramerate]->SetText("9999");
+	}
 }
 
 //--------------------------------------------------------------------------------------

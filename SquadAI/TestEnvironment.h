@@ -36,7 +36,7 @@ public:
 	~TestEnvironment(void);
 
 	bool Initialise(float gridSize, unsigned int numberOfGridPartitions);
-	void Update(RenderContext& pRenderContext);
+	void Update(RenderContext& pRenderContext, float deltaTime);
 	void Cleanup(void);
 
 	bool AddEntity(EntityType type, const XMFLOAT2& position, float rotation);
@@ -60,6 +60,10 @@ public:
 	unsigned int GetNumberOfGridPartitions(void) const;
 	float	     GetGridSpacing(void) const;
 	bool         IsPaused(void) const;
+
+	const std::list<Soldier>& GetTeamA(void) const;
+	const std::list<Soldier>& GetTeamB(void) const;
+	const std::list<CoverPosition>& GetCoverSpots(void) const;
 
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);

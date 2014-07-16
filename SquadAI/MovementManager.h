@@ -26,7 +26,7 @@ public:
 	~MovementManager(void);
 
 	bool Initialise(MovingEntity* pEntity);
-	void Update(void);
+	void Update(float deltaTime);
 
 	bool SetPathTo(const XMFLOAT2& targetPosition);
 
@@ -34,6 +34,7 @@ private:
 	void FollowPath(float nodeReachedRadius);
 	void Seek(const XMFLOAT2& targetPosition, float slowArrivalRadius);
 	void AvoidCollisions();
+	void Separate(float separationRadius);
 
 	MovingEntity* m_pEntity;     // The entity that this movement manager is associated to
 

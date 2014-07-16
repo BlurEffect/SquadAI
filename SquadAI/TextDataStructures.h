@@ -60,6 +60,8 @@ enum SentenceIdentifiers
 	TxtRotation,
 	LabelEntityType,
 	TxtEntityType,
+	LabelFramerate,
+	TxtFramerate,
 	NumberOfSentences
 };
 

@@ -40,8 +40,9 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 //--------------------------------------------------------------------------------------
 // Updates the test environment.
 // Param1: The render context that is used to keep track of entities within the environment to be drawn.
+// Param2: The time in seconds passed since the last frame.
 //--------------------------------------------------------------------------------------
-void TestEnvironment::Update(RenderContext& pRenderContext)
+void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 {
 
 	// Update entities and add them to the render context after calculating their transforms
@@ -50,7 +51,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 	{
 		if(!m_isPaused)
 		{
-			it->Update();
+			it->Update(deltaTime);
 		}
 
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
@@ -66,7 +67,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext)
 	{
 		if(!m_isPaused)
 		{
-			it->Update();
+			it->Update(deltaTime);
 		}
 
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
@@ -144,7 +145,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		}
 		break;
 	case CoverSpot:
-		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this));
+		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing , this));  //* 0.5f
 		// Update the graph
 		UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], false);
 		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_coverSpots.back();
@@ -388,6 +389,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	// The normalised movement direction of the entity
 	XMVECTOR normDirection = XMVector2Normalize(XMLoadFloat2(&entity.GetVelocity()));
 
+	/*
 	// Check other soldiers for collisions
 	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
@@ -474,7 +476,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 			}
 		}
 	}
-
+	*/
 	for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
 	{
 		// The vector from the centre of the radius surrounding the possible collision object to the start of the 
@@ -800,4 +802,19 @@ Pathfinder& TestEnvironment::GetPathfinder(void)
 Node** TestEnvironment::GetNodes(void)
 {
 	return m_pNodes;
+}
+
+const std::list<Soldier>& TestEnvironment::GetTeamA(void) const
+{
+	return m_teamA;
+}
+
+const std::list<Soldier>& TestEnvironment::GetTeamB(void) const
+{
+	return m_teamB;
+}
+
+const std::list<CoverPosition>& TestEnvironment::GetCoverSpots(void) const
+{
+	return m_coverSpots;
 }

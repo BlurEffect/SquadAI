@@ -47,11 +47,14 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 //--------------------------------------------------------------------------------------
 // Updates the position and velocity of the entity associated to this movement manager
 // using the accumulated sum of all forces impacting the entity.
+// Param1: The time in seconds passed since the last frame.
 //--------------------------------------------------------------------------------------
-void MovementManager::Update(void)
+void MovementManager::Update(float deltaTime)
 {
 	FollowPath(2.0f); // 1.5f
+	//Seek(XMFLOAT2(20,20), 5.0f);
 	AvoidCollisions();
+	Separate(3.0f);
 
 	// Truncate steering force to not be greater than the maximal allowed force
 	float magnitude = 0.0f;
@@ -81,7 +84,7 @@ void MovementManager::Update(void)
 	m_pEntity->SetVelocity(newVelocity);
 
 	XMFLOAT2 newPosition;
-	XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity));
+	XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity) * deltaTime);
 
 	m_pEntity->SetPosition(newPosition);
 
@@ -186,7 +189,7 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 
 //--------------------------------------------------------------------------------------
 // Calculate the collision avoidance force and add it to the total force.
-//--------------------------------------------------------------------------------------s
+//--------------------------------------------------------------------------------------
 void MovementManager::AvoidCollisions()
 {
 	const Entity* pCollisionObject = m_pEntity->GetTestEnvironment()->GetCollisionObject(*m_pEntity);
@@ -196,17 +199,46 @@ void MovementManager::AvoidCollisions()
 		XMVECTOR ahead = XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_pEntity->GetVelocity())) * m_pEntity->GetMaxSeeAhead();
 
 		XMFLOAT2 avoidanceForce;
+		
 		//
-		/*XMFLOAT3 toCamera(0.0f, 0.0f, 1.0f);
+		/*
+		XMFLOAT2 a = m_pEntity->GetPosition();
+		a.x += m_pEntity->GetTestEnvironment()->GetGridSize() * 0.5f;
+		a.y += m_pEntity->GetTestEnvironment()->GetGridSize() * 0.5f;
+
+		ahead = XMLoadFloat2(&a) + XMVector2Normalize(XMLoadFloat2(&m_pEntity->GetVelocity())) * m_pEntity->GetMaxSeeAhead();
+
+
+		XMFLOAT2 b;
+		XMStoreFloat2(&b, XMLoadFloat2(&a) + XMLoadFloat2(&m_pEntity->GetVelocity()));
+
+		XMFLOAT2 c = pCollisionObject->GetPosition();
+		c.x += m_pEntity->GetTestEnvironment()->GetGridSize() * 0.5f;
+		c.y += m_pEntity->GetTestEnvironment()->GetGridSize() * 0.5f;
+
+		// Determine what side of the obstacle will be hit
+		//(Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax)
+		float result = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+
+
+		XMFLOAT3 toCamera(0.0f, 0.0f, 1.0f);
 		XMFLOAT3 avoidDirection;
 		XMStoreFloat3(&avoidDirection, XMVector3Cross(ahead, XMLoadFloat3(&toCamera)));
-
+		
 		avoidanceForce.x = avoidDirection.x;
 		avoidanceForce.y = avoidDirection.y;
 		
-		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * g_kMaxCollisionAvoidanceForce);*/
+		if(result >= 0)
+		{
+			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * g_kMaxCollisionAvoidanceForce);
+		}else
+		{
+			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * -1.0f * g_kMaxCollisionAvoidanceForce);
+		}
+		*/
 		//
 
+		
 		if(pCollisionObject->GetType() == CoverSpot)
 		{
 			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce);
@@ -214,7 +246,72 @@ void MovementManager::AvoidCollisions()
 		{
 			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce * 2.0f);
 		}
+
 		// Add the collision avoidance force to the accumulated steering force
 		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&avoidanceForce));
 	}
+}
+
+//--------------------------------------------------------------------------------------
+// Calculate the separation force and add it to the total force.
+// Param1: The entity will try to move away from entities that are close than this distance.
+//--------------------------------------------------------------------------------------
+void MovementManager::Separate(float separationRadius)
+{
+	// Use square distances
+	float squareRadius = separationRadius * separationRadius;
+
+    XMFLOAT2     separationForce(0.0f, 0.0f); // The separation force to prevent overlapping of moving entities
+    unsigned int numberOfNeighbours = 0;      // The number of moving entities in close proximity
+
+	// Find the moving entities that are in close proximity to this one (check both teams)
+
+	for(std::list<Soldier>::const_iterator it = m_pEntity->GetTestEnvironment()->GetTeamA().begin(); it !=  m_pEntity->GetTestEnvironment()->GetTeamA().end(); ++it)
+	{
+		if(it->GetId() != m_pEntity->GetId())
+		{
+			// Calculate the distance between the entity and other entities
+			XMVECTOR distanceVector = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition());
+
+			float squareDistance = 0.0f;
+			XMStoreFloat(&squareDistance, XMVector2Dot(distanceVector, distanceVector));
+			
+			if(squareDistance < squareRadius)
+			{
+				XMStoreFloat2(&separationForce, XMLoadFloat2(&separationForce) + (distanceVector / -squareDistance));
+				++numberOfNeighbours;
+			}
+		}
+	}
+
+	for(std::list<Soldier>::const_iterator it = m_pEntity->GetTestEnvironment()->GetTeamB().begin(); it !=  m_pEntity->GetTestEnvironment()->GetTeamB().end(); ++it)
+	{
+		if(it->GetId() != m_pEntity->GetId())
+		{
+			// Calculate the distance between the entity and other entities
+			XMVECTOR distanceVector = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition());
+
+			float squareDistance = 0.0f;
+			XMStoreFloat(&squareDistance, XMVector2Dot(distanceVector, distanceVector));
+			
+			if(squareDistance < squareRadius)
+			{
+				XMStoreFloat2(&separationForce, XMLoadFloat2(&separationForce) + (distanceVector / -squareDistance));
+				++numberOfNeighbours;
+			}
+		}
+	}
+
+	// Divide the force by the number of neighbours and truncate it according to the maximally allowed
+	// separation force.
+	if(numberOfNeighbours > 0)
+	{
+		XMVECTOR separationVector =  XMLoadFloat2(&separationForce) / static_cast<float>(numberOfNeighbours);
+		separationVector = XMVector2Normalize(separationVector);
+		separationVector *= g_kMaxSeparationForce;
+
+		// Add the separation force to the accumulated steering force
+		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + separationVector);
+	}
+
 }

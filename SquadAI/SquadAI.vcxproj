@@ -61,7 +61,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dx11.lib;dinput8.lib;dxguid.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;d3d11.lib;d3dx11.lib;dinput8.lib;dxguid.lib;user32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -80,7 +80,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>d3d11.lib;d3dx11.lib;dinput8.lib;dxguid.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;d3d11.lib;d3dx11.lib;dinput8.lib;dxguid.lib;user32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -102,6 +102,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Pathfinder.cpp" />
+    <ClCompile Include="PerformanceTimer.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="SentenceDrawable.cpp">
@@ -138,6 +139,7 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="EntityData.h" />
     <ClInclude Include="Pathfinder.h" />
+    <ClInclude Include="PerformanceTimer.h" />
     <ClInclude Include="PS_FontCompiled.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />
     <ClInclude Include="Drawable.h" />

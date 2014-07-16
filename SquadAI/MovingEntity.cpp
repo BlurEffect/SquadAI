@@ -32,10 +32,11 @@ bool MovingEntity::Initialise(void)
 
 //--------------------------------------------------------------------------------------
 // Updates the moving entity.
+// Param1: The time in seconds passed since the last frame.
 //--------------------------------------------------------------------------------------
-void MovingEntity::Update(void)
+void MovingEntity::Update(float deltaTime)
 {
-	m_movementManager.Update();
+	m_movementManager.Update(deltaTime);
 }
 
 // Data access functions

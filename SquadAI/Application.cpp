@@ -20,6 +20,8 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 	float        gridSize	            = 50.0f;
 	unsigned int numberOfGridPartitions = 20;
 
+	m_performanceTimer.Initialise();
+
 	return m_camera.Initialise(g_kInitialCameraPosition, g_kInitialCameraLookAt, g_kCameraUpVector, 
 							   windowWidth, windowHeight, g_kCameraNearClippingPlane, g_kCameraFarClippingPlane, 
 		                       g_kInitialCameraSpeed) &&
@@ -36,10 +38,14 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 //--------------------------------------------------------------------------------------
 void Application::Update()
 {
+	m_performanceTimer.Update();
+
+	m_appData.m_framesPerSecond = m_performanceTimer.GetFPS();
+
 	m_inputManager.Update();
 	ProcessInput();
 	m_camera.Update(m_inputManager.GetCameraMovement());
-	m_testEnvironment.Update(m_renderer.GetRenderContext());
+	m_testEnvironment.Update(m_renderer.GetRenderContext(), m_performanceTimer.GetDeltaTime());
 	m_renderer.RenderScene(m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix(), m_appData);
 }
 

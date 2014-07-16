@@ -24,9 +24,9 @@ bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidt
 
 	return m_camera.Initialise(g_kInitialCameraPosition, g_kInitialCameraLookAt, g_kCameraUpVector, 
 							   windowWidth, windowHeight, g_kCameraNearClippingPlane, g_kCameraFarClippingPlane, 
-		                       g_kInitialCameraSpeed) &&
+		                       g_kInitialCameraSpeed, g_kInitialCameraZoomFactor) &&
 		   m_inputManager.Initialise(hInst, hWnd) &&
-		   m_renderer.Initialise(hWnd, windowWidth, windowHeight, m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix()) &&
+		   m_renderer.Initialise(hWnd, windowWidth, windowHeight, m_camera.GetBaseViewMatrix(), m_camera.GetBaseProjectionMatrix()) &&
 		   m_renderer.SetupGrid(gridSize, numberOfGridPartitions) &&
 		   m_testEnvironment.Initialise(gridSize, numberOfGridPartitions);
 

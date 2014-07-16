@@ -22,12 +22,15 @@ public:
 	OrthographicCamera(void);
 	~OrthographicCamera(void);
 
-	bool Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed);
+	bool Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed, float initialZoomFactor);
 	void Update(const XMFLOAT3& moveVector);
 	void Cleanup(void);
 
 	const XMFLOAT4X4& GetViewMatrix(void) const;
+	const XMFLOAT4X4& GetBaseViewMatrix(void) const;
 	const XMFLOAT4X4& GetProjectionMatrix(void) const;
+	const XMFLOAT4X4& GetBaseProjectionMatrix(void) const;
+
 	const XMFLOAT3&   GetCameraPosition(void) const;
 	float             GetZoomFactor(void) const;
 
@@ -37,8 +40,10 @@ public:
 private:
 	void Move(const XMFLOAT3& moveVector);
 
-	XMFLOAT4X4	m_viewMatrix;				    // The view matrix associated to this camera
-	XMFLOAT4X4	m_projectionMatrix;	// The orthographic projection matrix associated to this camera
+	XMFLOAT4X4	m_viewMatrix;		    // The view matrix associated to this camera
+	XMFLOAT4X4	m_baseViewMatrix;		// The original view matrix the camera was initialised with
+	XMFLOAT4X4	m_projectionMatrix;	    // The orthographic projection matrix associated to this camera
+	XMFLOAT4X4	m_baseProjectionMatrix;	// The original orthographic projection matrix, without applied zoom
 
 	XMFLOAT3	m_position;		    // The current position of the camera
 	XMFLOAT3    m_movementSpeed;    // Determines how fast the camera moves, that is how sensible it is to user input

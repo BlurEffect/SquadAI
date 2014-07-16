@@ -42,7 +42,7 @@ OrthographicCamera::~OrthographicCamera()
 // Param10: Determines whether the camera will use perspective or orthographic projection. 
 // Returns true if the camera was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool OrthographicCamera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed)
+bool OrthographicCamera::Initialise(const XMFLOAT3& position,const XMFLOAT3& lookAt,const XMFLOAT3& up, int windowWidth, int windowHeight, float clipNear, float clipFar, const XMFLOAT3& newMovementSpeed, float initialZoomFactor)
 {
 	m_position          = position;
 	m_lookAt            = lookAt;
@@ -52,6 +52,7 @@ bool OrthographicCamera::Initialise(const XMFLOAT3& position,const XMFLOAT3& loo
 	m_nearClippingPlane = clipNear;
 	m_farClippingPlane  = clipFar;
 	m_movementSpeed     = newMovementSpeed;
+	m_zoomFactor        = initialZoomFactor;
 
 	// Calculate the right vector
 	XMStoreFloat3(&m_right, XMVector3Cross(XMLoadFloat3(&m_up), XMLoadFloat3(&m_lookAt)));
@@ -59,7 +60,10 @@ bool OrthographicCamera::Initialise(const XMFLOAT3& position,const XMFLOAT3& loo
 	// Calculate the view matrix
 	XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(XMLoadFloat3(&m_position), XMLoadFloat3(&m_lookAt), XMLoadFloat3(&m_up)));
 
+	m_baseViewMatrix = m_viewMatrix;
+
 	XMStoreFloat4x4(&m_projectionMatrix, XMMatrixOrthographicLH(m_windowWidth * m_zoomFactor, m_windowHeight * m_zoomFactor, m_nearClippingPlane, m_farClippingPlane));
+	XMStoreFloat4x4(&m_baseProjectionMatrix, XMMatrixOrthographicLH(m_windowWidth, m_windowHeight, m_nearClippingPlane, m_farClippingPlane));
 	
 	return true;
 }
@@ -140,10 +144,21 @@ const XMFLOAT4X4& OrthographicCamera::GetViewMatrix(void) const
 	return m_viewMatrix;
 }
 
+const XMFLOAT4X4& OrthographicCamera::GetBaseViewMatrix(void) const
+{
+	return m_baseViewMatrix;
+}
+
 const XMFLOAT4X4& OrthographicCamera::GetProjectionMatrix(void) const
 {
 	return m_projectionMatrix;
 }
+
+const XMFLOAT4X4& OrthographicCamera::GetBaseProjectionMatrix(void) const
+{
+	return m_baseProjectionMatrix;
+}
+
 
 const XMFLOAT3& OrthographicCamera::GetCameraPosition(void) const
 {

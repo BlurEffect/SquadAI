@@ -51,10 +51,9 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 //--------------------------------------------------------------------------------------
 void MovementManager::Update(float deltaTime)
 {
-	FollowPath(2.0f); // 1.5f
-	//Seek(XMFLOAT2(20,20), 5.0f);
+	FollowPath(g_kTargetReachedRadius);
 	AvoidCollisions();
-	Separate(3.0f);
+	Separate(g_kSeparationRadius);
 
 	// Truncate steering force to not be greater than the maximal allowed force
 	float magnitude = 0.0f;
@@ -181,7 +180,7 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 			}else
 			{
 				// Slow arrival for the last node
-				Seek(m_path[m_currentNode], 2.0f);
+				Seek(m_path[m_currentNode], g_kSlowArrivalRadius);
 			}
 		}
 	}
@@ -244,7 +243,7 @@ void MovementManager::AvoidCollisions()
 			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce);
 		}else
 		{
-			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce * 2.0f);
+			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce * 0.5f);
 		}
 
 		// Add the collision avoidance force to the accumulated steering force

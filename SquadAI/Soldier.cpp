@@ -7,11 +7,23 @@
 // Includes
 #include "Soldier.h"
 
-Soldier::Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment, const EntityMovementData& movementData, const EntitySensorData& sensorData, const EntityCombatData& combatData)
-	: FightingEntity(id, type, position, rotation, scale, radius, pEnvironment, movementData, sensorData, combatData)
+Soldier::Soldier(void) : FightingEntity()
 {
 }
 
 Soldier::~Soldier(void)
 {
+}
+
+//--------------------------------------------------------------------------------------
+// Initialises the soldier.
+// Param1: The base initialisation data for the entity.
+// Param2: The initialisation data required to initialise the movement component of the entity.
+// Param3: The initialisation data required to initialise the sensors component of the entity.
+// Param4: The initialisation data required to initialise the combat component of the entity.
+// Returns true if the soldier was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::Initialise(EntityInitData initData, const EntityMovementInitData& movementInitData, const EntitySensorInitData& sensorInitData, const EntityCombatInitData& combatInitData)
+{
+	return FightingEntity::Initialise(initData, movementInitData, sensorInitData, combatInitData);
 }

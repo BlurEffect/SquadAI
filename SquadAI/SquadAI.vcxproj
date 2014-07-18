@@ -93,7 +93,7 @@
     <ClCompile Include="FightingEntity.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
-    <ClCompile Include="MovementManager.cpp" />
+    <ClCompile Include="EntityMovementManager.cpp" />
     <ClCompile Include="MovingEntity.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
@@ -136,7 +136,7 @@
     <ClInclude Include="FightingEntity.h" />
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
-    <ClInclude Include="MovementManager.h" />
+    <ClInclude Include="EntityMovementManager.h" />
     <ClInclude Include="MovingEntity.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="OrthographicCamera.h" />

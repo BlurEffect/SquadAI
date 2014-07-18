@@ -19,19 +19,48 @@ Entity::Entity(void) : m_id(0),
 {
 }
 
-Entity::Entity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment) 
-	: m_id(id), 
-	  m_type(type),
-	  m_position(position),
-	  m_rotation(rotation),
-	  m_scale(scale),
-	  m_radius(radius),
-	  m_pEnvironment(pEnvironment)
+Entity::~Entity(void)
 {
 }
 
-Entity::~Entity(void)
+//--------------------------------------------------------------------------------------
+// Initialises the entity.
+// Param1: The initialisation data to be used for initialisation of the entity.
+// Returns true if the entity was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Entity::Initialise(const EntityInitData& initData)
 {
+	if(!initData.m_pEnvironment)
+	{
+		return false;
+	}
+
+	m_id		   = initData.m_id;
+	m_type		   = initData.m_type;
+	m_position	   = initData.m_position;
+	m_rotation	   = initData.m_rotation;
+	m_scale		   = initData.m_scale;
+	m_radius	   = initData.m_radius;
+	m_pEnvironment = initData.m_pEnvironment;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the entity.
+// Param1: The time in seconds passed since the last frame.
+//--------------------------------------------------------------------------------------
+void Entity::Update(float deltaTime)
+{
+	// Do nothing
+}
+	
+//--------------------------------------------------------------------------------------
+// Resets the entity
+//--------------------------------------------------------------------------------------
+void Entity::Reset(void)
+{
+	// Do nothing
 }
 
 // Data access functions

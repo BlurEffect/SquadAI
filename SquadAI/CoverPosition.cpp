@@ -11,11 +11,16 @@ CoverPosition::CoverPosition(void) : Entity()
 {
 }
 
-CoverPosition::CoverPosition(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment) 
-	: Entity(id, type, position, rotation, scale, radius, pEnvironment)
+CoverPosition::~CoverPosition(void)
 {
 }
 
-CoverPosition::~CoverPosition(void)
+//--------------------------------------------------------------------------------------
+// Initialises the cover position.
+// Param1: The base initialisation data for the entity.
+// Returns true if the cover position was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool CoverPosition::Initialise(EntityInitData initData)
 {
+	return Entity::Initialise(initData);
 }

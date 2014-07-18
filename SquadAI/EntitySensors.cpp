@@ -22,13 +22,11 @@ EntitySensors::~EntitySensors(void)
 
 //--------------------------------------------------------------------------------------
 // Initialises the sensor component of the entity
-// Param1: The radian value determining the field of view of the entity. 
-//         The FOV will be twice the size of the passed in value.
-// Param2: The distance that the entity is able to see ahead.
-// Param3: A pointer to the entity that the sensors are associated to
+// Param1: A pointer to the entity that the sensors are associated to.
+// Param2: The initialisation data required to initialise the sensors of the entity.
 // Returns true if the sensor component was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool EntitySensors::Initialise(float fieldOfView, float viewingDistance, FightingEntity* pEntity)
+bool EntitySensors::Initialise(FightingEntity* pEntity, const EntitySensorInitData& initData)
 {
 	if(!pEntity)
 	{
@@ -36,8 +34,9 @@ bool EntitySensors::Initialise(float fieldOfView, float viewingDistance, Fightin
 	}
 
 	m_pEntity         = pEntity;
-	m_fieldOfView     = fieldOfView;
-	m_viewingDistance = viewingDistance;
+
+	m_fieldOfView     = initData.m_fieldOfView;
+	m_viewingDistance = initData.m_viewingDistance;
 
 	return true;
 }

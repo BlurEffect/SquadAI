@@ -1,7 +1,7 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
 *  MovingEntity.h
-*  Base class for all moving entities in the test environment.
+*  Abstract base class for all moving entities in the test environment.
 */
 
 #ifndef MOVING_ENTITY_H
@@ -10,31 +10,46 @@
 // Includes
 #include <DirectXMath.h>
 #include "Entity.h"
-#include "MovementManager.h"
+#include "EntityMovementManager.h"
 
 using namespace DirectX;
 
 //--------------------------------------------------------------------------------------
-// Bundles the data defining the properties for entity movement.
+// Bundles the data defining the properties of the entity related to movement.
 //--------------------------------------------------------------------------------------
-struct EntityMovementData
+struct EntityMovementInitData
 {
-	EntityMovementData(void) : m_velocity(0.0f, 0.0f),
-							   m_maxVelocity(0.0f),
-							   m_maxForce(0.0f),
-							   m_maxSeeAhead(0.0f)
+	EntityMovementInitData(void) : m_maxVelocity(0.0f),
+							       m_maxTotalForce(0.0f),
+							       m_maxSeeAhead(0.0f),
+								   m_maxCollisionAvoidanceForce(0.0f),
+								   m_maxSeparationForce(0.0f),       
+								   m_targetReachedRadius(0.0f),		
+								   m_slowArrivalRadius(0.0f),		 
+								   m_separationRadius(0.0f)
 	{}
 
-	EntityMovementData(XMFLOAT2 velocity, float maxVelocity, float maxForce, float maxSeeAhead) : m_velocity(velocity),
-																							      m_maxVelocity(maxVelocity),
-																			                      m_maxForce(maxForce),
-																			                      m_maxSeeAhead(maxSeeAhead)
+	EntityMovementInitData(float maxVelocity, float maxTotalForce, float maxSeeAhead, float maxCollisionAvoidanceForce, 
+		                   float maxSeparationForce, float targetReachedRadius, float slowArrivalRadius, float separationRadius) 
+				: m_maxVelocity(maxVelocity),
+				  m_maxTotalForce(maxTotalForce),
+				  m_maxSeeAhead(maxSeeAhead),
+				  m_maxCollisionAvoidanceForce(maxCollisionAvoidanceForce),
+				  m_maxSeparationForce(maxSeparationForce),       
+				  m_targetReachedRadius(targetReachedRadius),		
+				  m_slowArrivalRadius(slowArrivalRadius),		 
+				  m_separationRadius(separationRadius)
 	{}
 
-	XMFLOAT2 m_velocity;    // The current velocity of the entity
-	float    m_maxVelocity; // The maximal velocity allowed (limits the length of the velocity vector)
-	float    m_maxForce;    // The maximal force that can impact this entity's movement
-	float    m_maxSeeAhead; // The distance that the entity can see ahead and check for collisions with other entities
+	float    m_maxVelocity;		// The maximal velocity allowed (limits the length of the velocity vector)
+	float    m_maxTotalForce;	// The maximal force that can impact this entity's movement
+	float    m_maxSeeAhead;		// The distance that the entity can see ahead and check for collisions with other entities
+
+	float m_maxCollisionAvoidanceForce; // The maximal force that can result from avoiding collisions
+	float m_maxSeparationForce;         // The maximal force that can result from separation from other entities
+	float m_targetReachedRadius;		// When the distance between an entity and its target is lower than this, latter one counts as reached
+	float m_slowArrivalRadius;		    // When this close to the final target, an entity will start to slow down
+	float m_separationRadius;		    // When an entity registers other entities within this radius it will steer for separation from them
 };
 
 
@@ -42,24 +57,36 @@ class MovingEntity : public Entity
 {
 public:
 	MovingEntity(void);
-	MovingEntity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment, const EntityMovementData& movementData);
-	virtual ~MovingEntity(void);
+	virtual ~MovingEntity(void) = 0;
 
-	virtual bool Initialise(void);
+	bool Initialise(const EntityInitData& initData, const EntityMovementInitData& movementInitData);
 	virtual void Update(float deltaTime);
+	virtual void Reset(void);
 
 	// Data access functions
+
 	const XMFLOAT2& GetVelocity(void) const;
 	float           GetMaxVelocity(void) const;
-	float           GetMaxForce(void) const;
+	float           GetMaxTotalForce(void) const;
 	float           GetMaxSeeAhead(void) const;
+	float           GetMaxCollisionAvoidanceForce(void) const;
+	float           GetMaxSeparationForce(void) const;
+	float           GetTargetReachedRadius(void) const;
+	float           GetSlowArrivalRadius(void) const;
+	float           GetSeparationRadius(void) const;
+
 	void SetVelocity(const XMFLOAT2& velocity);
 	void SetMaxVelocity(float maxVelocity);
-	void SetMaxForce(float maxForce);
+	void SetMaxTotalForce(float maxForce);
 	void SetMaxSeeAhead(float maxSeeAhead);
+	void SetMaxCollisionAvoidanceForce(float maxCollisionAvoidanceForce);
+	void SetMaxSeparationForce(float maxSeparationForce);
+	void SetTargetReachedRadius(float targetReachedRadius);
+	void SetSlowArrivalRadius(float slowArrivalRadius);
+	void SetSeparationRadius(float separationRadius);
+
 private:
-	EntityMovementData m_movementData;    // The movement properties of the entity
-	MovementManager    m_movementManager; // The manager responsible for updating the entities velocity and position
+	EntityMovementManager    m_movementManager; // The manager responsible for updating the entities velocity and position
 };
 
 #endif // MOVING_ENTITY_H

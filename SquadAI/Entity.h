@@ -12,16 +12,54 @@
 #include <DirectXMath.h>
 #include "EntityData.h"
 
+// Forward declarations
 class TestEnvironment;
 
 using namespace DirectX;
+
+//--------------------------------------------------------------------------------------
+// Bundles the data defining the properties for an entity.
+//--------------------------------------------------------------------------------------
+struct EntityInitData
+{
+	EntityInitData(void) : m_id(0),
+						   m_type(EntityType(0)),
+						   m_position(0.0f, 0.0f),
+						   m_rotation(0.0f),
+					 	   m_scale(1.0f),
+					  	   m_radius(0.0f),
+						   m_pEnvironment(nullptr)
+	{}
+	
+	EntityInitData(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment)
+						 : m_id(id), 
+						   m_type(type),
+						   m_position(position),
+						   m_rotation(rotation),
+						   m_scale(scale),
+						   m_radius(radius),
+						   m_pEnvironment(pEnvironment)
+	{}
+
+	unsigned long	 m_id;			 // A unique identifier for the entity, 0 is an invalid value
+	EntityType		 m_type;         // Identifies the type of this entity
+	XMFLOAT2		 m_position;     // The position, where this entity is placed
+	float			 m_rotation;     // The z-axis rotation of the entity
+	float            m_scale;        // The uniform scale factor for the entity
+	float		     m_radius;       // The radius of a circle with centre in the entity's position that contains the entity
+	TestEnvironment* m_pEnvironment; // A pointer to the test environment the entity is "living" in
+};
+
 
 class Entity
 {
 public:
 	Entity(void);
-	Entity::Entity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment);
 	virtual ~Entity(void) = 0;
+
+	bool Initialise(const EntityInitData& initData);
+	virtual void Update(float deltaTime);
+	virtual void Reset(void);
 
 	// Data access functions
 	unsigned long	 GetId(void) const;

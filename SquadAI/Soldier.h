@@ -17,8 +17,10 @@ class Soldier : public FightingEntity
 {
 public:
 	Soldier(void);
-	Soldier(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment, const EntityMovementData& movementData, const EntitySensorData& sensorData, const EntityCombatData& combatData);
 	~Soldier(void);
+
+	bool Initialise(EntityInitData initData, const EntityMovementInitData& movementInitData, const EntitySensorInitData& sensorInitData, const EntityCombatInitData& combatInitData);
+
 private:
 };
 

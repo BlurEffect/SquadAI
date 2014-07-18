@@ -17,7 +17,13 @@ EntityCombatManager::~EntityCombatManager(void)
 {
 }
 
-bool EntityCombatManager::Initialise(FightingEntity* pEntity)
+//--------------------------------------------------------------------------------------
+// Initialises the combat manager.
+// Param1: A pointer to the entity that the combat manager are associated to.
+// Param2: The initialisation data required to initialise the combat component of the entity.
+// Returns true if the combat component was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool EntityCombatManager::Initialise(FightingEntity* pEntity, const EntityCombatInitData& initData)
 {
 	return true;
 }

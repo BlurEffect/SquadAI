@@ -13,7 +13,9 @@
 #include <list>
 #include "EntityMemory.h"
 
+// Forward declarations
 class FightingEntity;
+struct EntitySensorInitData;
 
 using namespace DirectX;
 
@@ -23,7 +25,7 @@ public:
 	EntitySensors(void);
 	~EntitySensors(void);
 
-	bool Initialise(float fieldOfView, float viewingDistance, FightingEntity* pEntity);
+	bool Initialise(FightingEntity* pEntity, const EntitySensorInitData& initData);
 	void CheckForThreats(void);
 
 	// Data access functions

@@ -11,7 +11,11 @@
 // Includes
 #include <DirectXMath.h>
 
+// Forward declarations
 class FightingEntity;
+struct EntityCombatInitData;
+
+using namespace DirectX;
 
 class EntityCombatManager
 {
@@ -19,7 +23,7 @@ public:
 	EntityCombatManager(void);
 	~EntityCombatManager(void);
 
-	bool Initialise(FightingEntity* pEntity);
+	bool Initialise(FightingEntity* pEntity, const EntityCombatInitData& initData);
 private:
 
 };

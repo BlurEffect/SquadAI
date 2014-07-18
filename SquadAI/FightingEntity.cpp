@@ -7,10 +7,7 @@
 // Includes
 #include "FightingEntity.h"
 
-FightingEntity::FightingEntity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment, const EntityMovementData& movementData, const EntitySensorData& sensorData, const EntityCombatData& combatData)
-	: MovingEntity(id, type, position, rotation, scale, radius, pEnvironment, movementData),																																						
-	  m_sensorData(sensorData),
-	  m_combatData(combatData)
+FightingEntity::FightingEntity(void) : MovingEntity()
 {
 }
 
@@ -20,14 +17,17 @@ FightingEntity::~FightingEntity(void)
 
 //--------------------------------------------------------------------------------------
 // Initialises the fighting entity.
+// Param1: The base initialisation data for the entity.
+// Param2: The initialisation data required to initialise the movement component of the entity.
+// Param3: The initialisation data required to initialise the sensors component of the entity.
+// Param4: The initialisation data required to initialise the combat component of the entity.
 // Returns true if the fighting entity was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool FightingEntity::Initialise(void)
+bool FightingEntity::Initialise(const EntityInitData& initData, const EntityMovementInitData& movementInitData, const EntitySensorInitData& sensorInitData, const EntityCombatInitData& combatInitData)
 {
-	return m_sensors.Initialise(m_sensorData.m_fieldOfView, m_sensorData.m_viewingDistance, this) && 
-		   m_combatManager.Initialise(this) &&
-		   MovingEntity::Initialise();
-
+	return MovingEntity::Initialise(initData, movementInitData) &&
+		   m_sensors.Initialise(this, sensorInitData) && 
+		   m_combatManager.Initialise(this, combatInitData);
 }
 
 //--------------------------------------------------------------------------------------
@@ -39,4 +39,32 @@ void FightingEntity::Update(float deltaTime)
 	MovingEntity::Update(deltaTime);
 }
 
+//--------------------------------------------------------------------------------------
+// Resets the fighting entity.
+//--------------------------------------------------------------------------------------
+void FightingEntity::Reset(void)
+{
+	MovingEntity::Reset();
+}
+
 // Data access functions
+
+float FightingEntity::GetFieldOfView(void) const
+{
+	return m_sensors.GetFieldOfView();
+}
+
+float FightingEntity::GetViewingDistance(void) const
+{
+	return m_sensors.GetViewingDistance();
+}
+
+void FightingEntity::SetFieldOfView(float fieldOfView)
+{
+	m_sensors.SetFieldOfView(fieldOfView);
+}
+
+void FightingEntity::SetViewingDistance(float viewingDistance)
+{
+	m_sensors.SetViewingDistance(viewingDistance);
+}

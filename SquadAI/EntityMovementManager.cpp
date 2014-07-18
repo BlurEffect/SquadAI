@@ -1,36 +1,43 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  MovementManager.cpp
+*  EntityMovementManager.cpp
 *  Each entity able to move has a movement manager associated to it that
 *  is responsible for controlling the position and velocity of the entity.
 */
 
 // Includes
-#include "MovementManager.h"
+#include "EntityMovementManager.h"
 #include "MovingEntity.h"
 #include "Pathfinder.h"
-#include "ApplicationSettings.h"
 #include "TestEnvironment.h"
 
-MovementManager::MovementManager(void) : m_pEntity(nullptr),
-								         m_steeringForce(0.0f, 0.0f),
-										 m_currentNode(0),
-										 m_reachedNodeRadius(0.0f),
-										 m_seekTarget(0.0f, 0.0f),
-										 m_slowArrivalRadius(0.0f)
+EntityMovementManager::EntityMovementManager(void) : m_pEntity(nullptr),
+									 				 m_velocity(XMFLOAT2(0.0f, 0.0f)),
+									 				 m_maxVelocity(0.0f),
+													 m_maxTotalForce(0.0f),
+													 m_maxSeeAhead(0.0f),
+													 m_maxCollisionAvoidanceForce(0.0f),
+													 m_maxSeparationForce(0.0f),
+													 m_targetReachedRadius(0.0f),
+													 m_slowArrivalRadius(0.0f),
+													 m_separationRadius(0.0f),
+													 m_steeringForce(0.0f, 0.0f),
+													 m_currentNode(0),
+													 m_seekTarget(0.0f, 0.0f)
 {
 }
 
-MovementManager::~MovementManager(void)
+EntityMovementManager::~EntityMovementManager(void)
 {
 }
 
 //--------------------------------------------------------------------------------------
 // Initialises movement manager for a given entity.
 // Param1: A pointer to the entity that this movement manager will be associated to.
+// Param2: The initialisation data required to initialise the movement component of the entity.
 // Returns true if the movement manager could be initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool MovementManager::Initialise(MovingEntity* pEntity)
+bool EntityMovementManager::Initialise(MovingEntity* pEntity, const EntityMovementInitData& initData)
 {
 	if(!pEntity)
 	{
@@ -38,7 +45,15 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 	}
 
 	m_pEntity = pEntity;
-	m_pEntity->SetVelocity(XMFLOAT2(0.0f, 0.0f));
+
+	m_maxVelocity				 = initData.m_maxVelocity;
+	m_maxTotalForce				 = initData.m_maxTotalForce;
+	m_maxSeeAhead				 = initData.m_maxSeeAhead;
+	m_maxCollisionAvoidanceForce = initData.m_maxCollisionAvoidanceForce;
+	m_maxSeparationForce		 = initData.m_maxSeparationForce;
+	m_targetReachedRadius		 = initData.m_targetReachedRadius;
+	m_slowArrivalRadius			 = initData.m_slowArrivalRadius;
+	m_separationRadius			 = initData.m_separationRadius;
 
 	SetPathTo(XMFLOAT2(20.0f, 20.0f));
 
@@ -50,38 +65,38 @@ bool MovementManager::Initialise(MovingEntity* pEntity)
 // using the accumulated sum of all forces impacting the entity.
 // Param1: The time in seconds passed since the last frame.
 //--------------------------------------------------------------------------------------
-void MovementManager::Update(float deltaTime)
+void EntityMovementManager::Update(float deltaTime)
 {
-	FollowPath(g_kTargetReachedRadius);
-	AvoidCollisions();
-	Separate(g_kSeparationRadius);
+	FollowPath(m_targetReachedRadius);
+	AvoidObstacleCollisions();
+	Separate(m_separationRadius);
 
 	// Truncate steering force to not be greater than the maximal allowed force
 	float magnitude = 0.0f;
 	XMStoreFloat(&magnitude, XMVector2Length(XMLoadFloat2(&m_steeringForce)));
 
-	if(magnitude > m_pEntity->GetMaxForce())
+	if(magnitude > m_maxTotalForce)
 	{
 		// Truncate the vector to be of the magnitude corresponding to the maximal allowed force
-		XMStoreFloat2(&m_steeringForce, XMVector2Normalize(XMLoadFloat2(&m_steeringForce)) * m_pEntity->GetMaxForce());
+		XMStoreFloat2(&m_steeringForce, XMVector2Normalize(XMLoadFloat2(&m_steeringForce)) * m_maxTotalForce);
 	}
 
 	// Calculate the new velocity for the entity
 	XMFLOAT2 newVelocity;
-	XMStoreFloat2(&newVelocity, XMLoadFloat2(&m_pEntity->GetVelocity()) + XMLoadFloat2(&m_steeringForce));
+	XMStoreFloat2(&newVelocity, XMLoadFloat2(&m_velocity) + XMLoadFloat2(&m_steeringForce));
 
 	// Truncate the velocity if it is greater than the maximally allowed velocity for the entity
 	XMStoreFloat(&magnitude, XMVector2Length(XMLoadFloat2(&newVelocity)));
 
-	if(magnitude > m_pEntity->GetMaxVelocity())
+	if(magnitude > m_maxVelocity)
 	{
 		// Truncate the vector to be of the magnitude corresponding to the maximal allowed force
-		XMStoreFloat2(&newVelocity, XMVector2Normalize(XMLoadFloat2(&newVelocity)) * m_pEntity->GetMaxVelocity());
+		XMStoreFloat2(&newVelocity, XMVector2Normalize(XMLoadFloat2(&newVelocity)) * m_maxVelocity);
 	}
 
 	// Set the new velocity and position on the entity
 
-	m_pEntity->SetVelocity(newVelocity);
+	m_velocity = newVelocity;
 
 	XMFLOAT2 newPosition;
 	XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity) * deltaTime);
@@ -98,11 +113,20 @@ void MovementManager::Update(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
+// Resets the movement component of the entity.
+//--------------------------------------------------------------------------------------
+void EntityMovementManager::Reset(void)
+{
+	m_velocity = XMFLOAT2(0.0f, 0.0f);
+	m_currentNode = 0;
+}
+
+//--------------------------------------------------------------------------------------
 // Calculate a path to the target position and set it active.
 // Param1: The target position of the entity.
 // Returns true if a path for the entity could be created successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool MovementManager::SetPathTo(const XMFLOAT2& targetPosition)
+bool EntityMovementManager::SetPathTo(const XMFLOAT2& targetPosition)
 {
 	bool result = false;
 	result = m_pEntity->GetTestEnvironment()->GetPathfinder().CalculatePath(AStar, EuclideanDistance, m_pEntity->GetPosition(), targetPosition, m_path);
@@ -120,7 +144,7 @@ bool MovementManager::SetPathTo(const XMFLOAT2& targetPosition)
 // Param1: The target position of the entity.
 // Param2: The radius around the target position from which the entity will slow down upon approaching.
 //--------------------------------------------------------------------------------------
-void MovementManager::Seek(const XMFLOAT2& targetPosition, float slowArrivalRadius)
+void EntityMovementManager::Seek(const XMFLOAT2& targetPosition, float slowArrivalRadius)
 {
 	XMFLOAT2 desiredVelocity;
 	XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&targetPosition) - XMLoadFloat2(&m_pEntity->GetPosition()));
@@ -134,14 +158,14 @@ void MovementManager::Seek(const XMFLOAT2& targetPosition, float slowArrivalRadi
 
 	if(distance <= slowArrivalRadius)
 	{
-		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_pEntity->GetMaxVelocity() * distance/slowArrivalRadius);
+		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_maxVelocity * distance/slowArrivalRadius);
 	}else
 	{
-		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_pEntity->GetMaxVelocity());
+		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_maxVelocity);
 	}
 
 	XMFLOAT2 force;
-	XMStoreFloat2(&force, XMLoadFloat2(&desiredVelocity) - XMLoadFloat2(&m_pEntity->GetVelocity()));
+	XMStoreFloat2(&force, XMLoadFloat2(&desiredVelocity) - XMLoadFloat2(&m_velocity));
 
 	// Add the seek force to the accumulated steering force
 	XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&force));
@@ -151,7 +175,7 @@ void MovementManager::Seek(const XMFLOAT2& targetPosition, float slowArrivalRadi
 // Calculate the path following force and add it to the total force.
 // Param1: When the entity has approached the target by this distance, it counts as reached.
 //--------------------------------------------------------------------------------------
-void MovementManager::FollowPath(float nodeReachedRadius)
+void EntityMovementManager::FollowPath(float nodeReachedRadius)
 {
 	if(!m_path.empty())
 	{
@@ -171,7 +195,7 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 			{
 				// Final destination reached, clear the path
 				m_path.clear();
-				m_pEntity->SetVelocity(XMFLOAT2(0.0f, 0.0f));
+				m_velocity = XMFLOAT2(0.0f, 0.0f);
 			}
 		}else
 		{
@@ -181,22 +205,24 @@ void MovementManager::FollowPath(float nodeReachedRadius)
 			}else
 			{
 				// Slow arrival for the last node
-				Seek(m_path[m_currentNode], g_kSlowArrivalRadius);
+				Seek(m_path[m_currentNode], m_slowArrivalRadius);
 			}
 		}
 	}
 }
 
 //--------------------------------------------------------------------------------------
-// Calculate the collision avoidance force and add it to the total force.
+// Calculate the collision avoidance force and add it to the total force. This force 
+// is used to avoid collisions of the entity with static obstacles in the environment, 
+// such as walls.
 //--------------------------------------------------------------------------------------
-void MovementManager::AvoidCollisions()
+void EntityMovementManager::AvoidObstacleCollisions()
 {
 	const Entity* pCollisionObject = m_pEntity->GetTestEnvironment()->GetCollisionObject(*m_pEntity);
 	
 	if(pCollisionObject != nullptr)
 	{
-		XMVECTOR ahead = XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_pEntity->GetVelocity())) * m_pEntity->GetMaxSeeAhead();
+		XMVECTOR ahead = XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_velocity)) * m_maxSeeAhead;
 
 		XMFLOAT2 avoidanceForce;
 		
@@ -238,15 +264,8 @@ void MovementManager::AvoidCollisions()
 		*/
 		//
 
+		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * m_maxCollisionAvoidanceForce);
 		
-		if(pCollisionObject->GetType() == CoverSpot)
-		{
-			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce);
-		}else
-		{
-			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * g_kMaxCollisionAvoidanceForce * 0.5f);
-		}
-
 		// Add the collision avoidance force to the accumulated steering force
 		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&avoidanceForce));
 	}
@@ -256,7 +275,7 @@ void MovementManager::AvoidCollisions()
 // Calculate the separation force and add it to the total force.
 // Param1: The entity will try to move away from entities that are close than this distance.
 //--------------------------------------------------------------------------------------
-void MovementManager::Separate(float separationRadius)
+void EntityMovementManager::Separate(float separationRadius)
 {
 	// Use square distances
 	float squareRadius = separationRadius * separationRadius;
@@ -308,10 +327,102 @@ void MovementManager::Separate(float separationRadius)
 	{
 		XMVECTOR separationVector =  XMLoadFloat2(&separationForce) / static_cast<float>(numberOfNeighbours);
 		separationVector = XMVector2Normalize(separationVector);
-		separationVector *= g_kMaxSeparationForce;
+		separationVector *= m_maxSeparationForce;
 
 		// Add the separation force to the accumulated steering force
 		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + separationVector);
 	}
 
+}
+
+// Data access functions
+
+const XMFLOAT2& EntityMovementManager::GetVelocity(void) const
+{
+	return m_velocity;
+}
+
+float EntityMovementManager::GetMaxVelocity(void) const
+{
+	return m_maxVelocity;
+}
+
+float EntityMovementManager::GetMaxTotalForce(void) const
+{
+	return m_maxTotalForce;
+}
+
+float EntityMovementManager::GetMaxSeeAhead(void) const
+{
+	return m_maxSeeAhead;
+}
+
+float EntityMovementManager::GetMaxCollisionAvoidanceForce(void) const
+{
+	return m_maxCollisionAvoidanceForce;
+}
+
+float EntityMovementManager::GetMaxSeparationForce(void) const
+{
+	return m_maxSeparationForce;
+}
+
+float EntityMovementManager::GetTargetReachedRadius(void) const
+{
+	return m_targetReachedRadius;
+}
+
+float EntityMovementManager::GetSlowArrivalRadius(void) const
+{
+	return m_slowArrivalRadius;
+}
+
+float EntityMovementManager::GetSeparationRadius(void) const
+{
+	return m_separationRadius;
+}
+
+void EntityMovementManager::SetVelocity(const XMFLOAT2& velocity)
+{
+	m_velocity = velocity;
+}
+
+void EntityMovementManager::SetMaxVelocity(float maxVelocity)
+{
+	m_maxVelocity = maxVelocity;
+}
+
+void EntityMovementManager::SetMaxTotalForce(float maxForce)
+{
+	m_maxTotalForce = maxForce;
+}
+
+void EntityMovementManager::SetMaxSeeAhead(float maxSeeAhead)
+{
+	m_maxSeeAhead = maxSeeAhead;
+}
+
+void EntityMovementManager::SetMaxCollisionAvoidanceForce(float maxCollisionAvoidanceForce)
+{
+	m_maxCollisionAvoidanceForce = maxCollisionAvoidanceForce;
+}
+
+void EntityMovementManager::SetMaxSeparationForce(float maxSeparationForce)
+{
+	m_maxSeparationForce = maxSeparationForce;
+}
+
+void EntityMovementManager::SetTargetReachedRadius(float targetReachedRadius)
+{
+	m_targetReachedRadius = targetReachedRadius;
+}
+
+void EntityMovementManager::SetSlowArrivalRadius(float slowArrivalRadius)
+{
+	m_slowArrivalRadius = slowArrivalRadius;
+}
+
+void EntityMovementManager::SetSeparationRadius(float separationRadius)
+{
+	m_separationRadius = separationRadius;
 }

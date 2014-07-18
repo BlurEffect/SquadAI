@@ -132,20 +132,43 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 	{
 	case ASoldier:
 		{
-			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead), EntitySensorData(XM_PI/6.0f, 10.0f), EntityCombatData(100.0f));
-			m_teamA.push_back(soldier);
+			m_teamA.push_back(Soldier());
+			if(!m_teamA.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this),
+										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, g_kSoldierSlowArrivalRadius, g_kSoldierSeparationRadius),
+										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
+										  EntityCombatInitData(100.0f)))
+			{
+				m_teamA.pop_back();
+				return false;
+			}
+
 			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamA.back();
 		}
 		break;
 	case BSoldier:
 		{
-			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead), EntitySensorData(XM_PI/6.0f, 10.0f), EntityCombatData(100.0f));
-			m_teamB.push_back(soldier);
+			m_teamB.push_back(Soldier());
+			if(!m_teamB.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this),
+										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, g_kSoldierSlowArrivalRadius, g_kSoldierSeparationRadius),
+										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
+										  EntityCombatInitData(100.0f)))
+			{
+				m_teamB.pop_back();
+				return false;
+			}
+			
 			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamB.back();
 		}
 		break;
 	case CoverSpot:
-		m_coverSpots.push_back(CoverPosition(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing , this));  //* 0.5f
+		m_coverSpots.push_back(CoverPosition());
+
+		if(!m_coverSpots.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing, this)))
+		{
+			m_coverSpots.pop_back();
+			return false;
+		}
+		
 		// Update the graph
 		UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], false);
 		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_coverSpots.back();
@@ -671,16 +694,6 @@ bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGr
 //--------------------------------------------------------------------------------------
 void TestEnvironment::StartSimulation(void)
 {
-	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
-	{
-		it->Initialise();
-	}
-
-	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-	{
-		it->Initialise();
-	}
-
 	m_isPaused = false;
 }
 
@@ -701,6 +714,7 @@ void TestEnvironment::EndSimulation(void)
 					GridToWorldPosition(XMFLOAT2(i, k), position);
 					m_pGrid[i][k].m_pEntity->SetPosition(position);
 					m_pGrid[i][k].m_pEntity->SetRotation(m_pGrid[i][k].m_rotation);
+					m_pGrid[i][k].m_pEntity->Reset();
 				}
 			}
 		}

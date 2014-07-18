@@ -11,8 +11,7 @@
 // Includes
 #include <DirectXMath.h>
 #include <vector>
-#include "Pathfinder.h"
-#include "ApplicationSettings.h"
+
 
 
 class MovingEntity;

@@ -87,6 +87,10 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="CoverPosition.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityCombatManager.cpp" />
+    <ClCompile Include="EntityMemory.cpp" />
+    <ClCompile Include="EntitySensors.cpp" />
+    <ClCompile Include="FightingEntity.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="MovementManager.cpp" />
@@ -126,6 +130,10 @@
     <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="CoverPosition.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityCombatManager.h" />
+    <ClInclude Include="EntityMemory.h" />
+    <ClInclude Include="EntitySensors.h" />
+    <ClInclude Include="FightingEntity.h" />
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
     <ClInclude Include="MovementManager.h" />
@@ -215,6 +223,9 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

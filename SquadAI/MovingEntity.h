@@ -43,10 +43,10 @@ class MovingEntity : public Entity
 public:
 	MovingEntity(void);
 	MovingEntity(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment, const EntityMovementData& movementData);
-	~MovingEntity(void);
+	virtual ~MovingEntity(void);
 
-	bool Initialise(void);
-	void Update(float deltaTime);
+	virtual bool Initialise(void);
+	virtual void Update(float deltaTime);
 
 	// Data access functions
 	const XMFLOAT2& GetVelocity(void) const;

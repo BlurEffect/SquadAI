@@ -132,14 +132,14 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 	{
 	case ASoldier:
 		{
-			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead));
+			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead), EntitySensorData(XM_PI/6.0f, 10.0f), EntityCombatData(100.0f));
 			m_teamA.push_back(soldier);
 			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamA.back();
 		}
 		break;
 	case BSoldier:
 		{
-			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead));
+			Soldier soldier(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this, EntityMovementData(XMFLOAT2(0.0f, 0.0f), g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead), EntitySensorData(XM_PI/6.0f, 10.0f), EntityCombatData(100.0f));
 			m_teamB.push_back(soldier);
 			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamB.back();
 		}
@@ -477,6 +477,66 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 		}
 	}
 	*/
+
+	// This approach is faster than the commented one below
+	// The number of grid fields that the entity can maximally see ahead
+	unsigned int maxGridDistance = (entity.GetMaxSeeAhead() / m_gridSpacing) + 1;
+
+	// Get the current grid position of the entity
+	XMFLOAT2 gridPos;
+	WorldToGridPosition(entity.GetPosition(), gridPos);
+
+	unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
+	unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
+	unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+	unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+
+	// Check the grid within that distance for colliding obstacles
+	for(unsigned int i = startX; i <= endX; ++i)
+	{
+		for(unsigned int k = startY; k <= endY; ++k)
+		{
+			if(m_pGrid[i][k].m_type == CoverSpot)
+			{
+				XMVECTOR colObjectToEntity = XMLoadFloat2(&entity.GetPosition()) - XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition());
+
+				float a;
+				float b;
+				float c;
+
+				float radiusSquare = m_pGrid[i][k].m_pEntity->GetRadius() * m_pGrid[i][k].m_pEntity->GetRadius();
+
+				XMStoreFloat(&a, XMVector2Dot(normDirection, normDirection));
+				XMStoreFloat(&b, 2.0f * XMVector2Dot(colObjectToEntity, normDirection));
+				XMStoreFloat(&c, XMVector2Dot(colObjectToEntity, colObjectToEntity) - XMLoadFloat(&radiusSquare));
+
+				float discriminant = b * b - 4 * a * c;
+
+				// If discriminant is smaller than 0, there is no intersection
+				if(discriminant >= 0)
+				{
+					// There is an intersection of the movement vector and the object. 
+
+					// Note: The intersection points could now be deduced but for the moment it is sufficient
+					//       to simply know that an object intersects and to determine the closest colliding object.
+
+					// Get the square distance between the object and the entity
+					float distance; 
+					XMStoreFloat(&distance, XMVector2Dot(colObjectToEntity, colObjectToEntity));
+
+					if(distance <= shortestCollisionDistance)
+					{
+						pCollisionObject = &(*m_pGrid[i][k].m_pEntity);
+						shortestCollisionDistance = distance;
+					}
+				}
+
+			}
+		}
+	}
+	
+
+	/*
 	for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
 	{
 		// The vector from the centre of the radius surrounding the possible collision object to the start of the 
@@ -516,8 +576,94 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 		}
 		
 	}
-
+	*/
 	return pCollisionObject;
+}
+
+//--------------------------------------------------------------------------------------
+// Accumulates a list of entities hostile to the passed in entity.
+// Param1: The entity, for which enemies should be found.
+// Param2: The list that will hold pointers to the found enemies (out parameter).
+//--------------------------------------------------------------------------------------
+void TestEnvironment::GetEnemies(const FightingEntity* pEntity, std::list<FightingEntity*>& enemies)
+{
+	if(pEntity == nullptr)
+	{
+		return;
+	}
+
+	if(pEntity->GetType() == ASoldier)
+	{
+		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+		{
+			enemies.push_back(&(*it));
+		}
+	}else
+	{
+		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+		{
+			enemies.push_back(&(*it));
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Determines whether there is a direct line of sight between two fields on the grid.
+// Note: This only checks between the centre of the two given grid fields. Uses 
+//       Bresenham's line algorithm.
+// Param1: The x-coordinate of the start grid field in grid units.
+// Param2: The y-coordinate of the start grid field in grid units.
+// Param3: The x-coordinate of the end grid field in grid units.
+// Param4: The y-coordinate of the end grid field in grid units.
+// Returns true if a direct line of sight exists, false if an obstacle obstructs the view.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY)
+{
+	// Prepare the coordinates for the calculation according to the properties of the line 
+	// connecting drawn between them.
+    bool steep = std::abs(endGridY - startGridY) > std::abs(endGridX - startGridX);
+    if(steep) 
+	{
+		std::swap(startGridX, startGridY);
+		std::swap(endGridX, endGridY);
+    }
+    if(startGridX > endGridX) 
+	{
+		std::swap(startGridX, endGridX);
+		std::swap(startGridY, endGridY);
+    }
+
+    int deltaX = endGridX - startGridX;
+    int deltaY = std::abs(endGridY - startGridY);
+    int error = 0;
+    int yStep;
+    int y = startGridY;
+
+    if (startGridY < endGridY)
+	{
+		yStep = 1;
+	}else 
+	{
+		yStep = -1;
+	}
+
+	for(int x = startGridX; x <= endGridX; x++) 
+	{
+		// Check if there is an obstacle blocking the line of sight
+        if((steep && (m_pGrid[y][x].m_type == CoverSpot)) || (!steep && (m_pGrid[x][y].m_type == CoverSpot)))
+		{
+			return false;
+		}
+
+        error += deltaY;
+        if(2 * error >= deltaX) 
+		{
+            y += yStep;
+            error -= deltaX;
+        }
+    }
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------

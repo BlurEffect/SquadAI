@@ -8,8 +8,9 @@
 // Includes
 #include "MovementManager.h"
 #include "MovingEntity.h"
-#include "TestEnvironment.h"
 #include "Pathfinder.h"
+#include "ApplicationSettings.h"
+#include "TestEnvironment.h"
 
 MovementManager::MovementManager(void) : m_pEntity(nullptr),
 								         m_steeringForce(0.0f, 0.0f),

@@ -43,6 +43,18 @@
     <Filter Include="Source Files\Entities">
       <UniqueIdentifier>{6733c01d-50f4-456b-8b9d-17768f002eab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\EntityComponents">
+      <UniqueIdentifier>{807d0025-974d-4732-aeff-a734bccd53fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\EntityComponents">
+      <UniqueIdentifier>{661ba2a0-549d-4639-899f-d854e4a9c2d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Colliders">
+      <UniqueIdentifier>{d9ea745a-a29d-4308-8fb9-eda516473af0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Colliders">
+      <UniqueIdentifier>{4ab0c89a-0a1a-494a-8e03-0590c506a962}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -135,20 +147,32 @@
     <ClCompile Include="PerformanceTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EntitySensors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityMemory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FightingEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="EntityCombatManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EntityMovementManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\EntityComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityCombatManager.cpp">
+      <Filter>Source Files\EntityComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityMemory.cpp">
+      <Filter>Source Files\EntityComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="EntitySensors.cpp">
+      <Filter>Source Files\EntityComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="CircleCollider.cpp">
+      <Filter>Source Files\Colliders</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>Source Files\Colliders</Filter>
+    </ClCompile>
+    <ClCompile Include="AxisAlignedRectangleCollider.cpp">
+      <Filter>Source Files\Colliders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -281,20 +305,38 @@
     <ClInclude Include="PerformanceTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntitySensors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityMemory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FightingEntity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="EntityCombatManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\EntityComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityMemory.h">
+      <Filter>Header Files\EntityComponents</Filter>
     </ClInclude>
     <ClInclude Include="EntityMovementManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\EntityComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySensors.h">
+      <Filter>Header Files\EntityComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="SoldierProperties.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileProperties.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>Header Files\Colliders</Filter>
+    </ClInclude>
+    <ClInclude Include="CircleCollider.h">
+      <Filter>Header Files\Colliders</Filter>
+    </ClInclude>
+    <ClInclude Include="AxisAlignedRectangleCollider.h">
+      <Filter>Header Files\Colliders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,8 @@ public:
 	~Soldier(void);
 
 	bool Initialise(EntityInitData initData, const EntityMovementInitData& movementInitData, const EntitySensorInitData& sensorInitData, const EntityCombatInitData& combatInitData);
+	void Update(float deltaTime);
+	void Activate(void);
 
 private:
 };

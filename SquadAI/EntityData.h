@@ -22,7 +22,7 @@ enum EntityType
 	CoverSpot,
 	ADeadSoldier,
 	BDeadSoldier,
-	Projectile,
+	ProjectileType,
 	NumberOfEntityTypes
 };
 

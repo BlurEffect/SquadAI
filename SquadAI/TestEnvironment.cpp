@@ -81,6 +81,11 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 	
 	for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
 	{
+		if(!m_isPaused)
+		{
+			it->Update(deltaTime);
+		}
+
 		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f -it->GetRotation()));
 		XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
@@ -88,6 +93,22 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		XMFLOAT4X4 transform;
 		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
 		pRenderContext.AddInstance(CoverSpot, transform);
+	}
+
+	for(std::list<Projectile>::iterator it = m_projectiles.begin(); it != m_projectiles.end(); ++it)
+	{
+		if(!m_isPaused)
+		{
+			it->Update(deltaTime);
+		}
+
+		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
+		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
+		XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
+
+		XMFLOAT4X4 transform;
+		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
+		pRenderContext.AddInstance(ProjectileType, transform);
 	}
 }
 
@@ -132,8 +153,9 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 	{
 	case ASoldier:
 		{
+			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
 			m_teamA.push_back(Soldier());
-			if(!m_teamA.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this),
+			if(!m_teamA.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, CircleColliderType, &collider, this),
 										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, g_kSoldierSlowArrivalRadius, g_kSoldierSeparationRadius),
 										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
 										  EntityCombatInitData(100.0f)))
@@ -147,8 +169,9 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		break;
 	case BSoldier:
 		{
+			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
 			m_teamB.push_back(Soldier());
-			if(!m_teamB.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing * 0.5f, this),
+			if(!m_teamB.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, CircleColliderType, &collider, this),
 										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, g_kSoldierSlowArrivalRadius, g_kSoldierSeparationRadius),
 										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
 										  EntityCombatInitData(100.0f)))
@@ -161,9 +184,9 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		}
 		break;
 	case CoverSpot:
+		CircleCollider collider(updatedPosition, m_gridSpacing);
 		m_coverSpots.push_back(CoverPosition());
-
-		if(!m_coverSpots.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, m_gridSpacing, this)))
+		if(!m_coverSpots.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing,CircleColliderType, &collider, this)))
 		{
 			m_coverSpots.pop_back();
 			return false;
@@ -185,7 +208,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 }
 
 //--------------------------------------------------------------------------------------
-// Removes an entity from the test environment.
+// Removes an entity from the test environment (only edit mode).
 // Param1: The world position, the corresponding grid field of which holds the entity to be deleted.
 // Returns true if the entity was successfully removed, false otherwise.
 //--------------------------------------------------------------------------------------
@@ -254,6 +277,27 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 		// Nothing to delete in that grid field
 		return false;
 	}
+}
+
+//--------------------------------------------------------------------------------------
+// Adds a new projectile entity to the test environment.
+// Param1: The position from which the projectile is being fired.
+// Param2: The target position towards which the projectile is being fired.
+// Returns true if the projectile was successfully added and initialised, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::AddProjectile(const XMFLOAT2& origin, const XMFLOAT2& target)
+{
+	CircleCollider collider(origin, m_gridSpacing * g_kProjectileScale * 0.5f);
+	m_projectiles.push_back(Projectile());
+	if(!m_projectiles.back().Initialise(target,
+		EntityInitData(++m_id, ProjectileType, origin, 0.0f, m_gridSpacing * g_kProjectileScale, CircleColliderType, &collider, this),
+										EntityMovementInitData(g_kProjectileMaxVelocity, g_kProjectileMaxForce, g_kProjectileMaxSeeAhead, g_kProjectileMaxCollisionAvoidanceForce, g_kProjectileMaxSeparationForce, g_kProjectileTargetReachedRadius, g_kProjectileSlowArrivalRadius, g_kProjectileSeparationRadius)))
+	{
+		m_projectiles.pop_back();
+		return false;
+	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -503,7 +547,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 
 	// This approach is faster than the commented one below
 	// The number of grid fields that the entity can maximally see ahead
-	unsigned int maxGridDistance = (entity.GetMaxSeeAhead() / m_gridSpacing) + 1;
+	unsigned int maxGridDistance = static_cast<unsigned int>(entity.GetMaxSeeAhead() / m_gridSpacing) + 1;
 
 	// Get the current grid position of the entity
 	XMFLOAT2 gridPos;
@@ -521,6 +565,24 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 		{
 			if(m_pGrid[i][k].m_type == CoverSpot)
 			{
+				XMFLOAT2 lineEndPoint;
+				XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&entity.GetPosition()) + normDirection * entity.GetMaxSeeAhead());
+				
+				if(m_pGrid[i][k].m_pEntity->GetCollider()->CheckLineCollision(entity.GetPosition(), lineEndPoint))
+				{
+					XMVECTOR colObjectToEntity = XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition()) - XMLoadFloat2(&entity.GetPosition());
+					// Get the square distance between the object and the entity
+					float distance; 
+					XMStoreFloat(&distance, XMVector2Dot(colObjectToEntity, colObjectToEntity));
+
+					if(distance <= shortestCollisionDistance)
+					{
+						pCollisionObject = &(*m_pGrid[i][k].m_pEntity);
+						shortestCollisionDistance = distance;
+					}
+				}
+
+				/*
 				XMVECTOR colObjectToEntity = XMLoadFloat2(&entity.GetPosition()) - XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition());
 
 				float a;
@@ -553,7 +615,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 						shortestCollisionDistance = distance;
 					}
 				}
-
+				*/
 			}
 		}
 	}
@@ -694,6 +756,16 @@ bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGr
 //--------------------------------------------------------------------------------------
 void TestEnvironment::StartSimulation(void)
 {
+	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+	{
+		it->Activate();
+	}
+
+	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+	{
+		it->Activate();
+	}
+
 	m_isPaused = false;
 }
 
@@ -711,7 +783,7 @@ void TestEnvironment::EndSimulation(void)
 				if(m_pGrid[i][k].m_type == ASoldier || m_pGrid[i][k].m_type == BSoldier)
 				{
 					XMFLOAT2 position;
-					GridToWorldPosition(XMFLOAT2(i, k), position);
+					GridToWorldPosition(XMFLOAT2(static_cast<float>(i), static_cast<float>(k)), position);
 					m_pGrid[i][k].m_pEntity->SetPosition(position);
 					m_pGrid[i][k].m_pEntity->SetRotation(m_pGrid[i][k].m_rotation);
 					m_pGrid[i][k].m_pEntity->Reset();
@@ -719,6 +791,9 @@ void TestEnvironment::EndSimulation(void)
 			}
 		}
 	}
+
+	// Delete all projectiles
+	m_projectiles.clear();
 
 	m_isPaused = true;
 }
@@ -890,8 +965,8 @@ void TestEnvironment::UpdateCoverMap(Node& coverNode, bool doDelete)
 {
 	coverNode.SetObstacle(!doDelete);
 
-	int gridX = static_cast<int>(coverNode.GetGridPosition().x);
-	int gridY = static_cast<int>(coverNode.GetGridPosition().y);
+	unsigned int gridX = static_cast<unsigned int>(coverNode.GetGridPosition().x);
+	unsigned int gridY = static_cast<unsigned int>(coverNode.GetGridPosition().y);
 
 	// Update the adjacent nodes with regard to the added/deleted cover spot
 

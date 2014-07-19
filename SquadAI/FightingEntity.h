@@ -65,7 +65,7 @@ public:
 	void SetFieldOfView(float fieldOfView);
 	void SetViewingDistance(float viewingDistance);
 
-private:
+protected:
 	EntitySensors       m_sensors;       // The sensor component for the entity
 	EntityCombatManager m_combatManager; // The manager responsible for updating the entities velocity and position
 };

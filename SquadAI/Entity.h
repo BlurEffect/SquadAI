@@ -11,6 +11,9 @@
 // Includes
 #include <DirectXMath.h>
 #include "EntityData.h"
+#include "Collider.h"
+#include "CircleCollider.h"
+#include "AxisAlignedRectangleCollider.h"
 
 // Forward declarations
 class TestEnvironment;
@@ -27,17 +30,19 @@ struct EntityInitData
 						   m_position(0.0f, 0.0f),
 						   m_rotation(0.0f),
 					 	   m_scale(1.0f),
-					  	   m_radius(0.0f),
+						   m_colliderType(ColliderType(0)),
+					  	   m_pCollider(nullptr),
 						   m_pEnvironment(nullptr)
 	{}
 	
-	EntityInitData(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, float radius, TestEnvironment* pEnvironment)
+	EntityInitData(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, ColliderType colliderType, Collider* pCollider, TestEnvironment* pEnvironment)
 						 : m_id(id), 
 						   m_type(type),
 						   m_position(position),
 						   m_rotation(rotation),
 						   m_scale(scale),
-						   m_radius(radius),
+						   m_colliderType(colliderType),
+						   m_pCollider(pCollider),
 						   m_pEnvironment(pEnvironment)
 	{}
 
@@ -46,7 +51,8 @@ struct EntityInitData
 	XMFLOAT2		 m_position;     // The position, where this entity is placed
 	float			 m_rotation;     // The z-axis rotation of the entity
 	float            m_scale;        // The uniform scale factor for the entity
-	float		     m_radius;       // The radius of a circle with centre in the entity's position that contains the entity
+	ColliderType     m_colliderType; // The type of the collider for this entity.
+	Collider*        m_pCollider;	 // The pointer to the collider that should be used to initialise this entity's collider
 	TestEnvironment* m_pEnvironment; // A pointer to the test environment the entity is "living" in
 };
 
@@ -59,6 +65,7 @@ public:
 
 	bool Initialise(const EntityInitData& initData);
 	virtual void Update(float deltaTime);
+	virtual void Activate(void);
 	virtual void Reset(void);
 
 	// Data access functions
@@ -67,7 +74,8 @@ public:
 	const XMFLOAT2&	 GetPosition(void) const;
 	float			 GetRotation(void) const;
 	float	         GetScale(void) const;
-	float		     GetRadius(void) const;
+	ColliderType     GetColliderType(void) const;
+	const Collider*  GetCollider(void) const;
 	TestEnvironment* GetTestEnvironment(void);
 
 	void SetId(unsigned long id);
@@ -75,17 +83,20 @@ public:
 	void SetPosition(const XMFLOAT2& position);
 	void SetRotation(float rotation);
 	void SetScale(float rotation);
-	void SetRadius(float rotation);
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 
 private:
-	unsigned long	 m_id;			 // A unique identifier for this entity, 0 is an invalid value
-	EntityType		 m_type;         // Identifies the type of this entity
-	XMFLOAT2		 m_position;     // The position, where this entity is placed
-	float			 m_rotation;     // The z-axis rotation of the entity
-	float            m_scale;        // The uniform scale factor for the entity
-	float		     m_radius;       // The radius of a circle with centre in the entity's position that contains the entity
-	TestEnvironment* m_pEnvironment; // A pointer to the test environment the entity is "living" in
+
+	bool CreateCollider(ColliderType type, Collider* pCollider);
+
+	unsigned long	 m_id;				  // A unique identifier for this entity, 0 is an invalid value
+	EntityType		 m_type;			  // Identifies the type of this entity
+	XMFLOAT2		 m_position;		  // The position, where this entity is placed
+	float			 m_rotation;		  // The z-axis rotation of the entity
+	float            m_scale;			  // The uniform scale factor for the entity
+	ColliderType     m_colliderType;      // The type of the collider associated to the entity
+	Collider*        m_pCollider;         // The collider associated to this entity
+	TestEnvironment* m_pEnvironment;	  // A pointer to the test environment the entity is "living" in
 };
 
 #endif // ENTITY_H

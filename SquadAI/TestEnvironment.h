@@ -22,10 +22,13 @@
 #include "TestEnvironmentData.h"
 #include "Soldier.h"
 #include "CoverPosition.h"
+#include "Projectile.h"
 #include "Node.h"
 #include "Pathfinder.h"
-#include "ApplicationSettings.h"
-
+#include "SoldierProperties.h"
+#include "ProjectileProperties.h"
+#include "CircleCollider.h"
+#include "AxisAlignedRectangleCollider.h"
 
 class FightingEntity;
 class MovingEntity;
@@ -45,6 +48,8 @@ public:
 
 	bool AddEntity(EntityType type, const XMFLOAT2& position, float rotation);
 	bool RemoveEntity(const XMFLOAT2& position);
+
+	bool AddProjectile(const XMFLOAT2& origin, const XMFLOAT2& target);
 
 	bool Save(std::string filename);
 	bool Load(std::string filename);
@@ -71,6 +76,7 @@ public:
 	const std::list<Soldier>& GetTeamA(void) const;
 	const std::list<Soldier>& GetTeamB(void) const;
 	const std::list<CoverPosition>& GetCoverSpots(void) const;
+	
 
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);
@@ -93,9 +99,10 @@ private:
 	unsigned int        m_numberOfGridPartitions; // The number of grid fields along x and y axis
 	float               m_gridSpacing;			  // The size of a grid field along x and y axis
 
-	std::list<Soldier>	     m_teamA;      // Holds the soldier entities associated to Team A
-	std::list<Soldier>	     m_teamB;      // Holds the soldier entities associated to Team B
-	std::list<CoverPosition> m_coverSpots; // Holds the cover objects that were placed in the environment
+	std::list<Soldier>	     m_teamA;       // Holds the soldier entities associated to Team A
+	std::list<Soldier>	     m_teamB;       // Holds the soldier entities associated to Team B
+	std::list<CoverPosition> m_coverSpots;  // Holds the cover objects that were placed in the environment
+	std::list<Projectile>    m_projectiles; // Holds the currently active projectiles
 
 	bool m_isPaused; // Tells whether the simulation running in the environment is currently paused
 

@@ -360,17 +360,17 @@ bool Renderer::InitialiseDrawables()
 bool Renderer::InitialiseEntityRenderData()
 {
 	m_entityRenderData[ASoldier].m_drawableType = TriangleType;
-	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	m_entityRenderData[ASoldier].m_name         = "A - Soldier";
 	m_entityRenderData[ASoldier].m_baseZ        = 1.0f;
 
 	m_entityRenderData[BSoldier].m_drawableType = TriangleType;
-	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	m_entityRenderData[BSoldier].m_name         = "B - Soldier";
 	m_entityRenderData[BSoldier].m_baseZ        = 1.0f;
 
 	m_entityRenderData[CoverSpot].m_drawableType = SquareType;
-	m_entityRenderData[CoverSpot].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	m_entityRenderData[CoverSpot].m_colour       = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_entityRenderData[CoverSpot].m_name         = "Cover Spot";
 	m_entityRenderData[CoverSpot].m_baseZ        = 0.0f;
 			
@@ -380,14 +380,14 @@ bool Renderer::InitialiseEntityRenderData()
 	m_entityRenderData[ADeadSoldier].m_baseZ        = -2.0f;
 	
 	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
-	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.2f, 0.0f, 1.0f);
+	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.2f, 1.0f);
 	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
 	m_entityRenderData[BDeadSoldier].m_baseZ        = -2.0f;
 
-	m_entityRenderData[Projectile].m_drawableType = CircleType;
-	m_entityRenderData[Projectile].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
-	m_entityRenderData[Projectile].m_name         = "Projectile";
-	m_entityRenderData[Projectile].m_baseZ        = -1.0f;
+	m_entityRenderData[ProjectileType].m_drawableType = CircleType;
+	m_entityRenderData[ProjectileType].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_entityRenderData[ProjectileType].m_name         = "Projectile";
+	m_entityRenderData[ProjectileType].m_baseZ        = -1.0f;
 
 	return true;
 }

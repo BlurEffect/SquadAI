@@ -14,13 +14,15 @@ Entity::Entity(void) : m_id(0),
 					   m_position(0.0f, 0.0f),
 					   m_rotation(0.0f),
 					   m_scale(1.0f),
-					   m_radius(0.0f),
+					   m_colliderType(ColliderType(0)),
+					   m_pCollider(nullptr),
 					   m_pEnvironment(nullptr)
 {
 }
 
 Entity::~Entity(void)
 {
+	delete m_pCollider;
 }
 
 //--------------------------------------------------------------------------------------
@@ -30,7 +32,7 @@ Entity::~Entity(void)
 //--------------------------------------------------------------------------------------
 bool Entity::Initialise(const EntityInitData& initData)
 {
-	if(!initData.m_pEnvironment)
+	if(!initData.m_pEnvironment || !initData.m_pCollider)
 	{
 		return false;
 	}
@@ -40,10 +42,38 @@ bool Entity::Initialise(const EntityInitData& initData)
 	m_position	   = initData.m_position;
 	m_rotation	   = initData.m_rotation;
 	m_scale		   = initData.m_scale;
-	m_radius	   = initData.m_radius;
 	m_pEnvironment = initData.m_pEnvironment;
 
-	return true;
+	return CreateCollider(initData.m_colliderType, initData.m_pCollider);
+}
+
+//--------------------------------------------------------------------------------------
+// Creates the collider for the entity.
+// Param1: The type of collider that should be created for this entity.
+// Param2: A pointer to the collider that should be used to initialise the entity's one.
+// Returns true if the collider was successfully created, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Entity::CreateCollider(ColliderType type, Collider* pCollider)
+{
+	if(m_pCollider)
+	{
+		delete m_pCollider;
+		m_pCollider = nullptr;
+	}
+
+	m_colliderType = type;
+
+	switch(type)
+	{
+	case CircleColliderType:
+		m_pCollider = new CircleCollider(*reinterpret_cast<CircleCollider*>(pCollider));
+		break;
+	case AxisAlignedRectangleColliderType:
+		m_pCollider = new AxisAlignedRectangleCollider(*reinterpret_cast<AxisAlignedRectangleCollider*>(pCollider));
+		break;
+	}
+
+	return (m_pCollider) ? true : false;
 }
 
 //--------------------------------------------------------------------------------------
@@ -55,6 +85,14 @@ void Entity::Update(float deltaTime)
 	// Do nothing
 }
 	
+//--------------------------------------------------------------------------------------
+// Activates the entity to start simulation.
+//--------------------------------------------------------------------------------------
+void Entity::Activate(void)
+{
+	// Do nothing
+}
+
 //--------------------------------------------------------------------------------------
 // Resets the entity
 //--------------------------------------------------------------------------------------
@@ -90,9 +128,14 @@ float Entity::GetScale(void) const
 	return m_scale;
 }
 	
-float Entity::GetRadius(void) const
+ColliderType Entity::GetColliderType(void) const
 {
-	return m_radius;
+	return m_colliderType;
+}
+	
+const Collider* Entity::GetCollider(void) const
+{
+	return m_pCollider;
 }
 
 TestEnvironment* Entity::GetTestEnvironment(void)
@@ -123,11 +166,6 @@ void Entity::SetRotation(float rotation)
 void Entity::SetScale(float scale)
 {
 	m_scale = scale;
-}
-
-void Entity::SetRadius(float radius)
-{
-	m_radius = radius;
 }
 
 void Entity::SetTestEnvironment(TestEnvironment* pEnvironment)

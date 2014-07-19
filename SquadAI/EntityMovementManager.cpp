@@ -55,8 +55,6 @@ bool EntityMovementManager::Initialise(MovingEntity* pEntity, const EntityMoveme
 	m_slowArrivalRadius			 = initData.m_slowArrivalRadius;
 	m_separationRadius			 = initData.m_separationRadius;
 
-	SetPathTo(XMFLOAT2(20.0f, 20.0f));
-
 	return true;
 }
 
@@ -67,10 +65,6 @@ bool EntityMovementManager::Initialise(MovingEntity* pEntity, const EntityMoveme
 //--------------------------------------------------------------------------------------
 void EntityMovementManager::Update(float deltaTime)
 {
-	FollowPath(m_targetReachedRadius);
-	AvoidObstacleCollisions();
-	Separate(m_separationRadius);
-
 	// Truncate steering force to not be greater than the maximal allowed force
 	float magnitude = 0.0f;
 	XMStoreFloat(&magnitude, XMVector2Length(XMLoadFloat2(&m_steeringForce)));
@@ -90,7 +84,7 @@ void EntityMovementManager::Update(float deltaTime)
 
 	if(magnitude > m_maxVelocity)
 	{
-		// Truncate the vector to be of the magnitude corresponding to the maximal allowed force
+		// Truncate the vector to be of the magnitude corresponding to the maximal allowed velocity
 		XMStoreFloat2(&newVelocity, XMVector2Normalize(XMLoadFloat2(&newVelocity)) * m_maxVelocity);
 	}
 
@@ -142,9 +136,10 @@ bool EntityMovementManager::SetPathTo(const XMFLOAT2& targetPosition)
 //--------------------------------------------------------------------------------------
 // Move the entity to a specified target position.
 // Param1: The target position of the entity.
-// Param2: The radius around the target position from which the entity will slow down upon approaching.
+// Param2: The radius around the target position from which the target counts as reached
+// Param3: The radius around the target position from which the entity will slow down upon approaching.
 //--------------------------------------------------------------------------------------
-void EntityMovementManager::Seek(const XMFLOAT2& targetPosition, float slowArrivalRadius)
+void EntityMovementManager::Seek(const XMFLOAT2& targetPosition, float targetReachedRadius, float slowArrivalRadius)
 {
 	XMFLOAT2 desiredVelocity;
 	XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&targetPosition) - XMLoadFloat2(&m_pEntity->GetPosition()));
@@ -162,6 +157,12 @@ void EntityMovementManager::Seek(const XMFLOAT2& targetPosition, float slowArriv
 	}else
 	{
 		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_maxVelocity);
+	}
+
+	// Target reached
+	if(distance <= targetReachedRadius)
+	{
+		desiredVelocity = XMFLOAT2(0.0f, 0.0f);
 	}
 
 	XMFLOAT2 force;
@@ -196,16 +197,19 @@ void EntityMovementManager::FollowPath(float nodeReachedRadius)
 				// Final destination reached, clear the path
 				m_path.clear();
 				m_velocity = XMFLOAT2(0.0f, 0.0f);
+
+				// Debug, remove this
+				m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetPosition(), XMFLOAT2(m_pEntity->GetPosition().x + 10, m_pEntity->GetPosition().y + 10));
 			}
 		}else
 		{
 			if(m_currentNode < m_path.size() - 1)
 			{
-				Seek(m_path[m_currentNode], 0.0f);
+				Seek(m_path[m_currentNode], nodeReachedRadius, 0.0f);
 			}else
 			{
 				// Slow arrival for the last node
-				Seek(m_path[m_currentNode], m_slowArrivalRadius);
+				Seek(m_path[m_currentNode], nodeReachedRadius, m_slowArrivalRadius);
 			}
 		}
 	}

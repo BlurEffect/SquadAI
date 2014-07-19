@@ -27,3 +27,21 @@ bool Soldier::Initialise(EntityInitData initData, const EntityMovementInitData& 
 {
 	return FightingEntity::Initialise(initData, movementInitData, sensorInitData, combatInitData);
 }
+
+//--------------------------------------------------------------------------------------
+// Updates the soldier entity.
+// Param1: The time in seconds passed since the last frame.
+//--------------------------------------------------------------------------------------
+void Soldier::Update(float deltaTime)
+{
+	m_movementManager.FollowPath(GetTargetReachedRadius());
+	m_movementManager.AvoidObstacleCollisions();
+	m_movementManager.Separate(GetSeparationRadius());
+
+	m_movementManager.Update(deltaTime);
+}
+
+void Soldier::Activate(void)
+{
+	m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
+}

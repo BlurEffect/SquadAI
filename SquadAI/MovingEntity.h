@@ -85,7 +85,7 @@ public:
 	void SetSlowArrivalRadius(float slowArrivalRadius);
 	void SetSeparationRadius(float separationRadius);
 
-private:
+protected:
 	EntityMovementManager    m_movementManager; // The manager responsible for updating the entities velocity and position
 };
 

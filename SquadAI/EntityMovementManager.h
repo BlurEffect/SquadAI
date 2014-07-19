@@ -30,6 +30,11 @@ public:
 
 	bool SetPathTo(const XMFLOAT2& targetPosition);
 
+	void FollowPath(float nodeReachedRadius);
+	void Seek(const XMFLOAT2& targetPosition, float targetReachedRadius, float slowArrivalRadius);
+	void AvoidObstacleCollisions(void);
+	void Separate(float separationRadius);
+
 	// Data access functions
 
 	const XMFLOAT2& GetVelocity(void) const;
@@ -53,10 +58,6 @@ public:
 	void SetSeparationRadius(float separationRadius);
 
 private:
-	void FollowPath(float nodeReachedRadius);
-	void Seek(const XMFLOAT2& targetPosition, float slowArrivalRadius);
-	void AvoidObstacleCollisions(void);
-	void Separate(float separationRadius);
 
 	MovingEntity* m_pEntity; // The entity that this movement manager is associated to
 

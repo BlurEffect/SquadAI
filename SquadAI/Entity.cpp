@@ -22,7 +22,11 @@ Entity::Entity(void) : m_id(0),
 
 Entity::~Entity(void)
 {
-	delete m_pCollider;
+	if(m_pCollider)
+	{
+		delete m_pCollider;
+		m_pCollider = nullptr;
+	}
 }
 
 //--------------------------------------------------------------------------------------

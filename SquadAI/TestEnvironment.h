@@ -86,7 +86,7 @@ private:
 	bool InitialiseGrid(void);
 	void CleanupGrid(void);
 	void UpdateCoverMap(Node& coverNode, bool doDelete);
-
+	bool CheckCollision(const MovingEntity* pEntity, const XMFLOAT2& oldPosition, EntityGroup entityGroup);
 
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
 
@@ -114,7 +114,7 @@ private:
 	{
 	public:
 		FindEntityById(unsigned long id) : m_id(id){}
-		bool operator()(EntityTypeName entity)
+		bool operator()(const EntityTypeName& entity)
 		{
 			return entity.GetId() == m_id;
 		}

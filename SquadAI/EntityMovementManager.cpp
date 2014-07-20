@@ -91,6 +91,8 @@ void EntityMovementManager::Update(float deltaTime)
 	// Set the new velocity and position on the entity
 
 	m_velocity = newVelocity;
+	//XMStoreFloat2(&m_velocity, XMLoadFloat2(&newVelocity) * deltaTime );
+		
 
 	XMFLOAT2 newPosition;
 	XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity) * deltaTime);
@@ -151,7 +153,7 @@ void EntityMovementManager::Seek(const XMFLOAT2& targetPosition, float targetRea
 	// Normalise the desired velocity
 	XMStoreFloat2(&desiredVelocity, XMVector2Normalize(XMLoadFloat2(&desiredVelocity)));
 
-	if(distance <= slowArrivalRadius)
+	if(distance <= slowArrivalRadius && slowArrivalRadius != 0.0f)
 	{
 		XMStoreFloat2(&desiredVelocity, XMLoadFloat2(&desiredVelocity) * m_maxVelocity * distance/slowArrivalRadius);
 	}else

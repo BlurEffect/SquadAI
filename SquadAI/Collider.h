@@ -26,9 +26,10 @@ class Collider
 {
 public:
 	Collider(const XMFLOAT2& centre);
-	~Collider(void);
+	virtual ~Collider(void);
 
 	virtual bool CheckLineCollision(const XMFLOAT2& lineStart, const XMFLOAT2& lineEnd) const = 0;
+	virtual bool CheckPointCollision(const XMFLOAT2& point) const = 0;
 
 	// Data access functions
 	const XMFLOAT2& GetCentre(void) const;

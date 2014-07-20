@@ -14,7 +14,7 @@
 using namespace DirectX;
 
 // Movement
-const float g_kProjectileMaxVelocity(20.0f);				// Determines how fast soldiers can move within the test environment
+const float g_kProjectileMaxVelocity(30.0f);				// Determines how fast soldiers can move within the test environment
 const float g_kProjectileMaxForce(20.0f);				    // Determines the maximum amount of forces that can impact the character
 const float g_kProjectileMaxSeeAhead(0.0f);				    // Determines how far the soldier can look ahead in order to check for collisions
 const float g_kProjectileMaxCollisionAvoidanceForce(0.0f);  // The maximal force that can result from avoiding collisions

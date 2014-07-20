@@ -95,6 +95,37 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		pRenderContext.AddInstance(CoverSpot, transform);
 	}
 
+
+	std::list<Projectile>::iterator it = m_projectiles.begin();
+	while(it != m_projectiles.end())
+	{
+		XMFLOAT2 oldPos = it->GetPosition();
+
+		if(!m_isPaused)
+		{
+			it->Update(deltaTime);
+		}
+
+		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
+		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
+		XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
+
+		XMFLOAT4X4 transform;
+		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
+		pRenderContext.AddInstance(ProjectileType, transform);
+
+		XMFLOAT2 newPos = it->GetPosition();
+
+		if(CheckCollision(&(*it), oldPos, GroupObstacles))
+		{
+			m_projectiles.erase(it++);
+		}else
+		{
+			++it;
+		}
+
+	}
+	/*
 	for(std::list<Projectile>::iterator it = m_projectiles.begin(); it != m_projectiles.end(); ++it)
 	{
 		if(!m_isPaused)
@@ -110,6 +141,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
 		pRenderContext.AddInstance(ProjectileType, transform);
 	}
+	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -184,9 +216,10 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 		}
 		break;
 	case CoverSpot:
-		CircleCollider collider(updatedPosition, m_gridSpacing);
+		AxisAlignedRectangleCollider collider(updatedPosition, m_gridSpacing, m_gridSpacing);
+
 		m_coverSpots.push_back(CoverPosition());
-		if(!m_coverSpots.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing,CircleColliderType, &collider, this)))
+		if(!m_coverSpots.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, AxisAlignedRectangleColliderType, &collider, this)))
 		{
 			m_coverSpots.pop_back();
 			return false;
@@ -231,7 +264,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 		{
 		case ASoldier:
 			{
-				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamA.begin(), m_teamA.end(), FindEntityById<Soldier>(deleteId));
+				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamA.begin(), m_teamA.end(), FindEntityById<Entity>(deleteId));
 
 				if(deleteIterator != m_teamA.end())
 				{
@@ -242,7 +275,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 			break;
 		case BSoldier:
 			{
-				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamB.begin(), m_teamB.end(), FindEntityById<Soldier>(deleteId));
+				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamB.begin(), m_teamB.end(), FindEntityById<Entity>(deleteId));
 
 				if(deleteIterator != m_teamB.end())
 				{
@@ -253,7 +286,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 			break;
 		case CoverSpot:
 			{
-				std::list<CoverPosition>::iterator deleteIterator = std::find_if(m_coverSpots.begin(), m_coverSpots.end(), FindEntityById<CoverPosition>(deleteId));
+				std::list<CoverPosition>::iterator deleteIterator = std::find_if(m_coverSpots.begin(), m_coverSpots.end(), FindEntityById<Entity>(deleteId));
 
 				if(deleteIterator != m_coverSpots.end())
 				{
@@ -311,7 +344,7 @@ void TestEnvironment::WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gr
 	// Assumes that the grid centre is at (0,0)
 
 	// Check for invalid world positions that don't lie within the grid
-	if(abs(worldPos.x) > (m_gridSize * 0.5f) || abs(worldPos.y) > (m_gridSize * 0.5f))
+	if(abs(worldPos.x) >= (m_gridSize * 0.5f) || abs(worldPos.y) >= (m_gridSize * 0.5f))
 	{
 		gridPos.x = -1.0f;
 		gridPos.y = -1.0f;
@@ -663,6 +696,94 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	}
 	*/
 	return pCollisionObject;
+}
+
+//--------------------------------------------------------------------------------------
+// Checks fro collisions between an entity and a specified group of other entities.
+// Param1: A pointer to the entity that should be checked for collision with other entities.
+// Param2: The previous position of the entity (during the last frame).
+// Param3: Specifies the group of entities that should be checked for collision with the given entity.
+// Returns true if the entity is about to collide with an entity of the specified group, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::CheckCollision(const MovingEntity* pEntity,  const XMFLOAT2& oldPosition, EntityGroup entityGroup)
+{
+	// Determine the points of the line that the colliders of other entities will be checked against
+	
+	// Current position of the entity
+	XMFLOAT2 start = oldPosition;//pEntity->GetPosition();
+	// The position, where the entity will at the end of the frame
+	XMFLOAT2 end = pEntity->GetPosition();
+	//XMStoreFloat2(&end, XMLoadFloat2(&start) + XMLoadFloat2(&pEntity->GetVelocity()));
+
+	if(entityGroup == GroupTeamA || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamAAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	{
+		// Check team A for collision
+		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+		{
+			if(it->GetCollider()->CheckLineCollision(start, end))
+			{
+				return true;
+			}
+		}
+	}
+
+	if(entityGroup == GroupTeamB || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamBAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	{
+		// Check team B for collision
+		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+		{
+			if(it->GetCollider()->CheckLineCollision(start, end))
+			{
+				return true;
+			}
+		}
+	}
+
+	if(entityGroup == GroupObstacles || entityGroup == GroupTeamAAndObstacles || entityGroup == GroupTeamBAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	{
+		float distance = 0.0f;
+		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&pEntity->GetPosition()) - XMLoadFloat2(&oldPosition)));
+
+		// Only check nearby obstacles for collision
+		unsigned int maxGridDistance = static_cast<unsigned int>(distance / m_gridSpacing) + 1;
+
+		// Get the current grid position of the entity
+		XMFLOAT2 gridPos;
+		WorldToGridPosition(pEntity->GetPosition(), gridPos);
+
+		unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
+		unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
+		unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+		unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+
+		// Check the grid within that distance for colliding obstacles
+		for(unsigned int i = startX; i <= endX; ++i)
+		{
+			for(unsigned int k = startY; k <= endY; ++k)
+			{
+				if(m_pGrid[i][k].m_type == CoverSpot)
+				{
+					if(m_pGrid[i][k].m_pEntity->GetCollider()->CheckLineCollision(start, end))
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		/*
+		// Check cover positions (obstacles) for collision
+		for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
+		{
+			if(it->GetCollider()->CheckLineCollision(start, end))
+			{
+				return true;
+			}
+		}
+		*/
+	}
+
+	return false;
 }
 
 //--------------------------------------------------------------------------------------

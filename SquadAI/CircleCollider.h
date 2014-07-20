@@ -20,6 +20,7 @@ public:
 	~CircleCollider(void);
 
 	bool CheckLineCollision(const XMFLOAT2& lineStart, const XMFLOAT2& lineEnd) const;
+	bool CheckPointCollision(const XMFLOAT2& point) const;
 
 	// Data access functions
 	float GetRadius(void) const;

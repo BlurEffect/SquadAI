@@ -21,6 +21,7 @@ public:
 	~AxisAlignedRectangleCollider(void);
 
 	bool CheckLineCollision(const XMFLOAT2& lineStart, const XMFLOAT2& lineEnd) const;
+	bool CheckPointCollision(const XMFLOAT2& point) const;
 
 	// Data access functions
 	float GetWidth(void) const;
@@ -32,8 +33,13 @@ private:
 
 	bool CheckLineSegmentsIntersection(const XMFLOAT2& line1Start, const XMFLOAT2& line1End, const XMFLOAT2& line2Start, const XMFLOAT2& line2End) const;
 
-	float m_width;
-	float m_height;
+	float	 m_width;		// The width of the rectangle making up the collider
+	float	 m_height;		// The height of the rectangle making up the collider
+
+	XMFLOAT2 m_topLeft;     // The upper left corner of the rectangle
+	XMFLOAT2 m_topRight;	// The upper right corner of the rectangle
+	XMFLOAT2 m_bottomLeft;	// The lower left corner of the rectangle
+	XMFLOAT2 m_bottomRight;	// The lower right corner of the rectangle
 };
 
 #endif // AXIS_ALIGNED_RECTANGLE_COLLIDER_H

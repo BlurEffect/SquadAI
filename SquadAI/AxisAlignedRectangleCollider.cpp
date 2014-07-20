@@ -11,6 +11,11 @@ AxisAlignedRectangleCollider::AxisAlignedRectangleCollider(const XMFLOAT2& centr
 																								                m_width(width),
 																												m_height(height)
 {
+	// Define the four corners of the rectangle
+	m_topLeft	  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
+	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
+	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
+	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
 }
 
 AxisAlignedRectangleCollider::~AxisAlignedRectangleCollider(void)
@@ -27,17 +32,10 @@ AxisAlignedRectangleCollider::~AxisAlignedRectangleCollider(void)
 bool AxisAlignedRectangleCollider::CheckLineCollision(const XMFLOAT2& lineStart, const XMFLOAT2& lineEnd) const
 {
 	// Determine intersections of the four lines making up the rectangle with the passed in line
-	
-	// Define the four corners of the rectangle
-	XMFLOAT2 topLeft = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
-	XMFLOAT2 topRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
-	XMFLOAT2 bottomLeft = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
-	XMFLOAT2 bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
 
 	// Check if the line is fully encompassed by the rectangle (if so the tests conducted below won't
 	// register an intersection).
-	if(lineStart.x >= bottomLeft.x && lineStart.y >= bottomLeft.y && lineStart.x <= bottomRight.x && lineStart.y <= topLeft.y &&
-	   lineEnd.x >= bottomLeft.x && lineEnd.y >= bottomLeft.y && lineEnd.x <= bottomRight.x && lineEnd.y <= topLeft.y)
+	if(CheckPointCollision(lineStart) && CheckPointCollision(lineEnd))
 	{
 		// Both line segment end points are encompassed by the rectangle
 		return true;
@@ -45,11 +43,22 @@ bool AxisAlignedRectangleCollider::CheckLineCollision(const XMFLOAT2& lineStart,
 
 	// Check the sides of the rectangle
 
-	return (CheckLineSegmentsIntersection(lineStart, lineEnd, bottomLeft, topLeft) ||     // left side
-			CheckLineSegmentsIntersection(lineStart, lineEnd, topLeft, topRight) ||       // top
-			CheckLineSegmentsIntersection(lineStart, lineEnd, bottomRight, topRight) ||   // right
-			CheckLineSegmentsIntersection(lineStart, lineEnd, bottomLeft, bottomRight));  // bottom
+	return (CheckLineSegmentsIntersection(lineStart, lineEnd, m_bottomLeft, m_topLeft) ||     // left side
+			CheckLineSegmentsIntersection(lineStart, lineEnd, m_topLeft, m_topRight) ||       // top
+			CheckLineSegmentsIntersection(lineStart, lineEnd, m_bottomRight, m_topRight) ||   // right
+			CheckLineSegmentsIntersection(lineStart, lineEnd, m_bottomLeft, m_bottomRight));  // bottom
 
+}
+
+//--------------------------------------------------------------------------------------
+// Checks for collision of a point with this collider.
+// Param1: The point to test.
+// Returns true if the point is within the collider, that includes touching its outer line,
+// false otherwise.
+//--------------------------------------------------------------------------------------
+bool AxisAlignedRectangleCollider::CheckPointCollision(const XMFLOAT2& point) const
+{
+	return point.x >= m_bottomLeft.x && point.y >= m_bottomLeft.y && point.x <= m_bottomRight.x && point.y <= m_topLeft.y;
 }
 
 //--------------------------------------------------------------------------------------
@@ -76,10 +85,14 @@ bool AxisAlignedRectangleCollider::CheckLineSegmentsIntersection(const XMFLOAT2&
 
 			// Check if the intersection point lies within both segments.
 			// Checking the x value is sufficient as it is already guaranteed that the point lies on the lines.
-			std::pair<float, float> line1MinMax = std::minmax<float>(line1Start.x, line1End.x);
-			std::pair<float, float> line2MinMax = std::minmax<float>(line2Start.x, line2End.x);
-			if((line1MinMax.first <= intersectionPoint.x  && intersectionPoint.x <= line1MinMax.second) ||
-			   (line2MinMax.first <= intersectionPoint.x  && intersectionPoint.x <= line2MinMax.second))
+			std::pair<float, float> line1XMinMax = std::minmax<float>(line1Start.x, line1End.x);
+			std::pair<float, float> line2XMinMax = std::minmax<float>(line2Start.x, line2End.x);
+			std::pair<float, float> line1YMinMax = std::minmax<float>(line1Start.y, line1End.y);
+			std::pair<float, float> line2YMinMax = std::minmax<float>(line2Start.y, line2End.y);
+			if((line1XMinMax.first <= intersectionPoint.x  && intersectionPoint.x <= line1XMinMax.second) &&
+			   (line2XMinMax.first <= intersectionPoint.x  && intersectionPoint.x <= line2XMinMax.second) &&
+			   (line1YMinMax.first <= intersectionPoint.y  && intersectionPoint.y <= line1YMinMax.second) &&
+			   (line2YMinMax.first <= intersectionPoint.y  && intersectionPoint.y <= line2YMinMax.second))
 			{
 				return true;
 			}

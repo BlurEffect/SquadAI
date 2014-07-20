@@ -362,32 +362,32 @@ bool Renderer::InitialiseEntityRenderData()
 	m_entityRenderData[ASoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	m_entityRenderData[ASoldier].m_name         = "A - Soldier";
-	m_entityRenderData[ASoldier].m_baseZ        = 1.0f;
+	m_entityRenderData[ASoldier].m_baseZ        = -1.0f;
 
 	m_entityRenderData[BSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	m_entityRenderData[BSoldier].m_name         = "B - Soldier";
-	m_entityRenderData[BSoldier].m_baseZ        = 1.0f;
+	m_entityRenderData[BSoldier].m_baseZ        = -1.0f;
 
 	m_entityRenderData[CoverSpot].m_drawableType = SquareType;
 	m_entityRenderData[CoverSpot].m_colour       = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_entityRenderData[CoverSpot].m_name         = "Cover Spot";
-	m_entityRenderData[CoverSpot].m_baseZ        = 0.0f;
+	m_entityRenderData[CoverSpot].m_baseZ        = -2.0f;
 			
 	m_entityRenderData[ADeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
 	m_entityRenderData[ADeadSoldier].m_name         = "A - Dead Soldier";
-	m_entityRenderData[ADeadSoldier].m_baseZ        = -2.0f;
+	m_entityRenderData[ADeadSoldier].m_baseZ        = 1.0f;
 	
 	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
 	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.2f, 1.0f);
 	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
-	m_entityRenderData[BDeadSoldier].m_baseZ        = -2.0f;
+	m_entityRenderData[BDeadSoldier].m_baseZ        = 1.0f;
 
 	m_entityRenderData[ProjectileType].m_drawableType = CircleType;
 	m_entityRenderData[ProjectileType].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 	m_entityRenderData[ProjectileType].m_name         = "Projectile";
-	m_entityRenderData[ProjectileType].m_baseZ        = -1.0f;
+	m_entityRenderData[ProjectileType].m_baseZ        = 0.0f;
 
 	return true;
 }
@@ -639,7 +639,7 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 
 	// Update the per object data according to the current instance
 	m_perObjectData.m_colour = g_kGridColour;
-	XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMMatrixIdentity() * XMLoadFloat4x4(&viewProjection));
+	XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, XMMatrixTranslation(0.0f, 0.0f, -5.0f) * XMLoadFloat4x4(&viewProjection));
 	// Update the shader's constant buffer
 	m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
 	// Render the grid drawable

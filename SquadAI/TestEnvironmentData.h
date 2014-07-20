@@ -27,6 +27,20 @@ enum Direction
 };
 
 //--------------------------------------------------------------------------------------
+// Used to distinguish between different groups of entities.
+//--------------------------------------------------------------------------------------
+enum EntityGroup
+{
+	GroupTeamA,
+	GroupTeamB,
+	GroupAllSoldiers,
+	GroupObstacles,
+	GroupTeamAAndObstacles,
+	GroupTeamBAndObstacles,
+	GroupAllSoldiersAndObstacles
+};
+
+//--------------------------------------------------------------------------------------
 // Holds the information associated to a grid field in edit mode.
 //--------------------------------------------------------------------------------------
 struct GridField

@@ -34,14 +34,16 @@ bool Soldier::Initialise(EntityInitData initData, const EntityMovementInitData& 
 //--------------------------------------------------------------------------------------
 void Soldier::Update(float deltaTime)
 {
-	m_movementManager.FollowPath(GetTargetReachedRadius());
+	//m_movementManager.FollowPath(GetTargetReachedRadius());
 	m_movementManager.AvoidObstacleCollisions();
 	m_movementManager.Separate(GetSeparationRadius());
+
+	m_movementManager.Seek(XMFLOAT2(10.0f, 10.0f), 1.0f, 0.0f);
 
 	m_movementManager.Update(deltaTime);
 }
 
 void Soldier::Activate(void)
 {
-	m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
+	m_movementManager.SetPathTo(XMFLOAT2(10.0f, 10.0f));
 }

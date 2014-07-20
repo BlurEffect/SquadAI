@@ -25,7 +25,7 @@ enum ColliderType
 class Collider
 {
 public:
-	Collider(const XMFLOAT2& centre);
+	Collider(ColliderType type, const XMFLOAT2& centre);
 	virtual ~Collider(void);
 
 	virtual bool CheckLineCollision(const XMFLOAT2& lineStart, const XMFLOAT2& lineEnd) const = 0;
@@ -33,10 +33,12 @@ public:
 
 	// Data access functions
 	const XMFLOAT2& GetCentre(void) const;
+	ColliderType	GetType(void) const;
 	void SetCentre(const XMFLOAT2& centre);
 
 private:
-	XMFLOAT2 m_centre;
+	ColliderType m_type;
+	XMFLOAT2     m_centre;
 };
 
 #endif // COLLIDER_H

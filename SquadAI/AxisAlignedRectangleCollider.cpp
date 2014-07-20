@@ -7,7 +7,7 @@
 // Includes
 #include "AxisAlignedRectangleCollider.h"
 
-AxisAlignedRectangleCollider::AxisAlignedRectangleCollider(const XMFLOAT2& centre, float width, float height) : Collider(centre),
+AxisAlignedRectangleCollider::AxisAlignedRectangleCollider(const XMFLOAT2& centre, float width, float height) : Collider(AxisAlignedRectangleColliderType, centre),
 																								                m_width(width),
 																												m_height(height)
 {

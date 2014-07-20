@@ -8,6 +8,7 @@
 // Includes
 #include "EntityCombatManager.h"
 #include "FightingEntity.h"
+#include "TestEnvironment.h"
 
 EntityCombatManager::EntityCombatManager(void)
 {
@@ -25,5 +26,21 @@ EntityCombatManager::~EntityCombatManager(void)
 //--------------------------------------------------------------------------------------
 bool EntityCombatManager::Initialise(FightingEntity* pEntity, const EntityCombatInitData& initData)
 {
+	if(!pEntity)
+	{
+		return false;
+	}
+
+	m_pEntity = pEntity;
+
 	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Fires a projectile towards a specified target position.
+// Param1: The target position to shoot at.
+//--------------------------------------------------------------------------------------
+void EntityCombatManager::ShootAt(const XMFLOAT2& target)
+{
+	m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetPosition(), target);
 }

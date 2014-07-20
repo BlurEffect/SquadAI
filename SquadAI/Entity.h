@@ -74,7 +74,6 @@ public:
 	const XMFLOAT2&	 GetPosition(void) const;
 	float			 GetRotation(void) const;
 	float	         GetScale(void) const;
-	ColliderType     GetColliderType(void) const;
 	const Collider*  GetCollider(void) const;
 	TestEnvironment* GetTestEnvironment(void);
 
@@ -94,7 +93,6 @@ private:
 	XMFLOAT2		 m_position;		  // The position, where this entity is placed
 	float			 m_rotation;		  // The z-axis rotation of the entity
 	float            m_scale;			  // The uniform scale factor for the entity
-	ColliderType     m_colliderType;      // The type of the collider associated to the entity
 	Collider*        m_pCollider;         // The collider associated to this entity
 	TestEnvironment* m_pEnvironment;	  // A pointer to the test environment the entity is "living" in
 };

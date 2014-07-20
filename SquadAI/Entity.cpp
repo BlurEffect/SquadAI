@@ -14,7 +14,6 @@ Entity::Entity(void) : m_id(0),
 					   m_position(0.0f, 0.0f),
 					   m_rotation(0.0f),
 					   m_scale(1.0f),
-					   m_colliderType(ColliderType(0)),
 					   m_pCollider(nullptr),
 					   m_pEnvironment(nullptr)
 {
@@ -64,8 +63,6 @@ bool Entity::CreateCollider(ColliderType type, Collider* pCollider)
 		delete m_pCollider;
 		m_pCollider = nullptr;
 	}
-
-	m_colliderType = type;
 
 	switch(type)
 	{
@@ -130,11 +127,6 @@ float Entity::GetRotation(void) const
 float Entity::GetScale(void) const
 {
 	return m_scale;
-}
-	
-ColliderType Entity::GetColliderType(void) const
-{
-	return m_colliderType;
 }
 	
 const Collider* Entity::GetCollider(void) const

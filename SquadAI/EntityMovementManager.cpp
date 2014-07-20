@@ -201,7 +201,7 @@ void EntityMovementManager::FollowPath(float nodeReachedRadius)
 				m_velocity = XMFLOAT2(0.0f, 0.0f);
 
 				// Debug, remove this
-				m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetPosition(), XMFLOAT2(m_pEntity->GetPosition().x + 10, m_pEntity->GetPosition().y + 10));
+				//m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetPosition(), XMFLOAT2(m_pEntity->GetPosition().x + 10, m_pEntity->GetPosition().y + 10));
 			}
 		}else
 		{
@@ -221,18 +221,57 @@ void EntityMovementManager::FollowPath(float nodeReachedRadius)
 // Calculate the collision avoidance force and add it to the total force. This force 
 // is used to avoid collisions of the entity with static obstacles in the environment, 
 // such as walls.
+// Param1: Obstacles within this radius around the entity will be avoided.
 //--------------------------------------------------------------------------------------
-void EntityMovementManager::AvoidObstacleCollisions()
+void EntityMovementManager::AvoidObstacleCollisions(float avoidanceRadius)
 {
+	std::multimap<float, Entity*> nearbyEntities;
+
+	m_pEntity->GetTestEnvironment()->GetNearbyEntities(m_pEntity, avoidanceRadius, GroupObstacles, nearbyEntities);
+
+	if(!nearbyEntities.empty())
+	{
+		
+		XMVECTOR avoidanceForce = XMVectorZero();
+
+		for(std::multimap<float, Entity*>::iterator it = nearbyEntities.begin(); it != nearbyEntities.end(); ++it)
+		{
+			avoidanceForce += XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&(it->second->GetPosition()));
+		}
+
+		// Truncate the avoidance force
+		avoidanceForce = XMVector2Normalize(avoidanceForce) * m_maxCollisionAvoidanceForce;
+		
+		// Add the collision avoidance force to the accumulated steering force
+		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + avoidanceForce);
+		
+
+		//XMVECTOR avoidanceForce;
+
+		//std::multimap<float, Entity*>::iterator first = nearbyEntities.begin();
+
+	}
+
+
+	/* old working version
 	const Entity* pCollisionObject = m_pEntity->GetTestEnvironment()->GetCollisionObject(*m_pEntity);
-	
+
 	if(pCollisionObject != nullptr)
 	{
 		XMVECTOR ahead = XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_velocity)) * m_maxSeeAhead;
 
 		XMFLOAT2 avoidanceForce;
+
+		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * m_maxCollisionAvoidanceForce);
 		
-		//
+		// Add the collision avoidance force to the accumulated steering force
+		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&avoidanceForce));
+	}*/
+
+
+
+	// Alt implementation, push velocity vector perpendicular
+	//
 		/*
 		XMFLOAT2 a = m_pEntity->GetPosition();
 		a.x += m_pEntity->GetTestEnvironment()->GetGridSize() * 0.5f;
@@ -269,12 +308,6 @@ void EntityMovementManager::AvoidObstacleCollisions()
 		}
 		*/
 		//
-
-		XMStoreFloat2(&avoidanceForce, XMVector2Normalize(ahead - XMLoadFloat2(&pCollisionObject->GetPosition())) * m_maxCollisionAvoidanceForce);
-		
-		// Add the collision avoidance force to the accumulated steering force
-		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&avoidanceForce));
-	}
 }
 
 //--------------------------------------------------------------------------------------

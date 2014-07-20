@@ -62,6 +62,8 @@ public:
 	void WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gridPos) const;
 	void GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const;
 
+	void GetNearbyEntities(const Entity* pEntity, float radius, EntityGroup entityGroup, std::multimap<float, Entity*>& collisionObjects);
+
 	const Entity* GetCollisionObject(const MovingEntity& entity); 
 	bool          CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);
 

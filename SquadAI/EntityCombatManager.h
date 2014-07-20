@@ -24,8 +24,10 @@ public:
 	~EntityCombatManager(void);
 
 	bool Initialise(FightingEntity* pEntity, const EntityCombatInitData& initData);
-private:
+	void ShootAt(const XMFLOAT2& target);
 
+private:
+	FightingEntity* m_pEntity; // The entity that this combat manager is associated to
 };
 
 #endif // ENTITY_COMBAT_MANAGER_H

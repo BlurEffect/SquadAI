@@ -7,7 +7,7 @@
 // Includes
 #include "CircleCollider.h"
 
-CircleCollider::CircleCollider(const XMFLOAT2& centre, float radius) : Collider(centre),
+CircleCollider::CircleCollider(const XMFLOAT2& centre, float radius) : Collider(CircleColliderType, centre),
 																	   m_radius(radius)
 {
 }

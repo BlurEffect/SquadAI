@@ -11,6 +11,7 @@
 // Includes
 #include <DirectXMath.h>
 #include <vector>
+#include <map>
 
 // Forward declarations
 class MovingEntity;
@@ -32,7 +33,7 @@ public:
 
 	void FollowPath(float nodeReachedRadius);
 	void Seek(const XMFLOAT2& targetPosition, float targetReachedRadius, float slowArrivalRadius);
-	void AvoidObstacleCollisions(void);
+	void AvoidObstacleCollisions(float avoidanceRadius);
 	void Separate(float separationRadius);
 
 	// Data access functions

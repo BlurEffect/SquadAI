@@ -320,6 +320,11 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 //--------------------------------------------------------------------------------------
 bool TestEnvironment::AddProjectile(const XMFLOAT2& origin, const XMFLOAT2& target)
 {
+	if((origin.x == target.x) && (origin.y == target.y))
+	{
+		return false;
+	}
+
 	CircleCollider collider(origin, m_gridSpacing * g_kProjectileScale * 0.5f);
 	m_projectiles.push_back(Projectile());
 	if(!m_projectiles.back().Initialise(target,
@@ -468,6 +473,85 @@ bool TestEnvironment::Load(std::string filename)
 
 	// Opening of the file failed
 	return false;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines the entities of a specific group that are within a specified circle-shaped
+// area around a given entity. This checks against the centres of entities. Does not include
+// the entity itself in the return list.
+// Param1: A pointer to the entity, for which the nearby entities should be found.
+// Param2: The radius of the circle area.
+// Param3: Specifies which set of entities will be checked and returned.
+// Param4: A multimap that will hold the entities positioned within the radius, 
+//         sorted by the square distance to the entity as key elements.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, EntityGroup entityGroup, std::multimap<float, Entity*>& collisionObjects)
+{
+	float squareRadius = radius * radius;
+	float squareDistance = 0.0f;
+
+	if(entityGroup == GroupTeamA || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamAAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	{
+		// Check team A
+		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+		{
+			if(it->GetId() != pEntity->GetId())
+			{
+				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
+				if(squareDistance <= squareRadius)
+				{
+					collisionObjects.insert(std::pair<float, Entity*>(squareDistance,(&(*it))));
+				}
+			}
+		}
+	}
+
+	if(entityGroup == GroupTeamB || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamBAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	{
+		// Check team B for collision
+		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+		{
+			if(it->GetId() != pEntity->GetId())
+			{
+				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
+				if(squareDistance <= squareRadius)
+				{
+					collisionObjects.insert(std::pair<float, Entity*>(squareDistance,(&(*it))));
+				}
+			}
+		}
+	}
+
+	if(entityGroup == GroupObstacles || entityGroup == GroupTeamAAndObstacles || entityGroup == GroupTeamBAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	{
+		// Only check nearby obstacles for collision
+		unsigned int maxGridDistance = static_cast<unsigned int>(radius / m_gridSpacing) + 1;
+
+		// Get the current grid position of the entity
+		XMFLOAT2 gridPos;
+		WorldToGridPosition(pEntity->GetPosition(), gridPos);
+
+		unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
+		unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
+		unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+		unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+
+		// Check the grid within that distance for colliding obstacles
+		for(unsigned int i = startX; i <= endX; ++i)
+		{
+			for(unsigned int k = startY; k <= endY; ++k)
+			{
+				if((m_pGrid[i][k].m_type == CoverSpot) && (m_pGrid[i][k].m_id != pEntity->GetId()))
+				{
+					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
+					if(squareDistance <= squareRadius)
+					{
+						collisionObjects.insert(std::pair<float, Entity*>(squareDistance, m_pGrid[i][k].m_pEntity));
+					}
+				}
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------

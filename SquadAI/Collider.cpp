@@ -8,7 +8,8 @@
 // Includes
 #include "Collider.h"
 
-Collider::Collider(const XMFLOAT2& centre) : m_centre(centre)
+Collider::Collider(ColliderType type, const XMFLOAT2& centre) : m_type(type),
+																m_centre(centre)
 {
 }
 
@@ -21,6 +22,11 @@ Collider::~Collider(void)
 const XMFLOAT2& Collider::GetCentre(void) const
 {
 	return m_centre;
+}
+
+ColliderType Collider::GetType(void) const
+{
+	return m_type;
 }
 
 void Collider::SetCentre(const XMFLOAT2& centre)

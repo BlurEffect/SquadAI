@@ -375,12 +375,12 @@ bool Renderer::InitialiseEntityRenderData()
 	m_entityRenderData[CoverSpot].m_baseZ        = -2.0f;
 			
 	m_entityRenderData[ADeadSoldier].m_drawableType = TriangleType;
-	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
+	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
 	m_entityRenderData[ADeadSoldier].m_name         = "A - Dead Soldier";
 	m_entityRenderData[ADeadSoldier].m_baseZ        = 1.0f;
 	
 	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
-	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.2f, 1.0f);
+	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
 	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
 	m_entityRenderData[BDeadSoldier].m_baseZ        = 1.0f;
 

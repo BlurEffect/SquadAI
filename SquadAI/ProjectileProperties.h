@@ -24,6 +24,8 @@ const float g_kProjectileSlowArrivalRadius(0.0f);			// When this close to the fi
 const float g_kProjectileSeparationRadius(0.0f);			// When an entity registers other entities within this radius it will steer for separation from them
 
 // Other
-const float g_kProjectileScale(0.2f); // Determines how big projectiles are in relation to a grid field
+const float g_kProjectileScale(0.2f);   // Determines how big projectiles are in relation to a grid field
+const float g_kProjectileDamage(20.0f); // The damage that an entity suffers when hit by a hostile projectile.
+
 
 #endif // PROJECTILE_PROPERTIES_H

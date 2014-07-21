@@ -44,7 +44,18 @@ void FightingEntity::Update(float deltaTime)
 //--------------------------------------------------------------------------------------
 void FightingEntity::Reset(void)
 {
+	m_combatManager.Reset();
 	MovingEntity::Reset();
+}
+
+//--------------------------------------------------------------------------------------
+// Called when the entity is hit by a hostile projectile.
+// Param1: The target position to shoot at.
+// Param2: The velocity of the projectile that hit the entity. Used to determine the position of the threat.
+//--------------------------------------------------------------------------------------
+void FightingEntity::Hit(float damage, const XMFLOAT2& direction)
+{
+	m_combatManager.Hit(damage, direction);
 }
 
 // Data access functions
@@ -59,6 +70,21 @@ float FightingEntity::GetViewingDistance(void) const
 	return m_sensors.GetViewingDistance();
 }
 
+float FightingEntity::GetCurrentHealth(void) const
+{
+	return m_combatManager.GetCurrentHealth();
+}
+
+float FightingEntity::GetMaximalHealth(void) const
+{
+	return m_combatManager.GetMaximalHealth();
+}
+
+float FightingEntity::IsAlive(void) const
+{
+	return m_combatManager.IsAlive();
+}
+
 void FightingEntity::SetFieldOfView(float fieldOfView)
 {
 	m_sensors.SetFieldOfView(fieldOfView);
@@ -67,4 +93,9 @@ void FightingEntity::SetFieldOfView(float fieldOfView)
 void FightingEntity::SetViewingDistance(float viewingDistance)
 {
 	m_sensors.SetViewingDistance(viewingDistance);
+}
+
+void FightingEntity::SetCurrentHealth(float health)
+{
+	return m_combatManager.SetCurrentHealth(health);
 }

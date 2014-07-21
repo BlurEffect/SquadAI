@@ -18,17 +18,20 @@ Projectile::~Projectile(void)
 
 //--------------------------------------------------------------------------------------
 // Initialises the projectile entity.
-// Param1: The target position for the projectile.
-// Param2: The basic initialisation data for the entity.
-// Param3: The movement specific initialisation data for the entity.
+// Param1: The type of the entity that fired this projectile.
+// Param2: The target position for the projectile.
+// Param3: The basic initialisation data for the entity.
+// Param4: The movement specific initialisation data for the entity.
 // Returns true if the projectile entity was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Projectile::Initialise(const XMFLOAT2& target, const EntityInitData& initData, const EntityMovementInitData& movementInitData)
+bool Projectile::Initialise(EntityType originType, const XMFLOAT2& target, const EntityInitData& initData, const EntityMovementInitData& movementInitData)
 {
 	if(!MovingEntity::Initialise(initData, movementInitData))
 	{
 		return false;
 	}
+
+	m_originType = originType;
 
 	// Set the velocity for the projectile (will be constant throughout)
 	XMFLOAT2 velocity;
@@ -54,4 +57,11 @@ void Projectile::Update(float deltaTime)
 	m_movementManager.Seek(target, GetTargetReachedRadius(), GetSlowArrivalRadius());
 
 	MovingEntity::Update(deltaTime);
+}
+
+// Data access functions
+
+EntityType Projectile::GetOriginType(void) const
+{
+	return m_originType;
 }

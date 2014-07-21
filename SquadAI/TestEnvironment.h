@@ -17,6 +17,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <limits>
 
 #include "RenderContext.h"
 #include "TestEnvironmentData.h"
@@ -49,7 +50,7 @@ public:
 	bool AddEntity(EntityType type, const XMFLOAT2& position, float rotation);
 	bool RemoveEntity(const XMFLOAT2& position);
 
-	bool AddProjectile(const XMFLOAT2& origin, const XMFLOAT2& target);
+	bool AddProjectile(EntityType originType, const XMFLOAT2& origin, const XMFLOAT2& target);
 
 	bool Save(std::string filename);
 	bool Load(std::string filename);
@@ -88,7 +89,7 @@ private:
 	bool InitialiseGrid(void);
 	void CleanupGrid(void);
 	void UpdateCoverMap(Node& coverNode, bool doDelete);
-	bool CheckCollision(const MovingEntity* pEntity, const XMFLOAT2& oldPosition, EntityGroup entityGroup);
+	bool CheckCollision(const MovingEntity* pEntity, const XMFLOAT2& oldPosition, EntityGroup entityGroup, Entity*& outCollisionEntity);
 
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
 

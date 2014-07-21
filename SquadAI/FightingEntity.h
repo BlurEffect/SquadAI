@@ -56,15 +56,19 @@ public:
 	bool Initialise(const EntityInitData& initData, const EntityMovementInitData& movementInitData, const EntitySensorInitData& sensorInitData, const EntityCombatInitData& combatInitData);
 	virtual void Update(float deltaTime);
 	virtual void Reset(void);
+	virtual void Hit(float damage, const XMFLOAT2& direction);
 
 	// Data access functions
 
 	float GetFieldOfView(void) const;
 	float GetViewingDistance(void) const;
+	float GetCurrentHealth(void) const;
+	float GetMaximalHealth(void) const;
+	float IsAlive(void) const;
 
 	void SetFieldOfView(float fieldOfView);
 	void SetViewingDistance(float viewingDistance);
-
+	void SetCurrentHealth(float health);
 protected:
 	EntitySensors       m_sensors;       // The sensor component for the entity
 	EntityCombatManager m_combatManager; // The manager responsible for updating the entities velocity and position

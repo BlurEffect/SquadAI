@@ -29,5 +29,6 @@ const float g_kSoldierFieldOfView(XM_PI/6.0f); // Determines the field of view o
 const float g_kSoldierViewingDistance(10.0f);  // Determines how far soldiers can see in order to spot enemies
 
 // Combat
+const float g_kSoldierMaxHealth(100.0f); // The maximal health of a soldier entity.
 
 #endif // SOLDIER_PROPERTIES_H

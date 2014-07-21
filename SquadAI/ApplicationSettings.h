@@ -35,4 +35,5 @@ const float    g_kBackgroundColour[4] = {0.0f, 0.0f, 0.0f, 1.0f}; // The colour 
 const XMFLOAT4 g_kGridColour(1.0f, 1.0f, 1.0f, 1.0f);			  // The colour of the grid representing the test environment
 
 
+
 #endif // APPLICATION_SETTINGS_H

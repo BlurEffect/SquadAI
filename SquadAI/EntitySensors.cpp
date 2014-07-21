@@ -65,33 +65,37 @@ void EntitySensors::CheckForThreats(void)
 		{
 			// Check if enemy is within line of sight and within visibiliy range
 
-			// Get the vector from the entity to the enemy
-			XMFLOAT2 toEnemyVector;
-			XMStoreFloat2(&toEnemyVector, XMLoadFloat2(&(*it)->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition()));
-
-			// Check the distance to the enemy
-			float squareDistanceToEnemy = 0.0f;
-			XMStoreFloat(&squareDistanceToEnemy, XMVector2Dot(XMLoadFloat2(&toEnemyVector), XMLoadFloat2(&toEnemyVector)));
-
-			// Check if enemy is in range
-			if(squareViewingDistance < squareViewingDistance)
+			if((*it)->IsAlive())
 			{
-				// Get the angle between the vectors
-				float angle = 0.0f;
-				XMStoreFloat(&angle, XMVector2AngleBetweenVectors(XMLoadFloat2(&viewVector), XMLoadFloat2(&toEnemyVector)));
-				
-				// Check if enemy is in field of view
-				if(abs(angle) <= m_fieldOfView)
-				{
-					XMFLOAT2 enemyGridPos;
-					m_pEntity->GetTestEnvironment()->WorldToGridPosition((*it)->GetPosition(), enemyGridPos);
 
-					// Check if enemy is visible or hidden behind an obstacle
-					if(m_pEntity->GetTestEnvironment()->CheckLineOfSight(static_cast<int>(gridPos.x), static_cast<int>(gridPos.y), static_cast<int>(enemyGridPos.x), static_cast<int>(enemyGridPos.y)))
+				// Get the vector from the entity to the enemy
+				XMFLOAT2 toEnemyVector;
+				XMStoreFloat2(&toEnemyVector, XMLoadFloat2(&(*it)->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition()));
+
+				// Check the distance to the enemy
+				float squareDistanceToEnemy = 0.0f;
+				XMStoreFloat(&squareDistanceToEnemy, XMVector2Dot(XMLoadFloat2(&toEnemyVector), XMLoadFloat2(&toEnemyVector)));
+
+				// Check if enemy is in range
+				if(squareViewingDistance < squareViewingDistance)
+				{
+					// Get the angle between the vectors
+					float angle = 0.0f;
+					XMStoreFloat(&angle, XMVector2AngleBetweenVectors(XMLoadFloat2(&viewVector), XMLoadFloat2(&toEnemyVector)));
+				
+					// Check if enemy is in field of view
+					if(abs(angle) <= m_fieldOfView)
 					{
-						// Add threat
-					}
-				}	
+						XMFLOAT2 enemyGridPos;
+						m_pEntity->GetTestEnvironment()->WorldToGridPosition((*it)->GetPosition(), enemyGridPos);
+
+						// Check if enemy is visible or hidden behind an obstacle
+						if(m_pEntity->GetTestEnvironment()->CheckLineOfSight(static_cast<int>(gridPos.x), static_cast<int>(gridPos.y), static_cast<int>(enemyGridPos.x), static_cast<int>(enemyGridPos.y)))
+						{
+							// Add threat
+						}
+					}	
+				}
 			}
 		}
 	}

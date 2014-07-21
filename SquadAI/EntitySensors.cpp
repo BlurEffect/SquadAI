@@ -57,7 +57,8 @@ void EntitySensors::CheckForThreats(void)
 
 		// Get the vector that represents the direction the entity is looking to
 		XMFLOAT2 viewVector;
-		XMStoreFloat2(&viewVector, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&m_pEntity->GetVelocity()));
+		//XMStoreFloat2(&viewVector, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&m_pEntity->GetVelocity()));
+		XMStoreFloat2(&viewVector, XMLoadFloat2(&m_pEntity->GetViewDirection()));
 
 		float squareViewingDistance = m_viewingDistance * m_viewingDistance;
 
@@ -77,7 +78,7 @@ void EntitySensors::CheckForThreats(void)
 				XMStoreFloat(&squareDistanceToEnemy, XMVector2Dot(XMLoadFloat2(&toEnemyVector), XMLoadFloat2(&toEnemyVector)));
 
 				// Check if enemy is in range
-				if(squareViewingDistance < squareViewingDistance)
+				if(squareDistanceToEnemy <= squareViewingDistance)
 				{
 					// Get the angle between the vectors
 					float angle = 0.0f;
@@ -92,6 +93,7 @@ void EntitySensors::CheckForThreats(void)
 						// Check if enemy is visible or hidden behind an obstacle
 						if(m_pEntity->GetTestEnvironment()->CheckLineOfSight(static_cast<int>(gridPos.x), static_cast<int>(gridPos.y), static_cast<int>(enemyGridPos.x), static_cast<int>(enemyGridPos.y)))
 						{
+							return;
 							// Add threat
 						}
 					}	

@@ -74,6 +74,7 @@ public:
 	float           GetTargetReachedRadius(void) const;
 	float           GetSlowArrivalRadius(void) const;
 	float           GetSeparationRadius(void) const;
+	const XMFLOAT2& GetViewDirection(void) const;
 
 	void SetVelocity(const XMFLOAT2& velocity);
 	void SetMaxVelocity(float maxVelocity);

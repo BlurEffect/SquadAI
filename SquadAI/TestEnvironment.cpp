@@ -596,7 +596,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	Entity* pCollisionObject = nullptr;
 
 	// The normalised movement direction of the entity
-	XMVECTOR normDirection = XMVector2Normalize(XMLoadFloat2(&entity.GetVelocity()));
+	XMVECTOR normDirection = XMVector2Normalize(XMLoadFloat2(&entity.GetViewDirection()));
 
 	/*
 	// Check other soldiers for collisions
@@ -687,6 +687,52 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	}
 	*/
 
+	XMFLOAT2 lineEndPoint;
+	XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&entity.GetPosition()) + normDirection * entity.GetMaxSeeAhead());
+	
+	/*
+	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+	{
+		// Don't check for collision of the entity with itself
+		if(it->GetId() != entity.GetId())
+		{
+			if(it->GetCollider()->CheckLineCollision(entity.GetPosition(), lineEndPoint))
+			{
+				XMVECTOR colObjectToEntity = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&entity.GetPosition());
+				// Get the square distance between the object and the entity
+				float distance; 
+				XMStoreFloat(&distance, XMVector2Dot(colObjectToEntity, colObjectToEntity));
+
+				if(distance <= shortestCollisionDistance)
+				{
+					pCollisionObject = &(*it);
+					shortestCollisionDistance = distance;
+				}
+			}
+		}
+	}
+
+	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
+	{
+		// Don't check for collision of the entity with itself
+		if(it->GetId() != entity.GetId())
+		{
+			if(it->GetCollider()->CheckLineCollision(entity.GetPosition(), lineEndPoint))
+			{
+				XMVECTOR colObjectToEntity = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&entity.GetPosition());
+				// Get the square distance between the object and the entity
+				float distance; 
+				XMStoreFloat(&distance, XMVector2Dot(colObjectToEntity, colObjectToEntity));
+
+				if(distance <= shortestCollisionDistance)
+				{
+					pCollisionObject = &(*it);
+					shortestCollisionDistance = distance;
+				}
+			}
+		}
+	}
+	*/
 	// This approach is faster than the commented one below
 	// The number of grid fields that the entity can maximally see ahead
 	unsigned int maxGridDistance = static_cast<unsigned int>(entity.GetMaxSeeAhead() / m_gridSpacing) + 1;
@@ -694,6 +740,9 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	// Get the current grid position of the entity
 	XMFLOAT2 gridPos;
 	WorldToGridPosition(entity.GetPosition(), gridPos);
+
+	
+				
 
 	unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
 	unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
@@ -707,8 +756,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 		{
 			if(!m_pGrid[i][k].m_isEmpty && m_pGrid[i][k].m_type == CoverSpot)
 			{
-				XMFLOAT2 lineEndPoint;
-				XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&entity.GetPosition()) + normDirection * entity.GetMaxSeeAhead());
+				
 				
 				if(m_pGrid[i][k].m_pEntity->GetCollider()->CheckLineCollision(entity.GetPosition(), lineEndPoint))
 				{

@@ -21,6 +21,7 @@ EntityMovementManager::EntityMovementManager(void) : m_pEntity(nullptr),
 													 m_targetReachedRadius(0.0f),
 													 m_slowArrivalRadius(0.0f),
 													 m_separationRadius(0.0f),
+													 m_viewDirection(0.0f, 1.0f),
 													 m_steeringForce(0.0f, 0.0f),
 													 m_currentNode(0),
 													 m_seekTarget(0.0f, 0.0f)
@@ -55,7 +56,31 @@ bool EntityMovementManager::Initialise(MovingEntity* pEntity, const EntityMoveme
 	m_slowArrivalRadius			 = initData.m_slowArrivalRadius;
 	m_separationRadius			 = initData.m_separationRadius;
 
+	SetInitialViewDirection();
+
 	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Initialises the view direction variable based on the initial rotation of the entity.
+//--------------------------------------------------------------------------------------
+void EntityMovementManager::SetInitialViewDirection(void)
+{
+	// Only four possible start values
+	if(m_pEntity->GetRotation() == 0.0f)
+	{
+		m_viewDirection = XMFLOAT2(0.0f, 1.0f);
+	}else if(m_pEntity->GetRotation() == 90.0f)
+	{
+		m_viewDirection = XMFLOAT2(1.0f, 0.0f);
+	}else if(m_pEntity->GetRotation() == 180.0f)
+	{
+		m_viewDirection = XMFLOAT2(0.0f, -1.0f);
+	}else
+	{
+		// 270 degrees rotation
+		m_viewDirection = XMFLOAT2(-1.0f, 0.0f);
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -100,8 +125,12 @@ void EntityMovementManager::Update(float deltaTime)
 	m_pEntity->SetPosition(newPosition);
 
 	// Update the rotation to make the entity face the direction, in which it is moving
-	float rotation = (atan2(newVelocity.x, newVelocity.y)) * 180 / XM_PI;
-	m_pEntity->SetRotation(rotation);
+	if(!(newVelocity.x == 0.0f && newVelocity.y == 0.0f))
+	{
+		m_viewDirection = newVelocity;
+		float rotation = (atan2(m_viewDirection.x, m_viewDirection.y)) * 180 / XM_PI;
+		m_pEntity->SetRotation(rotation);
+	}
 
 	// Reset the steering force for the next frame
 	m_steeringForce.x = 0.0f;
@@ -223,41 +252,19 @@ void EntityMovementManager::FollowPath(float nodeReachedRadius)
 // such as walls.
 // Param1: Obstacles within this radius around the entity will be avoided.
 //--------------------------------------------------------------------------------------
-void EntityMovementManager::AvoidObstacleCollisions(float avoidanceRadius)
+void EntityMovementManager::AvoidObstacleCollisions()
 {
-	std::multimap<float, Entity*> nearbyEntities;
-
-	m_pEntity->GetTestEnvironment()->GetNearbyEntities(m_pEntity, avoidanceRadius, GroupObstacles, nearbyEntities);
-
-	if(!nearbyEntities.empty())
+	if(m_velocity.x == 0.0f && m_velocity.y == 0.0f)
 	{
-		
-		XMVECTOR avoidanceForce = XMVectorZero();
-
-		for(std::multimap<float, Entity*>::iterator it = nearbyEntities.begin(); it != nearbyEntities.end(); ++it)
-		{
-			avoidanceForce += XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&(it->second->GetPosition()));
-		}
-
-		// Truncate the avoidance force
-		avoidanceForce = XMVector2Normalize(avoidanceForce) * m_maxCollisionAvoidanceForce;
-		
-		// Add the collision avoidance force to the accumulated steering force
-		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + avoidanceForce);
-		
-
-		//XMVECTOR avoidanceForce;
-
-		//std::multimap<float, Entity*>::iterator first = nearbyEntities.begin();
-
+		return;
 	}
 
-
-	/* old working version
+	///* old working version
 	const Entity* pCollisionObject = m_pEntity->GetTestEnvironment()->GetCollisionObject(*m_pEntity);
 
 	if(pCollisionObject != nullptr)
 	{
+		
 		XMVECTOR ahead = XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_velocity)) * m_maxSeeAhead;
 
 		XMFLOAT2 avoidanceForce;
@@ -266,18 +273,23 @@ void EntityMovementManager::AvoidObstacleCollisions(float avoidanceRadius)
 		
 		// Add the collision avoidance force to the accumulated steering force
 		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMLoadFloat2(&avoidanceForce));
-	}*/
+	}
+	
 
 
-
+	/*
 	// Alt implementation, push velocity vector perpendicular
 	//
-		/*
+
+	XMFLOAT2 avoidanceForce;
+		
+	if(pCollisionObject != nullptr)
+	{
 		XMFLOAT2 a = m_pEntity->GetPosition();
 		a.x += m_pEntity->GetTestEnvironment()->GetGridSize() * 0.5f;
 		a.y += m_pEntity->GetTestEnvironment()->GetGridSize() * 0.5f;
 
-		ahead = XMLoadFloat2(&a) + XMVector2Normalize(XMLoadFloat2(&m_pEntity->GetVelocity())) * m_pEntity->GetMaxSeeAhead();
+		XMVECTOR ahead = XMLoadFloat2(&a) + XMVector2Normalize(XMLoadFloat2(&m_pEntity->GetViewDirection())) * m_pEntity->GetMaxSeeAhead();
 
 
 		XMFLOAT2 b;
@@ -301,13 +313,42 @@ void EntityMovementManager::AvoidObstacleCollisions(float avoidanceRadius)
 		
 		if(result >= 0)
 		{
-			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * g_kMaxCollisionAvoidanceForce);
+			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * GetMaxCollisionAvoidanceForce());
 		}else
 		{
-			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * -1.0f * g_kMaxCollisionAvoidanceForce);
+			XMStoreFloat2(&avoidanceForce, XMVector2Normalize(XMLoadFloat2(&avoidanceForce)) * -1.0f * GetMaxCollisionAvoidanceForce());
 		}
+	}
 		*/
 		//
+}
+
+//--------------------------------------------------------------------------------------
+// Calculate the wall avoidance force and add it to the total force. This force 
+// is used to push the entity away from walls (objects) that it is getting too close to.
+// Param1: Obstacles within this radius around the entity will be avoided.
+//--------------------------------------------------------------------------------------
+void EntityMovementManager::StayAwayFromWalls(float avoidWallsRadius)
+{
+	std::multimap<float, Entity*> nearbyEntities;
+
+	m_pEntity->GetTestEnvironment()->GetNearbyEntities(m_pEntity, avoidWallsRadius, GroupObstacles, nearbyEntities);
+
+	if(!nearbyEntities.empty())
+	{
+		XMVECTOR avoidanceForce = XMVectorZero();
+
+		for(std::multimap<float, Entity*>::iterator it = nearbyEntities.begin(); it != nearbyEntities.end(); ++it)
+		{
+			avoidanceForce += XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&(it->second->GetPosition()));
+		}
+
+		// Truncate the avoidance force
+		avoidanceForce = XMVector2Normalize(avoidanceForce) * m_maxCollisionAvoidanceForce;
+		
+		// Add the collision avoidance force to the accumulated steering force
+		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + avoidanceForce);
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -319,59 +360,34 @@ void EntityMovementManager::Separate(float separationRadius)
 	// Use square distances
 	float squareRadius = separationRadius * separationRadius;
 
-    XMFLOAT2     separationForce(0.0f, 0.0f); // The separation force to prevent overlapping of moving entities
-    unsigned int numberOfNeighbours = 0;      // The number of moving entities in close proximity
+	XMVECTOR     separationVector = XMVectorZero(); // The separation force to prevent overlapping of moving entities
+    unsigned int numberOfNeighbours = 0;		    // The number of moving entities in close proximity
 
 	// Find the moving entities that are in close proximity to this one (check both teams)
 
-	for(std::list<Soldier>::const_iterator it = m_pEntity->GetTestEnvironment()->GetTeamA().begin(); it !=  m_pEntity->GetTestEnvironment()->GetTeamA().end(); ++it)
+	std::multimap<float, Entity*> nearbySoldiers;
+	m_pEntity->GetTestEnvironment()->GetNearbyEntities(m_pEntity, GetSeparationRadius(), GroupAllSoldiers, nearbySoldiers);
+
+	for(std::multimap<float, Entity*>::const_iterator it = nearbySoldiers.begin(); it !=  nearbySoldiers.end(); ++it)
 	{
-		if(it->GetId() != m_pEntity->GetId())
-		{
-			// Calculate the distance between the entity and other entities
-			XMVECTOR distanceVector = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition());
-
-			float squareDistance = 0.0f;
-			XMStoreFloat(&squareDistance, XMVector2Dot(distanceVector, distanceVector));
-			
-			if(squareDistance < squareRadius)
-			{
-				XMStoreFloat2(&separationForce, XMLoadFloat2(&separationForce) + (distanceVector / -squareDistance));
-				++numberOfNeighbours;
-			}
-		}
-	}
-
-	for(std::list<Soldier>::const_iterator it = m_pEntity->GetTestEnvironment()->GetTeamB().begin(); it !=  m_pEntity->GetTestEnvironment()->GetTeamB().end(); ++it)
-	{
-		if(it->GetId() != m_pEntity->GetId())
-		{
-			// Calculate the distance between the entity and other entities
-			XMVECTOR distanceVector = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition());
-
-			float squareDistance = 0.0f;
-			XMStoreFloat(&squareDistance, XMVector2Dot(distanceVector, distanceVector));
-			
-			if(squareDistance < squareRadius)
-			{
-				XMStoreFloat2(&separationForce, XMLoadFloat2(&separationForce) + (distanceVector / -squareDistance));
-				++numberOfNeighbours;
-			}
-		}
+		// Scale the vector by the distance from the entity (the closer the other entity is, the stronger will be the
+		// separation force.
+		separationVector += (XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&it->second->GetPosition())) / it->first;
+		++numberOfNeighbours;
 	}
 
 	// Divide the force by the number of neighbours and truncate it according to the maximally allowed
 	// separation force.
 	if(numberOfNeighbours > 0)
 	{
-		XMVECTOR separationVector =  XMLoadFloat2(&separationForce) / static_cast<float>(numberOfNeighbours);
+		//XMVECTOR separationVector =  XMLoadFloat2(&separationForce) / static_cast<float>(numberOfNeighbours);
+		separationVector = separationVector / static_cast<float>(numberOfNeighbours);
 		separationVector = XMVector2Normalize(separationVector);
 		separationVector *= m_maxSeparationForce;
 
 		// Add the separation force to the accumulated steering force
 		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + separationVector);
 	}
-
 }
 
 // Data access functions
@@ -419,6 +435,11 @@ float EntityMovementManager::GetSlowArrivalRadius(void) const
 float EntityMovementManager::GetSeparationRadius(void) const
 {
 	return m_separationRadius;
+}
+
+const XMFLOAT2& EntityMovementManager::GetViewDirection(void) const
+{
+	return m_viewDirection;
 }
 
 void EntityMovementManager::SetVelocity(const XMFLOAT2& velocity)

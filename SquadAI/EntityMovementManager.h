@@ -33,7 +33,8 @@ public:
 
 	void FollowPath(float nodeReachedRadius);
 	void Seek(const XMFLOAT2& targetPosition, float targetReachedRadius, float slowArrivalRadius);
-	void AvoidObstacleCollisions(float avoidanceRadius);
+	void AvoidObstacleCollisions();
+	void StayAwayFromWalls(float avoidWallsRadius);
 	void Separate(float separationRadius);
 
 	// Data access functions
@@ -47,6 +48,7 @@ public:
 	float           GetTargetReachedRadius(void) const;
 	float           GetSlowArrivalRadius(void) const;
 	float           GetSeparationRadius(void) const;
+	const XMFLOAT2& GetViewDirection(void) const;
 
 	void SetVelocity(const XMFLOAT2& velocity);
 	void SetMaxVelocity(float maxVelocity);
@@ -60,6 +62,8 @@ public:
 
 private:
 
+	void SetInitialViewDirection(void);
+
 	MovingEntity* m_pEntity; // The entity that this movement manager is associated to
 
 	XMFLOAT2 m_velocity;                   // The initial velocity of the entity
@@ -72,7 +76,8 @@ private:
 	float	 m_slowArrivalRadius;		   // When this close to the final target, an entity will start to slow down
 	float	 m_separationRadius;		   // When an entity registers other entities within this radius it will steer for separation from them
 
-	XMFLOAT2              m_steeringForce; // The accumulated force that will be applied to the entity
+	XMFLOAT2 m_viewDirection;			   // The current view direction of the entity.
+	XMFLOAT2 m_steeringForce;			   // The accumulated force that will be applied to the entity
 	
 	// For follow path behaviour
 	std::vector<XMFLOAT2> m_path;        // The current path of the entity, empty when no destination for pathfinding

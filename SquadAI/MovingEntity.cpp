@@ -91,6 +91,11 @@ float MovingEntity::GetSeparationRadius(void) const
 	return m_movementManager.GetSeparationRadius();
 }
 
+const XMFLOAT2& MovingEntity::GetViewDirection(void) const
+{
+	return m_movementManager.GetViewDirection();
+}
+
 void MovingEntity::SetVelocity(const XMFLOAT2& velocity)
 {
 	m_movementManager.SetVelocity(velocity);

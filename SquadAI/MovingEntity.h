@@ -23,21 +23,23 @@ struct EntityMovementInitData
 							       m_maxTotalForce(0.0f),
 							       m_maxSeeAhead(0.0f),
 								   m_maxCollisionAvoidanceForce(0.0f),
+								   m_maxAvoidWallsForce(0.0f),
 								   m_maxSeparationForce(0.0f),       
 								   m_targetReachedRadius(0.0f),		
-								   m_slowArrivalRadius(0.0f),		 
+								   m_avoidWallsRadius(0.0f),		 
 								   m_separationRadius(0.0f)
 	{}
 
-	EntityMovementInitData(float maxVelocity, float maxTotalForce, float maxSeeAhead, float maxCollisionAvoidanceForce, 
-		                   float maxSeparationForce, float targetReachedRadius, float slowArrivalRadius, float separationRadius) 
+	EntityMovementInitData(float maxVelocity, float maxTotalForce, float maxSeeAhead, float maxCollisionAvoidanceForce, float maxAvoidWallsForce, 
+		                   float maxSeparationForce, float targetReachedRadius, float avoidWallsRadius, float separationRadius) 
 				: m_maxVelocity(maxVelocity),
 				  m_maxTotalForce(maxTotalForce),
 				  m_maxSeeAhead(maxSeeAhead),
 				  m_maxCollisionAvoidanceForce(maxCollisionAvoidanceForce),
+				  m_maxAvoidWallsForce(maxAvoidWallsForce),
 				  m_maxSeparationForce(maxSeparationForce),       
 				  m_targetReachedRadius(targetReachedRadius),		
-				  m_slowArrivalRadius(slowArrivalRadius),		 
+				  m_avoidWallsRadius(avoidWallsRadius),		 
 				  m_separationRadius(separationRadius)
 	{}
 
@@ -46,9 +48,10 @@ struct EntityMovementInitData
 	float    m_maxSeeAhead;		// The distance that the entity can see ahead and check for collisions with other entities
 
 	float m_maxCollisionAvoidanceForce; // The maximal force that can result from avoiding collisions
+	float m_maxAvoidWallsForce;         // The maximal force that can result from avoiding walls (being pushed away from them)
 	float m_maxSeparationForce;         // The maximal force that can result from separation from other entities
 	float m_targetReachedRadius;		// When the distance between an entity and its target is lower than this, latter one counts as reached
-	float m_slowArrivalRadius;		    // When this close to the final target, an entity will start to slow down
+	float m_avoidWallsRadius;		    // When this close to an obstacle, the entity will get pushed away from it (prevents intersection with walls)
 	float m_separationRadius;		    // When an entity registers other entities within this radius it will steer for separation from them
 };
 
@@ -70,9 +73,10 @@ public:
 	float           GetMaxTotalForce(void) const;
 	float           GetMaxSeeAhead(void) const;
 	float           GetMaxCollisionAvoidanceForce(void) const;
+	float           GetMaxAvoidWallsForce(void) const;
 	float           GetMaxSeparationForce(void) const;
 	float           GetTargetReachedRadius(void) const;
-	float           GetSlowArrivalRadius(void) const;
+	float           GetAvoidWallsRadius(void) const;
 	float           GetSeparationRadius(void) const;
 	const XMFLOAT2& GetViewDirection(void) const;
 
@@ -81,9 +85,10 @@ public:
 	void SetMaxTotalForce(float maxForce);
 	void SetMaxSeeAhead(float maxSeeAhead);
 	void SetMaxCollisionAvoidanceForce(float maxCollisionAvoidanceForce);
+	void SetMaxAvoidWallsForce(float maxAvoidWallsForce);
 	void SetMaxSeparationForce(float maxSeparationForce);
 	void SetTargetReachedRadius(float targetReachedRadius);
-	void SetSlowArrivalRadius(float slowArrivalRadius);
+	void SetAvoidWallsRadius(float slowArrivalRadius);
 	void SetSeparationRadius(float separationRadius);
 
 protected:

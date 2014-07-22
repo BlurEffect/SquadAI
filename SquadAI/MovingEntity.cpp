@@ -71,6 +71,11 @@ float MovingEntity::GetMaxCollisionAvoidanceForce(void) const
 	return m_movementManager.GetMaxCollisionAvoidanceForce();
 }
 
+float MovingEntity::GetMaxAvoidWallsForce(void) const
+{
+	return m_movementManager.GetMaxAvoidWallsForce();
+}
+
 float MovingEntity::GetMaxSeparationForce(void) const
 {
 	return m_movementManager.GetMaxSeparationForce();
@@ -81,9 +86,9 @@ float MovingEntity::GetTargetReachedRadius(void) const
 	return m_movementManager.GetTargetReachedRadius();
 }
 
-float MovingEntity::GetSlowArrivalRadius(void) const
+float MovingEntity::GetAvoidWallsRadius(void) const
 {
-	return m_movementManager.GetSlowArrivalRadius();
+	return m_movementManager.GetAvoidWallsRadius();
 }
 
 float MovingEntity::GetSeparationRadius(void) const
@@ -121,6 +126,11 @@ void MovingEntity::SetMaxCollisionAvoidanceForce(float maxCollisionAvoidanceForc
 	m_movementManager.SetMaxCollisionAvoidanceForce(maxCollisionAvoidanceForce);
 }
 
+void MovingEntity::SetMaxAvoidWallsForce(float maxAvoidWallsForce)
+{
+	m_movementManager.SetMaxAvoidWallsForce(maxAvoidWallsForce);
+}
+
 void MovingEntity::SetMaxSeparationForce(float maxSeparationForce)
 {
 	m_movementManager.SetMaxSeparationForce(maxSeparationForce);
@@ -131,9 +141,9 @@ void MovingEntity::SetTargetReachedRadius(float targetReachedRadius)
 	m_movementManager.SetTargetReachedRadius(targetReachedRadius);
 }
 
-void MovingEntity::SetSlowArrivalRadius(float slowArrivalRadius)
+void MovingEntity::SetAvoidWallsRadius(float slowArrivalRadius)
 {
-	m_movementManager.SetSlowArrivalRadius(slowArrivalRadius);
+	m_movementManager.SetAvoidWallsRadius(slowArrivalRadius);
 }
 
 void MovingEntity::SetSeparationRadius(float separationRadius)

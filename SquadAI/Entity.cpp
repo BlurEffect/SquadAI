@@ -129,7 +129,7 @@ float Entity::GetScale(void) const
 	return m_scale;
 }
 	
-const Collider* Entity::GetCollider(void) const
+Collider* Entity::GetCollider(void)
 {
 	return m_pCollider;
 }

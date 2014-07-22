@@ -212,7 +212,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
 			m_teamA.push_back(Soldier());
 			if(!m_teamA.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, CircleColliderType, &collider, this),
-										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, g_kSoldierSlowArrivalRadius, g_kSoldierSeparationRadius),
+				EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
 										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
 										  EntityCombatInitData(g_kSoldierMaxHealth)))
 			{
@@ -228,7 +228,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
 			m_teamB.push_back(Soldier());
 			if(!m_teamB.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, CircleColliderType, &collider, this),
-										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, g_kSoldierSlowArrivalRadius, g_kSoldierSeparationRadius),
+										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
 										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
 										  EntityCombatInitData(g_kSoldierMaxHealth)))
 			{
@@ -354,7 +354,7 @@ bool TestEnvironment::AddProjectile(EntityType originType, const XMFLOAT2& origi
 	m_projectiles.push_back(Projectile());
 	if(!m_projectiles.back().Initialise(originType, target,
 										EntityInitData(++m_id, ProjectileType, origin, 0.0f, m_gridSpacing * g_kProjectileScale, CircleColliderType, &collider, this),
-										EntityMovementInitData(g_kProjectileMaxVelocity, g_kProjectileMaxForce, g_kProjectileMaxSeeAhead, g_kProjectileMaxCollisionAvoidanceForce, g_kProjectileMaxSeparationForce, g_kProjectileTargetReachedRadius, g_kProjectileSlowArrivalRadius, g_kProjectileSeparationRadius)))
+										EntityMovementInitData(g_kProjectileMaxVelocity, g_kProjectileMaxForce, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)))
 	{
 		m_projectiles.pop_back();
 		return false;
@@ -690,7 +690,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	XMFLOAT2 lineEndPoint;
 	XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&entity.GetPosition()) + normDirection * entity.GetMaxSeeAhead());
 	
-	/*
+	
 	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
 		// Don't check for collision of the entity with itself
@@ -732,7 +732,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 			}
 		}
 	}
-	*/
+	
 	// This approach is faster than the commented one below
 	// The number of grid fields that the entity can maximally see ahead
 	unsigned int maxGridDistance = static_cast<unsigned int>(entity.GetMaxSeeAhead() / m_gridSpacing) + 1;

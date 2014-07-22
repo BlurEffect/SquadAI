@@ -74,7 +74,7 @@ public:
 	const XMFLOAT2&	 GetPosition(void) const;
 	float			 GetRotation(void) const;
 	float	         GetScale(void) const;
-	const Collider*  GetCollider(void) const;
+	Collider*        GetCollider(void);
 	TestEnvironment* GetTestEnvironment(void);
 
 	void SetId(unsigned long id);

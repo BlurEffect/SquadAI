@@ -54,7 +54,7 @@ void Projectile::Update(float deltaTime)
 	XMFLOAT2 target;
 	XMStoreFloat2(&target, XMLoadFloat2(&GetPosition()) + XMLoadFloat2(&GetVelocity()) * GetMaxVelocity());
 
-	m_movementManager.Seek(target, GetTargetReachedRadius(), GetSlowArrivalRadius());
+	m_movementManager.Seek(target, GetTargetReachedRadius());
 
 	MovingEntity::Update(deltaTime);
 }

@@ -16,13 +16,12 @@ using namespace DirectX;
 
 // Movement
 const float g_kSoldierMaxVelocity(15.0f);				 // Determines how fast soldiers can move within the test environment
-const float g_kSoldierMaxForce(0.5f);					 // Determines the maximum amount of forces that can impact the character
-const float g_kSoldierMaxSeeAhead(5.0f);				 // Determines how far the soldier can look ahead in order to check for collisions
-const float g_kSoldierMaxCollisionAvoidanceForce(10.0f); // The maximal force that can result from avoiding collisions
-const float g_kSoldierMaxSeparationForce(4.0f);          // The maximal force that can result from separation from other entities
+const float g_kSoldierMaxForce(1.0f);					 // Determines the maximum amount of forces that can impact the character
+const float g_kSoldierMaxSeeAhead(6.0f);				 // Determines how far the soldier can look ahead in order to check for collisions
+const float g_kSoldierMaxCollisionAvoidanceForce(2.0f); // The maximal force that can result from avoiding collisions
+const float g_kSoldierMaxAvoidWallsForce(1.2f);         // The maximal force that can result from being pushed away from walls
+const float g_kSoldierMaxSeparationForce(1.0f);          // The maximal force that can result from separation from other entities
 const float g_kSoldierTargetReachedRadius(2.0f);		 // When the distance between an entity and its target is lower than this, latter one counts as reached
-const float g_kSoldierSlowArrivalRadius(2.0f);			 // When this close to the final target, an entity will start to slow down
-const float g_kSoldierSeparationRadius(3.0f);			 // When an entity registers other entities within this radius it will steer for separation from them
 
 // Sensors
 const float g_kSoldierFieldOfView(XM_PI/6.0f); // Determines the field of view of soldiers

@@ -65,7 +65,7 @@ public:
 
 	void GetNearbyEntities(const Entity* pEntity, float radius, EntityGroup entityGroup, std::multimap<float, Entity*>& collisionObjects);
 
-	const Entity* GetCollisionObject(const MovingEntity& entity); 
+	const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
 	bool          CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);
 
 	void          GetEnemies(const FightingEntity* pEntity, std::list<FightingEntity*>& enemies);

@@ -37,18 +37,23 @@ float g_time = 0.0f;
 //--------------------------------------------------------------------------------------
 void Soldier::Update(float deltaTime)
 {
-	//m_movementManager.FollowPath(GetTargetReachedRadius());
-	m_movementManager.AvoidObstacleCollisions();
-	//m_movementManager.Separate(GetSeparationRadius());
-	//m_movementManager.StayAwayFromWalls(2.5f);
+	if(deltaTime == 0.0f)
+	{
+		return;
+	}
+
+	m_movementManager.FollowPath(GetTargetReachedRadius());
+	m_movementManager.AvoidObstacleCollisions(GetMaxSeeAhead());
+	m_movementManager.Separate(GetSeparationRadius());
+	m_movementManager.StayAwayFromWalls(GetAvoidWallsRadius());
 
 	if(GetType() == ASoldier)
 	{
 		//m_sensors.CheckForThreats();
-		m_movementManager.Seek(XMFLOAT2(24.0f, 24.0f), 1.0f, 0.0f);
+		//m_movementManager.Seek(XMFLOAT2(24.0f, 24.0f), 1.0f);
 	}else
 	{
-		//m_movementManager.Seek(XMFLOAT2(-24.0f, -24.0f), 1.0f, 0.0f);
+		//m_movementManager.Seek(XMFLOAT2(-24.0f, -24.0f), 1.0f);
 	}
 	
 	g_time += deltaTime;
@@ -68,13 +73,13 @@ void Soldier::Update(float deltaTime)
 
 void Soldier::Activate(void)
 {
-	m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
+	//m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
 
 	if(GetType() == ASoldier)
 	{
-		//m_movementManager.SetPathTo(XMFLOAT2(24.0f, 24.0f));
+		m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
 	}else
 	{
-		//m_movementManager.SetPathTo(XMFLOAT2(-24.0f, -24.0f));
+		m_movementManager.SetPathTo(XMFLOAT2(-20.0f, -20.0f));
 	}
 }

@@ -289,54 +289,53 @@ void EntityMovementManager::AvoidObstacleCollisions(float seeAhead)
 
 		for(std::multimap<float, Entity*>::iterator it = nearbyEntities.begin(); it != nearbyEntities.end(); ++it)
 		{
-			if(it->second->GetId() != m_pEntity->GetId())
+			
+			if(it->second->GetCollider()->CheckLineCollision(m_pEntity->GetPosition(), lineEndPoint))
 			{
-				if(it->second->GetCollider()->CheckLineCollision(m_pEntity->GetPosition(), lineEndPoint))
-				{
-					/*
+				/*
 
-					lineEndPoint = XMFLOAT2(it->second->GetPosition().x + 10.0f, it->second->GetPosition().y);
+				lineEndPoint = XMFLOAT2(it->second->GetPosition().x + 10.0f, it->second->GetPosition().y);
 
-					XMVECTOR avoidanceForce = XMVector2Normalize(XMLoadFloat2(&lineEndPoint) - XMLoadFloat2(&it->second->GetPosition())) * m_maxCollisionAvoidanceForce;
+				XMVECTOR avoidanceForce = XMVector2Normalize(XMLoadFloat2(&lineEndPoint) - XMLoadFloat2(&it->second->GetPosition())) * m_maxCollisionAvoidanceForce;
 		
-					// Add the collision avoidance force to the accumulated steering force
-					XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + avoidanceForce);
+				// Add the collision avoidance force to the accumulated steering force
+				XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + avoidanceForce);
 
-					break;
+				break;
 
-					*/
+				*/
 
-					// Alternative
+				// Alternative
 
-					// Determine whether the other entity is left or right of this entity
+				// Determine whether the other entity is left or right of this entity
 
-					XMFLOAT2 entityToObject(0.0f, 0.0f);
-					XMStoreFloat2(&entityToObject, XMLoadFloat2(&it->second->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition()));
+				XMFLOAT2 entityToObject(0.0f, 0.0f);
+				XMStoreFloat2(&entityToObject, XMLoadFloat2(&it->second->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition()));
 
-					float dot = GetViewDirection().x * (-entityToObject.y) + GetViewDirection().y * entityToObject.x;	
+				float dot = GetViewDirection().x * (-entityToObject.y) + GetViewDirection().y * entityToObject.x;	
 					
-					XMFLOAT2 avoidanceVector = GetViewDirection();
+				XMFLOAT2 avoidanceVector = GetViewDirection();
 
-					if(dot > 0)
-					{
-						// Object is right of entity, steer left to avoid
-						avoidanceVector.x = -GetViewDirection().y;
-						avoidanceVector.y = GetViewDirection().x;
-					}else
-					{
-						// Object is left of entity, steer right to avoid
-						avoidanceVector.x = GetViewDirection().y;
-						avoidanceVector.y = -GetViewDirection().x;
-					}
-					
-					XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMVector2Normalize(XMLoadFloat2(&avoidanceVector)) * m_maxCollisionAvoidanceForce);
-					
-					// Bail out of the function as soon as the first collision is found (the nearby entities are already sorted
-					// by their distance from the original entity, thus the first collision found is the closest one)
-
-					return;
+				if(dot > 0)
+				{
+					// Object is right of entity, steer left to avoid
+					avoidanceVector.x = -GetViewDirection().y;
+					avoidanceVector.y = GetViewDirection().x;
+				}else
+				{
+					// Object is left of entity, steer right to avoid
+					avoidanceVector.x = GetViewDirection().y;
+					avoidanceVector.y = -GetViewDirection().x;
 				}
+					
+				XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMVector2Normalize(XMLoadFloat2(&avoidanceVector)) * m_maxCollisionAvoidanceForce);
+					
+				// Bail out of the function as soon as the first collision is found (the nearby entities are already sorted
+				// by their distance from the original entity, thus the first collision found is the closest one)
+
+				return;
 			}
+			
 		}
 	}
 }

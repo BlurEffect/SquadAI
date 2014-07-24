@@ -520,7 +520,7 @@ void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, Ent
 		// Check team A
 		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 		{
-			if(it->GetId() != pEntity->GetId())
+			if(it->GetId() != pEntity->GetId() && it->IsAlive())
 			{
 				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
 				if(squareDistance <= squareRadius)
@@ -536,7 +536,7 @@ void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, Ent
 		// Check team B for collision
 		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 		{
-			if(it->GetId() != pEntity->GetId())
+			if(it->GetId() != pEntity->GetId() && it->IsAlive())
 			{
 				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
 				if(squareDistance <= squareRadius)
@@ -694,7 +694,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
 		// Don't check for collision of the entity with itself
-		if(it->GetId() != entity.GetId())
+		if(it->GetId() != entity.GetId() && it->IsAlive())
 		{
 			if(it->GetCollider()->CheckLineCollision(entity.GetPosition(), lineEndPoint))
 			{
@@ -715,7 +715,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 	{
 		// Don't check for collision of the entity with itself
-		if(it->GetId() != entity.GetId())
+		if(it->GetId() != entity.GetId() && it->IsAlive())
 		{
 			if(it->GetCollider()->CheckLineCollision(entity.GetPosition(), lineEndPoint))
 			{

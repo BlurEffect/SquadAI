@@ -64,7 +64,7 @@ void Soldier::Update(float deltaTime)
 		target.x = GetPosition().x + 1.0f;
 		target.y = GetPosition().y;
 
-		//m_combatManager.ShootAt(target);
+		m_combatManager.ShootAt(target);
 		g_time = 0.0f;
 	}
 
@@ -80,6 +80,6 @@ void Soldier::Activate(void)
 		m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
 	}else
 	{
-		m_movementManager.SetPathTo(XMFLOAT2(-20.0f, -20.0f));
+		m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
 	}
 }

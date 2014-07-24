@@ -12,6 +12,24 @@
 
 using namespace DirectX;
 
+
+
+
+
+//--------------------------------------------------------------------------------------
+// Identifies an entity of a certain type within the test application.
+//--------------------------------------------------------------------------------------
+enum EntityType
+{
+	ASoldier,
+	BSoldier,
+	CoverSpot,
+	ADeadSoldier,
+	BDeadSoldier,
+	ProjectileType,
+	NumberOfEntityTypes
+};
+
 //--------------------------------------------------------------------------------------
 // Identifies an entity of a certain type within the test application.
 //--------------------------------------------------------------------------------------

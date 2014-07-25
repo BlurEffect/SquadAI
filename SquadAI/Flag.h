@@ -11,6 +11,7 @@
 #include <DirectXMath.h>
 #include "EntityData.h"
 #include "Entity.h"
+#include "ColliderFactory.h"
 
 using namespace DirectX;
 
@@ -30,7 +31,7 @@ public:
 	Flag(void);
 	~Flag(void);
 
-	void Initialise(EntityTeam team, const XMFLOAT2& position, float rotation, float uniformScale, float resetInterval);
+	bool Initialise(EntityTeam team, const XMFLOAT2& position, float rotation, float uniformScale, float resetInterval, Collider* pCollider);
 
 	bool OnPickUp(Entity* pEntity);
 	void Update(float deltaTime);
@@ -48,6 +49,7 @@ public:
 	const XMFLOAT2& GetResetPosition(void) const;
 	float           GetResetTimePassed(void) const;
 	const Entity*   GetCarrier(void) const;
+	const Collider* GetCollider(void) const;
 
 	void SetTeam(EntityTeam team);
 	void SetPosition(const XMFLOAT2& position);
@@ -63,6 +65,8 @@ private:
 	float      m_rotation;			// The rotation of the flag
 	float      m_uniformScale;		// The scale of the flag
 	float      m_resetInterval;		// The flag will be reset when it was dropped for this long
+	Collider*  m_pCollider;			// The collider associated to the flag
+
 	FlagState  m_currentState;		// The current state of the flag
 	XMFLOAT2   m_resetPosition;		// The position, to which the flag will be reset to when dropped too long or after scoring
 	float      m_resetTimePassed;   // A timer keeping track of how long the flag was dropped

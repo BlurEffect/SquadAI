@@ -10,10 +10,41 @@
 
 // Includes
 #include <DirectXMath.h>
-#include "MovingEntity.h"
+#include "Object.h"
+#include "EntityData.h"
+#include "Collider.h"
+#include "ColliderFactory.h"
 
 using namespace DirectX;
 
+class Projectile : public Object
+{
+public:
+	Projectile(const XMFLOAT2& position, float rotation, float uniformScale);
+	~Projectile(void);
+
+	bool Initialise(const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam, Collider* pCollider);
+	void Update(float deltaTime);
+
+	// Data access functions
+
+	const XMFLOAT2& GetDirection(void) const;
+	float			GetSpeed(void) const;
+	EntityTeam      GetFriendlyTeam(void) const;
+	const Collider* GetCollider(void) const;
+
+	void SetDirection(const XMFLOAT2& direction);
+	void SetSpeed(float speed);
+    void SetFriendlyTeam(EntityTeam team);
+
+private:
+	XMFLOAT2   m_direction;			// The direction, in which the projectile is flying
+	float      m_speed;				// The speed, at which the projectile is flying
+	EntityTeam m_friendlyTeam;		// The team that fired this projectile
+	Collider*  m_pCollider;			// The collider associated to the flag
+};
+
+/*
 class Projectile : public MovingEntity
 {
 public:
@@ -28,6 +59,6 @@ public:
 
 private:
 	ObjectType m_originType; // Entities of this type are immune to the projectiles.
-};
+};*/
 
 #endif // PROJECTILE_H

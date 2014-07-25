@@ -31,12 +31,12 @@ enum Direction
 //--------------------------------------------------------------------------------------
 enum EntityGroup
 {
-	GroupTeamA,						// The group of all living soldiers of team A
-	GroupTeamB,						// The group of all living soldiers of team B
+	GroupTeamRed,						// The group of all living soldiers of team A
+	GroupTeamBlue,						// The group of all living soldiers of team B
 	GroupAllSoldiers,				// The group of all living soldiers
 	GroupObstacles,					// The group of all obstacles/cover positions
-	GroupTeamAAndObstacles,			// The group of all living soldiers of team A and all obstacles
-	GroupTeamBAndObstacles,			// The group of all living soldiers of team B and all obstacles
+	GroupTeamRedAndObstacles,			// The group of all living soldiers of team A and all obstacles
+	GroupTeamBlueAndObstacles,			// The group of all living soldiers of team B and all obstacles
 	GroupAllSoldiersAndObstacles	// The group of all living soldiers and all obstacles
 };
 

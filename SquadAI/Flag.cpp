@@ -12,6 +12,7 @@ Flag::Flag(void) : m_team(EntityTeam(0)),
 				   m_rotation(0.0f),
 				   m_uniformScale(1.0f),
 				   m_resetInterval(0.0f),
+				   m_pCollider(nullptr),
 				   m_currentState(InBase),
 				   m_resetPosition(0.0f, 0.0f),
 				   m_resetTimePassed(0.0f),
@@ -21,6 +22,10 @@ Flag::Flag(void) : m_team(EntityTeam(0)),
 
 Flag::~Flag(void)
 {
+	if(m_pCollider)
+	{
+		delete m_pCollider;
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -32,17 +37,27 @@ Flag::~Flag(void)
 // Param5: The time it takes for the flag to be reset after being dropped
 // Returns true if the flag was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-void Flag::Initialise(EntityTeam team, const XMFLOAT2& position, float rotation, float uniformScale, float resetInterval)
+bool Flag::Initialise(EntityTeam team, const XMFLOAT2& position, float rotation, float uniformScale, float resetInterval, Collider* pCollider)
 {
 	m_team = team;
 	m_position = position;
 	m_rotation = rotation;
 	m_uniformScale = uniformScale;
 	m_resetInterval = resetInterval;
+
+	m_pCollider = ColliderFactory::CreateCollider(pCollider);
+
+	if(!m_pCollider)
+	{
+		return false;
+	}
+
 	m_currentState = InBase;
 	m_resetPosition = m_position;
 	m_resetTimePassed = 0.0f;
 	m_pCarrier = nullptr;
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------

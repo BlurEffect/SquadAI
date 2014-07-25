@@ -54,7 +54,7 @@ void EntityCombatManager::Reset(void)
 //--------------------------------------------------------------------------------------
 void EntityCombatManager::ShootAt(const XMFLOAT2& target)
 {
-	m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetType(), m_pEntity->GetPosition(), target);
+	m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
 }
 
 //--------------------------------------------------------------------------------------

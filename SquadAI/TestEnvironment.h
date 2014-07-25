@@ -53,12 +53,12 @@ public:
 	bool AddObject(ObjectType type, const XMFLOAT2& position, float rotation);
 	bool RemoveObjects(const XMFLOAT2& position);
 
-	bool AddProjectile(ObjectType originType, const XMFLOAT2& origin, const XMFLOAT2& target);
+	bool AddProjectile(EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target);
 
 	bool Save(std::string filename);
 	bool Load(std::string filename);
 
-	void StartSimulation(void);
+	bool StartSimulation(void);
 	void EndSimulation(void);
 	void PauseSimulation(void);
 	void ResumeSimulation(void);
@@ -94,14 +94,14 @@ private:
 	bool InitialiseGrid(void);
 	void CleanupGrid(void);
 	void UpdateCoverMap(Node& coverNode, bool doDelete);
-	bool CheckCollision(const MovingEntity* pEntity, const XMFLOAT2& oldPosition, EntityGroup entityGroup, Entity*& outCollisionEntity);
+	bool CheckCollision(const Collider* pCollider, const XMFLOAT2& oldPosition, EntityGroup entityGroup, Entity*& outCollisionEntity);
 
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
 
 	GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
 	Node**              m_pNodes; // The graph made up of nodes representing the test environment when in simulation mode
 
-	std::vector<BasicObject> m_staticObjects; // The static test environment objects, as set up by the user in edit mode
+	std::vector<BasicStaticObject> m_staticObjects; // The static test environment objects, as set up by the user in edit mode
 	// Dynamic test environment objects
 
 	Soldier m_soldiers[g_kSoldiersPerTeam * NumberOfTeams];
@@ -151,7 +151,7 @@ private:
 	{
 	public:
 		FindBasicObjectByGridId(unsigned long gridId) : m_gridId(gridId){}
-		bool operator()(const BasicObject& basicObject)
+		bool operator()(const BasicStaticObject& basicObject)
 		{
 			return basicObject.GetGridId() == m_gridId;
 		}

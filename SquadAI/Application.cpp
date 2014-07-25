@@ -79,8 +79,10 @@ void Application::ProcessInput(void)
 	{
 		if(m_appData.m_applicationState == EditMode)
 		{
-			m_appData.m_applicationState = SimulationRunning;
-			m_testEnvironment.StartSimulation();
+			if(m_testEnvironment.StartSimulation())
+			{
+				m_appData.m_applicationState = SimulationRunning;
+			}
 		}else
 		{
 			m_appData.m_applicationState = EditMode;

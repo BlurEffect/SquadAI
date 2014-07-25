@@ -30,6 +30,9 @@
 #include "ProjectileProperties.h"
 #include "CircleCollider.h"
 #include "AxisAlignedRectangleCollider.h"
+#include "BasicObject.h"
+#include "ApplicationSettings.h"
+#include "Flag.h"
 
 class FightingEntity;
 class MovingEntity;
@@ -47,10 +50,10 @@ public:
 	void Update(RenderContext& pRenderContext, float deltaTime);
 	void Cleanup(void);
 
-	bool AddEntity(EntityType type, const XMFLOAT2& position, float rotation);
-	bool RemoveEntity(const XMFLOAT2& position);
+	bool AddObject(ObjectType type, const XMFLOAT2& position, float rotation);
+	bool RemoveObjects(const XMFLOAT2& position);
 
-	bool AddProjectile(EntityType originType, const XMFLOAT2& origin, const XMFLOAT2& target);
+	bool AddProjectile(ObjectType originType, const XMFLOAT2& origin, const XMFLOAT2& target);
 
 	bool Save(std::string filename);
 	bool Load(std::string filename);
@@ -86,6 +89,8 @@ public:
 
 private:
 
+	bool PrepareSimulation(void);
+
 	bool InitialiseGrid(void);
 	void CleanupGrid(void);
 	void UpdateCoverMap(Node& coverNode, bool doDelete);
@@ -95,6 +100,14 @@ private:
 
 	GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
 	Node**              m_pNodes; // The graph made up of nodes representing the test environment when in simulation mode
+
+	std::vector<BasicObject> m_staticObjects; // The static test environment objects, as set up by the user in edit mode
+	// Dynamic test environment objects
+
+	Soldier m_soldiers[g_kSoldiersPerTeam * NumberOfTeams];
+	Flag    m_flags[NumberOfTeams];
+
+	// -> soldiers, projectiles, flags
 
 	Pathfinder          m_pathfinder; // The pathfinder associated to this environment.
 
@@ -108,6 +121,11 @@ private:
 	std::list<Projectile>    m_projectiles; // Holds the currently active projectiles
 
 	bool m_isPaused; // Tells whether the simulation running in the environment is currently paused
+	bool m_isInEditMode;
+	float m_objectScaleFactors[NumberOfObjectTypes]; // Determines the scale of the different objects in relation to a grid field
+
+	unsigned int m_soldierCount[NumberOfTeams]; // Keeps track of how many soldiers have been placed
+	bool		 m_flagSet[NumberOfTeams];		// Keeps track of the flags that have been placed
 
 	//--------------------------------------------------------------------------------------
 	// Private functor used to find an entity within a container based on its id.
@@ -123,6 +141,22 @@ private:
 		}
 	private:
 		unsigned long m_id;
+	};
+
+	//--------------------------------------------------------------------------------------
+	// Private functor used to find a basic object within a container based on the id of the
+	// grid field it is placed on.
+	//--------------------------------------------------------------------------------------
+	class FindBasicObjectByGridId
+	{
+	public:
+		FindBasicObjectByGridId(unsigned long gridId) : m_gridId(gridId){}
+		bool operator()(const BasicObject& basicObject)
+		{
+			return basicObject.GetGridId() == m_gridId;
+		}
+	private:
+		unsigned long m_gridId;
 	};
 };
 

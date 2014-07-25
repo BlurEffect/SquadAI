@@ -26,7 +26,8 @@ using namespace DirectX;
 struct EntityInitData
 {
 	EntityInitData(void) : m_id(0),
-						   m_type(EntityType(0)),
+						   m_team(EntityTeam(0)),
+						   m_type(ObjectType(0)),
 						   m_position(0.0f, 0.0f),
 						   m_rotation(0.0f),
 					 	   m_scale(1.0f),
@@ -35,8 +36,9 @@ struct EntityInitData
 						   m_pEnvironment(nullptr)
 	{}
 	
-	EntityInitData(unsigned long id, EntityType type, const XMFLOAT2& position, float rotation, float scale, ColliderType colliderType, Collider* pCollider, TestEnvironment* pEnvironment)
+	EntityInitData(unsigned long id, EntityTeam team, ObjectType type, const XMFLOAT2& position, float rotation, float scale, ColliderType colliderType, Collider* pCollider, TestEnvironment* pEnvironment)
 						 : m_id(id), 
+						   m_team(team),
 						   m_type(type),
 						   m_position(position),
 						   m_rotation(rotation),
@@ -47,7 +49,8 @@ struct EntityInitData
 	{}
 
 	unsigned long	 m_id;			 // A unique identifier for the entity, 0 is an invalid value
-	EntityType		 m_type;         // Identifies the type of this entity
+	EntityTeam       m_team;         // Identifies the team this entity belongs to
+	ObjectType		 m_type;         // Identifies the type of this entity
 	XMFLOAT2		 m_position;     // The position, where this entity is placed
 	float			 m_rotation;     // The z-axis rotation of the entity
 	float            m_scale;        // The uniform scale factor for the entity
@@ -70,7 +73,8 @@ public:
 
 	// Data access functions
 	unsigned long	 GetId(void) const;
-	EntityType		 GetType(void) const;
+	EntityTeam       GetTeam(void) const;
+	ObjectType		 GetType(void) const;
 	const XMFLOAT2&	 GetPosition(void) const;
 	float			 GetRotation(void) const;
 	float	         GetScale(void) const;
@@ -78,7 +82,8 @@ public:
 	TestEnvironment* GetTestEnvironment(void);
 
 	void SetId(unsigned long id);
-	void SetType(EntityType type);
+	void SetTeam(EntityTeam team);
+	void SetType(ObjectType type);
 	void SetPosition(const XMFLOAT2& position);
 	void SetRotation(float rotation);
 	void SetScale(float rotation);
@@ -89,7 +94,8 @@ private:
 	bool CreateCollider(ColliderType type, Collider* pCollider);
 
 	unsigned long	 m_id;				  // A unique identifier for this entity, 0 is an invalid value
-	EntityType		 m_type;			  // Identifies the type of this entity
+	EntityTeam       m_team;              // The team the entity belongs to
+	ObjectType		 m_type;			  // Identifies the type of this entity
 	XMFLOAT2		 m_position;		  // The position, where this entity is placed
 	float			 m_rotation;		  // The z-axis rotation of the entity
 	float            m_scale;			  // The uniform scale factor for the entity

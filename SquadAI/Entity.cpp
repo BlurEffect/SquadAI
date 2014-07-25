@@ -10,7 +10,8 @@
 #include "TestEnvironment.h"
 
 Entity::Entity(void) : m_id(0),
-					   m_type(EntityType(0)),
+				       m_team(EntityTeam(0)),
+					   m_type(ObjectType(0)),
 					   m_position(0.0f, 0.0f),
 					   m_rotation(0.0f),
 					   m_scale(1.0f),
@@ -41,6 +42,7 @@ bool Entity::Initialise(const EntityInitData& initData)
 	}
 
 	m_id		   = initData.m_id;
+	m_team         = initData.m_team;
 	m_type		   = initData.m_type;
 	m_position	   = initData.m_position;
 	m_rotation	   = initData.m_rotation;
@@ -109,7 +111,12 @@ unsigned long Entity::GetId(void) const
 	return m_id;
 }
 
-EntityType Entity::GetType(void) const
+EntityTeam Entity::GetTeam(void) const
+{
+	return m_team;
+}
+
+ObjectType Entity::GetType(void) const
 {
 	return m_type;
 }
@@ -144,7 +151,12 @@ void Entity::SetId(unsigned long id)
 	m_id = id;
 }
 
-void Entity::SetType(EntityType type)
+void Entity::SetTeam(EntityTeam team)
+{
+	m_team = team;
+}
+
+void Entity::SetType(ObjectType type)
 {
 	m_type = type;
 }

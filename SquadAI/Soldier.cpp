@@ -47,7 +47,7 @@ void Soldier::Update(float deltaTime)
 	m_movementManager.Separate(GetSeparationRadius());
 	m_movementManager.StayAwayFromWalls(GetAvoidWallsRadius());
 
-	if(GetType() == ASoldier)
+	if(GetType() == RedSoldierType)
 	{
 		//m_sensors.CheckForThreats();
 		//m_movementManager.Seek(XMFLOAT2(24.0f, 24.0f), 1.0f);
@@ -58,7 +58,7 @@ void Soldier::Update(float deltaTime)
 	
 	g_time += deltaTime;
 
-	if((g_time >= 2.0f) && GetType() == ASoldier)
+	if((g_time >= 2.0f) && GetType() == RedSoldierType)
 	{
 		XMFLOAT2 target;
 		target.x = GetPosition().x + 1.0f;
@@ -75,11 +75,11 @@ void Soldier::Activate(void)
 {
 	//m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
 
-	if(GetType() == ASoldier)
+	if(GetType() == RedSoldierType)
 	{
 		m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
 	}else
 	{
-		m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
+		m_movementManager.SetPathTo(XMFLOAT2(-20.0f, -20.0f));
 	}
 }

@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AxisAlignedRectangleCollider.cpp" />
+    <ClCompile Include="BasicObject.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CoverPosition.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="EntityMemory.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
     <ClCompile Include="FightingEntity.cpp" />
+    <ClCompile Include="Flag.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="EntityMovementManager.cpp" />
@@ -133,6 +135,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="AxisAlignedRectangleCollider.h" />
+    <ClInclude Include="BasicObject.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="CoverPosition.h" />
@@ -141,6 +144,7 @@
     <ClInclude Include="EntityMemory.h" />
     <ClInclude Include="EntitySensors.h" />
     <ClInclude Include="FightingEntity.h" />
+    <ClInclude Include="Flag.h" />
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
     <ClInclude Include="EntityMovementManager.h" />

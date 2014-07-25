@@ -20,14 +20,14 @@ public:
 	Projectile(void);
 	~Projectile(void);
 
-	bool Initialise(EntityType originType, const XMFLOAT2& target, const EntityInitData& initData, const EntityMovementInitData& movementInitData);
+	bool Initialise(ObjectType originType, const XMFLOAT2& target, const EntityInitData& initData, const EntityMovementInitData& movementInitData);
 	void Update(float deltaTime);
 
 	// Data access functions
-	EntityType GetOriginType(void) const;
+	ObjectType GetOriginType(void) const;
 
 private:
-	EntityType m_originType; // Entities of this type are immune to the projectiles.
+	ObjectType m_originType; // Entities of this type are immune to the projectiles.
 };
 
 #endif // PROJECTILE_H

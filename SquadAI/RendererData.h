@@ -30,9 +30,9 @@ enum DrawableType
 //--------------------------------------------------------------------------------------
 // Bundles information that is required to render a entity of the test application.
 //--------------------------------------------------------------------------------------
-struct EntityRenderData
+struct ObjectRenderData
 {
-	EntityRenderData(void) : m_drawableType(DrawableType(0)),
+	ObjectRenderData(void) : m_drawableType(DrawableType(0)),
 							 m_colour(1.0f, 1.0f, 1.0f, 1.0f),
 						     m_name(""),
 							 m_baseZ(0.0f)

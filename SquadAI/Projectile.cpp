@@ -24,7 +24,7 @@ Projectile::~Projectile(void)
 // Param4: The movement specific initialisation data for the entity.
 // Returns true if the projectile entity was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Projectile::Initialise(EntityType originType, const XMFLOAT2& target, const EntityInitData& initData, const EntityMovementInitData& movementInitData)
+bool Projectile::Initialise(ObjectType originType, const XMFLOAT2& target, const EntityInitData& initData, const EntityMovementInitData& movementInitData)
 {
 	if(!MovingEntity::Initialise(initData, movementInitData))
 	{
@@ -61,7 +61,7 @@ void Projectile::Update(float deltaTime)
 
 // Data access functions
 
-EntityType Projectile::GetOriginType(void) const
+ObjectType Projectile::GetOriginType(void) const
 {
 	return m_originType;
 }

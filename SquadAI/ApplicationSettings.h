@@ -34,6 +34,10 @@ const float g_kOrthoMaximalZoomFactor = 100.0f; // Determines the maximal zoom f
 const float    g_kBackgroundColour[4] = {0.0f, 0.0f, 0.0f, 1.0f}; // The colour to which the backbuffer is cleared
 const XMFLOAT4 g_kGridColour(1.0f, 1.0f, 1.0f, 1.0f);			  // The colour of the grid representing the test environment
 
+// Test environment settings
+const unsigned int g_kSoldiersPerTeam = 8; // The number of soldiers forming a team during the matches
 
+// Game settings
+const float g_kFlagResetTimer = 10.0f; // A flag will be reset to its start position after it was dropped for this long
 
 #endif // APPLICATION_SETTINGS_H

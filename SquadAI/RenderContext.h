@@ -18,16 +18,16 @@ public:
 	RenderContext(void);
 	~RenderContext(void);
 
-	void AddInstance(EntityType type, const XMFLOAT4X4& transform);
+	void AddInstance(ObjectType type, const XMFLOAT4X4& transform);
 	void Reset(void);
 
 	// Data access functions
 
-	int             GetEntityCount(EntityType type) const;
-	const Instance* GetInstances(EntityType type) const;		
+	int             GetObjectCount(ObjectType type) const;
+	const Instance* GetInstances(ObjectType type) const;		
 
 private:
-	std::vector<Instance> m_entityInstances[NumberOfEntityTypes]; // Contains the instances for each drawable type to be
+	std::vector<Instance> m_objectInstances[NumberOfObjectTypes]; // Contains the instances for each drawable type to be
 																  // rendered this frame
 };
 

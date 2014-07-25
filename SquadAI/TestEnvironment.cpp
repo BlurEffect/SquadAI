@@ -14,8 +14,14 @@ TestEnvironment::TestEnvironment(void) : m_id(0),
 										 m_gridSize(0.0f),
 										 m_numberOfGridPartitions(0),
 										 m_gridSpacing(0.0f),
-										 m_isPaused(true)
+										 m_isPaused(true),
+										 m_isInEditMode(true)
 {
+	for(unsigned int i = 0; i < NumberOfTeams; ++i)
+	{
+		m_soldierCount[i] = 0;
+		m_flagSet[i]      = false;
+	}
 }
 
 TestEnvironment::~TestEnvironment(void)
@@ -34,6 +40,22 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 	m_gridSize			     = gridSize;
 	m_numberOfGridPartitions = numberOfGridPartitions;
 
+	// Initialise the scale factors for the objects 
+	m_objectScaleFactors[RedSoldierStartPositionType]	= 1.0f;
+	m_objectScaleFactors[BlueSoldierStartPositionType]	= 1.0f;
+	m_objectScaleFactors[ObstacleType]					= 1.0f; 
+	m_objectScaleFactors[RedFlagStartPositionType]		= 0.5f;
+	m_objectScaleFactors[BlueFlagStartPositionType]		= 0.5f;
+	m_objectScaleFactors[RedBaseAreaType]				= 1.0f;
+	m_objectScaleFactors[BlueBaseAreaType]				= 1.0f; 
+	m_objectScaleFactors[RedSoldierType]				= 1.0f; 
+	m_objectScaleFactors[BlueSoldierType]				= 1.0f; 
+	m_objectScaleFactors[DeadRedSoldierType]			= 1.0f; 
+	m_objectScaleFactors[DeadBlueSoldierType]			= 1.0f; 
+	m_objectScaleFactors[RedFlagType]					= 0.5f; 
+	m_objectScaleFactors[BlueFlagType]					= 0.5f;
+	m_objectScaleFactors[ProjectileType]				= 0.2f;
+
 	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
 
@@ -44,9 +66,66 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 //--------------------------------------------------------------------------------------
 void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 {
+	for(std::vector<BasicObject>::iterator it = m_staticObjects.begin(); it != m_staticObjects.end(); ++it)
+	{
+		if(m_isInEditMode || (it->GetType() != RedSoldierStartPositionType &&
+							  it->GetType() != BlueSoldierStartPositionType &&
+						      it->GetType() != RedFlagStartPositionType &&
+							  it->GetType() != BlueFlagStartPositionType &&
+							  it->GetType() != RedBaseAreaType &&
+							  it->GetType() != BlueBaseAreaType))
+		{
+			XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
+			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
+			XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetUniformScale(), it->GetUniformScale(), 1.0f);
+
+			XMFLOAT4X4 transform;
+			XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
+
+			pRenderContext.AddInstance(it->GetType(), transform);
+		}
+	}
+
+	// Update soldiers
+
+	for(unsigned int i = 0; i < g_kSoldiersPerTeam * NumberOfTeams; ++i)
+	{
+		if(!m_isPaused && m_soldiers[i].IsAlive())
+		{
+			m_soldiers[i].Update(deltaTime);
+		}
+
+		XMMATRIX translationMatrix = XMMatrixTranslation(m_soldiers[i].GetPosition().x, m_soldiers[i].GetPosition().y, 0.0f);
+		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - m_soldiers[i].GetRotation()));
+		XMMATRIX scalingMatrix     = XMMatrixScaling(m_soldiers[i].GetScale(), m_soldiers[i].GetScale(), 1.0f);
+
+		XMFLOAT4X4 transform;
+		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
+
+		switch(m_soldiers[i].GetTeam())
+		{
+		case TeamRed:
+			if(m_soldiers[i].IsAlive())
+			{
+				pRenderContext.AddInstance(RedSoldierType, transform);
+			}else
+			{
+				pRenderContext.AddInstance(DeadRedSoldierType, transform);
+			}
+		case TeamBlue:
+			if(m_soldiers[i].IsAlive())
+			{
+				pRenderContext.AddInstance(BlueSoldierType, transform);
+			}else
+			{
+				pRenderContext.AddInstance(DeadBlueSoldierType, transform);
+			}
+		}
+	}
+
 
 	// Update entities and add them to the render context after calculating their transforms
-
+	/*
 	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
 		if(!m_isPaused && it->IsAlive())
@@ -63,10 +142,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 
 		if(it->IsAlive())
 		{
-			pRenderContext.AddInstance(ASoldier, transform);
+			pRenderContext.AddInstance(RedSoldierType, transform);
 		}else
 		{
-			pRenderContext.AddInstance(ADeadSoldier, transform);
+			pRenderContext.AddInstance(DeadRedSoldierType, transform);
 		}
 	}
 
@@ -86,10 +165,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		
 		if(it->IsAlive())
 		{
-			pRenderContext.AddInstance(BSoldier, transform);
+			pRenderContext.AddInstance(BlueSoldierType, transform);
 		}else
 		{
-			pRenderContext.AddInstance(BDeadSoldier, transform);
+			pRenderContext.AddInstance(DeadBlueSoldierType, transform);
 		}
 	}
 	
@@ -106,9 +185,9 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 
 		XMFLOAT4X4 transform;
 		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
-		pRenderContext.AddInstance(CoverSpot, transform);
+		pRenderContext.AddInstance(ObstacleType, transform);
 	}
-
+	*/
 
 	std::list<Projectile>::iterator it = m_projectiles.begin();
 	while(it != m_projectiles.end())
@@ -135,8 +214,8 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 
 		if(CheckCollision(&(*it), oldPos, GroupTeamBAndObstacles, pHitEntity))
 		{
-			if((pHitEntity->GetType() == ASoldier && it->GetOriginType() != ASoldier) ||
-			   (pHitEntity->GetType() == BSoldier && it->GetOriginType() != BSoldier))
+			if((pHitEntity->GetType() == RedSoldierType && it->GetOriginType() != RedSoldierType) ||
+			   (pHitEntity->GetType() == BlueSoldierType && it->GetOriginType() != BlueSoldierType))
 			{
 				FightingEntity* pFightingEntity = reinterpret_cast<FightingEntity*>(pHitEntity);
 				pFightingEntity->Hit(g_kProjectileDamage, it->GetVelocity());
@@ -177,26 +256,138 @@ void TestEnvironment::Cleanup()
 }
 
 //--------------------------------------------------------------------------------------
-// Adds a new entity to the test environment.
-// Param1: The type of the entity that should be added.
-// Param2: The world position, at which the entity should be added (that is a the correspondign grid field).
-// Param3: The rotation to apply to the new entity.
-// Returns true if the entity was successfully added and initialised, false otherwise.
+// Prepares the test environment for simulation by creating dynamic objects, colliders
+// and a node graph based on the objects placed by the user in edit mode. 
+// Returns true if the simulation was prepared successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float rotation)
+bool TestEnvironment::PrepareSimulation(void)
+{
+	// Initialise soldiers and flags
+
+	int soldierIndex = 0;
+
+	for(std::vector<BasicObject>::iterator it = m_staticObjects.begin(); it != m_staticObjects.end(); ++it)
+	{
+		switch(it->GetType())
+		{
+		case RedSoldierStartPositionType:
+			{
+			CircleCollider collider(it->GetPosition(), m_gridSpacing * 0.5f);
+			bool a = m_soldiers[soldierIndex++].Initialise(EntityInitData(++m_id, TeamRed, RedSoldierType, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CircleColliderType, &collider, this),
+												  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
+												  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
+												  EntityCombatInitData(g_kSoldierMaxHealth));
+			break;
+			}
+		case BlueSoldierStartPositionType:
+			{
+			CircleCollider collider(it->GetPosition(), m_gridSpacing * 0.5f);
+			bool b = m_soldiers[soldierIndex++].Initialise(EntityInitData(++m_id, TeamBlue, BlueSoldierType, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CircleColliderType, &collider, this),
+												  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
+												  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
+												  EntityCombatInitData(g_kSoldierMaxHealth));
+			break;
+			}
+		case RedFlagStartPositionType:
+			m_flags[TeamRed].Initialise(TeamRed, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), g_kFlagResetTimer);
+			break;
+		case BlueFlagStartPositionType:
+			m_flags[TeamBlue].Initialise(TeamBlue, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), g_kFlagResetTimer);
+			break;
+		}
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Adds a new object to the test environment (edit mode only).
+// Param1: The type of the object that should be added.
+// Param2: The world position, at which the object should be added (that is a the corresponding grid field).
+// Param3: The rotation to apply to the new entity.
+// Returns true if the object was successfully added and initialised, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::AddObject(ObjectType type, const XMFLOAT2& position, float rotation)
 {
 	// Set the entity to the centre of the grid field denoted by the passed in coordinates
 	XMFLOAT2 updatedPosition;
 	XMFLOAT2 gridPosition;
 
 	WorldToGridPosition(position, gridPosition);
-
+	
 	if(gridPosition.x < 0)
 	{
 		// Entity cannot be placed outside of the grid.
 		return false;
 	}
 
+	if((type == RedSoldierStartPositionType && m_soldierCount[TeamRed] >= g_kSoldiersPerTeam) || 
+	   (type == BlueSoldierStartPositionType && m_soldierCount[TeamBlue] >= g_kSoldiersPerTeam) ||
+	   (type == RedFlagStartPositionType && m_flagSet[TeamRed]) ||
+	   (type == BlueFlagStartPositionType && m_flagSet[TeamBlue]))
+	{
+		// Maximal number of flags/soldiers was already reached for a certain team.
+		return false;
+	}
+
+	GridToWorldPosition(gridPosition, updatedPosition);
+
+	// Get the ID for the grid field, that the entity was placed on
+	unsigned long gridId = static_cast<int>(gridPosition.x) * m_numberOfGridPartitions + static_cast<int>(gridPosition.y);
+
+	// Check if there are already static objects placed on this field
+	std::vector<BasicObject*> foundObjects;
+
+	// Find all objects with the given grid id
+	std::vector<BasicObject>::iterator foundIt = std::find_if(m_staticObjects.begin(), m_staticObjects.end(), FindBasicObjectByGridId(gridId));
+	while (foundIt != m_staticObjects.end()) {
+		foundObjects.push_back(&(*foundIt));
+		// Continue search from the position the last object was found.
+		foundIt = std::find_if(++foundIt, m_staticObjects.end(), FindBasicObjectByGridId(gridId));
+	}
+
+	bool doAddObject = true;
+
+	std::vector<BasicObject*>::iterator it = foundObjects.begin();
+	while(doAddObject && (it != foundObjects.end()))
+	{
+		// Make sure objects are only placed on top of each other if allowed
+		doAddObject = !((type == (*it)->GetType()) ||
+						((type != RedSoldierStartPositionType || ((*it)->GetType() != RedBaseAreaType)) && 
+						 (type != RedBaseAreaType || ((*it)->GetType() != RedSoldierStartPositionType)) &&
+						 (type != RedFlagStartPositionType || ((*it)->GetType() != RedBaseAreaType)) &&
+					     (type != RedBaseAreaType || ((*it)->GetType() != RedFlagStartPositionType)) &&
+						 (type != BlueSoldierStartPositionType || ((*it)->GetType() != BlueBaseAreaType)) &&
+					     (type != BlueBaseAreaType || ((*it)->GetType() != BlueSoldierStartPositionType)) &&
+					     (type != BlueFlagStartPositionType || ((*it)->GetType() != BlueBaseAreaType)) &&
+					     (type != BlueBaseAreaType || ((*it)->GetType() != BlueFlagStartPositionType))
+						));
+
+		++it;
+	}
+
+	if(doAddObject)
+	{
+		// Add the new object
+		m_staticObjects.emplace_back(gridId, type, updatedPosition, rotation, m_objectScaleFactors[type] * m_gridSpacing);
+
+		if(type == RedSoldierStartPositionType)
+		{
+			++m_soldierCount[TeamRed];
+		}else if(type == BlueSoldierStartPositionType)
+		{
+			++m_soldierCount[TeamBlue];
+		}else if(type == RedFlagStartPositionType)
+		{
+			m_flagSet[TeamRed] = true;
+		}else if(type == BlueFlagStartPositionType)
+		{
+			m_flagSet[TeamBlue] = true;
+		}
+	}
+
+	
+	/*
 	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty)
 	{
 		// Field is not empty, do not place entity on top of others
@@ -207,7 +398,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 
 	switch(type)
 	{
-	case ASoldier:
+	case RedSoldierType:
 		{
 			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
 			m_teamA.push_back(Soldier());
@@ -223,7 +414,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamA.back();
 		}
 		break;
-	case BSoldier:
+	case BlueSoldierType:
 		{
 			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
 			m_teamB.push_back(Soldier());
@@ -239,7 +430,7 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamB.back();
 		}
 		break;
-	case CoverSpot:
+	case ObstacleType:
 		AxisAlignedRectangleCollider collider(updatedPosition, m_gridSpacing, m_gridSpacing);
 
 		m_coverSpots.push_back(CoverPosition());
@@ -260,16 +451,16 @@ bool TestEnvironment::AddEntity(EntityType type, const XMFLOAT2& position, float
 	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id       = m_id;
 	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type     = type;
 	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_rotation = rotation;
-
+	*/
 	return true;
 }
 
 //--------------------------------------------------------------------------------------
-// Removes an entity from the test environment (only edit mode).
+// Removes all objects from a grid field of the test environment (only edit mode).
 // Param1: The world position, the corresponding grid field of which holds the entity to be deleted.
 // Returns true if the entity was successfully removed, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
+bool TestEnvironment::RemoveObjects(const XMFLOAT2& position)
 {
 	XMFLOAT2 gridPosition;
 	WorldToGridPosition(position, gridPosition);
@@ -280,13 +471,55 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 		return false;
 	}
 
+	// Get the ID for the grid field, that the entity was placed on
+	unsigned long gridId = static_cast<int>(gridPosition.x) * m_numberOfGridPartitions + static_cast<int>(gridPosition.y);
+
+	// Find all objects with the given grid id to be removed
+
+	std::vector<BasicObject*> foundObjects;
+	std::vector<BasicObject>::iterator foundIt = std::find_if(m_staticObjects.begin(), m_staticObjects.end(), FindBasicObjectByGridId(gridId));
+	while (foundIt != m_staticObjects.end()) {
+		foundObjects.push_back(&(*foundIt));
+		// Continue search from the position the last object was found.
+		foundIt = std::find_if(++foundIt, m_staticObjects.end(), FindBasicObjectByGridId(gridId));
+	}
+
+	if(foundObjects.empty())
+	{
+		return false;
+	}
+
+	for(std::vector<BasicObject*>::iterator it = foundObjects.begin(); it != foundObjects.end(); ++it)
+	{
+		// Update counts
+		if((*it)->GetType() == RedSoldierStartPositionType)
+		{
+			--m_soldierCount[TeamRed];
+		}else if((*it)->GetType() == BlueSoldierStartPositionType)
+		{
+			--m_soldierCount[TeamBlue];
+		}else if((*it)->GetType() == RedFlagStartPositionType)
+		{
+			m_flagSet[TeamRed] = false;
+		}else if((*it)->GetType() == BlueFlagStartPositionType)
+		{
+			m_flagSet[TeamBlue] = false;
+		}
+	}
+
+	// Actual deletion of the objects
+	std::vector<BasicObject>::iterator removeIt = std::remove_if(m_staticObjects.begin(), m_staticObjects.end(), FindBasicObjectByGridId(gridId));
+	m_staticObjects.erase(removeIt, m_staticObjects.end());
+	return true;
+
+	/*
 	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty)
 	{
 		unsigned long deleteId = m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id;
 
 		switch(m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type)
 		{
-		case ASoldier:
+		case RedSoldierType:
 			{
 				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamA.begin(), m_teamA.end(), FindEntityById<Entity>(deleteId));
 
@@ -297,7 +530,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 				}
 			}
 			break;
-		case BSoldier:
+		case BlueSoldierType:
 			{
 				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamB.begin(), m_teamB.end(), FindEntityById<Entity>(deleteId));
 
@@ -308,7 +541,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 				}
 			}
 			break;
-		case CoverSpot:
+		case ObstacleType:
 			{
 				std::list<CoverPosition>::iterator deleteIterator = std::find_if(m_coverSpots.begin(), m_coverSpots.end(), FindEntityById<Entity>(deleteId));
 
@@ -334,6 +567,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 		// Nothing to delete in that grid field
 		return false;
 	}
+	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -343,7 +577,7 @@ bool TestEnvironment::RemoveEntity(const XMFLOAT2& position)
 // Param3: The target position towards which the projectile is being fired.
 // Returns true if the projectile was successfully added and initialised, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::AddProjectile(EntityType originType, const XMFLOAT2& origin, const XMFLOAT2& target)
+bool TestEnvironment::AddProjectile(ObjectType originType, const XMFLOAT2& origin, const XMFLOAT2& target)
 {
 	if((origin.x == target.x) && (origin.y == target.y))
 	{
@@ -353,7 +587,7 @@ bool TestEnvironment::AddProjectile(EntityType originType, const XMFLOAT2& origi
 	CircleCollider collider(origin, m_gridSpacing * g_kProjectileScale * 0.5f);
 	m_projectiles.push_back(Projectile());
 	if(!m_projectiles.back().Initialise(originType, target,
-										EntityInitData(++m_id, ProjectileType, origin, 0.0f, m_gridSpacing * g_kProjectileScale, CircleColliderType, &collider, this),
+										EntityInitData(++m_id, TeamRed, ProjectileType, origin, 0.0f, m_gridSpacing * g_kProjectileScale, CircleColliderType, &collider, this),
 										EntityMovementInitData(g_kProjectileMaxVelocity, g_kProjectileMaxForce, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)))
 	{
 		m_projectiles.pop_back();
@@ -489,7 +723,7 @@ bool TestEnvironment::Load(std::string filename)
 
 			iss >> type >> position.x >> position.y >> rotation;
 
-			AddEntity(EntityType(type), position, rotation);
+			AddObject(ObjectType(type), position, rotation);
 		}
 
 		in.close();
@@ -566,7 +800,7 @@ void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, Ent
 		{
 			for(unsigned int k = startY; k <= endY; ++k)
 			{
-				if(!m_pGrid[i][k].m_isEmpty && (m_pGrid[i][k].m_type == CoverSpot) && (m_pGrid[i][k].m_id != pEntity->GetId()))
+				if(!m_pGrid[i][k].m_isEmpty && (m_pGrid[i][k].m_type == ObstacleType) && (m_pGrid[i][k].m_id != pEntity->GetId()))
 				{
 					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
 					if(squareDistance <= squareRadius)
@@ -754,7 +988,7 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	{
 		for(unsigned int k = startY; k <= endY; ++k)
 		{
-			if(!m_pGrid[i][k].m_isEmpty && m_pGrid[i][k].m_type == CoverSpot)
+			if(!m_pGrid[i][k].m_isEmpty && m_pGrid[i][k].m_type == ObstacleType)
 			{
 				
 				
@@ -944,7 +1178,7 @@ bool TestEnvironment::CheckCollision(const MovingEntity* pEntity,  const XMFLOAT
 		{
 			for(unsigned int k = startY; k <= endY; ++k)
 			{
-				if(!m_pGrid[i][k].m_isEmpty > 0 && m_pGrid[i][k].m_type == CoverSpot)
+				if(!m_pGrid[i][k].m_isEmpty > 0 && m_pGrid[i][k].m_type == ObstacleType)
 				{
 					if(m_pGrid[i][k].m_pEntity->GetCollider()->CheckLineCollision(start, end))
 					{
@@ -989,7 +1223,7 @@ void TestEnvironment::GetEnemies(const FightingEntity* pEntity, std::list<Fighti
 		return;
 	}
 
-	if(pEntity->GetType() == ASoldier)
+	if(pEntity->GetType() == RedSoldierType)
 	{
 		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
 		{
@@ -1047,7 +1281,7 @@ bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGr
 	for(int x = startGridX; x <= endGridX; x++) 
 	{
 		// Check if there is an obstacle blocking the line of sight
-        if((!m_pGrid[y][x].m_isEmpty > 0 && steep && (m_pGrid[y][x].m_type == CoverSpot)) || (!m_pGrid[x][y].m_isEmpty > 0 && !steep && (m_pGrid[x][y].m_type == CoverSpot)))
+		if((!m_pGrid[y][x].m_isEmpty > 0 && steep && (m_pGrid[y][x].m_type == ObstacleType)) || (!m_pGrid[x][y].m_isEmpty > 0 && !steep && (m_pGrid[x][y].m_type == ObstacleType)))
 		{
 			return false;
 		}
@@ -1068,6 +1302,7 @@ bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGr
 //--------------------------------------------------------------------------------------
 void TestEnvironment::StartSimulation(void)
 {
+	/*
 	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
 		it->Activate();
@@ -1077,7 +1312,16 @@ void TestEnvironment::StartSimulation(void)
 	{
 		it->Activate();
 	}
+	*/
 
+	PrepareSimulation();
+
+	for(unsigned int i = 0; i < g_kSoldiersPerTeam * NumberOfTeams; ++i)
+	{
+		m_soldiers[i].Activate();
+	}
+
+	m_isInEditMode = false;
 	m_isPaused = false;
 }
 
@@ -1092,7 +1336,7 @@ void TestEnvironment::EndSimulation(void)
 		{
 			if(!m_pGrid[i][k].m_isEmpty)
 			{
-				if(m_pGrid[i][k].m_type == ASoldier || m_pGrid[i][k].m_type == BSoldier)
+				if(m_pGrid[i][k].m_type == RedSoldierType || m_pGrid[i][k].m_type == BlueSoldierType)
 				{
 					XMFLOAT2 position;
 					GridToWorldPosition(XMFLOAT2(static_cast<float>(i), static_cast<float>(k)), position);
@@ -1107,6 +1351,7 @@ void TestEnvironment::EndSimulation(void)
 	// Delete all projectiles
 	m_projectiles.clear();
 
+	m_isInEditMode = true;
 	m_isPaused = true;
 }
 
@@ -1233,6 +1478,8 @@ bool TestEnvironment::InitialiseGrid()
 			}
 		}
 	}
+
+	
 
 	return true;
 }

@@ -50,7 +50,7 @@ private:
 	bool		InitialiseD3D(HWND hwnd);
 	bool		InitialiseRenderStates(void);
 	bool		InitialiseDrawables(void);
-	bool        InitialiseEntityRenderData(void);
+	bool        InitialiseObjectRenderData(void);
 	bool		InitialiseShaders(void);
 	bool        InitialiseTextRendering(HWND hwnd, const XMFLOAT4X4& baseViewMatrix, const XMFLOAT4X4& baseProjectionMatrix);
 	bool        InitialiseSentences(void);
@@ -97,7 +97,7 @@ private:
 	RenderContext            m_renderContext;                          // The render context is used collects render instance data of drawables to be rendered 
 	UINT                     m_windowWidth;                            // The width of the window the application is running in
 	UINT                     m_windowHeight;						   // The height of the window the application is running in
-	EntityRenderData         m_entityRenderData[NumberOfEntityTypes];  // Contains information on how to render the different entities
+	ObjectRenderData         m_objectRenderData[NumberOfObjectTypes];  // Contains information on how to render the different entities
 };
 
 #endif // RENDERER_H

@@ -131,22 +131,22 @@ void Application::ProcessInput(void)
 		if(m_inputManager.GetLeftClick())
 		{
 			// Add a new entity to the test environment
-			m_testEnvironment.AddEntity(m_appData.m_selectedEntityType, cursorPos, m_appData.m_currentRotation);
+			m_testEnvironment.AddObject(m_appData.m_selectedObjectType, cursorPos, m_appData.m_currentRotation);
 		}
 
 		if(m_inputManager.GetNextEntityType())
 		{
-			m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType + 1);
-			if(m_appData.m_selectedEntityType > CoverSpot)
+			m_appData.m_selectedObjectType = ObjectType(m_appData.m_selectedObjectType + 1);
+			if(m_appData.m_selectedObjectType > BlueBaseAreaType)
 			{
-				m_appData.m_selectedEntityType = EntityType(0);
+				m_appData.m_selectedObjectType = ObjectType(0);
 			}
 		}else if(m_inputManager.GetPreviousEntityType())
 		{
-			m_appData.m_selectedEntityType = EntityType(m_appData.m_selectedEntityType - 1);
-			if(m_appData.m_selectedEntityType < 0)
+			m_appData.m_selectedObjectType = ObjectType(m_appData.m_selectedObjectType - 1);
+			if(m_appData.m_selectedObjectType < 0)
 			{
-				m_appData.m_selectedEntityType = EntityType(CoverSpot);
+				m_appData.m_selectedObjectType = ObjectType(BlueBaseAreaType);
 			}
 		}
 
@@ -178,7 +178,7 @@ void Application::ProcessInput(void)
 
 		if(m_inputManager.GetDelete())
 		{
-			m_testEnvironment.RemoveEntity(cursorPos);
+			m_testEnvironment.RemoveObjects(cursorPos);
 		}
 	}
 }

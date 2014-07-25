@@ -20,9 +20,9 @@ RenderContext::~RenderContext(void)
 // Param1: The type of the entity to be rendered.
 // Param2: The matrix to transform the entity instance to world space.
 //--------------------------------------------------------------------------------------
-void RenderContext::AddInstance(EntityType type, const XMFLOAT4X4& transform)
+void RenderContext::AddInstance(ObjectType type, const XMFLOAT4X4& transform)
 {
-	m_entityInstances[type].push_back(Instance(transform));
+	m_objectInstances[type].push_back(Instance(transform));
 }
 
 //--------------------------------------------------------------------------------------
@@ -30,22 +30,22 @@ void RenderContext::AddInstance(EntityType type, const XMFLOAT4X4& transform)
 //--------------------------------------------------------------------------------------
 void RenderContext::Reset(void)
 {
-	for(int i = 0; i < NumberOfEntityTypes; ++i)
+	for(int i = 0; i < NumberOfObjectTypes; ++i)
 	{
-		m_entityInstances[i].clear();
+		m_objectInstances[i].clear();
 	}
 }
 
 // Data access functions
 
-int RenderContext::GetEntityCount(EntityType type) const
+int RenderContext::GetObjectCount(ObjectType type) const
 {
-	return m_entityInstances[type].size();
+	return m_objectInstances[type].size();
 }
 
-const Instance* RenderContext::GetInstances(EntityType type) const
+const Instance* RenderContext::GetInstances(ObjectType type) const
 {
-	return &m_entityInstances[type][0];
+	return &m_objectInstances[type][0];
 }
 
 

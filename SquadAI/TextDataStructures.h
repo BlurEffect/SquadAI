@@ -58,8 +58,8 @@ enum SentenceIdentifiers
 	TxtCursorPosY,
 	LabelRotation,
 	TxtRotation,
-	LabelEntityType,
-	TxtEntityType,
+	LabelObjectType,
+	TxtObjectType,
 	LabelFramerate,
 	TxtFramerate,
 	NumberOfSentences

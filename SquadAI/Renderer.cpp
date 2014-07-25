@@ -54,7 +54,7 @@ bool Renderer::Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const 
 
 	if(InitialiseD3D(hWnd) && 
 		InitialiseDrawables() && 
-		InitialiseEntityRenderData() &&
+		InitialiseObjectRenderData() &&
 		InitialiseShaders() && 
 		InitialiseTextRendering(hWnd, viewMatrix, projectionMatrix)
 	  )
@@ -357,37 +357,78 @@ bool Renderer::InitialiseDrawables()
 // Initialises the entity render data for each possible entity.
 // Returns true if the entity render data was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Renderer::InitialiseEntityRenderData()
+bool Renderer::InitialiseObjectRenderData()
 {
-	m_entityRenderData[ASoldier].m_drawableType = TriangleType;
-	m_entityRenderData[ASoldier].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	m_entityRenderData[ASoldier].m_name         = "A - Soldier";
-	m_entityRenderData[ASoldier].m_baseZ        = -1.0f;
 
-	m_entityRenderData[BSoldier].m_drawableType = TriangleType;
-	m_entityRenderData[BSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	m_entityRenderData[BSoldier].m_name         = "B - Soldier";
-	m_entityRenderData[BSoldier].m_baseZ        = -1.0f;
+	m_objectRenderData[RedSoldierStartPositionType].m_drawableType = TriangleType;
+	m_objectRenderData[RedSoldierStartPositionType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[RedSoldierStartPositionType].m_name         = "Red Soldier Start";
+	m_objectRenderData[RedSoldierStartPositionType].m_baseZ        = -1.0f;
 
-	m_entityRenderData[CoverSpot].m_drawableType = SquareType;
-	m_entityRenderData[CoverSpot].m_colour       = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_entityRenderData[CoverSpot].m_name         = "Cover Spot";
-	m_entityRenderData[CoverSpot].m_baseZ        = -2.0f;
+	m_objectRenderData[BlueSoldierStartPositionType].m_drawableType = TriangleType;
+	m_objectRenderData[BlueSoldierStartPositionType].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	m_objectRenderData[BlueSoldierStartPositionType].m_name         = "Blue Soldier Start";
+	m_objectRenderData[BlueSoldierStartPositionType].m_baseZ        = -1.0f;
+
+	m_objectRenderData[ObstacleType].m_drawableType = SquareType;
+	m_objectRenderData[ObstacleType].m_colour       = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_objectRenderData[ObstacleType].m_name         = "Obstacle";
+	m_objectRenderData[ObstacleType].m_baseZ        = -2.0f;
 			
-	m_entityRenderData[ADeadSoldier].m_drawableType = TriangleType;
-	m_entityRenderData[ADeadSoldier].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
-	m_entityRenderData[ADeadSoldier].m_name         = "A - Dead Soldier";
-	m_entityRenderData[ADeadSoldier].m_baseZ        = 1.0f;
-	
-	m_entityRenderData[BDeadSoldier].m_drawableType = TriangleType;
-	m_entityRenderData[BDeadSoldier].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
-	m_entityRenderData[BDeadSoldier].m_name         = "B - Dead Soldier";
-	m_entityRenderData[BDeadSoldier].m_baseZ        = 1.0f;
+	m_objectRenderData[RedFlagStartPositionType].m_drawableType = CircleType;
+	m_objectRenderData[RedFlagStartPositionType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[RedFlagStartPositionType].m_name         = "Red Flag Start";
+	m_objectRenderData[RedFlagStartPositionType].m_baseZ        = -2.0f;
 
-	m_entityRenderData[ProjectileType].m_drawableType = CircleType;
-	m_entityRenderData[ProjectileType].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
-	m_entityRenderData[ProjectileType].m_name         = "Projectile";
-	m_entityRenderData[ProjectileType].m_baseZ        = 0.0f;
+	m_objectRenderData[BlueFlagStartPositionType].m_drawableType = CircleType;
+	m_objectRenderData[BlueFlagStartPositionType].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	m_objectRenderData[BlueFlagStartPositionType].m_name         = "Blue Flag Start";
+	m_objectRenderData[BlueFlagStartPositionType].m_baseZ        = -2.0f;
+
+	m_objectRenderData[RedBaseAreaType].m_drawableType = SquareType;
+	m_objectRenderData[RedBaseAreaType].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[RedBaseAreaType].m_name         = "Red Base Area";
+	m_objectRenderData[RedBaseAreaType].m_baseZ        = 3.0f;
+
+	m_objectRenderData[BlueBaseAreaType].m_drawableType = SquareType;
+	m_objectRenderData[BlueBaseAreaType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
+	m_objectRenderData[BlueBaseAreaType].m_name         = "Blue Base Area";
+	m_objectRenderData[BlueBaseAreaType].m_baseZ        = 3.0f;
+
+	m_objectRenderData[RedSoldierType].m_drawableType = TriangleType;
+	m_objectRenderData[RedSoldierType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[RedSoldierType].m_name         = "Red Soldier";
+	m_objectRenderData[RedSoldierType].m_baseZ        = -1.0f;
+
+	m_objectRenderData[BlueSoldierType].m_drawableType = TriangleType;
+	m_objectRenderData[BlueSoldierType].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	m_objectRenderData[BlueSoldierType].m_name         = "Blue Soldier";
+	m_objectRenderData[BlueSoldierType].m_baseZ        = -1.0f;
+
+	m_objectRenderData[DeadRedSoldierType].m_drawableType = TriangleType;
+	m_objectRenderData[DeadRedSoldierType].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[DeadRedSoldierType].m_name         = "Dead Red Soldier";
+	m_objectRenderData[DeadRedSoldierType].m_baseZ        = 1.0f;
+	
+	m_objectRenderData[DeadBlueSoldierType].m_drawableType = TriangleType;
+	m_objectRenderData[DeadBlueSoldierType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
+	m_objectRenderData[DeadBlueSoldierType].m_name         = "Dead Blue Soldier";
+	m_objectRenderData[DeadBlueSoldierType].m_baseZ        = 1.0f;
+
+	m_objectRenderData[RedFlagType].m_drawableType = CircleType;
+	m_objectRenderData[RedFlagType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[RedFlagType].m_name         = "Red Flag";
+	m_objectRenderData[RedFlagType].m_baseZ        = -2.0f;
+
+	m_objectRenderData[BlueFlagType].m_drawableType = CircleType;
+	m_objectRenderData[BlueFlagType].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	m_objectRenderData[BlueFlagType].m_name         = "Blue Flag";
+	m_objectRenderData[BlueFlagType].m_baseZ        = -2.0f;
+
+	m_objectRenderData[ProjectileType].m_drawableType = CircleType;
+	m_objectRenderData[ProjectileType].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	m_objectRenderData[ProjectileType].m_name         = "Projectile";
+	m_objectRenderData[ProjectileType].m_baseZ        = 0.0f;
 
 	return true;
 }
@@ -508,13 +549,13 @@ bool Renderer::InitialiseSentences(void)
 		return false;
 	}
 
-	m_pPermanentSentences[LabelEntityType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -80, XMFLOAT3(1.0f, 1.0f, 1.0f));
-	if(!m_pPermanentSentences[LabelEntityType])
+	m_pPermanentSentences[LabelObjectType] = new SentenceDrawable(8, &m_font, "Entity: ", right - 250, top -80, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelObjectType])
 	{
 		return false;
 	}
-	m_pPermanentSentences[TxtEntityType] = new SentenceDrawable(20, &m_font, "Cover Position", right - 150, top -80, XMFLOAT3(1.0f, 1.0f, 1.0f));
-	if(!m_pPermanentSentences[TxtEntityType])
+	m_pPermanentSentences[TxtObjectType] = new SentenceDrawable(20, &m_font, "Cover Position", right - 150, top -80, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtObjectType])
 	{
 		return false;
 	}
@@ -647,20 +688,20 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 
 
 	// Render the objects collected by the render context
-	for(int i = 0; i < NumberOfEntityTypes; ++i)
+	for(int i = 0; i < NumberOfObjectTypes; ++i)
 	{
-		for(int k = 0; k < m_renderContext.GetEntityCount(EntityType(i)); ++k)
+		for(int k = 0; k < m_renderContext.GetObjectCount(ObjectType(i)); ++k)
 		{
 			// Update the per object data according to the current instance
-			m_perObjectData.m_colour = m_entityRenderData[i].m_colour;
+			m_perObjectData.m_colour = m_objectRenderData[i].m_colour;
 
-			XMMATRIX zTranslationMatrix = XMMatrixTranslation(0.0f, 0.0f, m_entityRenderData[i].m_baseZ);
+			XMMATRIX zTranslationMatrix = XMMatrixTranslation(0.0f, 0.0f, m_objectRenderData[i].m_baseZ);
 
-			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, zTranslationMatrix * XMLoadFloat4x4(&m_renderContext.GetInstances(EntityType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
+			XMStoreFloat4x4(&m_perObjectData.m_worldViewProjection, zTranslationMatrix * XMLoadFloat4x4(&m_renderContext.GetInstances(ObjectType(i))[k].m_world) * XMLoadFloat4x4(&viewProjection));
 			// Update the shader's constant buffer
 			m_shaderGroups[m_currentShaderGroup].SetObjectData(m_pD3d11DeviceContext, m_perObjectData);
 			// Draw the object
-			m_drawableObjects[m_entityRenderData[i].m_drawableType]->Draw(m_pD3d11DeviceContext);
+			m_drawableObjects[m_objectRenderData[i].m_drawableType]->Draw(m_pD3d11DeviceContext);
 		}
 	}
 }
@@ -740,7 +781,7 @@ void Renderer::UpdateSentences(const AppData& appData)
 	_itoa_s(static_cast<int>(appData.m_currentRotation), bufferRotation, 4, 10);
 	m_pPermanentSentences[TxtRotation]->SetText(bufferRotation);
 
-	m_pPermanentSentences[TxtEntityType]->SetText(m_entityRenderData[appData.m_selectedEntityType].m_name);
+	m_pPermanentSentences[TxtObjectType]->SetText(m_objectRenderData[appData.m_selectedObjectType].m_name);
 
 	char bufferFramerate[5];
 	if(appData.m_framesPerSecond <= 9999)

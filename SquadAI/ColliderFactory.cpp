@@ -10,24 +10,31 @@
 
 //--------------------------------------------------------------------------------------
 // Dynamically allocates a collider as an identical copy to the collider passed into the function.
-// Param1: A pointer to the collider that serves as blueprint for the new one.
+// Param1: The type of the collider that should be created.
+// Param2: A pointer to the initialisation data for the collider.
 // Returns true if the flag was successfully picked up, false otherwise.
 //--------------------------------------------------------------------------------------
-Collider* ColliderFactory::CreateCollider(Collider* pCollider)
+Collider* ColliderFactory::CreateCollider(ColliderType type, void* pColliderData)
 {
-	if(!pCollider)
+	if(!pColliderData)
 	{
 		return nullptr;
 	}
 
-	switch(pCollider->GetType())
+	switch(type)
 	{
 	case CircleColliderType:
-		return new CircleCollider(*(reinterpret_cast<CircleCollider*>(pCollider)));
+		{
+		CircleColliderData* pData = reinterpret_cast<CircleColliderData*>(pColliderData);
+		return new CircleCollider(pData->m_centre, pData->m_radius);
 		break;
+		}
 	case AxisAlignedRectangleColliderType:
-		return new AxisAlignedRectangleCollider(*(reinterpret_cast<AxisAlignedRectangleCollider*>(pCollider)));
+		{
+		AxisAlignedRectangleColliderData* pData = reinterpret_cast<AxisAlignedRectangleColliderData*>(pColliderData);
+		return new AxisAlignedRectangleCollider(pData->m_centre, pData->m_width, pData->m_height);
 		break;
+		}
 	default:
 		return nullptr;
 	}

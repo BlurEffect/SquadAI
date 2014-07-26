@@ -7,12 +7,9 @@
 // Includes
 #include "Flag.h"
 
-Flag::Flag(void) : m_team(EntityTeam(0)),
-				   m_position(0.0f, 0.0f),
-				   m_rotation(0.0f),
-				   m_uniformScale(1.0f),
+Flag::Flag(void) : CollidableObject(),
+				   m_team(EntityTeam(None)),
 				   m_resetInterval(0.0f),
-				   m_pCollider(nullptr),
 				   m_currentState(InBase),
 				   m_resetPosition(0.0f, 0.0f),
 				   m_resetTimePassed(0.0f),
@@ -22,40 +19,32 @@ Flag::Flag(void) : m_team(EntityTeam(0)),
 
 Flag::~Flag(void)
 {
-	if(m_pCollider)
-	{
-		delete m_pCollider;
-	}
 }
 
 //--------------------------------------------------------------------------------------
 // Initialise the flag object.
-// Param1: The team that the flag belongs to.
-// Param2: The initial position of the flag in world space.
-// Param3: The rotation of the flag.
-// Param4: The scale of the flag.
-// Param5: The time it takes for the flag to be reset after being dropped
+// Param1: The initial position of the flag in world space.
+// Param2: The rotation of the flag.
+// Param3: The scale of the flag.
+// Param4: The type of the collider that should be created.
+// Param5: A pointer to the initialisation data for the collider.
+// Param6: The team that the flag belongs to.
+// Param7: The time it takes for the flag to be reset after being dropped
 // Returns true if the flag was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Flag::Initialise(EntityTeam team, const XMFLOAT2& position, float rotation, float uniformScale, float resetInterval, Collider* pCollider)
+bool Flag::Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, EntityTeam team, float resetInterval)
 {
-	m_team = team;
-	m_position = position;
-	m_rotation = rotation;
-	m_uniformScale = uniformScale;
-	m_resetInterval = resetInterval;
-
-	m_pCollider = ColliderFactory::CreateCollider(pCollider);
-
-	if(!m_pCollider)
+	if(!CollidableObject::Initialise(position, rotation, uniformScale, colliderType, pColliderData))
 	{
 		return false;
 	}
 
-	m_currentState = InBase;
-	m_resetPosition = m_position;
+	m_team            = team;
+	m_resetInterval	  = resetInterval;
+	m_currentState    = InBase;
+	m_resetPosition   = GetPosition();
 	m_resetTimePassed = 0.0f;
-	m_pCarrier = nullptr;
+	m_pCarrier        = nullptr;
 
 	return true;
 }
@@ -90,7 +79,7 @@ void Flag::Update(float deltaTime)
 	{
 	case Stolen:
 		// Update the position of the flag according to the position of the carrier
-		m_position = m_pCarrier->GetPosition();
+		SetPosition(m_pCarrier->GetPosition());
 		break;
 	case Dropped:
 		m_resetTimePassed += deltaTime;
@@ -121,7 +110,7 @@ void Flag::OnDrop(void)
 //--------------------------------------------------------------------------------------
 void Flag::OnReset(void)
 {
-	m_position = m_resetPosition;
+	SetPosition(m_resetPosition);
 	m_currentState = InBase;
 }
 
@@ -130,21 +119,6 @@ void Flag::OnReset(void)
 EntityTeam Flag::GetTeam(void) const
 {
 	return m_team;
-}
-
-const XMFLOAT2& Flag::GetPosition(void) const
-{
-	return m_position;
-}
-
-float Flag::GetRotation(void) const
-{
-	return m_rotation;
-}
-
-float Flag::GetUniformScale(void) const
-{
-	return m_uniformScale;
 }
 
 float Flag::GetResetInterval(void) const
@@ -175,21 +149,6 @@ const Entity* Flag::GetCarrier(void) const
 void Flag::SetTeam(EntityTeam team)
 {
 	m_team = team;
-}
-
-void Flag::SetPosition(const XMFLOAT2& position)
-{
-	m_position = position;
-}
-
-void Flag::SetRotation(float rotation)
-{
-	m_rotation = rotation;
-}
-
-void Flag::SetUniformScale(float uniformScale)
-{
-	m_uniformScale = uniformScale;
 }
 
 void Flag::SetResetInterval(float resetInterval)

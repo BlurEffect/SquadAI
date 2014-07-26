@@ -36,6 +36,7 @@ private:
 	void ProcessInput(void);
 	bool SaveTestEnvironment(void);
 	bool LoadTestEnvironment(void);
+	bool CreateNewTestEnvironment(void);
 
 	AppData            m_appData;          // The current state and properties of the app
 	OrthographicCamera m_camera;		   // The camera component of the application

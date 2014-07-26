@@ -39,6 +39,7 @@ enum EntityTeam
 {
 	TeamRed, // The red team  
 	TeamBlue, // The blue team
+	None,
 	NumberOfTeams
 };
 
@@ -49,20 +50,18 @@ enum EntityTeam
 enum ObjectType
 {
 	// Placable
-	RedSoldierStartPositionType,	// Start position for a soldier of team red
-	BlueSoldierStartPositionType,	// Start position for a soldier of team blue
-	ObstacleType,					// An obstacle that blocks the way of soldiers
-	RedFlagStartPositionType,		// Start position for the red team flag
-	BlueFlagStartPositionType,		// Start position for the blue team flag
+	RedSoldierType,	// A soldier of team red
+	BlueSoldierType,	// A soldier of team blue
+	ObstacleType,			// An obstacle that blocks the way of soldiers
+	RedFlagType,		// The flag of team red
+	BlueFlagType,		// The flag of team blue
 	RedBaseAreaType,				// A grid field that belongs to the red base
 	BlueBaseAreaType,				// A grid field that belongs to the blue base
+	RedSpawnPointType,				// A point, where red team members can respawn
+	BlueSpawnPointType,				// A point, where blue team members can respawn
 	// Non placable
-	RedSoldierType,					// A soldier of team red
-	BlueSoldierType,				// A soldier of team blue
 	DeadRedSoldierType,				// A dead soldier of team red
 	DeadBlueSoldierType,			// A dead soldier of team blue
-	RedFlagType,					// The flag of team red
-	BlueFlagType,					// The flag of team blue
 	ProjectileType,					// A projectile shot by one of the soldiers
 	NumberOfObjectTypes
 };

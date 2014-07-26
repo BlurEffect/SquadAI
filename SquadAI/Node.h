@@ -12,8 +12,20 @@
 #include <DirectXMath.h>
 #include <vector>
 #include "TestEnvironmentData.h"
+#include "CollidableObject.h"
 
 using namespace DirectX;
+
+//--------------------------------------------------------------------------------------
+// Defines possible values for a node's property of providing access into a team's base.
+//--------------------------------------------------------------------------------------
+enum BaseEntranceType
+{
+	RedEntrance,
+	BlueEntrance,
+	NoEntrance,
+	RedAndBlueEntrance
+};
 
 class Node
 {
@@ -31,7 +43,12 @@ public:
 	const XMFLOAT2& GetGridPosition(void) const;
 	const XMFLOAT2& GetWorldPosition(void) const;
 	bool			IsObstacle(void) const;
+	const CollidableObject* GetObstacle(void) const;
 	bool            IsCovered(Direction direction) const;
+
+	EntityTeam     GetTerritoryOwner(void) const;
+	BaseEntranceType     GetEntranceToBase(void) const;
+
 	const std::vector<Node*>& GetAdjacentNodes(void) const;
 	float			GetMovementCost(void) const;
 	float           GetHeurisitcValue(void) const;
@@ -41,8 +58,12 @@ public:
 	void SetParent(Node* node);
 	void SetGridPosition(const XMFLOAT2& gridPos);
 	void SetWorldPosition(const XMFLOAT2& worldPos);
-	void SetObstacle(bool isObstacle);
+	void SetObstacle(CollidableObject* pObstacle);
 	void SetCovered(Direction direction, bool isCovered);
+
+	void SetTerritoryOwner(EntityTeam team);
+	void SetEntranceToBase(BaseEntranceType entrance);
+
 	void SetMovementCost(float cost);
 	void SetHeurisitcValue(float heuristicValue);
 
@@ -51,8 +72,15 @@ private:
 	Node*		  m_pParentNode;                       // The current parent node to this one
 	XMFLOAT2	  m_gridPos;					       // The position of the node in grid space and grid units
 	XMFLOAT2	  m_worldPos;						   // The position of the node in world space
+	
 	bool		  m_isObstacle;					       // Tells whether this node is an obstacle or can be traversed
+	
+	CollidableObject* m_pObstacle;   // The obstacle placed on this node, null if there is no obstacle
+	
 	bool		  m_coverProvided[NumberOfDirections]; // Tells whether this node is covered from some directions or is all in the open
+
+	EntityTeam    m_territoryOwner;					   // Tells whether this node is part of the base of a team
+	BaseEntranceType    m_entranceToBase;				       // Tells whether the node is an entrance node into a team base
 
 	std::vector<Node*> m_adjacentNodes;				   // The nodes in the graph that can be directly reached from this one
 	float			   m_movementCost;				   // The cost of a path from the start position to this node

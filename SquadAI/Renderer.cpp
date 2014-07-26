@@ -360,41 +360,6 @@ bool Renderer::InitialiseDrawables()
 bool Renderer::InitialiseObjectRenderData()
 {
 
-	m_objectRenderData[RedSoldierStartPositionType].m_drawableType = TriangleType;
-	m_objectRenderData[RedSoldierStartPositionType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	m_objectRenderData[RedSoldierStartPositionType].m_name         = "Red Soldier Start";
-	m_objectRenderData[RedSoldierStartPositionType].m_baseZ        = -1.0f;
-
-	m_objectRenderData[BlueSoldierStartPositionType].m_drawableType = TriangleType;
-	m_objectRenderData[BlueSoldierStartPositionType].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	m_objectRenderData[BlueSoldierStartPositionType].m_name         = "Blue Soldier Start";
-	m_objectRenderData[BlueSoldierStartPositionType].m_baseZ        = -1.0f;
-
-	m_objectRenderData[ObstacleType].m_drawableType = SquareType;
-	m_objectRenderData[ObstacleType].m_colour       = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_objectRenderData[ObstacleType].m_name         = "Obstacle";
-	m_objectRenderData[ObstacleType].m_baseZ        = -2.0f;
-			
-	m_objectRenderData[RedFlagStartPositionType].m_drawableType = CircleType;
-	m_objectRenderData[RedFlagStartPositionType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	m_objectRenderData[RedFlagStartPositionType].m_name         = "Red Flag Start";
-	m_objectRenderData[RedFlagStartPositionType].m_baseZ        = -2.0f;
-
-	m_objectRenderData[BlueFlagStartPositionType].m_drawableType = CircleType;
-	m_objectRenderData[BlueFlagStartPositionType].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	m_objectRenderData[BlueFlagStartPositionType].m_name         = "Blue Flag Start";
-	m_objectRenderData[BlueFlagStartPositionType].m_baseZ        = -2.0f;
-
-	m_objectRenderData[RedBaseAreaType].m_drawableType = SquareType;
-	m_objectRenderData[RedBaseAreaType].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
-	m_objectRenderData[RedBaseAreaType].m_name         = "Red Base Area";
-	m_objectRenderData[RedBaseAreaType].m_baseZ        = 3.0f;
-
-	m_objectRenderData[BlueBaseAreaType].m_drawableType = SquareType;
-	m_objectRenderData[BlueBaseAreaType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
-	m_objectRenderData[BlueBaseAreaType].m_name         = "Blue Base Area";
-	m_objectRenderData[BlueBaseAreaType].m_baseZ        = 3.0f;
-
 	m_objectRenderData[RedSoldierType].m_drawableType = TriangleType;
 	m_objectRenderData[RedSoldierType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	m_objectRenderData[RedSoldierType].m_name         = "Red Soldier";
@@ -405,16 +370,11 @@ bool Renderer::InitialiseObjectRenderData()
 	m_objectRenderData[BlueSoldierType].m_name         = "Blue Soldier";
 	m_objectRenderData[BlueSoldierType].m_baseZ        = -1.0f;
 
-	m_objectRenderData[DeadRedSoldierType].m_drawableType = TriangleType;
-	m_objectRenderData[DeadRedSoldierType].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
-	m_objectRenderData[DeadRedSoldierType].m_name         = "Dead Red Soldier";
-	m_objectRenderData[DeadRedSoldierType].m_baseZ        = 1.0f;
-	
-	m_objectRenderData[DeadBlueSoldierType].m_drawableType = TriangleType;
-	m_objectRenderData[DeadBlueSoldierType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
-	m_objectRenderData[DeadBlueSoldierType].m_name         = "Dead Blue Soldier";
-	m_objectRenderData[DeadBlueSoldierType].m_baseZ        = 1.0f;
-
+	m_objectRenderData[ObstacleType].m_drawableType = SquareType;
+	m_objectRenderData[ObstacleType].m_colour       = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_objectRenderData[ObstacleType].m_name         = "Obstacle";
+	m_objectRenderData[ObstacleType].m_baseZ        = -2.0f;
+			
 	m_objectRenderData[RedFlagType].m_drawableType = CircleType;
 	m_objectRenderData[RedFlagType].m_colour       = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	m_objectRenderData[RedFlagType].m_name         = "Red Flag";
@@ -424,6 +384,36 @@ bool Renderer::InitialiseObjectRenderData()
 	m_objectRenderData[BlueFlagType].m_colour       = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	m_objectRenderData[BlueFlagType].m_name         = "Blue Flag";
 	m_objectRenderData[BlueFlagType].m_baseZ        = -2.0f;
+
+	m_objectRenderData[RedBaseAreaType].m_drawableType = SquareType;
+	m_objectRenderData[RedBaseAreaType].m_colour       = XMFLOAT4(0.35f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[RedBaseAreaType].m_name         = "Red Base Area";
+	m_objectRenderData[RedBaseAreaType].m_baseZ        = 3.0f;
+
+	m_objectRenderData[BlueBaseAreaType].m_drawableType = SquareType;
+	m_objectRenderData[BlueBaseAreaType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.35f, 1.0f);
+	m_objectRenderData[BlueBaseAreaType].m_name         = "Blue Base Area";
+	m_objectRenderData[BlueBaseAreaType].m_baseZ        = 3.0f;
+
+	m_objectRenderData[RedSpawnPointType].m_drawableType = SquareType;
+	m_objectRenderData[RedSpawnPointType].m_colour       = XMFLOAT4(0.6f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[RedSpawnPointType].m_name         = "Red Spawn Point";
+	m_objectRenderData[RedSpawnPointType].m_baseZ        = 0.0f;
+
+	m_objectRenderData[BlueSpawnPointType].m_drawableType = SquareType;
+	m_objectRenderData[BlueSpawnPointType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.6f, 1.0f);
+	m_objectRenderData[BlueSpawnPointType].m_name         = "Blue Spawn Point";
+	m_objectRenderData[BlueSpawnPointType].m_baseZ        = 0.0f;
+
+	m_objectRenderData[DeadRedSoldierType].m_drawableType = TriangleType;
+	m_objectRenderData[DeadRedSoldierType].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+	m_objectRenderData[DeadRedSoldierType].m_name         = "Dead Red Soldier";
+	m_objectRenderData[DeadRedSoldierType].m_baseZ        = 1.0f;
+	
+	m_objectRenderData[DeadBlueSoldierType].m_drawableType = TriangleType;
+	m_objectRenderData[DeadBlueSoldierType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
+	m_objectRenderData[DeadBlueSoldierType].m_name         = "Dead Blue Soldier";
+	m_objectRenderData[DeadBlueSoldierType].m_baseZ        = 1.0f;
 
 	m_objectRenderData[ProjectileType].m_drawableType = CircleType;
 	m_objectRenderData[ProjectileType].m_colour       = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);

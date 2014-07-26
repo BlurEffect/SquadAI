@@ -14,6 +14,21 @@
 
 using namespace DirectX;
 
+//--------------------------------------------------------------------------------------
+// Bundles data required for the creation of an axis-aligned rectangle collider.
+//--------------------------------------------------------------------------------------
+struct AxisAlignedRectangleColliderData
+{
+	AxisAlignedRectangleColliderData(const XMFLOAT2& centre, float width, float height) : m_centre(centre),
+																						  m_width(width),
+																						  m_height(height)
+	{}
+
+	XMFLOAT2 m_centre;
+	float m_width;
+	float m_height;
+};
+
 class AxisAlignedRectangleCollider : public Collider
 {
 public:

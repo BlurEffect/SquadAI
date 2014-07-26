@@ -148,7 +148,7 @@ bool InputManager::GetDelete(void) const
 //--------------------------------------------------------------------------------------
 bool InputManager::GetToggleMode(void) const
 {
-	return m_input.KeyReturnDown();
+	return m_input.KeyTabDown();
 }
 
 //--------------------------------------------------------------------------------------
@@ -165,4 +165,12 @@ bool InputManager::GetTogglePaused(void) const
 bool InputManager::GetExitApplication(void) const
 {
 	return m_input.KeyEscapeDown();
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the user issued input to create a new test environment.
+//--------------------------------------------------------------------------------------
+bool InputManager::GetNewEnvironment(void) const
+{
+	return m_input.KeyF2Down();
 }

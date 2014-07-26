@@ -13,6 +13,19 @@
 
 using namespace DirectX;
 
+//--------------------------------------------------------------------------------------
+// Bundles data required for the creation of a circle collider.
+//--------------------------------------------------------------------------------------
+struct CircleColliderData
+{
+	CircleColliderData(const XMFLOAT2& centre, float radius) : m_centre(centre),
+															   m_radius(radius)
+	{}
+
+	XMFLOAT2 m_centre;
+	float    m_radius;
+};
+
 class CircleCollider : public Collider
 {
 public:

@@ -16,7 +16,7 @@
 class ColliderFactory
 {
 public:
-	static Collider* CreateCollider(Collider* collider);
+	static Collider* CreateCollider(ColliderType type, void* pColliderData);
 
 };
 

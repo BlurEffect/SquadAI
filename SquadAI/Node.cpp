@@ -13,6 +13,9 @@ Node::Node() : m_nodeId(0),
 			   m_gridPos(0.0f, 0.0f),
 			   m_worldPos(0.0f, 0.0f),
 			   m_isObstacle(false),
+			   m_pObstacle(nullptr),
+			   m_territoryOwner(EntityTeam(None)),
+			   m_entranceToBase(BaseEntranceType(NoEntrance)),
 			   m_movementCost(0.0f),
 			   m_heuristicValue(0.0f)
 {
@@ -93,9 +96,24 @@ bool Node::IsObstacle(void) const
 	return m_isObstacle;
 }
 
+const CollidableObject* Node::GetObstacle(void) const
+{
+	return m_pObstacle;
+}
+
 bool Node::IsCovered(Direction direction) const
 {
 	return m_coverProvided[direction];
+}
+
+EntityTeam Node::GetTerritoryOwner(void) const
+{
+	return m_territoryOwner;
+}
+
+BaseEntranceType Node::GetEntranceToBase(void) const
+{
+	return m_entranceToBase;
 }
 
 const std::vector<Node*>& Node::GetAdjacentNodes(void) const
@@ -138,14 +156,26 @@ void Node::SetWorldPosition(const XMFLOAT2& worldPos)
 	m_worldPos = worldPos;
 }
 
-void Node::SetObstacle(bool isObstacle)
+void Node::SetObstacle(CollidableObject* pObstacle)
 {
-	m_isObstacle = isObstacle;
+	m_pObstacle = pObstacle;
+
+	m_isObstacle = (m_pObstacle != nullptr);
 }
 
 void Node::SetCovered(Direction direction, bool isCovered)
 {
 	m_coverProvided[direction] = isCovered;
+}
+
+void Node::SetTerritoryOwner(EntityTeam team)
+{
+	m_territoryOwner = team;
+}
+
+void Node::SetEntranceToBase(BaseEntranceType entrance)
+{
+	m_entranceToBase = entrance;
 }
 
 void Node::SetMovementCost(float cost) 

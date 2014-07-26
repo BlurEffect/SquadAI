@@ -13,15 +13,24 @@ Object::Object(void) : m_position(0.0f, 0.0f),
 {
 }
 
-Object::Object(const XMFLOAT2& position, float rotation, float uniformScale)
-		: m_position(position),
-		  m_rotation(rotation),
-		  m_uniformScale(uniformScale)
+Object::~Object(void)
 {
 }
 
-Object::~Object(void)
+//--------------------------------------------------------------------------------------
+// Initialises the object.
+// Param1: The position of the object.
+// Param2: The rotation of the object along the world z-axis.
+// Param3: The uniform scale of the object.
+// Returns true if the object was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Object::Initialise(const XMFLOAT2& position, float rotation, float uniformScale)
 {
+	m_position = position;
+	m_rotation = rotation;
+	m_uniformScale = uniformScale;
+
+	return true;
 }
 
 // Data access functions

@@ -450,11 +450,11 @@ bool Input::KeyDeleteDown(void) const
 }
 
 //--------------------------------------------------------------------------------------
-// Returns true if the return key was pushed down in this frame.
+// Returns true if the tab key was pushed down in this frame.
 //--------------------------------------------------------------------------------------
-bool Input::KeyReturnDown(void) const
+bool Input::KeyTabDown(void) const
 {
-	return (KEYDOWN(m_keyboardState, DIK_RETURN)) && (!KEYDOWN(m_oldKeyboardState, DIK_RETURN));
+	return (KEYDOWN(m_keyboardState, DIK_TAB)) && (!KEYDOWN(m_oldKeyboardState, DIK_TAB));
 }
 
 //--------------------------------------------------------------------------------------
@@ -471,4 +471,12 @@ bool Input::KeySpaceDown(void) const
 bool Input::KeyEscapeDown(void) const
 {
 	return (KEYDOWN(m_keyboardState, DIK_ESCAPE)) && (!KEYDOWN(m_oldKeyboardState, DIK_ESCAPE));
+}
+
+//--------------------------------------------------------------------------------------
+// Returns true if the 'F2' key was pushed down in this frame.
+//--------------------------------------------------------------------------------------
+bool Input::KeyF2Down(void) const
+{
+	return (KEYDOWN(m_keyboardState, DIK_F2)) && (!KEYDOWN(m_oldKeyboardState, DIK_F2));
 }

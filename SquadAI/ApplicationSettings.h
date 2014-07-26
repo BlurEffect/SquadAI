@@ -38,6 +38,7 @@ const XMFLOAT4 g_kGridColour(1.0f, 1.0f, 1.0f, 1.0f);			  // The colour of the g
 const unsigned int g_kSoldiersPerTeam = 8; // The number of soldiers forming a team during the matches
 
 // Game settings
+const float g_kPickupFlagRadiusRelative = 0.25f; // An entity has to approach a flag this close (in relation to the grid spacing) in order to pick it up or return it
 const float g_kFlagResetTimer = 10.0f; // A flag will be reset to its start position after it was dropped for this long
 
 #endif // APPLICATION_SETTINGS_H

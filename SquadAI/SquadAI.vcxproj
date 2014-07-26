@@ -86,7 +86,8 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AxisAlignedRectangleCollider.cpp" />
-    <ClCompile Include="BasicObject.cpp" />
+    <ClCompile Include="CollidableObject.cpp" />
+    <ClCompile Include="EditModeObject.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="ColliderFactory.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="MovingEntity.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="CircleDrawable.cpp" />
     <ClCompile Include="Font.cpp">
@@ -137,7 +139,8 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="AxisAlignedRectangleCollider.h" />
-    <ClInclude Include="BasicObject.h" />
+    <ClInclude Include="CollidableObject.h" />
+    <ClInclude Include="EditModeObject.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="ColliderFactory.h" />
@@ -154,6 +157,7 @@
     <ClInclude Include="MovingEntity.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="CircleDrawable.h" />
     <ClInclude Include="Font.h">

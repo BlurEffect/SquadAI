@@ -12,18 +12,17 @@
 #include <DirectXMath.h>
 #include "Object.h"
 #include "EntityData.h"
-#include "Collider.h"
-#include "ColliderFactory.h"
+#include "CollidableObject.h"
 
 using namespace DirectX;
 
-class Projectile : public Object
+class Projectile : public CollidableObject
 {
 public:
-	Projectile(const XMFLOAT2& position, float rotation, float uniformScale);
+	Projectile(void);
 	~Projectile(void);
 
-	bool Initialise(const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam, Collider* pCollider);
+	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam);
 	void Update(float deltaTime);
 
 	// Data access functions
@@ -31,7 +30,6 @@ public:
 	const XMFLOAT2& GetDirection(void) const;
 	float			GetSpeed(void) const;
 	EntityTeam      GetFriendlyTeam(void) const;
-	const Collider* GetCollider(void) const;
 
 	void SetDirection(const XMFLOAT2& direction);
 	void SetSpeed(float speed);
@@ -41,7 +39,6 @@ private:
 	XMFLOAT2   m_direction;			// The direction, in which the projectile is flying
 	float      m_speed;				// The speed, at which the projectile is flying
 	EntityTeam m_friendlyTeam;		// The team that fired this projectile
-	Collider*  m_pCollider;			// The collider associated to the flag
 };
 
 /*

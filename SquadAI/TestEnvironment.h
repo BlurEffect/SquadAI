@@ -30,9 +30,10 @@
 #include "ProjectileProperties.h"
 #include "CircleCollider.h"
 #include "AxisAlignedRectangleCollider.h"
-#include "BasicObject.h"
+#include "EditModeObject.h"
 #include "ApplicationSettings.h"
 #include "Flag.h"
+#include "Obstacle.h"
 
 class FightingEntity;
 class MovingEntity;
@@ -93,7 +94,9 @@ private:
 
 	bool InitialiseGrid(void);
 	void CleanupGrid(void);
-	void UpdateCoverMap(Node& coverNode, bool doDelete);
+	void UpdateCoverSpots(CollidableObject* obstacle);
+	void UpdateBaseEntrances(void);
+	void UpdateNodeGraph(void);
 	bool CheckCollision(const Collider* pCollider, const XMFLOAT2& oldPosition, EntityGroup entityGroup, Entity*& outCollisionEntity);
 
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
@@ -101,13 +104,16 @@ private:
 	GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
 	Node**              m_pNodes; // The graph made up of nodes representing the test environment when in simulation mode
 
-	std::vector<BasicStaticObject> m_staticObjects; // The static test environment objects, as set up by the user in edit mode
+	std::vector<EditModeObject> m_staticObjects; // The static test environment objects, as set up by the user in edit mode
 	// Dynamic test environment objects
 
-	Soldier m_soldiers[g_kSoldiersPerTeam * NumberOfTeams];
-	Flag    m_flags[NumberOfTeams];
+	Soldier m_soldiers[g_kSoldiersPerTeam * (NumberOfTeams-1)];
+	Flag    m_flags[NumberOfTeams-1];
+
+	std::vector<Obstacle> m_obstacles;
 
 	// -> soldiers, projectiles, flags
+
 
 	Pathfinder          m_pathfinder; // The pathfinder associated to this environment.
 
@@ -124,8 +130,11 @@ private:
 	bool m_isInEditMode;
 	float m_objectScaleFactors[NumberOfObjectTypes]; // Determines the scale of the different objects in relation to a grid field
 
-	unsigned int m_soldierCount[NumberOfTeams]; // Keeps track of how many soldiers have been placed
-	bool		 m_flagSet[NumberOfTeams];		// Keeps track of the flags that have been placed
+	unsigned int m_soldierCount[NumberOfTeams-1]; // Keeps track of how many soldiers have been placed
+	bool		 m_flagSet[NumberOfTeams-1];		// Keeps track of the flags that have been placed
+
+	unsigned int m_spawnPointCount[NumberOfTeams-1];
+	std::vector<XMFLOAT2> m_spawnPoints[NumberOfTeams-1];
 
 	//--------------------------------------------------------------------------------------
 	// Private functor used to find an entity within a container based on its id.
@@ -147,11 +156,11 @@ private:
 	// Private functor used to find a basic object within a container based on the id of the
 	// grid field it is placed on.
 	//--------------------------------------------------------------------------------------
-	class FindBasicObjectByGridId
+	class FindEditModeObjectByGridId
 	{
 	public:
-		FindBasicObjectByGridId(unsigned long gridId) : m_gridId(gridId){}
-		bool operator()(const BasicStaticObject& basicObject)
+		FindEditModeObjectByGridId(unsigned long gridId) : m_gridId(gridId){}
+		bool operator()(const EditModeObject& basicObject)
 		{
 			return basicObject.GetGridId() == m_gridId;
 		}

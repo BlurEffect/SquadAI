@@ -11,7 +11,7 @@
 #include <DirectXMath.h>
 #include "EntityData.h"
 #include "Entity.h"
-#include "ColliderFactory.h"
+#include "CollidableObject.h"
 
 using namespace DirectX;
 
@@ -25,13 +25,13 @@ enum FlagState
 	Dropped // The flag was stolen but the carrier was killed and the flag was dropped
 };
 
-class Flag
+class Flag : public CollidableObject
 {
 public:
 	Flag(void);
 	~Flag(void);
 
-	bool Initialise(EntityTeam team, const XMFLOAT2& position, float rotation, float uniformScale, float resetInterval, Collider* pCollider);
+	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, EntityTeam team, float resetInterval);
 
 	bool OnPickUp(Entity* pEntity);
 	void Update(float deltaTime);
@@ -41,32 +41,20 @@ public:
 	// Data access functions
 
 	EntityTeam      GetTeam(void) const;
-	const XMFLOAT2& GetPosition(void) const;
-	float           GetRotation(void) const;
-	float			GetUniformScale(void) const;
 	float           GetResetInterval(void) const;
 	FlagState       GetState(void) const;
 	const XMFLOAT2& GetResetPosition(void) const;
 	float           GetResetTimePassed(void) const;
 	const Entity*   GetCarrier(void) const;
-	const Collider* GetCollider(void) const;
 
 	void SetTeam(EntityTeam team);
-	void SetPosition(const XMFLOAT2& position);
-	void SetRotation(float rotation);
-	void SetUniformScale(float uniformScale);
 	void SetResetInterval(float resetInterval);
 	void SetResetPosition(const XMFLOAT2& position);
 	void SetCarrier(Entity* pCarrier);
 
 private:
 	EntityTeam m_team;				// The team this flag belongs to
-	XMFLOAT2   m_position;			// The current position of the flag
-	float      m_rotation;			// The rotation of the flag
-	float      m_uniformScale;		// The scale of the flag
 	float      m_resetInterval;		// The flag will be reset when it was dropped for this long
-	Collider*  m_pCollider;			// The collider associated to the flag
-
 	FlagState  m_currentState;		// The current state of the flag
 	XMFLOAT2   m_resetPosition;		// The position, to which the flag will be reset to when dropped too long or after scoring
 	float      m_resetTimePassed;   // A timer keeping track of how long the flag was dropped

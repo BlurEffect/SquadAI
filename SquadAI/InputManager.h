@@ -37,7 +37,8 @@ public:
 	bool			GetToggleMode(void) const;
 	bool			GetTogglePaused(void) const;
 	bool			GetExitApplication(void) const;
-	
+	bool			GetNewEnvironment(void) const;
+
 private:
 	HWND     m_windowHandle;   // A handle to the window the application is running in
 	Input    m_input;          // The input object that is queried for key and mouse states

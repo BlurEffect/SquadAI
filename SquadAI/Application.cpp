@@ -73,6 +73,13 @@ void Application::ProcessInput(void)
 		return;
 	}
 
+	// Check if the user wants to create a new test application
+	if(m_inputManager.GetNewEnvironment())
+	{
+		CreateNewTestEnvironment();
+		return;
+	}
+
 	// Update the state of the application.
 
 	if(m_inputManager.GetToggleMode())
@@ -139,7 +146,7 @@ void Application::ProcessInput(void)
 		if(m_inputManager.GetNextEntityType())
 		{
 			m_appData.m_selectedObjectType = ObjectType(m_appData.m_selectedObjectType + 1);
-			if(m_appData.m_selectedObjectType > BlueBaseAreaType)
+			if(m_appData.m_selectedObjectType > BlueSpawnPointType)
 			{
 				m_appData.m_selectedObjectType = ObjectType(0);
 			}
@@ -148,7 +155,7 @@ void Application::ProcessInput(void)
 			m_appData.m_selectedObjectType = ObjectType(m_appData.m_selectedObjectType - 1);
 			if(m_appData.m_selectedObjectType < 0)
 			{
-				m_appData.m_selectedObjectType = ObjectType(BlueBaseAreaType);
+				m_appData.m_selectedObjectType = ObjectType(BlueSpawnPointType);
 			}
 		}
 
@@ -262,6 +269,59 @@ bool Application::LoadTestEnvironment(void)
 	}
 
 	// Loading operation finished, get rid of console
+	FreeConsole();
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Create a test environment based on user input.
+// Returns true if the new test environment could be created successfully.
+//--------------------------------------------------------------------------------------
+bool Application::CreateNewTestEnvironment(void)
+{
+	// Note: The whole application will close when the allocated console is closed manually by the user.
+
+	// Allocate a console to allow user input
+	FILE *stream;
+	AllocConsole();
+	freopen_s(&stream, "CONIN$", "r+t", stdin);
+	freopen_s(&stream, "CONOUT$", "w+t", stdout);
+	freopen_s(&stream, "CONOUT$", "w+t", stderr);
+
+	std::cout << "Please enter the size and number of partitions for the new grid separated by a space."
+			  << "\nEnter 'cancel' to cancel the process."
+			  << "\nPress enter after providing a name to proceed.\n";
+
+	// Note: Validation of the filename and error handling should be added.
+
+	// Get the input from the user or cancel the operation
+	
+	
+	std::string input;
+	getline(std::cin, input);
+
+	if(input != "cancel")
+	{
+		float        gridSize = 0.0f;
+		unsigned int partitions = 0;
+
+		std::istringstream iss(input);
+		iss >> gridSize >> partitions;
+		
+		std::cout << "\nCreating new environment...";
+
+		if((m_testEnvironment.Initialise(gridSize, partitions)) && m_renderer.SetupGrid(m_testEnvironment.GetGridSize(), m_testEnvironment.GetNumberOfGridPartitions()))
+		{
+			std::cout << "\nNew environment completed.";
+		}else
+		{
+			std::cout << "\nAn error occurred.";
+			return false;
+		}
+	}
+
+	// Saving operation finished, get rid of console
 	FreeConsole();
 
 	return true;

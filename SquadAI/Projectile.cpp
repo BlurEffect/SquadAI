@@ -8,42 +8,39 @@
 // Includes
 #include "Projectile.h"
 
-Projectile::Projectile(const XMFLOAT2& position, float rotation, float uniformScale) : Object(position, rotation, uniformScale),
-																					   m_direction(0.0f, 0.0f),	
-																		               m_speed(0.0f),			
-																					   m_friendlyTeam(EntityTeam(0)),
-																					   m_pCollider(nullptr)	
+Projectile::Projectile(void) : CollidableObject(),
+							   m_direction(0.0f, 0.0f),	
+							   m_speed(0.0f),			
+							   m_friendlyTeam(EntityTeam(0))
 {
 }
 
 Projectile::~Projectile(void)
 {
-	if(m_pCollider)
-	{
-		delete m_pCollider;
-	}
 }
 
 //--------------------------------------------------------------------------------------
 // Initialises the projectile.
-// Param1: The direction, into which the projectile should fly.
-// Param2: The speed, at which the projectile will travel.
-// Param3: The team that fired the projectile.
-// Param4: A pointer to the collider that should be used as blueprint for the projectile's collider
+// Param1: The position of the object.
+// Param2: The rotation of the object along the world z-axis.
+// Param3: The uniform scale of the object.
+// Param4: The type of the collider that should be created.
+// Param5: A pointer to the initialisation data for the collider.
+// Param6: The direction, into which the projectile should fly.
+// Param7: The speed, at which the projectile will travel.
+// Param8: The team that fired the projectile.
 // Returns true if the projectile was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Projectile::Initialise(const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam, Collider* pCollider)
+bool Projectile::Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam)
 {
-	m_direction    = direction;
-	m_speed        = speed;
-	m_friendlyTeam = friendlyTeam;
-
-	m_pCollider = ColliderFactory::CreateCollider(pCollider);
-
-	if(!m_pCollider)
+	if(!CollidableObject::Initialise(position, rotation, uniformScale, colliderType, pColliderData))
 	{
 		return false;
 	}
+
+	m_direction    = direction;
+	m_speed        = speed;
+	m_friendlyTeam = friendlyTeam;
 
 	return true;
 }
@@ -76,11 +73,6 @@ float Projectile::GetSpeed(void) const
 EntityTeam Projectile::GetFriendlyTeam(void) const
 {
 	return m_friendlyTeam;
-}
-
-const Collider* Projectile::GetCollider(void) const
-{
-	return m_pCollider;
 }
 
 void Projectile::SetDirection(const XMFLOAT2& direction)

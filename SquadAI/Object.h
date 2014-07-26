@@ -17,8 +17,9 @@ class Object
 {
 public:
 	Object(void);
-	Object(const XMFLOAT2& position, float rotation, float uniformScale);
 	virtual ~Object(void) = 0;
+	
+	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale);
 
 	// Data access functions
 

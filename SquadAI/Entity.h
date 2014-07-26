@@ -26,7 +26,7 @@ using namespace DirectX;
 struct EntityInitData
 {
 	EntityInitData(void) : m_id(0),
-						   m_team(EntityTeam(0)),
+						   m_team(EntityTeam(None)),
 						   m_type(ObjectType(0)),
 						   m_position(0.0f, 0.0f),
 						   m_rotation(0.0f),

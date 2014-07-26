@@ -1,11 +1,11 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  BasicObject.h
-*  Encapsulates a basic object present in the test environment.
+*  EditModeObject.h
+*  Encapsulates a basic object placed in edit mode.
 */
 
-#ifndef BASIC_OBJECT_H
-#define BASIC_OBJECT_H
+#ifndef EDIT_MODE_OBJECT_H
+#define EDIT_MODE_OBJECT_H
 
 // Includes
 #include <DirectXMath.h>
@@ -14,11 +14,13 @@
 
 using namespace DirectX;
 
-class BasicStaticObject : public Object
+class EditModeObject : public Object
 {
 public:
-	BasicStaticObject(unsigned long gridId, ObjectType type, const XMFLOAT2& position, float rotation, float uniformScale);
-	~BasicStaticObject(void);
+	EditModeObject(void);
+	~EditModeObject(void);
+
+	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale, unsigned long gridId, ObjectType type);
 
 	// Data access functions
 
@@ -33,4 +35,4 @@ private:
 	ObjectType			  m_type;			// The type of this object
 };
 
-#endif // BASIC_OBJECT_H
+#endif // EDIT_MODE_OBJECT_H

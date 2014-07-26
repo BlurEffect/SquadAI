@@ -61,9 +61,10 @@ public:
 	bool KeyLDown(void) const;
 	bool KeySDown(void) const;
 	bool KeyDeleteDown(void) const;
-	bool KeyReturnDown(void) const;
+	bool KeyTabDown(void) const;
 	bool KeySpaceDown(void) const;
 	bool KeyEscapeDown(void) const;
+	bool KeyF2Down(void) const;
 
 private:
 	bool SetupDirectInput(HINSTANCE hInst, HWND hWnd);

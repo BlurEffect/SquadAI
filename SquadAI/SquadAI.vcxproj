@@ -86,7 +86,9 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AxisAlignedRectangleCollider.cpp" />
+    <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="CollidableObject.cpp" />
+    <ClCompile Include="Composite.cpp" />
     <ClCompile Include="EditModeObject.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
@@ -116,9 +118,11 @@
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="RenderContext.cpp" />
+    <ClCompile Include="Selector.cpp" />
     <ClCompile Include="SentenceDrawable.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderFactory.cpp" />
     <ClCompile Include="ShaderGroup.cpp" />
@@ -136,7 +140,9 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="AxisAlignedRectangleCollider.h" />
+    <ClInclude Include="Behaviour.h" />
     <ClInclude Include="CollidableObject.h" />
+    <ClInclude Include="Composite.h" />
     <ClInclude Include="EditModeObject.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
@@ -171,9 +177,11 @@
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RendererData.h" />
+    <ClInclude Include="Selector.h" />
     <ClInclude Include="SentenceDrawable.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Sequence.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderFactory.h" />
     <ClInclude Include="ShaderGroup.h" />

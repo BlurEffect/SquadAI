@@ -55,6 +55,12 @@
     <Filter Include="Source Files\Colliders">
       <UniqueIdentifier>{4ab0c89a-0a1a-494a-8e03-0590c506a962}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\BehaviourTree">
+      <UniqueIdentifier>{dda02094-12b7-4bd7-8f41-8283a90b9cb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree">
+      <UniqueIdentifier>{6c6ee9f5-5fe0-4b57-bbc9-8bb4d3478740}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -182,6 +188,18 @@
     </ClCompile>
     <ClCompile Include="EntityKnowledge.cpp">
       <Filter>Source Files\EntityComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Behaviour.cpp">
+      <Filter>Source Files\BehaviourTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Composite.cpp">
+      <Filter>Source Files\BehaviourTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Selector.cpp">
+      <Filter>Source Files\BehaviourTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequence.cpp">
+      <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -355,6 +373,18 @@
     </ClInclude>
     <ClInclude Include="EntityKnowledge.h">
       <Filter>Header Files\EntityComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Behaviour.h">
+      <Filter>Header Files\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Composite.h">
+      <Filter>Header Files\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Sequence.h">
+      <Filter>Header Files\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Selector.h">
+      <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -22,7 +22,6 @@
 #include "RenderContext.h"
 #include "TestEnvironmentData.h"
 #include "Soldier.h"
-#include "CoverPosition.h"
 #include "Projectile.h"
 #include "Node.h"
 #include "Pathfinder.h"
@@ -67,12 +66,13 @@ public:
 	void WorldToGridPosition(const XMFLOAT2& worldPos, XMFLOAT2& gridPos) const;
 	void GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const;
 
-	void GetNearbyEntities(const Entity* pEntity, float radius, EntityGroup entityGroup, std::multimap<float, Entity*>& collisionObjects);
+	// 
+	void GetNearbyObjects(const XMFLOAT2& position, float radius, EntityGroup entityGroup, std::multimap<float, CollidableObject*>& collisionObjects);
 
-	const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
+	//const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
 	bool          CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);
 
-	void          GetEnemies(const FightingEntity* pEntity, std::list<FightingEntity*>& enemies);
+	//void          GetEnemies(const FightingEntity* pEntity, std::list<FightingEntity*>& enemies);
 
 	// Data access functions
 	float		 GetGridSize(void) const;
@@ -80,9 +80,9 @@ public:
 	float	     GetGridSpacing(void) const;
 	bool         IsPaused(void) const;
 
-	const std::list<Soldier>& GetTeamA(void) const;
-	const std::list<Soldier>& GetTeamB(void) const;
-	const std::list<CoverPosition>& GetCoverSpots(void) const;
+	//const std::list<Soldier>& GetTeamA(void) const;
+	//const std::list<Soldier>& GetTeamB(void) const;
+	//const std::list<CoverPosition>& GetCoverSpots(void) const;
 	
 
 	Pathfinder&  GetPathfinder(void);
@@ -97,11 +97,11 @@ private:
 	void UpdateCoverSpots(CollidableObject* obstacle);
 	void UpdateBaseEntrances(void);
 	void UpdateNodeGraph(void);
-	bool CheckCollision(const Collider* pCollider, const XMFLOAT2& oldPosition, EntityGroup entityGroup, Entity*& outCollisionEntity);
+	bool CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject);
 
 	unsigned long       m_id;    // An id is assigned to each entity being created in the environment
 
-	GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
+	//GridField**         m_pGrid;  // The grid the test application is using and on which entities are placed in edit mode
 	Node**              m_pNodes; // The graph made up of nodes representing the test environment when in simulation mode
 
 	std::vector<EditModeObject> m_staticObjects; // The static test environment objects, as set up by the user in edit mode
@@ -110,7 +110,7 @@ private:
 	Soldier m_soldiers[g_kSoldiersPerTeam * (NumberOfTeams-1)];
 	Flag    m_flags[NumberOfTeams-1];
 
-	std::vector<Obstacle> m_obstacles;
+	std::list<Obstacle> m_obstacles;
 
 	// -> soldiers, projectiles, flags
 
@@ -121,9 +121,9 @@ private:
 	unsigned int        m_numberOfGridPartitions; // The number of grid fields along x and y axis
 	float               m_gridSpacing;			  // The size of a grid field along x and y axis
 
-	std::list<Soldier>	     m_teamA;       // Holds the soldier entities associated to Team A
-	std::list<Soldier>	     m_teamB;       // Holds the soldier entities associated to Team B
-	std::list<CoverPosition> m_coverSpots;  // Holds the cover objects that were placed in the environment
+	//std::list<Soldier>	     m_teamA;       // Holds the soldier entities associated to Team A
+	//std::list<Soldier>	     m_teamB;       // Holds the soldier entities associated to Team B
+	//std::list<CoverPosition> m_coverSpots;  // Holds the cover objects that were placed in the environment
 	std::list<Projectile>    m_projectiles; // Holds the currently active projectiles
 
 	bool m_isPaused; // Tells whether the simulation running in the environment is currently paused

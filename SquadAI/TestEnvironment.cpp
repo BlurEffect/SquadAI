@@ -9,7 +9,7 @@
 
 
 TestEnvironment::TestEnvironment(void) : m_id(0),
-										 m_pGrid(nullptr),
+										 //m_pGrid(nullptr),
 										 m_pNodes(nullptr),
 										 m_gridSize(0.0f),
 										 m_numberOfGridPartitions(0),
@@ -106,7 +106,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 
 			XMMATRIX translationMatrix = XMMatrixTranslation(m_soldiers[i].GetPosition().x, m_soldiers[i].GetPosition().y, 0.0f);
 			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - m_soldiers[i].GetRotation()));
-			XMMATRIX scalingMatrix     = XMMatrixScaling(m_soldiers[i].GetScale(), m_soldiers[i].GetScale(), 1.0f);
+			XMMATRIX scalingMatrix     = XMMatrixScaling(m_soldiers[i].GetUniformScale(), m_soldiers[i].GetUniformScale(), 1.0f);
 
 			XMFLOAT4X4 transform;
 			XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
@@ -154,7 +154,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		}
 
 		// Update obstacles
-		for(std::vector<Obstacle>::iterator it = m_obstacles.begin(); it != m_obstacles.end(); ++it)
+		for(std::list<Obstacle>::iterator it = m_obstacles.begin(); it != m_obstacles.end(); ++it)
 		{
 			XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
 			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
@@ -187,16 +187,21 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 			XMFLOAT2 newPos = it->GetPosition();
 
 			// The entity that was hit by the projectile
-			Entity* pHitEntity = nullptr;
+			CollidableObject* pHitEntity = nullptr;
 
-			if(CheckCollision(it->GetCollider(), oldPos, GroupTeamBlueAndObstacles, pHitEntity))
+			if(CheckCollision(&(*it), oldPos, GroupTeamBlueAndObstacles, pHitEntity))
 			{
-				if((pHitEntity->GetTeam() == TeamRed && it->GetFriendlyTeam() != TeamRed) ||
-				   (pHitEntity->GetTeam() == TeamBlue && it->GetFriendlyTeam() != TeamBlue))
+				if(pHitEntity->GetCategory() == CategoryEntity && ((reinterpret_cast<Entity*>(pHitEntity)->GetTeam() == TeamRed && it->GetFriendlyTeam() != TeamRed) ||
+				   (reinterpret_cast<Entity*>(pHitEntity)->GetTeam() == TeamBlue && it->GetFriendlyTeam() != TeamBlue)))
 				{
-					FightingEntity* pFightingEntity = reinterpret_cast<FightingEntity*>(pHitEntity);
-					pFightingEntity->Hit(g_kProjectileDamage, it->GetDirection());
+					{
+						// todo: change this when hit method is moved to entity from soldier
+						Soldier* pSoldier = reinterpret_cast<Soldier*>(pHitEntity);
+						pSoldier->Hit(g_kProjectileDamage, it->GetDirection());
+					}
 				}
+
+				
 
 				m_projectiles.erase(it++);
 			}else
@@ -321,11 +326,25 @@ bool TestEnvironment::PrepareSimulation(void)
 		{
 		case RedSoldierType:
 			{
-			CircleCollider collider(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[RedSoldierType] * 0.5f);
-			if(!m_soldiers[soldierIndex++].Initialise(EntityInitData(++m_id, TeamRed, RedSoldierType, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CircleColliderType, &collider, this),
-												  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
-												  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
-												  EntityCombatInitData(g_kSoldierMaxHealth)))
+
+			SoldierProperties properties;
+			properties.m_maxSpeed					= g_kSoldierMaxSpeed;
+			properties.m_maxTotalForce				= g_kSoldierMaxForce;
+			properties.m_maxCollisionSeeAhead		= g_kSoldierMaxSeeAhead;
+			properties.m_maxCollisionAvoidanceForce = g_kSoldierMaxCollisionAvoidanceForce;
+			properties.m_maxAvoidWallsForce			= g_kSoldierMaxAvoidWallsForce;
+			properties.m_maxSeparationForce			= g_kSoldierMaxSeparationForce;
+			properties.m_targetReachedRadius		= g_kSoldierTargetReachedRadius;
+			properties.m_avoidWallsRadius			= m_gridSpacing; 
+			properties.m_separationRadius			= m_gridSpacing;
+			properties.m_fieldOfView				= g_kSoldierFieldOfView;
+			properties.m_viewingDistance			= g_kSoldierViewingDistance;
+			properties.m_maxHealth					= g_kSoldierMaxHealth;
+
+			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[RedSoldierType] * 0.5f);
+
+			if(!m_soldiers[soldierIndex++].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
+												      &colliderData, TeamRed, properties, this))
 			{
 				return false;
 			}
@@ -333,11 +352,24 @@ bool TestEnvironment::PrepareSimulation(void)
 			}
 		case BlueSoldierType:
 			{
-			CircleCollider collider(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[BlueSoldierType] * 0.5f);
-			if(!m_soldiers[soldierIndex++].Initialise(EntityInitData(++m_id, TeamBlue, BlueSoldierType, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CircleColliderType, &collider, this),
-												  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
-												  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
-												  EntityCombatInitData(g_kSoldierMaxHealth)))
+			SoldierProperties properties;
+			properties.m_maxSpeed					= g_kSoldierMaxSpeed;
+			properties.m_maxTotalForce				= g_kSoldierMaxForce;
+			properties.m_maxCollisionSeeAhead		= g_kSoldierMaxSeeAhead;
+			properties.m_maxCollisionAvoidanceForce = g_kSoldierMaxCollisionAvoidanceForce;
+			properties.m_maxAvoidWallsForce			= g_kSoldierMaxAvoidWallsForce;
+			properties.m_maxSeparationForce			= g_kSoldierMaxSeparationForce;
+			properties.m_targetReachedRadius		= g_kSoldierTargetReachedRadius;
+			properties.m_avoidWallsRadius			= m_gridSpacing; 
+			properties.m_separationRadius			= m_gridSpacing;
+			properties.m_fieldOfView				= g_kSoldierFieldOfView;
+			properties.m_viewingDistance			= g_kSoldierViewingDistance;
+			properties.m_maxHealth					= g_kSoldierMaxHealth;
+
+			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[BlueSoldierType] * 0.5f);
+
+			if(!m_soldiers[soldierIndex++].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
+												      &colliderData, TeamBlue, properties, this))
 			{
 				return false;
 			}
@@ -348,7 +380,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			//AxisAlignedRectangleCollider collider(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[ObstacleType], m_gridSpacing * m_objectScaleFactors[ObstacleType]);
 			AxisAlignedRectangleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[ObstacleType], m_gridSpacing * m_objectScaleFactors[ObstacleType]);
 			m_obstacles.push_back(Obstacle());
-			if(!m_obstacles.back().Initialise(it->GetPosition(), it->GetRotation(), it->GetUniformScale(), AxisAlignedRectangleColliderType, &colliderData))
+			if(!m_obstacles.back().Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObstacle, AxisAlignedRectangleColliderType, &colliderData))
 			{
 				m_obstacles.pop_back();
 				return false;
@@ -359,7 +391,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			{
 			//CircleCollider collider(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
-			if(!m_flags[TeamRed].Initialise(it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CircleColliderType, &colliderData, TeamRed, g_kFlagResetTimer))
+			if(!m_flags[TeamRed].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamRed, g_kFlagResetTimer))
 			{
 				return false;
 			}
@@ -369,7 +401,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			{
 			//CircleCollider collider(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
-			if(!m_flags[TeamBlue].Initialise(it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CircleColliderType, &colliderData, TeamBlue, g_kFlagResetTimer))
+			if(!m_flags[TeamBlue].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamBlue, g_kFlagResetTimer))
 			{
 				return false;
 			}
@@ -468,7 +500,7 @@ bool TestEnvironment::AddObject(ObjectType type, const XMFLOAT2& position, float
 		// Add the new object
 		m_staticObjects.push_back(EditModeObject());
 
-		if(!m_staticObjects.back().Initialise(updatedPosition, rotation, m_objectScaleFactors[type] * m_gridSpacing, gridId, type))
+		if(!m_staticObjects.back().Initialise(++m_id, updatedPosition, rotation, m_objectScaleFactors[type] * m_gridSpacing, gridId, type))
 		{
 			m_staticObjects.pop_back();
 			return false;
@@ -709,7 +741,7 @@ bool TestEnvironment::AddProjectile(EntityTeam friendlyTeam, const XMFLOAT2& ori
 
 	//CircleCollider collider(origin, m_gridSpacing * m_objectScaleFactors[ProjectileType] * 0.5f);
 	CircleColliderData colliderData(origin, m_gridSpacing * m_objectScaleFactors[ProjectileType] * 0.5f);
-	if(!m_projectiles.back().Initialise(origin, 0.0f, m_objectScaleFactors[ProjectileType] * m_gridSpacing, CircleColliderType, &colliderData, direction, g_kProjectileSpeed, friendlyTeam))
+	if(!m_projectiles.back().Initialise(++m_id, origin, 0.0f, m_objectScaleFactors[ProjectileType] * m_gridSpacing, CategoryProjectile, CircleColliderType, &colliderData, direction, g_kProjectileSpeed, friendlyTeam))
 	{
 		m_projectiles.pop_back();
 		return false;
@@ -872,15 +904,15 @@ bool TestEnvironment::Load(std::string filename)
 
 //--------------------------------------------------------------------------------------
 // Determines the entities of a specific group that are within a specified circle-shaped
-// area around a given entity. This checks against the centres of entities. Does not include
-// the entity itself in the return list.
+// area around a given position. This checks against the centres of entities. Does not include
+// dead entities.
 // Param1: A pointer to the entity, for which the nearby entities should be found.
 // Param2: The radius of the circle area.
 // Param3: Specifies which set of entities will be checked and returned.
 // Param4: A multimap that will hold the entities positioned within the radius, 
 //         sorted by the square distance to the entity as key elements.
 //--------------------------------------------------------------------------------------
-void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, EntityGroup entityGroup, std::multimap<float, Entity*>& collisionObjects)
+void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, EntityGroup entityGroup, std::multimap<float, CollidableObject*>& collisionObjects)
 {
 	// work on nodes, not on grid
 	// get rid of grid
@@ -893,21 +925,21 @@ void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, Ent
 	float squareRadius = radius * radius;
 	float squareDistance = 0.0f;
 
-	//if(entityGroup != GroupObstacles) 
-	//{
-	//	// Check soldiers
-	//	for(unsigned int i = 0; i < g_kSoldiersPerTeam * NumberOfTeams; ++i)
-	//	{
-	//		if(it->GetId() != pEntity->GetId() && it->IsAlive())
-	//		{
-	//			XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
-	//			if(squareDistance <= squareRadius)
-	//			{
-	//				collisionObjects.insert(std::pair<float, Entity*>(squareDistance,(&(*it))));
-	//			}
-	//		}
-	//	}
-	//}
+	if(entityGroup != GroupObstacles) 
+	{
+		// Check soldiers
+		for(unsigned int i = 0; i < g_kSoldiersPerTeam * NumberOfTeams; ++i)
+		{
+			if(m_soldiers[i].IsAlive())
+			{
+				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&position)));
+				if(squareDistance <= squareRadius)
+				{
+					collisionObjects.insert(std::pair<float, CollidableObject*>(squareDistance,(&(m_soldiers[i]))));
+				}
+			}
+		}
+	}
 
 	//if(entityGroup == GroupTeamBlue || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
 	//{
@@ -925,36 +957,36 @@ void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, Ent
 	//	}
 	//}
 
-	//if(entityGroup == GroupObstacles || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
-	//{
-	//	// Only check nearby obstacles for collision
-	//	unsigned int maxGridDistance = static_cast<unsigned int>(radius / m_gridSpacing) + 1;
+	if(entityGroup == GroupObstacles || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	{
+		// Only check nearby obstacles for collision
+		unsigned int maxGridDistance = static_cast<unsigned int>(radius / m_gridSpacing) + 1;
 
-	//	// Get the current grid position of the entity
-	//	XMFLOAT2 gridPos;
-	//	WorldToGridPosition(pEntity->GetPosition(), gridPos);
+		// Get the current grid position of the entity
+		XMFLOAT2 gridPos;
+		WorldToGridPosition(position, gridPos);
 
-	//	unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
-	//	unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
-	//	unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
-	//	unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+		unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
+		unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
+		unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+		unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
 
-	//	// Check the grid within that distance for colliding obstacles
-	//	for(unsigned int i = startX; i <= endX; ++i)
-	//	{
-	//		for(unsigned int k = startY; k <= endY; ++k)
-	//		{
-	//			if(!m_pGrid[i][k].m_isEmpty && (m_pGrid[i][k].m_type == ObstacleType) && (m_pGrid[i][k].m_id != pEntity->GetId()))
-	//			{
-	//				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
-	//				if(squareDistance <= squareRadius)
-	//				{
-	//					collisionObjects.insert(std::pair<float, Entity*>(squareDistance, m_pGrid[i][k].m_pEntity));
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+		// Check the grid within that distance for colliding obstacles
+		for(unsigned int i = startX; i <= endX; ++i)
+		{
+			for(unsigned int k = startY; k <= endY; ++k)
+			{
+				if(m_pNodes[i][k].IsObstacle())
+				{
+					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_pNodes[i][k].GetObstacle()->GetPosition()) - XMLoadFloat2(&position)));
+					if(squareDistance <= squareRadius)
+					{
+						collisionObjects.insert(std::pair<float, CollidableObject*>(squareDistance, m_pNodes[i][k].GetObstacle()));
+					}
+				}
+			}
+		}
+	}
 
 	/*
 	if(entityGroup == GroupTeamRed || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamAAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
@@ -1022,6 +1054,7 @@ void TestEnvironment::GetNearbyEntities(const Entity* pEntity, float radius, Ent
 	*/
 }
 
+/*
 //--------------------------------------------------------------------------------------
 // Determines the closest object in a moving entity's movement direction that it could
 // collide with. Mostly based on: http://stackoverflow.com/questions/1073336/circle-line-collision-detection
@@ -1041,7 +1074,6 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	// The normalised movement direction of the entity
 	XMVECTOR normDirection = XMVector2Normalize(XMLoadFloat2(&entity.GetViewDirection()));
 
-	/*
 	// Check other soldiers for collisions
 	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
 	{
@@ -1128,7 +1160,6 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 			}
 		}
 	}
-	*/
 
 	XMFLOAT2 lineEndPoint;
 	XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&entity.GetPosition()) + normDirection * entity.GetMaxSeeAhead());
@@ -1249,9 +1280,9 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 					}
 				}
 				*/
-			}
-		}
-	}
+			//}
+		//}
+	//}
 	
 
 	/*
@@ -1295,87 +1326,69 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 		
 	}
 	*/
-	return pCollisionObject;
-}
+	//return pCollisionObject;
+//}
 
 //--------------------------------------------------------------------------------------
-// Checks fro collisions between an entity and a specified group of other entities.
+// Checks for collisions between an entity and a specified group of other entities. Collision
+// of an object with itself is excluded, as are collisions with dead entities.
 // Param1: A pointer to the collider that should be checked for collision with other entities.
 // Param2: The previous position of the entity (during the last frame).
 // Param3: Specifies the group of entities that should be checked for collision with the given entity.
-// Param4: Out parameter that will hold a pointer to the colliding entity that is closest to the entity specified in Param1. 
+// Param4: Out parameter that will hold a pointer to the colliding object that is closest to the collidable object specified in Param1. 
 //         Null if there is no collision at all. 
 // Returns true if the entity is about to collide with an entity of the specified group, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::CheckCollision(const Collider* pCollider,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, Entity*& outCollisionEntity)
+bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject)
 {
 	float shortestSquareDistance = std::numeric_limits<float>::max();
-	outCollisionEntity = nullptr;
+	outCollisionObject = nullptr;
 
 	// Determine the points of the line that the colliders of other entities will be checked against
 	
 	// Current position of the entity
 	XMFLOAT2 start = oldPosition;
 	// The position, where the entity will at the end of the frame
-	XMFLOAT2 end = pCollider->GetCentre();
+	XMFLOAT2 end = pCollidableObject->GetPosition();
 
-	if(entityGroup == GroupTeamRed || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	if(entityGroup != GroupObstacles)
 	{
-		// Check team A for collision
-		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 		{
-			if(it->IsAlive())
+			if(m_soldiers[i].IsAlive() && (m_soldiers[i].GetId() != pCollidableObject->GetId()) &&
+			   (entityGroup == GroupAllSoldiersAndObstacles ||
+				entityGroup == GroupAllSoldiers ||
+				(m_soldiers[i].GetTeam() == TeamRed && (entityGroup == GroupTeamRed || entityGroup == GroupTeamRedAndObstacles)) ||
+				(m_soldiers[i].GetTeam() == TeamBlue && (entityGroup == GroupTeamBlue || entityGroup == GroupTeamBlueAndObstacles)))				)
 			{
-				if(it->GetCollider()->CheckLineCollision(start, end))
+				if(m_soldiers[i].GetCollider()->CheckLineCollision(start, end))
 				{
 					float squareDistance = 0.0f;
-					XMVECTOR vector = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pCollider->GetCentre());
+					XMVECTOR vector = XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
 					XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
 
 					if(squareDistance < shortestSquareDistance)
 					{
 						shortestSquareDistance = squareDistance;
-						outCollisionEntity = &(*it);
+						outCollisionObject = &(m_soldiers[i]);
 					}
 				}
 			}
 		}
 	}
 
-	if(entityGroup == GroupTeamBlue || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
-	{
-		// Check team B for collision
-		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-		{
-			if(it->IsAlive())
-			{
-				if(it->GetCollider()->CheckLineCollision(start, end))
-				{
-					float squareDistance = 0.0f;
-					XMVECTOR vector = XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pCollider->GetCentre());
-					XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
-
-					if(squareDistance < shortestSquareDistance)
-					{
-						shortestSquareDistance = squareDistance;
-						outCollisionEntity = &(*it);
-					}
-				}
-			}
-		}
-	}
 
 	if(entityGroup == GroupObstacles || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
 	{
 		float distance = 0.0f;
-		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&pCollider->GetCentre()) - XMLoadFloat2(&oldPosition)));
+		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&pCollidableObject->GetPosition()) - XMLoadFloat2(&oldPosition)));
 
 		// Only check nearby obstacles for collision
 		unsigned int maxGridDistance = static_cast<unsigned int>(distance / m_gridSpacing) + 1;
 
 		// Get the current grid position of the entity
 		XMFLOAT2 gridPos;
-		WorldToGridPosition(pCollider->GetCentre(), gridPos);
+		WorldToGridPosition(pCollidableObject->GetPosition(), gridPos);
 
 		unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
 		unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
@@ -1387,18 +1400,18 @@ bool TestEnvironment::CheckCollision(const Collider* pCollider,  const XMFLOAT2&
 		{
 			for(unsigned int k = startY; k <= endY; ++k)
 			{
-				if(!m_pGrid[i][k].m_isEmpty > 0 && m_pGrid[i][k].m_type == ObstacleType)
+				if(m_pNodes[i][k].IsObstacle())
 				{
-					if(m_pGrid[i][k].m_pEntity->GetCollider()->CheckLineCollision(start, end))
+					if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(start, end))
 					{
 						float squareDistance = 0.0f;
-						XMVECTOR vector = XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition()) - XMLoadFloat2(&pCollider->GetCentre());
+						XMVECTOR vector = XMLoadFloat2(&m_pNodes[i][k].GetWorldPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
 						XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
 
 						if(squareDistance < shortestSquareDistance)
 						{
 							shortestSquareDistance = squareDistance;
-							outCollisionEntity = m_pGrid[i][k].m_pEntity;
+							outCollisionObject = m_pNodes[i][k].GetObstacle();
 						}
 					}
 				}
@@ -1417,9 +1430,10 @@ bool TestEnvironment::CheckCollision(const Collider* pCollider,  const XMFLOAT2&
 		*/
 	}
 
-	return (outCollisionEntity != nullptr);
+	return (outCollisionObject != nullptr);
 }
 
+/*
 //--------------------------------------------------------------------------------------
 // Accumulates a list of entities hostile to the passed in entity.
 // Param1: The entity, for which enemies should be found.
@@ -1445,7 +1459,7 @@ void TestEnvironment::GetEnemies(const FightingEntity* pEntity, std::list<Fighti
 			enemies.push_back(&(*it));
 		}
 	}
-}
+}*/
 
 //--------------------------------------------------------------------------------------
 // Determines whether there is a direct line of sight between two fields on the grid.
@@ -1599,6 +1613,7 @@ bool TestEnvironment::StartSimulation(void)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::EndSimulation(void)
 {
+	/*
 	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
 	{
 		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
@@ -1615,11 +1630,22 @@ void TestEnvironment::EndSimulation(void)
 				}
 			}
 		}
-	}
+	}*/
 
 	// Delete all projectiles
 	m_projectiles.clear();
 	m_obstacles.clear();
+
+	for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+	{
+		m_soldiers[i].Reset();
+	}
+
+	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+	{
+		// not sure if needed
+		//m_flags[i].OnReset();
+	}
 
 //-----	// TODO:
 //-----	// delete obstacles/spawn points, reset soldiers, flags, etc
@@ -1653,7 +1679,7 @@ bool TestEnvironment::InitialiseGrid()
 	m_gridSpacing = m_gridSize / static_cast<float>(m_numberOfGridPartitions);
 
 	// Initialise the grid
-
+	/*
 	m_pGrid = new GridField*[m_numberOfGridPartitions];
 
 	if(!m_pGrid)
@@ -1673,7 +1699,7 @@ bool TestEnvironment::InitialiseGrid()
 		// All grid fields are initially empty
 		m_pGrid[i]->m_isEmpty = true;
 	}
-
+	*/
 	// Initialise the nodes
 
 	m_pNodes = new Node*[m_numberOfGridPartitions];
@@ -1762,6 +1788,7 @@ bool TestEnvironment::InitialiseGrid()
 //--------------------------------------------------------------------------------------
 void TestEnvironment::CleanupGrid()
 {
+	/*
 	if(m_pGrid)
 	{
 		for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
@@ -1772,7 +1799,7 @@ void TestEnvironment::CleanupGrid()
 
 		delete[] m_pGrid;
 		m_pGrid = nullptr;
-	}
+	}*/
 
 	if(m_pNodes)
 	{
@@ -1794,7 +1821,7 @@ void TestEnvironment::CleanupGrid()
 void TestEnvironment::UpdateNodeGraph(void)
 {
 	// Update cover positions
-	for(std::vector<Obstacle>::iterator it = m_obstacles.begin(); it != m_obstacles.end(); ++it)
+	for(std::list<Obstacle>::iterator it = m_obstacles.begin(); it != m_obstacles.end(); ++it)
 	{
 		UpdateCoverSpots(&(*it));
 	}
@@ -1965,6 +1992,7 @@ Node** TestEnvironment::GetNodes(void)
 	return m_pNodes;
 }
 
+/*
 const std::list<Soldier>& TestEnvironment::GetTeamA(void) const
 {
 	return m_teamA;
@@ -1979,3 +2007,4 @@ const std::list<CoverPosition>& TestEnvironment::GetCoverSpots(void) const
 {
 	return m_coverSpots;
 }
+*/

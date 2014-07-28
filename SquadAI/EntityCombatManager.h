@@ -12,8 +12,8 @@
 #include <DirectXMath.h>
 
 // Forward declarations
-class FightingEntity;
-struct EntityCombatInitData;
+class Entity;
+class TestEnvironment;
 
 using namespace DirectX;
 
@@ -23,25 +23,17 @@ public:
 	EntityCombatManager(void);
 	~EntityCombatManager(void);
 
-	bool Initialise(FightingEntity* pEntity, const EntityCombatInitData& initData);
+	bool Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment);
 	void Reset(void);
 
 	void ShootAt(const XMFLOAT2& target);
-	void Hit(float damage, const XMFLOAT2& direction);
 
 	// Data access functions
 
-	float GetCurrentHealth(void) const;
-	float GetMaximalHealth(void) const;
-	float IsAlive(void) const;
-	void SetCurrentHealth(float health);
-
 private:
-	FightingEntity* m_pEntity; // The entity that this combat manager is associated to
-
-	bool  m_isAlive;
-	float m_currentHealth;
-	float m_maximalHealth;
+	Entity* m_pEntity;  // The entity that this combat manager is associated to
+	TestEnvironment* m_pEnvironment;
+	
 };
 
 #endif // ENTITY_COMBAT_MANAGER_H

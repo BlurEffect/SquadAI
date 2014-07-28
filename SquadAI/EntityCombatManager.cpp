@@ -7,10 +7,11 @@
 
 // Includes
 #include "EntityCombatManager.h"
-#include "FightingEntity.h"
+#include "Entity.h"
 #include "TestEnvironment.h"
 
-EntityCombatManager::EntityCombatManager(void)
+EntityCombatManager::EntityCombatManager(void) : m_pEntity(nullptr),
+												 m_pEnvironment(nullptr)
 {
 }
 
@@ -20,21 +21,19 @@ EntityCombatManager::~EntityCombatManager(void)
 
 //--------------------------------------------------------------------------------------
 // Initialises the combat manager.
-// Param1: A pointer to the entity that the combat manager are associated to.
-// Param2: The initialisation data required to initialise the combat component of the entity.
+// Param1: A pointer to the entity that the combat manager is associated to.
+// Param2: A pointer to the test environment that the entity belongs to.
 // Returns true if the combat component was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool EntityCombatManager::Initialise(FightingEntity* pEntity, const EntityCombatInitData& initData)
+bool EntityCombatManager::Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment)
 {
-	if(!pEntity)
+	if(!pEntity || !pTestEnvironment)
 	{
 		return false;
 	}
 
-	m_pEntity = pEntity;
-	m_maximalHealth = initData.m_maxHealth;
-	m_currentHealth = m_maximalHealth;
-	m_isAlive = (m_currentHealth > 0.0f);
+	m_pEntity	   = pEntity;
+	m_pEnvironment = pTestEnvironment;
 
 	return true;
 }
@@ -44,8 +43,7 @@ bool EntityCombatManager::Initialise(FightingEntity* pEntity, const EntityCombat
 //--------------------------------------------------------------------------------------
 void EntityCombatManager::Reset(void)
 {
-	m_currentHealth = m_maximalHealth;
-	m_isAlive = (m_currentHealth > 0.0f);
+	
 }
 
 //--------------------------------------------------------------------------------------
@@ -54,44 +52,6 @@ void EntityCombatManager::Reset(void)
 //--------------------------------------------------------------------------------------
 void EntityCombatManager::ShootAt(const XMFLOAT2& target)
 {
-	m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
+	m_pEnvironment->AddProjectile(m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
 }
 
-//--------------------------------------------------------------------------------------
-// Called when the entity is hit by a hostile projectile.
-// Param1: The target position to shoot at.
-// Param2: The velocity of the projectile that hit the entity. Used to determine the position of the threat.
-//--------------------------------------------------------------------------------------
-void EntityCombatManager::Hit(float damage, const XMFLOAT2& direction)
-{
-	// add new suspected threat somewhere -> event queue?
-
-	m_currentHealth -= damage;
-
-	if(m_currentHealth <= 0.0f)
-	{
-		m_isAlive = false;
-	}
-}
-
-// Data access functions
-
-float EntityCombatManager::GetCurrentHealth(void) const
-{
-	return m_currentHealth;
-}
-
-float EntityCombatManager::GetMaximalHealth(void) const
-{
-	return m_maximalHealth;
-}
-
-float EntityCombatManager::IsAlive(void) const
-{
-	return m_currentHealth > 0.0f;
-}
-
-void EntityCombatManager::SetCurrentHealth(float health)
-{
-	m_currentHealth = health;
-}

@@ -23,18 +23,20 @@ Flag::~Flag(void)
 
 //--------------------------------------------------------------------------------------
 // Initialise the flag object.
-// Param1: The initial position of the flag in world space.
-// Param2: The rotation of the flag.
-// Param3: The scale of the flag.
-// Param4: The type of the collider that should be created.
-// Param5: A pointer to the initialisation data for the collider.
-// Param6: The team that the flag belongs to.
-// Param7: The time it takes for the flag to be reset after being dropped
+// Param1: A unique identifier for the object.
+// Param2: The initial position of the flag in world space.
+// Param3: The rotation of the flag.
+// Param4: The scale of the flag.
+// Param5: The category the object belongs to.
+// Param6: The type of the collider that should be created.
+// Param7: A pointer to the initialisation data for the collider.
+// Param8: The team that the flag belongs to.
+// Param9: The time it takes for the flag to be reset after being dropped
 // Returns true if the flag was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Flag::Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, EntityTeam team, float resetInterval)
+bool Flag::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team, float resetInterval)
 {
-	if(!CollidableObject::Initialise(position, rotation, uniformScale, colliderType, pColliderData))
+	if(!CollidableObject::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData))
 	{
 		return false;
 	}

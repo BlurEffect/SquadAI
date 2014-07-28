@@ -20,7 +20,7 @@ public:
 	EditModeObject(void);
 	~EditModeObject(void);
 
-	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale, unsigned long gridId, ObjectType type);
+	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, unsigned long gridId, ObjectType type);
 
 	// Data access functions
 

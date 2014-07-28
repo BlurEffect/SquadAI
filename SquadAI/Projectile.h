@@ -22,7 +22,7 @@ public:
 	Projectile(void);
 	~Projectile(void);
 
-	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam);
+	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam);
 	void Update(float deltaTime);
 
 	// Data access functions

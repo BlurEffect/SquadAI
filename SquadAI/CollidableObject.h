@@ -15,19 +15,36 @@
 
 using namespace DirectX;
 
+//--------------------------------------------------------------------------------------
+// Used to quickly distinguish between different sorts of collidable objects.
+//--------------------------------------------------------------------------------------
+enum ObjectCategory
+{
+	CategoryObstacle,  // All obstacles blocking paths
+	CategoryEntity,    // All AI-controlled entities
+	CategoryObjective, // Game objectives (flags)
+	CategoryProjectile // Bullets and other projectiles
+};
+
 class CollidableObject : public Object
 {
 public:
 	CollidableObject(void);
 	virtual ~CollidableObject(void) = 0;
 
-	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData);
+	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory, ColliderType colliderType, void* pColliderData);
+
+	void UpdateColliderPosition(const XMFLOAT2& position);
 
 	// Data access functions
 	const Collider* GetCollider(void) const;
+	ObjectCategory  GetCategory(void) const;
+
+	void SetCategory(ObjectCategory category);
 
 private:
-	Collider*  m_pCollider;			// The collider associated to the object
+	ObjectCategory m_category;  // The category the object belongs to
+	Collider*      m_pCollider;	// The collider associated to the object
 };
 
 #endif // COLLIDABLE_OBJECT_H

@@ -21,19 +21,21 @@ Projectile::~Projectile(void)
 
 //--------------------------------------------------------------------------------------
 // Initialises the projectile.
-// Param1: The position of the object.
-// Param2: The rotation of the object along the world z-axis.
-// Param3: The uniform scale of the object.
-// Param4: The type of the collider that should be created.
-// Param5: A pointer to the initialisation data for the collider.
-// Param6: The direction, into which the projectile should fly.
-// Param7: The speed, at which the projectile will travel.
-// Param8: The team that fired the projectile.
+// Param1: A unique identifier for the object.
+// Param2: The position of the object.
+// Param3: The rotation of the object along the world z-axis.
+// Param4: The uniform scale of the object.
+// Param5: The category the object belongs to.
+// Param6: The type of the collider that should be created.
+// Param7: A pointer to the initialisation data for the collider.
+// Param8: The direction, into which the projectile should fly.
+// Param9: The speed, at which the projectile will travel.
+// Param10: The team that fired the projectile.
 // Returns true if the projectile was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Projectile::Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam)
+bool Projectile::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, const XMFLOAT2& direction, float speed, EntityTeam friendlyTeam)
 {
-	if(!CollidableObject::Initialise(position, rotation, uniformScale, colliderType, pColliderData))
+	if(!CollidableObject::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData))
 	{
 		return false;
 	}
@@ -55,7 +57,9 @@ void Projectile::Update(float deltaTime)
 
 	XMFLOAT2 newPosition;
 	XMStoreFloat2(&newPosition, XMLoadFloat2(&GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_direction)) * m_speed * deltaTime);
+	
 	SetPosition(newPosition);
+	UpdateColliderPosition(newPosition);
 }
 
 // Data access functions

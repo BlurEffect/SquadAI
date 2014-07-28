@@ -43,7 +43,7 @@ public:
 	const XMFLOAT2& GetGridPosition(void) const;
 	const XMFLOAT2& GetWorldPosition(void) const;
 	bool			IsObstacle(void) const;
-	const CollidableObject* GetObstacle(void) const;
+	CollidableObject* GetObstacle(void);
 	bool            IsCovered(Direction direction) const;
 
 	EntityTeam     GetTerritoryOwner(void) const;

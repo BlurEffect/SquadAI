@@ -1,10 +1,91 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
 *  Entity.cpp
-*  This is the abstract base class for all objects that can be present
-*  within a test environment.
+*  This is the abstract base class for AI controlled entities that are able
+*  to move and fight.
 */
+	
+// Includes
+#include "Entity.h"
+#include "TestEnvironment.h"
 
+Entity::Entity(void) : CollidableObject(),
+				       m_team(EntityTeam(None))
+{
+}
+
+Entity::~Entity(void)
+{
+}
+
+//--------------------------------------------------------------------------------------
+// Initialises the entity.
+// Param1: A unique identifier for the object.
+// Param2: The start position of the entity.
+// Param3: The initial rotation of the entity.
+// Param4: The uniform scale of the entity.
+// Param5: The category the object belongs to.
+// Param6: The type of the collider that should be created for this entity.
+// Param7: The collider data that should be used for the creation of the collider.
+// Param8: Identifies the team that this entity belongs to.
+// Returns true if the entity was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team)
+{
+	if(!CollidableObject::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData))
+	{
+		return false;
+	}
+
+	// Check for invalid values
+	if(team == None)
+	{
+		return false;
+	}
+
+	m_team = team;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the entity.
+// Param1: The time in seconds passed since the last frame.
+//--------------------------------------------------------------------------------------
+void Entity::Update(float deltaTime)
+{
+	// Do nothing
+}
+	
+//--------------------------------------------------------------------------------------
+// Activates the entity at the start of the simulation.
+//--------------------------------------------------------------------------------------
+void Entity::Activate(void)
+{
+	// Do nothing
+}
+
+//--------------------------------------------------------------------------------------
+// Resets the entity
+//--------------------------------------------------------------------------------------
+void Entity::Reset(void)
+{
+	// Do nothing
+}
+
+// Data access functions
+
+EntityTeam Entity::GetTeam(void) const
+{
+	return m_team;
+}
+
+void Entity::SetTeam(EntityTeam team)
+{
+	m_team = team;
+}
+
+/*
 // Includes
 #include "Entity.h"
 #include "TestEnvironment.h"
@@ -180,3 +261,4 @@ void Entity::SetTestEnvironment(TestEnvironment* pEnvironment)
 {
 	m_pEnvironment = pEnvironment;
 }
+*/

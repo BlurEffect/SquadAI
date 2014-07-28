@@ -96,7 +96,7 @@ bool Node::IsObstacle(void) const
 	return m_isObstacle;
 }
 
-const CollidableObject* Node::GetObstacle(void) const
+CollidableObject* Node::GetObstacle(void) 
 {
 	return m_pObstacle;
 }

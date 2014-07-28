@@ -31,7 +31,7 @@ public:
 	Flag(void);
 	~Flag(void);
 
-	bool Initialise(const XMFLOAT2& position, float rotation, float uniformScale, ColliderType colliderType, void* pColliderData, EntityTeam team, float resetInterval);
+	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team, float resetInterval);
 
 	bool OnPickUp(Entity* pEntity);
 	void Update(float deltaTime);

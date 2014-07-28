@@ -11,11 +11,11 @@
 // Includes
 #include <DirectXMath.h>
 #include <list>
-#include "EntityMemory.h"
+//#include "EntityMemory.h"
 
 // Forward declarations
-class FightingEntity;
-struct EntitySensorInitData;
+class Entity;
+class TestEnvironment;
 
 using namespace DirectX;
 
@@ -25,21 +25,15 @@ public:
 	EntitySensors(void);
 	~EntitySensors(void);
 
-	bool Initialise(FightingEntity* pEntity, const EntitySensorInitData& initData);
-	void CheckForThreats(void);
+	bool Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment);
+	
+	void CheckForThreats(const XMFLOAT2& viewDirection, float viewingRange, float fieldOfView);
 
 	// Data access functions
 
-	float GetFieldOfView(void) const;
-	float GetViewingDistance(void) const;
-
-	void SetFieldOfView(float fieldOfView);
-	void SetViewingDistance(float viewingDistance);
-
 private:
-	float		    m_fieldOfView;     // The angle determining the field of view in radians
-	float		    m_viewingDistance; // The entity can look this far ahead
-	FightingEntity* m_pEntity;         // The memory object associated to the entity using these sensors
+	Entity*          m_pEntity;      // The entity object associated to this sensors component
+	TestEnvironment* m_pEnvironment; // The test environment, to which the entity belongs
 };
 
 #endif // ENTITY_SENSORS_H

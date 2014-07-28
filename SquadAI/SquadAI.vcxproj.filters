@@ -132,12 +132,6 @@
     <ClCompile Include="Soldier.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="CoverPosition.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="MovingEntity.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -147,16 +141,10 @@
     <ClCompile Include="PerformanceTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FightingEntity.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="EntityMovementManager.cpp">
       <Filter>Source Files\EntityComponents</Filter>
     </ClCompile>
     <ClCompile Include="EntityCombatManager.cpp">
-      <Filter>Source Files\EntityComponents</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityMemory.cpp">
       <Filter>Source Files\EntityComponents</Filter>
     </ClCompile>
     <ClCompile Include="EntitySensors.cpp">
@@ -191,6 +179,9 @@
     </ClCompile>
     <ClCompile Include="Obstacle.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityKnowledge.cpp">
+      <Filter>Source Files\EntityComponents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,12 +299,6 @@
     <ClInclude Include="Soldier.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="CoverPosition.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="MovingEntity.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -323,13 +308,7 @@
     <ClInclude Include="PerformanceTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FightingEntity.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="EntityCombatManager.h">
-      <Filter>Header Files\EntityComponents</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityMemory.h">
       <Filter>Header Files\EntityComponents</Filter>
     </ClInclude>
     <ClInclude Include="EntityMovementManager.h">
@@ -373,6 +352,9 @@
     </ClInclude>
     <ClInclude Include="Obstacle.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityKnowledge.h">
+      <Filter>Header Files\EntityComponents</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

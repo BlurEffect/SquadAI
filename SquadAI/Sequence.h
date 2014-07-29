@@ -6,6 +6,7 @@
 *  fails, the sequence fails as well. The sequence succeeds if all children are
 *  executed successfully.
 *  Based on Alex Champandard's presentation "Understanding the Second-Generation of Behavior Trees"
+*  and the associated "Behavior Tree Starter Kit" (BTSK).
 */
 
 #ifndef SEQUENCE_H

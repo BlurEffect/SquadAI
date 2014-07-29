@@ -3,13 +3,37 @@
 *  Behaviour.cpp
 *  Abstract base class for entity behaviours.
 *  Based on Alex Champandard's presentation "Understanding the Second-Generation of Behavior Trees"
+*  and the associated "Behavior Tree Starter Kit" (BTSK).
 */
 
 // Includes
 #include "Behaviour.h"
 
-Behaviour::Behaviour(void) : m_status(StatusInvalid)
+unsigned long Behaviour::s_BehaviourId = 0;
+
+Behaviour::Behaviour(void) : m_id(++s_BehaviourId),
+							 m_status(StatusInvalid)
 {
+}
+
+//--------------------------------------------------------------------------------------
+// Custom copy constructor to ensure that the id stays unique.
+//--------------------------------------------------------------------------------------
+Behaviour::Behaviour(const Behaviour& sourceBehaviour)
+{
+	m_id     = ++s_BehaviourId;
+	m_status = sourceBehaviour.GetStatus();
+}
+
+//--------------------------------------------------------------------------------------
+// Custom assignment operator to ensure that the id stays unique.
+//--------------------------------------------------------------------------------------
+Behaviour& Behaviour::operator= (const Behaviour& sourceBehaviour)
+{
+	m_id     = ++s_BehaviourId;
+	m_status = sourceBehaviour.GetStatus();
+
+	return *this;
 }
 
 Behaviour::~Behaviour(void)
@@ -43,6 +67,33 @@ BehaviourStatus Behaviour::Tick(void)
 }
 
 //--------------------------------------------------------------------------------------
+// Aborts the behaviour.
+//--------------------------------------------------------------------------------------
+void Behaviour::Abort(void)
+{
+	OnTerminate(StatusAborted);
+	m_status = StatusAborted;
+}
+
+//--------------------------------------------------------------------------------------
+// Resets the behaviour.
+//--------------------------------------------------------------------------------------
+void Behaviour::Reset(void)
+{
+	m_status = StatusInvalid;
+}
+
+bool Behaviour::IsTerminated(void) const
+{
+	return (m_status == StatusSuccess || m_status == StatusFailure);
+}
+
+bool Behaviour::IsRunning(void) const
+{
+	return (m_status == StatusRunning);
+}
+
+//--------------------------------------------------------------------------------------
 // Initialises the behaviour.
 //--------------------------------------------------------------------------------------
 void Behaviour::OnInitialise(void)
@@ -56,4 +107,14 @@ void Behaviour::OnInitialise(void)
 void Behaviour::OnTerminate(BehaviourStatus status)
 {
 
+}
+
+unsigned long Behaviour::GetId(void) const
+{
+
+}
+
+BehaviourStatus Behaviour::GetStatus(void) const
+{
+	return m_status;
 }

@@ -7,12 +7,13 @@
 *  the selector succeeds as well. The selector fails when none of the children 
 *  completes successfully.
 *  Based on Alex Champandard's presentation "Understanding the Second-Generation of Behavior Trees"
+*  and the associated "Behavior Tree Starter Kit" (BTSK).
 */
 
 // Includes
 #include "Selector.h"
 
-Selector::Selector(void)
+Selector::Selector(void) : Composite()
 {
 }
 
@@ -35,6 +36,11 @@ void Selector::OnInitialise(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Selector::Update(void)
 {
+	if(m_children.size() < 1)
+	{
+		return StatusInvalid;
+	}
+
 	// Keep executing child behaviours until one returns a running
 	// status. This is required as some children, such as conditions,
 	// might complete within a single update.

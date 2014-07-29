@@ -7,6 +7,7 @@
 *  the selector succeeds as well. The selector fails when none of the children 
 *  completes successfully.
 *  Based on Alex Champandard's presentation "Understanding the Second-Generation of Behavior Trees"
+*  and the associated "Behavior Tree Starter Kit" (BTSK).
 */
 
 #ifndef SELECTOR_H

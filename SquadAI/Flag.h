@@ -9,7 +9,7 @@
 
 // Includes
 #include <DirectXMath.h>
-#include "EntityData.h"
+#include "ObjectTypes.h"
 #include "Entity.h"
 #include "CollidableObject.h"
 

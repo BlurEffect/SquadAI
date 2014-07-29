@@ -16,7 +16,7 @@
 class ActiveSelector : public Selector
 {
 public:
-	ActiveSelector(void);
+	ActiveSelector(const char* name);
 	virtual ~ActiveSelector(void);
 
 protected:

@@ -10,8 +10,7 @@
 
 // Includes
 #include <DirectXMath.h>
-#include "Object.h"
-#include "EntityData.h"
+#include "ObjectTypes.h"
 #include "CollidableObject.h"
 
 using namespace DirectX;
@@ -40,22 +39,5 @@ private:
 	float      m_speed;				// The speed, at which the projectile is flying
 	EntityTeam m_friendlyTeam;		// The team that fired this projectile
 };
-
-/*
-class Projectile : public MovingEntity
-{
-public:
-	Projectile(void);
-	~Projectile(void);
-
-	bool Initialise(ObjectType originType, const XMFLOAT2& target, const EntityInitData& initData, const EntityMovementInitData& movementInitData);
-	void Update(float deltaTime);
-
-	// Data access functions
-	ObjectType GetOriginType(void) const;
-
-private:
-	ObjectType m_originType; // Entities of this type are immune to the projectiles.
-};*/
 
 #endif // PROJECTILE_H

@@ -28,11 +28,9 @@ public:
 
 	void ShootAt(const XMFLOAT2& target);
 
-	// Data access functions
-
 private:
-	Entity* m_pEntity;  // The entity that this combat manager is associated to
-	TestEnvironment* m_pEnvironment;
+	Entity*          m_pEntity;      // The entity that this combat manager is associated to
+	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 	
 };
 

@@ -11,7 +11,6 @@
 // Includes
 #include <DirectXMath.h>
 #include <list>
-//#include "EntityMemory.h"
 
 // Forward declarations
 class Entity;
@@ -28,8 +27,6 @@ public:
 	bool Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment);
 	
 	void CheckForThreats(const XMFLOAT2& viewDirection, float viewingRange, float fieldOfView);
-
-	// Data access functions
 
 private:
 	Entity*          m_pEntity;      // The entity object associated to this sensors component

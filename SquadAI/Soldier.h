@@ -7,11 +7,9 @@
 #ifndef SOLDIER_H
 #define SOLDIER_H
 
-
 // Includes
 #include <DirectXMath.h>
 #include "Entity.h"
-#include "EntityData.h"
 #include "EntityMovementManager.h"
 #include "EntityCombatManager.h"
 #include "EntitySensors.h"
@@ -107,41 +105,19 @@ public:
 
 private:
 
-	TestEnvironment* m_pEnvironment; // A pointer to the test environment that the soldier is part of
+	TestEnvironment*      m_pEnvironment;      // A pointer to the test environment that the soldier is part of
 
 	// Soldier components
-	EntityMovementManager m_movementManager; // The movement manager used by this soldier
-	EntityCombatManager   m_combatManager;	 // The combat manager used by this soldier
-	EntitySensors         m_sensors;		 // The sensor component used by this soldier
+	EntityMovementManager m_movementManager;   // The movement manager used by this soldier
+	EntityCombatManager   m_combatManager;	   // The combat manager used by this soldier
+	EntitySensors         m_sensors;		   // The sensor component used by this soldier
 
-	SoldierProperties     m_soldierProperties;     // Determines some properties of the soldier related to movement, combat and sensors
+	SoldierProperties     m_soldierProperties; // Determines some properties of the soldier related to movement, combat and sensors
 
 	// Soldier state
-	bool  m_isAlive;
-	float m_currentHealth;
+	bool				  m_isAlive;           // Tells whether the soldier is currently alive or dead
+	float				  m_currentHealth;	   // The current health of the soldier
 
 };
-	
-	
-/*
-// Includes
-#include <DirectXMath.h>
-#include "FightingEntity.h"
-
-using namespace DirectX;
-
-class Soldier : public FightingEntity
-{
-public:
-	Soldier(void);
-	~Soldier(void);
-
-	bool Initialise(EntityInitData initData, const EntityMovementInitData& movementInitData, const EntitySensorInitData& sensorInitData, const EntityCombatInitData& combatInitData);
-	void Update(float deltaTime);
-	void Activate(void);
-
-private:
-};
-*/
 
 #endif // SOLDIER_H

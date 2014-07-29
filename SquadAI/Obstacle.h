@@ -20,8 +20,6 @@ public:
 	~Obstacle(void);
 
 	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData);
-
-private:
 };
 
 #endif // OBSTACLE_H

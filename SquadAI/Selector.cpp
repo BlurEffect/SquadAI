@@ -13,7 +13,7 @@
 // Includes
 #include "Selector.h"
 
-Selector::Selector(void) : Composite()
+Selector::Selector(const char* name) : Composite(name)
 {
 }
 

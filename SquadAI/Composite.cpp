@@ -9,7 +9,7 @@
 // Includes
 #include "Composite.h"
 
-Composite::Composite(void) : Behaviour()
+Composite::Composite(const char* name) : Behaviour(name)
 {
 }
 

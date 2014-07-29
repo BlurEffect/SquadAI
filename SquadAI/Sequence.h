@@ -18,7 +18,7 @@
 class Sequence : public Composite
 {
 public:
-	Sequence(void);
+	Sequence(const char* name);
 	virtual ~Sequence(void);
 
 protected:

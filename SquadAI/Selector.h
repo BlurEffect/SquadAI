@@ -19,7 +19,7 @@
 class Selector : public Composite
 {
 public:
-	Selector(void);
+	Selector(const char* name);
 	virtual ~Selector(void);
 
 protected:

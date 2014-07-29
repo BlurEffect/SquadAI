@@ -10,9 +10,9 @@
 #include "Repeat.h"
 
 
-Repeat::Repeat(Behaviour* pChild) : Decorator(pChild),
-								    m_numberOfRepeats(0),
-								    m_counter(0)		
+Repeat::Repeat(const char* name, Behaviour* pChild) : Decorator(name, pChild),
+												      m_numberOfRepeats(0),
+													  m_counter(0)		
 {
 }
 

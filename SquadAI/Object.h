@@ -9,7 +9,6 @@
 
 // Includes
 #include <DirectXMath.h>
-#include "EntityData.h"
 
 using namespace DirectX;
 

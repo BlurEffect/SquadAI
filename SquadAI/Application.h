@@ -20,7 +20,7 @@
 #include "TestEnvironment.h"
 #include "ApplicationSettings.h"
 #include "AppData.h"
-#include "EntityData.h"
+#include "ObjectTypes.h"
 #include "PerformanceTimer.h"
 
 using namespace DirectX;

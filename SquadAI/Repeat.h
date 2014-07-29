@@ -15,7 +15,7 @@
 class Repeat : public Decorator
 {
 public:
-	Repeat(Behaviour* pChild);
+	Repeat(const char* name, Behaviour* pChild);
 	~Repeat(void);
 
 	void SetNumberOfRepeats(unsigned int count);

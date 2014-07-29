@@ -12,7 +12,7 @@
 // Includes
 #include "Sequence.h"
 
-Sequence::Sequence(void) : Composite()
+Sequence::Sequence(const char* name) : Composite(name)
 {
 }
 

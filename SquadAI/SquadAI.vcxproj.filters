@@ -37,12 +37,6 @@
     <Filter Include="Header Files\Drawables">
       <UniqueIdentifier>{39e769f3-6cdc-4f56-9ca3-47438a1d08e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Entities">
-      <UniqueIdentifier>{dd322255-946a-4e86-bf35-7008c9798ab2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Entities">
-      <UniqueIdentifier>{6733c01d-50f4-456b-8b9d-17768f002eab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\EntityComponents">
       <UniqueIdentifier>{807d0025-974d-4732-aeff-a734bccd53fe}</UniqueIdentifier>
     </Filter>
@@ -61,20 +55,50 @@
     <Filter Include="Source Files\BehaviourTree">
       <UniqueIdentifier>{6c6ee9f5-5fe0-4b57-bbc9-8bb4d3478740}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{dd322255-946a-4e86-bf35-7008c9798ab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{6733c01d-50f4-456b-8b9d-17768f002eab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TestEnvironment">
+      <UniqueIdentifier>{3331e72a-80e9-464f-84a1-bfdbd018a4c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Application">
+      <UniqueIdentifier>{343818c8-28cc-4f79-8018-833887df59c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{f589082c-7837-4ea8-a415-501138bc851d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{dd98d5cd-c487-4e91-98c4-d5d7ca67ba57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Camera">
+      <UniqueIdentifier>{f688fdcb-dccc-4222-8c6c-1bb967d4f39f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Other">
+      <UniqueIdentifier>{0ab131c3-9c2d-4aee-b110-ad85d29ba906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Application">
+      <UniqueIdentifier>{81c510ef-9228-4217-a23e-9f14a24cb6f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{884973d6-3a32-46c9-9f0c-bebcc74a4f5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{ae923b95-9cd8-4db0-aa13-0aa2bb766343}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TestEnvironment">
+      <UniqueIdentifier>{8bd0f876-2b20-4b3c-8f8e-e2650f02dc68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer">
+      <UniqueIdentifier>{0374fd06-7eee-4896-9a77-203d331d05cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Other">
+      <UniqueIdentifier>{003547f2-05fb-4377-bf25-6b28592f2c64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SimplePixelShader.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
@@ -90,20 +114,11 @@
     <ClCompile Include="VertexShader.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
-    <ClCompile Include="TestEnvironment.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderFactory.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
     <ClCompile Include="ShaderGroup.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderContext.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CircleDrawable.cpp">
       <Filter>Source Files\Drawables</Filter>
@@ -120,9 +135,6 @@
     <ClCompile Include="Font.cpp">
       <Filter>Source Files\TextRendering</Filter>
     </ClCompile>
-    <ClCompile Include="OrthographicCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FontVertexShader.cpp">
       <Filter>Source Files\ShaderFramework</Filter>
     </ClCompile>
@@ -133,19 +145,10 @@
       <Filter>Source Files\TextRendering</Filter>
     </ClCompile>
     <ClCompile Include="Entity.cpp">
-      <Filter>Source Files\Entities</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="Soldier.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Pathfinder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PerformanceTimer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="EntityMovementManager.cpp">
       <Filter>Source Files\EntityComponents</Filter>
@@ -157,7 +160,7 @@
       <Filter>Source Files\EntityComponents</Filter>
     </ClCompile>
     <ClCompile Include="Projectile.cpp">
-      <Filter>Source Files\Entities</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="CircleCollider.cpp">
       <Filter>Source Files\Colliders</Filter>
@@ -168,23 +171,8 @@
     <ClCompile Include="AxisAlignedRectangleCollider.cpp">
       <Filter>Source Files\Colliders</Filter>
     </ClCompile>
-    <ClCompile Include="Flag.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ColliderFactory.cpp">
       <Filter>Source Files\Colliders</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EditModeObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CollidableObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Obstacle.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EntityKnowledge.cpp">
       <Filter>Source Files\EntityComponents</Filter>
@@ -216,23 +204,56 @@
     <ClCompile Include="Monitor.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="OrthographicCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="CollidableObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="EditModeObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Flag.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Obstacle.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="TestEnvironment.cpp">
+      <Filter>Source Files\TestEnvironment</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files\TestEnvironment</Filter>
+    </ClCompile>
+    <ClCompile Include="Pathfinder.cpp">
+      <Filter>Source Files\TestEnvironment</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderContext.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="PerformanceTimer.cpp">
+      <Filter>Source Files\Other</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PixelShader.h">
       <Filter>Header Files\ShaderFramework</Filter>
     </ClInclude>
@@ -257,26 +278,11 @@
     <ClInclude Include="ShaderParameters.h">
       <Filter>Header Files\ShaderFramework</Filter>
     </ClInclude>
-    <ClInclude Include="TestEnvironment.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderFactory.h">
       <Filter>Header Files\ShaderFramework</Filter>
     </ClInclude>
     <ClInclude Include="ShaderGroup.h">
       <Filter>Header Files\ShaderFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RendererData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderContext.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CircleDrawable.h">
       <Filter>Header Files\Drawables</Filter>
@@ -299,9 +305,6 @@
     <ClInclude Include="TextDataStructures.h">
       <Filter>Header Files\TextRendering</Filter>
     </ClInclude>
-    <ClInclude Include="OrthographicCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FontPixelShader.h">
       <Filter>Header Files\ShaderFramework</Filter>
     </ClInclude>
@@ -317,29 +320,11 @@
     <ClInclude Include="SentenceDrawable.h">
       <Filter>Header Files\TextRendering</Filter>
     </ClInclude>
-    <ClInclude Include="TestEnvironmentData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AppData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityData.h">
-      <Filter>Header Files\Entities</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Soldier.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Pathfinder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PerformanceTimer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="EntityCombatManager.h">
       <Filter>Header Files\EntityComponents</Filter>
@@ -351,13 +336,10 @@
       <Filter>Header Files\EntityComponents</Filter>
     </ClInclude>
     <ClInclude Include="SoldierProperties.h">
-      <Filter>Header Files\Entities</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Projectile.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="ProjectileProperties.h">
-      <Filter>Header Files\Entities</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Collider.h">
       <Filter>Header Files\Colliders</Filter>
@@ -368,23 +350,8 @@
     <ClInclude Include="AxisAlignedRectangleCollider.h">
       <Filter>Header Files\Colliders</Filter>
     </ClInclude>
-    <ClInclude Include="Flag.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ColliderFactory.h">
       <Filter>Header Files\Colliders</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EditModeObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CollidableObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Obstacle.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntityKnowledge.h">
       <Filter>Header Files\EntityComponents</Filter>
@@ -415,6 +382,72 @@
     </ClInclude>
     <ClInclude Include="ActiveSelector.h">
       <Filter>Header Files\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="CollidableObject.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="EditModeObject.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Flag.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Obstacle.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectTypes.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files\TestEnvironment</Filter>
+    </ClInclude>
+    <ClInclude Include="Pathfinder.h">
+      <Filter>Header Files\TestEnvironment</Filter>
+    </ClInclude>
+    <ClInclude Include="TestEnvironmentData.h">
+      <Filter>Header Files\TestEnvironment</Filter>
+    </ClInclude>
+    <ClInclude Include="TestEnvironment.h">
+      <Filter>Header Files\TestEnvironment</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexData.h">
+      <Filter>Header Files\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererData.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderContext.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="AppData.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationSettings.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="OrthographicCamera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Header Files\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="PerformanceTimer.h">
+      <Filter>Header Files\Other</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

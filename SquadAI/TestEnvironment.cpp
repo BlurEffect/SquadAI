@@ -9,14 +9,19 @@
 
 
 TestEnvironment::TestEnvironment(void) : m_id(0),
-										 //m_pGrid(nullptr),
-										 m_pNodes(nullptr),
+											m_isPaused(true),
+										 m_isInEditMode(true),
 										 m_gridSize(0.0f),
 										 m_numberOfGridPartitions(0),
 										 m_gridSpacing(0.0f),
-										 m_isPaused(true),
-										 m_isInEditMode(true)
+										 //m_pGrid(nullptr),
+										 m_pNodes(nullptr)				 
 {
+	for(unsigned int i = 0; i < NumberOfObjectTypes; ++i)
+	{
+		m_objectScaleFactors[i] = 1.0f;
+	}	
+	
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
 		m_soldierCount[i]    = 0;

@@ -8,9 +8,21 @@
 #define RENDER_CONTEXT_H
 
 // Includes
+#include <DirectXMath.h>
 #include <vector>
-#include "EntityData.h"
-#include "VertexData.h"
+#include "ObjectTypes.h"
+
+using namespace DirectX;
+
+//--------------------------------------------------------------------------------------
+// The structure of the instance data for a renderable object.
+//--------------------------------------------------------------------------------------
+struct Instance
+{
+	Instance(const XMFLOAT4X4& world) : m_world( world ){}
+
+	XMFLOAT4X4 m_world;
+};
 
 class RenderContext
 {

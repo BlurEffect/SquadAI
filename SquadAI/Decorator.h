@@ -18,7 +18,7 @@
 class Decorator : public Behaviour
 {
 public:
-	Decorator(Behaviour* pChild);
+	Decorator(const char* name, Behaviour* pChild);
 	virtual ~Decorator(void) = 0;
 
 protected:

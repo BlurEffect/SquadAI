@@ -11,7 +11,7 @@
 #include "Monitor.h"
 
 
-Monitor::Monitor(void) : Parallel(RequireAll, RequireOne)
+Monitor::Monitor(const char* name) : Parallel(name, RequireAll, RequireOne)
 {
 }
 

@@ -26,7 +26,7 @@ public:
 		RequireAll, // All child behaviours have to evaluate to a certain status
 	};
 
-	Parallel(Policy successPolicy, Policy failurePolicy);
+	Parallel(const char* name, Policy successPolicy, Policy failurePolicy);
 	virtual ~Parallel(void);
 
 protected:

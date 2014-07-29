@@ -10,7 +10,7 @@
 // Includes
 #include "ActiveSelector.h"
 
-ActiveSelector::ActiveSelector(void) : Selector()
+ActiveSelector::ActiveSelector(const char* name) : Selector(name)
 {
 
 }

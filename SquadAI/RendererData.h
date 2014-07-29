@@ -11,7 +11,7 @@
 
 // Includes
 #include <DirectXMath.h>
-#include "EntityData.h"
+#include "ObjectTypes.h"
 
 using namespace DirectX;
 

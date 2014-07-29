@@ -11,8 +11,9 @@
 
 unsigned long Behaviour::s_BehaviourId = 0;
 
-Behaviour::Behaviour(void) : m_id(++s_BehaviourId),
-							 m_status(StatusInvalid)
+Behaviour::Behaviour(const char* name) : m_id(++s_BehaviourId),
+										 m_name(name),
+										 m_status(StatusInvalid)
 {
 }
 
@@ -111,7 +112,12 @@ void Behaviour::OnTerminate(BehaviourStatus status)
 
 unsigned long Behaviour::GetId(void) const
 {
+	return m_id;
+}
 
+const char* Behaviour::GetName(void) const
+{
+	return m_name;
 }
 
 BehaviourStatus Behaviour::GetStatus(void) const

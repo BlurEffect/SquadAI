@@ -172,12 +172,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="InputManager.h" />
-    <ClInclude Include="EntityData.h" />
+    <ClInclude Include="ObjectTypes.h" />
     <ClInclude Include="Parallel.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="PerformanceTimer.h" />
     <ClInclude Include="Projectile.h" />
-    <ClInclude Include="ProjectileProperties.h" />
     <ClInclude Include="PS_FontCompiled.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />
     <ClInclude Include="Drawable.h" />

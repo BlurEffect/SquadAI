@@ -25,20 +25,14 @@ public:
 	EntityMovementManager(void);
 	~EntityMovementManager(void);
 
-	//bool Initialise(MovingEntity* pEntity, const EntityMovementInitData& initData);
 	bool Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment);
-		
 	void UpdatePosition(float deltaTime, float maxSpeed, float maxForce);
 	void Reset(void);
 
 	bool SetPathTo(const XMFLOAT2& targetPosition);
-	
 	bool Seek(const XMFLOAT2& targetPosition, float targetReachedRadius, float speed);
 	bool FollowPath(float nodeReachedRadius, float speed);
-
 	void LookAt(const XMFLOAT2& targetPosition);
-	
-
 	void Wait();
 	
 	void AvoidCollisions(float seeAhead, float maximalForce);
@@ -54,13 +48,12 @@ private:
 
 	void SetInitialViewDirection(void);
 
-	Entity* m_pEntity; // The entity that this movement manager is associated to
-	TestEnvironment* m_pEnvironment;
+	Entity*          m_pEntity;      // The entity that this movement manager is associated to
+	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 
-	XMFLOAT2 m_velocity;                // The initial velocity of the entity
-
-	XMFLOAT2 m_viewDirection;			   // The current view direction of the entity.
-	XMFLOAT2 m_steeringForce;			   // The accumulated force that will be applied to the entity
+	XMFLOAT2 m_velocity;      // The initial velocity of the entity
+	XMFLOAT2 m_viewDirection; // The current view direction of the entity.
+	XMFLOAT2 m_steeringForce; // The accumulated force that will be applied to the entity
 	
 	// For follow path behaviour
 	std::vector<XMFLOAT2> m_path;        // The current path of the entity, empty when no destination for pathfinding

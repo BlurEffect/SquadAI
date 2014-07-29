@@ -10,7 +10,7 @@
 // Includes
 #include <DirectXMath.h>
 #include "Object.h"
-#include "EntityData.h"
+#include "ObjectTypes.h"
 
 using namespace DirectX;
 
@@ -31,8 +31,8 @@ public:
 	void SetType(ObjectType type);
 
 private:
-	unsigned long		  m_gridId;			// An id that identifies the grid field that this object is placed on (multiple objects per field are allowed)
-	ObjectType			  m_type;			// The type of this object
+	unsigned long m_gridId;			// An id that identifies the grid field that this object is placed on (multiple objects per field are allowed)
+	ObjectType    m_type;			// The type of this object
 };
 
 #endif // EDIT_MODE_OBJECT_H

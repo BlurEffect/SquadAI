@@ -69,6 +69,16 @@ public:
 	void Activate(void);
 	void Reset(void);
 
+	// Basic actions as inherited from Entity
+	bool MoveTo(float deltaTime, const XMFLOAT2& targetPosition);
+	bool Attack(float deltaTime, const XMFLOAT2& targetPosition);
+	bool AimAt(float deltaTime, const XMFLOAT2& aimAtPosition);
+	bool DeterminePatrolTarget(float deltaTime);
+	bool DetermineApproachThreatTarget(float deltaTime);
+	bool UpdateThreats(float deltaTime);
+	bool UpdateAttackReadiness(float deltaTime);
+
+	// Events
 	void Hit(float damage, const XMFLOAT2& direction);
 
 	// Data access functions

@@ -47,13 +47,13 @@ public:
 	virtual void Reset(void);
 
 	// Basic actions
-	virtual bool MoveTo(const XMFLOAT2& targetPosition) = 0;
-	virtual bool Attack(const XMFLOAT2& targetPosition) = 0;
-	virtual bool LookAt(const XMFLOAT2& lookAtPosition) = 0;
-
-	virtual bool DetermineRandomMovementTarget(void) = 0;
-	virtual bool DetermineGreatestThreat(void)       = 0;
-	virtual bool DetermineAttackReadiness(void)      = 0;
+	virtual bool MoveTo(float deltaTime, const XMFLOAT2& targetPosition) = 0;
+	virtual bool Attack(float deltaTime, const XMFLOAT2& targetPosition) = 0;
+	virtual bool AimAt(float deltaTime, const XMFLOAT2& aimAtPosition)   = 0;
+	virtual bool DeterminePatrolTarget(float deltaTime)			         = 0;
+	virtual bool DetermineApproachThreatTarget(float deltaTime)          = 0;
+	virtual bool UpdateThreats(float deltaTime)					         = 0;
+	virtual bool UpdateAttackReadiness(float deltaTime)					 = 0;
 
 	// Threat management
 	void AddKnownThreat(Entity* pThreat);
@@ -69,6 +69,8 @@ public:
 	bool								IsAlive(void) const;
 	const std::vector<Entity*>&			GetKnownThreats(void) const;
 	const std::vector<SuspectedThreat>& GetSuspectedThreats(void) const;
+	const Entity*						GetGreatestKnownThreat(void) const;
+	const SuspectedThreat*				GetGreatestSuspectedThreat(void) const;
 	bool								IsReadyForAttack(void) const;
 	bool								IsMovementTargetSet(void) const;
 	const XMFLOAT2&						GetMovementTarget(void) const;
@@ -77,6 +79,8 @@ public:
 
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 	void SetTeam(EntityTeam team);
+	void SetGreatestKnownThreat(Entity* pThreat);
+	void SetGreatestSuspectedThreat(SuspectedThreat* pThreat);
 	void SetReadyForAttack(bool readyForAttack);
 	void SetMovementTargetSet(bool targetSet);
 	void SetMovementTarget(const XMFLOAT2& target);
@@ -117,13 +121,15 @@ private:
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 	EntityTeam       m_team;		 // The team the entity belongs to
 
-	std::vector<Entity*>		 m_knownThreats;      // Known Threats (enemies, whose position is definitely known)
-	std::vector<SuspectedThreat> m_suspectedThreats;  // Suspected Threats (positions, where enemies are expected and the id of the enemy that is expected to be there)
-	bool						 m_readyForAttack;    // Tells whether the entity is ready for attack
-	bool						 m_movementTargetSet; // Tells whether there is a movement target set or not
-	XMFLOAT2			         m_movementTarget;    // The position to move to
-	float						 m_currentHealth;     // The current health state of the entity (percentage between 0.0 and 1.0 in relation to maximal health)
-	float                        m_maximalHealth;     // The maximal amount of health for this entity
+	std::vector<Entity*>		 m_knownThreats;			 // Known Threats (enemies, whose position is definitely known)
+	std::vector<SuspectedThreat> m_suspectedThreats;		 // Suspected Threats (positions, where enemies are expected and the id of the enemy that is expected to be there)
+	Entity*                      m_pGreatestKnownThreat;     // The greatest (most dangerous) known threat to the entity at the moment
+	SuspectedThreat*             m_pGreatestSuspectedThreat; // The greatest (most dangerous) suspected threat to the entity at the moment
+	bool						 m_readyForAttack;			 // Tells whether the entity is ready for attack
+	bool						 m_movementTargetSet;		 // Tells whether there is a movement target set or not
+	XMFLOAT2			         m_movementTarget;			 // The position to move to
+	float						 m_currentHealth;			 // The current health state of the entity (percentage between 0.0 and 1.0 in relation to maximal health)
+	float                        m_maximalHealth;			 // The maximal amount of health for this entity
 
 
 };

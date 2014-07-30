@@ -192,6 +192,16 @@ const std::vector<SuspectedThreat>& Entity::GetSuspectedThreats(void) const
 	return m_suspectedThreats;
 }
 
+const Entity* Entity::GetGreatestKnownThreat(void) const
+{
+	return m_pGreatestKnownThreat;
+}
+
+const SuspectedThreat* Entity::GetGreatestSuspectedThreat(void) const
+{
+	return m_pGreatestSuspectedThreat;
+}
+
 bool Entity::IsReadyForAttack(void) const
 {
 	return m_readyForAttack;
@@ -228,6 +238,16 @@ void Entity::SetTestEnvironment(TestEnvironment* pEnvironment)
 void Entity::SetTeam(EntityTeam team)
 {
 	m_team = team;
+}
+
+void Entity::SetGreatestKnownThreat(Entity* pThreat)
+{
+	m_pGreatestKnownThreat = pThreat;
+}
+
+void Entity::SetGreatestSuspectedThreat(SuspectedThreat* pThreat)
+{
+	m_pGreatestSuspectedThreat = pThreat;
 }
 
 void Entity::SetReadyForAttack(bool readyForAttack)

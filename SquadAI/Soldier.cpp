@@ -87,6 +87,80 @@ void Soldier::Update(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
+// Moves the soldier entity towards a given target.
+// Param1: The time in seconds passed since the last frame.
+// Param2: The position, to which the soldier should move.
+// Returns true if the target was reached, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::MoveTo(float deltaTime, const XMFLOAT2& targetPosition)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Makes the soldier attack a target at the given position.
+// Param1: The time in seconds passed since the last frame.
+// Param2: The position, that the soldier should attack.
+// Returns true if the attack was successfully executed, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::Attack(float deltaTime, const XMFLOAT2& targetPosition)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Makes the soldier aim at a given position.
+// Param1: The time in seconds passed since the last frame.
+// Param2: The position, at which the soldier should aim.
+// Returns true if the soldier is now aiming at the given position, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::AimAt(float deltaTime, const XMFLOAT2& aimAtPosition)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines and sets a patrol target position for the soldier.
+// Param1: The time in seconds passed since the last frame.
+// Returns true if a valid target position was found and set, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::DeterminePatrolTarget(float deltaTime)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines and sets a target position for the soldier to move to in order to approach threats.
+// Param1: The time in seconds passed since the last frame.
+// Returns true if a valid target position was found and set, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::DetermineApproachThreatTarget(float deltaTime)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the known and suspected threats for the soldier.
+// Param1: The time in seconds passed since the last frame.
+// Returns true if the threats were updated successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::UpdateThreats(float deltaTime)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the attack readiness of the soldier.
+// Param1: The time in seconds passed since the last frame.
+// Returns true if the attack readiness was updated successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Soldier::UpdateAttackReadiness(float deltaTime)
+{
+	return true;
+}
+
+
+//--------------------------------------------------------------------------------------
 // Activates the soldier entity.
 //--------------------------------------------------------------------------------------
 void Soldier::Activate(void)

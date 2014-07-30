@@ -9,12 +9,11 @@
 
 
 TestEnvironment::TestEnvironment(void) : m_id(0),
-											m_isPaused(true),
+										 m_isPaused(true),
 										 m_isInEditMode(true),
 										 m_gridSize(0.0f),
 										 m_numberOfGridPartitions(0),
 										 m_gridSpacing(0.0f),
-										 //m_pGrid(nullptr),
 										 m_pNodes(nullptr)				 
 {
 	for(unsigned int i = 0; i < NumberOfObjectTypes; ++i)
@@ -206,8 +205,6 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 					}
 				}
 
-				
-
 				m_projectiles.erase(it++);
 			}else
 			{
@@ -215,95 +212,6 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 			}
 		}
 	}
-
-
-
-		
-
-
-		// Update entities and add them to the render context after calculating their transforms
-		/*
-		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
-		{
-			if(!m_isPaused && it->IsAlive())
-			{
-				it->Update(deltaTime);
-			}
-
-			XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
-			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
-			XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
-
-			XMFLOAT4X4 transform;
-			XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
-
-			if(it->IsAlive())
-			{
-				pRenderContext.AddInstance(RedSoldierType, transform);
-			}else
-			{
-				pRenderContext.AddInstance(DeadRedSoldierType, transform);
-			}
-		}
-
-		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-		{
-			if(!m_isPaused && it->IsAlive())
-			{
-				it->Update(deltaTime);
-			}
-
-			XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
-			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
-			XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
-
-			XMFLOAT4X4 transform;
-			XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
-		
-			if(it->IsAlive())
-			{
-				pRenderContext.AddInstance(BlueSoldierType, transform);
-			}else
-			{
-				pRenderContext.AddInstance(DeadBlueSoldierType, transform);
-			}
-		}
-	
-		for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
-		{
-			if(!m_isPaused)
-			{
-				it->Update(deltaTime);
-			}
-
-			XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
-			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f -it->GetRotation()));
-			XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
-
-			XMFLOAT4X4 transform;
-			XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
-			pRenderContext.AddInstance(ObstacleType, transform);
-		}
-		*/
-
-
-	/*
-	for(std::list<Projectile>::iterator it = m_projectiles.begin(); it != m_projectiles.end(); ++it)
-	{
-		if(!m_isPaused)
-		{
-			it->Update(deltaTime);
-		}
-
-		XMMATRIX translationMatrix = XMMatrixTranslation(it->GetPosition().x, it->GetPosition().y, 0.0f);
-		XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - it->GetRotation()));
-		XMMATRIX scalingMatrix     = XMMatrixScaling(it->GetScale(), it->GetScale(), 1.0f);
-
-		XMFLOAT4X4 transform;
-		XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
-		pRenderContext.AddInstance(ProjectileType, transform);
-	}
-	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -382,7 +290,6 @@ bool TestEnvironment::PrepareSimulation(void)
 			}
 		case ObstacleType:
 			{
-			//AxisAlignedRectangleCollider collider(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[ObstacleType], m_gridSpacing * m_objectScaleFactors[ObstacleType]);
 			AxisAlignedRectangleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[ObstacleType], m_gridSpacing * m_objectScaleFactors[ObstacleType]);
 			m_obstacles.push_back(Obstacle());
 			if(!m_obstacles.back().Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObstacle, AxisAlignedRectangleColliderType, &colliderData))
@@ -394,7 +301,6 @@ bool TestEnvironment::PrepareSimulation(void)
 			}
 		case RedFlagType:
 			{
-			//CircleCollider collider(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
 			if(!m_flags[TeamRed].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamRed, g_kFlagResetTimer))
 			{
@@ -404,7 +310,6 @@ bool TestEnvironment::PrepareSimulation(void)
 			}
 		case BlueFlagType:
 			{
-			//CircleCollider collider(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
 			if(!m_flags[TeamBlue].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamBlue, g_kFlagResetTimer))
 			{
@@ -532,72 +437,6 @@ bool TestEnvironment::AddObject(ObjectType type, const XMFLOAT2& position, float
 		}
 	}
 
-	
-	/*
-	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty)
-	{
-		// Field is not empty, do not place entity on top of others
-		return false;
-	}
-
-	GridToWorldPosition(gridPosition, updatedPosition);
-
-	switch(type)
-	{
-	case RedSoldierType:
-		{
-			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
-			m_teamA.push_back(Soldier());
-			if(!m_teamA.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, CircleColliderType, &collider, this),
-				EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
-										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
-										  EntityCombatInitData(g_kSoldierMaxHealth)))
-			{
-				m_teamA.pop_back();
-				return false;
-			}
-
-			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamA.back();
-		}
-		break;
-	case BlueSoldierType:
-		{
-			CircleCollider collider(updatedPosition, m_gridSpacing * 0.5f);
-			m_teamB.push_back(Soldier());
-			if(!m_teamB.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, CircleColliderType, &collider, this),
-										  EntityMovementInitData(g_kSoldierMaxVelocity, g_kSoldierMaxForce, g_kSoldierMaxSeeAhead, g_kSoldierMaxCollisionAvoidanceForce, g_kSoldierMaxAvoidWallsForce, g_kSoldierMaxSeparationForce, g_kSoldierTargetReachedRadius, m_gridSpacing, m_gridSpacing),
-										  EntitySensorInitData(g_kSoldierFieldOfView, g_kSoldierViewingDistance),
-										  EntityCombatInitData(g_kSoldierMaxHealth)))
-			{
-				m_teamB.pop_back();
-				return false;
-			}
-			
-			m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_teamB.back();
-		}
-		break;
-	case ObstacleType:
-		AxisAlignedRectangleCollider collider(updatedPosition, m_gridSpacing, m_gridSpacing);
-
-		m_coverSpots.push_back(CoverPosition());
-		if(!m_coverSpots.back().Initialise(EntityInitData(++m_id, type, updatedPosition, rotation, m_gridSpacing, AxisAlignedRectangleColliderType, &collider, this)))
-		{
-			m_coverSpots.pop_back();
-			return false;
-		}
-		
-		// Update the graph
-		UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], false);
-		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_pEntity = &m_coverSpots.back();
-		break;
-	}
-
-	// Update the grid field
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty  = false;
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id       = m_id;
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type     = type;
-	m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_rotation = rotation;
-	*/
 	return true;
 }
 
@@ -663,63 +502,6 @@ bool TestEnvironment::RemoveObjects(const XMFLOAT2& position)
 	std::vector<EditModeObject>::iterator removeIt = std::remove_if(m_staticObjects.begin(), m_staticObjects.end(), EditModeObject::FindEditModeObjectByGridId(gridId));
 	m_staticObjects.erase(removeIt, m_staticObjects.end());
 	return true;
-
-	/*
-	if(!m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty)
-	{
-		unsigned long deleteId = m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id;
-
-		switch(m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_type)
-		{
-		case RedSoldierType:
-			{
-				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamA.begin(), m_teamA.end(), FindEntityById<Entity>(deleteId));
-
-				if(deleteIterator != m_teamA.end())
-				{
-					// Delete the entity
-					m_teamA.erase(deleteIterator);
-				}
-			}
-			break;
-		case BlueSoldierType:
-			{
-				std::list<Soldier>::iterator deleteIterator = std::find_if(m_teamB.begin(), m_teamB.end(), FindEntityById<Entity>(deleteId));
-
-				if(deleteIterator != m_teamB.end())
-				{
-					// Delete the entity
-					m_teamB.erase(deleteIterator);
-				}
-			}
-			break;
-		case ObstacleType:
-			{
-				std::list<CoverPosition>::iterator deleteIterator = std::find_if(m_coverSpots.begin(), m_coverSpots.end(), FindEntityById<Entity>(deleteId));
-
-				if(deleteIterator != m_coverSpots.end())
-				{
-					// Update the test environment graph
-					UpdateCoverMap(m_pNodes[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)], true);
-
-					// Delete the entity
-					m_coverSpots.erase(deleteIterator);
-				}
-			}
-			break;
-		}
-
-		// Mark grid field as empty
-		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_id = 0;
-		m_pGrid[static_cast<int>(gridPosition.x)][static_cast<int>(gridPosition.y)].m_isEmpty = true;
-
-		return true;
-	}else
-	{
-		// Nothing to delete in that grid field
-		return false;
-	}
-	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -744,7 +526,6 @@ bool TestEnvironment::AddProjectile(EntityTeam friendlyTeam, const XMFLOAT2& ori
 	XMFLOAT2 direction(0.0f, 0.0f);
 	XMStoreFloat2(&direction, XMLoadFloat2(&target) - XMLoadFloat2(&origin));
 
-	//CircleCollider collider(origin, m_gridSpacing * m_objectScaleFactors[ProjectileType] * 0.5f);
 	CircleColliderData colliderData(origin, m_gridSpacing * m_objectScaleFactors[ProjectileType] * 0.5f);
 	if(!m_projectiles.back().Initialise(++m_id, origin, 0.0f, m_objectScaleFactors[ProjectileType] * m_gridSpacing, CategoryProjectile, CircleColliderType, &colliderData, direction, g_kProjectileSpeed, friendlyTeam))
 	{
@@ -811,25 +592,7 @@ bool TestEnvironment::Save(std::string filename)
 		{
 			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
 		}
-		/*
-		// Save soldiers of team A
-		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
-		{
-			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
-		}
-
-		// Save soldiers of team B
-		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-		{
-			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
-		}
-
-		// Save cover spots
-		for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
-		{
-			out << it->GetType() << " " << it->GetPosition().x << " " << it->GetPosition().y << " " << it->GetRotation() << "\n";
-		}*/
-
+	
 		out.close();
 		return true;
 	}
@@ -853,10 +616,6 @@ bool TestEnvironment::Load(std::string filename)
 		// Note: Make a safety copy to be able to revert in case the loading fails.
 
 		CleanupGrid();
-
-		//m_teamA.clear();
-		//m_teamB.clear();
-		//m_coverSpots.clear();
 
 		m_staticObjects.clear();
 
@@ -919,14 +678,6 @@ bool TestEnvironment::Load(std::string filename)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, EntityGroup entityGroup, std::multimap<float, CollidableObject*>& collisionObjects)
 {
-	// work on nodes, not on grid
-	// get rid of grid
-	// check test env methods if all works (uncomment original soldier/coverPos)
-	
-	// new structure for entity, soldier, etc
-	// design BT
-	// If all works -> Cleanup
-
 	float squareRadius = radius * radius;
 	float squareDistance = 0.0f;
 
@@ -945,22 +696,6 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 			}
 		}
 	}
-
-	//if(entityGroup == GroupTeamBlue || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
-	//{
-	//	// Check team B for collision
-	//	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-	//	{
-	//		if(it->GetId() != pEntity->GetId() && it->IsAlive())
-	//		{
-	//			XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
-	//			if(squareDistance <= squareRadius)
-	//			{
-	//				collisionObjects.insert(std::pair<float, Entity*>(squareDistance,(&(*it))));
-	//			}
-	//		}
-	//	}
-	//}
 
 	if(entityGroup == GroupObstacles || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
 	{
@@ -992,48 +727,68 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 			}
 		}
 	}
+}
 
-	/*
-	if(entityGroup == GroupTeamRed || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamAAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+//--------------------------------------------------------------------------------------
+// Checks for collisions between an entity and a specified group of other entities. Collision
+// of an object with itself is excluded, as are collisions with dead entities.
+// Param1: A pointer to the collider that should be checked for collision with other entities.
+// Param2: The previous position of the entity (during the last frame).
+// Param3: Specifies the group of entities that should be checked for collision with the given entity.
+// Param4: Out parameter that will hold a pointer to the colliding object that is closest to the collidable object specified in Param1. 
+//         Null if there is no collision at all. 
+// Returns true if the entity is about to collide with an entity of the specified group, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject)
+{
+	float shortestSquareDistance = std::numeric_limits<float>::max();
+	outCollisionObject = nullptr;
+
+	// Determine the points of the line that the colliders of other entities will be checked against
+	
+	// Current position of the entity
+	XMFLOAT2 start = oldPosition;
+	// The position, where the entity will at the end of the frame
+	XMFLOAT2 end = pCollidableObject->GetPosition();
+
+	if(entityGroup != GroupObstacles)
 	{
-		// Check team A
-		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
+		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 		{
-			if(it->GetId() != pEntity->GetId() && it->IsAlive())
+			if(m_soldiers[i].IsAlive() && (m_soldiers[i].GetId() != pCollidableObject->GetId()) &&
+			   (entityGroup == GroupAllSoldiersAndObstacles ||
+				entityGroup == GroupAllSoldiers ||
+				(m_soldiers[i].GetTeam() == TeamRed && (entityGroup == GroupTeamRed || entityGroup == GroupTeamRedAndObstacles)) ||
+				(m_soldiers[i].GetTeam() == TeamBlue && (entityGroup == GroupTeamBlue || entityGroup == GroupTeamBlueAndObstacles)))				)
 			{
-				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
-				if(squareDistance <= squareRadius)
+				if(m_soldiers[i].GetCollider()->CheckLineCollision(start, end))
 				{
-					collisionObjects.insert(std::pair<float, Entity*>(squareDistance,(&(*it))));
+					float squareDistance = 0.0f;
+					XMVECTOR vector = XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
+					XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
+
+					if(squareDistance < shortestSquareDistance)
+					{
+						shortestSquareDistance = squareDistance;
+						outCollisionObject = &(m_soldiers[i]);
+					}
 				}
 			}
 		}
 	}
 
-	if(entityGroup == GroupTeamB || entityGroup == GroupAllSoldiers || entityGroup == GroupTeamBAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
-	{
-		// Check team B for collision
-		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-		{
-			if(it->GetId() != pEntity->GetId() && it->IsAlive())
-			{
-				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&it->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
-				if(squareDistance <= squareRadius)
-				{
-					collisionObjects.insert(std::pair<float, Entity*>(squareDistance,(&(*it))));
-				}
-			}
-		}
-	}
 
-	if(entityGroup == GroupObstacles || entityGroup == GroupTeamAAndObstacles || entityGroup == GroupTeamBAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
+	if(entityGroup == GroupObstacles || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
 	{
+		float distance = 0.0f;
+		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&pCollidableObject->GetPosition()) - XMLoadFloat2(&oldPosition)));
+
 		// Only check nearby obstacles for collision
-		unsigned int maxGridDistance = static_cast<unsigned int>(radius / m_gridSpacing) + 1;
+		unsigned int maxGridDistance = static_cast<unsigned int>(distance / m_gridSpacing) + 1;
 
 		// Get the current grid position of the entity
 		XMFLOAT2 gridPos;
-		WorldToGridPosition(pEntity->GetPosition(), gridPos);
+		WorldToGridPosition(pCollidableObject->GetPosition(), gridPos);
 
 		unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
 		unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
@@ -1045,21 +800,444 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 		{
 			for(unsigned int k = startY; k <= endY; ++k)
 			{
-				if(!m_pGrid[i][k].m_isEmpty && (m_pGrid[i][k].m_type == ObstacleType) && (m_pGrid[i][k].m_id != pEntity->GetId()))
+				if(m_pNodes[i][k].IsObstacle())
 				{
-					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_pGrid[i][k].m_pEntity->GetPosition()) - XMLoadFloat2(&pEntity->GetPosition())));
-					if(squareDistance <= squareRadius)
+					if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(start, end))
 					{
-						collisionObjects.insert(std::pair<float, Entity*>(squareDistance, m_pGrid[i][k].m_pEntity));
+						float squareDistance = 0.0f;
+						XMVECTOR vector = XMLoadFloat2(&m_pNodes[i][k].GetWorldPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
+						XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
+
+						if(squareDistance < shortestSquareDistance)
+						{
+							shortestSquareDistance = squareDistance;
+							outCollisionObject = m_pNodes[i][k].GetObstacle();
+						}
 					}
 				}
 			}
 		}
 	}
-	*/
+
+	return (outCollisionObject != nullptr);
 }
 
-/*
+//--------------------------------------------------------------------------------------
+// Determines whether there is a direct line of sight between two fields on the grid.
+// Note: This only checks between the centre of the two given grid fields. Uses 
+//       Bresenham's line algorithm.
+// Param1: The x-coordinate of the start grid field in grid units.
+// Param2: The y-coordinate of the start grid field in grid units.
+// Param3: The x-coordinate of the end grid field in grid units.
+// Param4: The y-coordinate of the end grid field in grid units.
+// Returns true if a direct line of sight exists, false if an obstacle obstructs the view.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY)
+{
+	// Prepare the coordinates for the calculation according to the properties of the line 
+	// connecting drawn between them.
+    bool steep = std::abs(endGridY - startGridY) > std::abs(endGridX - startGridX);
+    if(steep) 
+	{
+		std::swap(startGridX, startGridY);
+		std::swap(endGridX, endGridY);
+    }
+    if(startGridX > endGridX) 
+	{
+		std::swap(startGridX, endGridX);
+		std::swap(startGridY, endGridY);
+    }
+
+    int deltaX = endGridX - startGridX;
+    int deltaY = std::abs(endGridY - startGridY);
+    int error = 0;
+    int yStep;
+    int y = startGridY;
+
+    if (startGridY < endGridY)
+	{
+		yStep = 1;
+	}else 
+	{
+		yStep = -1;
+	}
+
+	for(int x = startGridX; x <= endGridX; x++) 
+	{
+		// Check if there is an obstacle blocking the line of sight
+		if((m_pNodes[y][x].IsObstacle() && steep) || (m_pNodes[x][y].IsObstacle() && !steep))
+		{
+			return false;
+		}
+
+        error += deltaY;
+        if(2 * error >= deltaX) 
+		{
+            y += yStep;
+            error -= deltaX;
+        }
+    }
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Starts the simulation, switches from edit to simulation mode.
+// Returns true if the simulation could be started successfully.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::StartSimulation(void)
+{
+
+	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+	{
+		if(!m_flagSet[i] || m_soldierCount[i] < g_kSoldiersPerTeam || m_spawnPointCount[i] < 1)
+		{
+			return false;
+		}
+	}
+
+	PrepareSimulation();
+
+	for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+	{
+		m_soldiers[i].Activate();
+	}
+
+	m_isInEditMode = false;
+	m_isPaused = false;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Stops the simulation and resets the test environment into its starting state.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::EndSimulation(void)
+{
+
+	// Delete all projectiles
+	m_projectiles.clear();
+	m_obstacles.clear();
+
+	for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+	{
+		m_soldiers[i].Reset();
+	}
+
+	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+	{
+		m_flags[i].OnReset();
+		m_spawnPoints[i].clear();
+	}
+
+	m_isInEditMode = true;
+	m_isPaused = true;
+}
+
+//--------------------------------------------------------------------------------------
+// Pauses the simulation.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::PauseSimulation(void)
+{
+	m_isPaused = true;
+}
+
+//--------------------------------------------------------------------------------------
+// Resumes the simulation from paused state.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::ResumeSimulation(void)
+{
+	m_isPaused = false;
+}
+
+//--------------------------------------------------------------------------------------
+// Initialise the grid containing the test environment
+// Returns true if the grid was successfully initialised, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::InitialiseGrid()
+{
+	m_gridSpacing = m_gridSize / static_cast<float>(m_numberOfGridPartitions);
+
+	// Initialise the nodes
+
+	m_pNodes = new Node*[m_numberOfGridPartitions];
+
+	if(!m_pNodes)
+	{
+		return false;
+	}
+
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
+	{
+		m_pNodes[i] = new Node[m_numberOfGridPartitions];
+		
+		if(!m_pNodes[i])
+		{
+			return false;
+		}
+	}
+
+	// Initialise the nodes
+
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
+	{
+		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
+		{
+			XMFLOAT2 gridPos(static_cast<float>(i), static_cast<float>(k));
+			XMFLOAT2 worldPos;
+
+			GridToWorldPosition(gridPos, worldPos);
+
+			// Use the array position as node ID
+			m_pNodes[i][k].Initialise(i * m_numberOfGridPartitions + k, gridPos, worldPos, false);
+		}
+	}
+
+	// Set up adjacency information for the nodes
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
+	{
+		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
+		{
+			if(i > 0)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k]);
+				if(k > 0)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k-1]);
+				}
+				if(k < m_numberOfGridPartitions-1)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k+1]);
+				}
+			}
+
+			if(i < m_numberOfGridPartitions-1)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k]);
+				if(k > 0)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k-1]);
+				}
+				if(k < m_numberOfGridPartitions-1)
+				{
+					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k+1]);
+				}
+			}
+
+			if(k > 0)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k-1]);
+			}
+
+			if(k < m_numberOfGridPartitions-1)
+			{
+				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k+1]);
+			}
+		}
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Releases resources allocated for the grid of the test environment.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::CleanupGrid()
+{
+
+	if(m_pNodes)
+	{
+		for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
+		{
+			delete[] m_pNodes[i];
+			m_pNodes[i] = nullptr;
+		}
+
+		delete[] m_pNodes;
+		m_pNodes = nullptr;
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the node graph underlying the test environment. During simulation the graph will 
+// be used for pathfinding, some collision detection and other things.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::UpdateNodeGraph(void)
+{
+	// Update cover positions
+	for(std::list<Obstacle>::iterator it = m_obstacles.begin(); it != m_obstacles.end(); ++it)
+	{
+		UpdateCoverSpots(&(*it));
+	}
+
+	// Update team base territories
+	for(std::vector<EditModeObject>::iterator it = m_staticObjects.begin(); it != m_staticObjects.end(); ++it)
+	{
+		if(it->GetType() == RedBaseAreaType)
+		{
+			XMFLOAT2 gridPos(0.0f, 0.0f);
+			WorldToGridPosition(it->GetPosition(), gridPos);
+			m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].SetTerritoryOwner(TeamRed);
+		}else if(it->GetType() == BlueBaseAreaType)
+		{
+			XMFLOAT2 gridPos(0.0f, 0.0f);
+			WorldToGridPosition(it->GetPosition(), gridPos);
+			m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].SetTerritoryOwner(TeamBlue);
+		}
+	}
+
+	// Update base entrances
+	UpdateBaseEntrances();
+
+}
+
+
+//--------------------------------------------------------------------------------------
+// Updates the nodes of the graph according to the new obstacle added to the environment.
+// Nodes next to the new obstacle node are registered as providing cover towards some
+// directions, based on the relative position of the obstacle.
+// Param1: A pointer to the collidable object (obstacle) blocking this node for traversal.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::UpdateCoverSpots(CollidableObject* obstacle)
+{
+	if(!obstacle)
+	{
+		return;
+	}
+
+	// Determine the node that the obstacle is placed in.
+	XMFLOAT2 gridPos;
+	WorldToGridPosition(obstacle->GetPosition(), gridPos);
+
+	unsigned int gridX = static_cast<unsigned int>(gridPos.x);
+	unsigned int gridY = static_cast<unsigned int>(gridPos.y);
+
+	m_pNodes[gridX][gridY].SetObstacle(obstacle);
+
+	// Update the adjacent nodes with regard to the added/deleted cover spot
+
+	if(gridX > 0)
+	{
+		m_pNodes[gridX-1][gridY].SetCovered(East, true);
+		if(gridY > 0)
+		{
+			m_pNodes[gridX-1][gridY-1].SetCovered(NorthEast, true);
+		}
+		if(gridY < m_numberOfGridPartitions-1)
+		{
+			m_pNodes[gridX-1][gridY+1].SetCovered(SouthEast, true);
+		}
+	}
+
+	if(gridX < m_numberOfGridPartitions-1)
+	{
+		m_pNodes[gridX+1][gridY].SetCovered(West, true);
+		if(gridY > 0)
+		{
+			m_pNodes[gridX+1][gridY-1].SetCovered(NorthWest, true);
+		}
+		if(gridY < m_numberOfGridPartitions-1)
+		{
+			m_pNodes[gridX+1][gridY+1].SetCovered(SouthWest, true);
+		}
+	}
+
+	if(gridY > 0)
+	{
+		m_pNodes[gridX][gridY-1].SetCovered(North, true);
+	}
+
+	if(gridY < m_numberOfGridPartitions-1)
+	{
+		m_pNodes[gridX][gridY+1].SetCovered(South, true);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the nodes of the graph according to the base territories and marks nodes that
+// are entrances into the territory of each team.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::UpdateBaseEntrances(void)
+{
+	for(unsigned int x = 0; x < m_numberOfGridPartitions; ++x)
+	{
+		for(unsigned int y = 0; y < m_numberOfGridPartitions; ++y)
+		{
+			if(!m_pNodes[x][y].IsObstacle() && m_pNodes[x][y].GetTerritoryOwner() == None)
+			{
+				// Note: Look for a better way of doing this.
+
+				// Check if the node is provides entrance to the red base. 
+				// Check all eight neighbour nodes
+				if((x > 0) && (m_pNodes[x-1][y].GetTerritoryOwner() == TeamRed) ||
+								  (x > 0) && (y > 0) && (m_pNodes[x-1][y-1].GetTerritoryOwner() == TeamRed) ||
+								  (x > 0) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x-1][y+1].GetTerritoryOwner() == TeamRed) ||
+								  (x < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y].GetTerritoryOwner() == TeamRed) ||
+								  (x < m_numberOfGridPartitions-1) && (y > 0) && (m_pNodes[x+1][y-1].GetTerritoryOwner() == TeamRed) ||
+								  (x < m_numberOfGridPartitions-1) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y+1].GetTerritoryOwner() == TeamRed) ||
+								  (y > 0) && (m_pNodes[x][y-1].GetTerritoryOwner() == TeamRed) ||
+								  (y < m_numberOfGridPartitions-1) && (m_pNodes[x][y+1].GetTerritoryOwner() == TeamRed))
+				{
+					m_pNodes[x][y].SetEntranceToBase(RedEntrance);
+				}
+	
+				// Check if the node is provides entrance to the blue base.
+				if((x > 0) && (m_pNodes[x-1][y].GetTerritoryOwner() == TeamBlue) ||
+								  (x > 0) && (y > 0) && (m_pNodes[x-1][y-1].GetTerritoryOwner() == TeamBlue) ||
+								  (x > 0) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x-1][y+1].GetTerritoryOwner() == TeamBlue) ||
+								  (x < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y].GetTerritoryOwner() == TeamBlue) ||
+								  (x < m_numberOfGridPartitions-1) && (y > 0) && (m_pNodes[x+1][y-1].GetTerritoryOwner() == TeamBlue) ||
+								  (x < m_numberOfGridPartitions-1) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y+1].GetTerritoryOwner() == TeamBlue) ||
+								  (y > 0) && (m_pNodes[x][y-1].GetTerritoryOwner() == TeamBlue) ||
+								  (y < m_numberOfGridPartitions-1) && (m_pNodes[x][y+1].GetTerritoryOwner() == TeamBlue))
+				{
+					if(m_pNodes[x][y].GetEntranceToBase() == RedEntrance)
+					{
+						m_pNodes[x][y].SetEntranceToBase(RedAndBlueEntrance);
+					}else
+					{
+						m_pNodes[x][y].SetEntranceToBase(BlueEntrance);
+					}
+				}
+			}
+		}
+	}
+}
+
+// Data access functions
+	
+bool TestEnvironment::IsPaused(void) const
+{
+	return m_isPaused;
+}
+
+float TestEnvironment::GetGridSize(void) const
+{
+	return m_gridSize;
+}
+	
+unsigned int TestEnvironment::GetNumberOfGridPartitions(void) const
+{
+	return m_numberOfGridPartitions;
+}
+	
+float TestEnvironment::GetGridSpacing(void) const
+{
+	return m_gridSpacing;
+}
+
+Pathfinder& TestEnvironment::GetPathfinder(void) 
+{
+	return m_pathfinder;
+}
+
+Node** TestEnvironment::GetNodes(void)
+{
+	return m_pNodes;
+}
+
+
+/* currently not used, at the moment left in for reference
 //--------------------------------------------------------------------------------------
 // Determines the closest object in a moving entity's movement direction that it could
 // collide with. Mostly based on: http://stackoverflow.com/questions/1073336/circle-line-collision-detection
@@ -1333,683 +1511,3 @@ const Entity* TestEnvironment::GetCollisionObject(const MovingEntity& entity)
 	*/
 	//return pCollisionObject;
 //}
-
-//--------------------------------------------------------------------------------------
-// Checks for collisions between an entity and a specified group of other entities. Collision
-// of an object with itself is excluded, as are collisions with dead entities.
-// Param1: A pointer to the collider that should be checked for collision with other entities.
-// Param2: The previous position of the entity (during the last frame).
-// Param3: Specifies the group of entities that should be checked for collision with the given entity.
-// Param4: Out parameter that will hold a pointer to the colliding object that is closest to the collidable object specified in Param1. 
-//         Null if there is no collision at all. 
-// Returns true if the entity is about to collide with an entity of the specified group, false otherwise.
-//--------------------------------------------------------------------------------------
-bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject)
-{
-	float shortestSquareDistance = std::numeric_limits<float>::max();
-	outCollisionObject = nullptr;
-
-	// Determine the points of the line that the colliders of other entities will be checked against
-	
-	// Current position of the entity
-	XMFLOAT2 start = oldPosition;
-	// The position, where the entity will at the end of the frame
-	XMFLOAT2 end = pCollidableObject->GetPosition();
-
-	if(entityGroup != GroupObstacles)
-	{
-		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
-		{
-			if(m_soldiers[i].IsAlive() && (m_soldiers[i].GetId() != pCollidableObject->GetId()) &&
-			   (entityGroup == GroupAllSoldiersAndObstacles ||
-				entityGroup == GroupAllSoldiers ||
-				(m_soldiers[i].GetTeam() == TeamRed && (entityGroup == GroupTeamRed || entityGroup == GroupTeamRedAndObstacles)) ||
-				(m_soldiers[i].GetTeam() == TeamBlue && (entityGroup == GroupTeamBlue || entityGroup == GroupTeamBlueAndObstacles)))				)
-			{
-				if(m_soldiers[i].GetCollider()->CheckLineCollision(start, end))
-				{
-					float squareDistance = 0.0f;
-					XMVECTOR vector = XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
-					XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
-
-					if(squareDistance < shortestSquareDistance)
-					{
-						shortestSquareDistance = squareDistance;
-						outCollisionObject = &(m_soldiers[i]);
-					}
-				}
-			}
-		}
-	}
-
-
-	if(entityGroup == GroupObstacles || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
-	{
-		float distance = 0.0f;
-		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&pCollidableObject->GetPosition()) - XMLoadFloat2(&oldPosition)));
-
-		// Only check nearby obstacles for collision
-		unsigned int maxGridDistance = static_cast<unsigned int>(distance / m_gridSpacing) + 1;
-
-		// Get the current grid position of the entity
-		XMFLOAT2 gridPos;
-		WorldToGridPosition(pCollidableObject->GetPosition(), gridPos);
-
-		unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
-		unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
-		unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
-		unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
-
-		// Check the grid within that distance for colliding obstacles
-		for(unsigned int i = startX; i <= endX; ++i)
-		{
-			for(unsigned int k = startY; k <= endY; ++k)
-			{
-				if(m_pNodes[i][k].IsObstacle())
-				{
-					if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(start, end))
-					{
-						float squareDistance = 0.0f;
-						XMVECTOR vector = XMLoadFloat2(&m_pNodes[i][k].GetWorldPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
-						XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
-
-						if(squareDistance < shortestSquareDistance)
-						{
-							shortestSquareDistance = squareDistance;
-							outCollisionObject = m_pNodes[i][k].GetObstacle();
-						}
-					}
-				}
-			}
-		}
-
-		/*
-		// Check cover positions (obstacles) for collision
-		for(std::list<CoverPosition>::iterator it = m_coverSpots.begin(); it != m_coverSpots.end(); ++it)
-		{
-			if(it->GetCollider()->CheckLineCollision(start, end))
-			{
-				return true;
-			}
-		}
-		*/
-	}
-
-	return (outCollisionObject != nullptr);
-}
-
-/*
-//--------------------------------------------------------------------------------------
-// Accumulates a list of entities hostile to the passed in entity.
-// Param1: The entity, for which enemies should be found.
-// Param2: The list that will hold pointers to the found enemies (out parameter).
-//--------------------------------------------------------------------------------------
-void TestEnvironment::GetEnemies(const FightingEntity* pEntity, std::list<FightingEntity*>& enemies)
-{
-	if(pEntity == nullptr)
-	{
-		return;
-	}
-
-	if(pEntity->GetType() == RedSoldierType)
-	{
-		for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-		{
-			enemies.push_back(&(*it));
-		}
-	}else
-	{
-		for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
-		{
-			enemies.push_back(&(*it));
-		}
-	}
-}*/
-
-//--------------------------------------------------------------------------------------
-// Determines whether there is a direct line of sight between two fields on the grid.
-// Note: This only checks between the centre of the two given grid fields. Uses 
-//       Bresenham's line algorithm.
-// Param1: The x-coordinate of the start grid field in grid units.
-// Param2: The y-coordinate of the start grid field in grid units.
-// Param3: The x-coordinate of the end grid field in grid units.
-// Param4: The y-coordinate of the end grid field in grid units.
-// Returns true if a direct line of sight exists, false if an obstacle obstructs the view.
-//--------------------------------------------------------------------------------------
-bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY)
-{
-	// Prepare the coordinates for the calculation according to the properties of the line 
-	// connecting drawn between them.
-    bool steep = std::abs(endGridY - startGridY) > std::abs(endGridX - startGridX);
-    if(steep) 
-	{
-		std::swap(startGridX, startGridY);
-		std::swap(endGridX, endGridY);
-    }
-    if(startGridX > endGridX) 
-	{
-		std::swap(startGridX, endGridX);
-		std::swap(startGridY, endGridY);
-    }
-
-    int deltaX = endGridX - startGridX;
-    int deltaY = std::abs(endGridY - startGridY);
-    int error = 0;
-    int yStep;
-    int y = startGridY;
-
-    if (startGridY < endGridY)
-	{
-		yStep = 1;
-	}else 
-	{
-		yStep = -1;
-	}
-
-	for(int x = startGridX; x <= endGridX; x++) 
-	{
-		// Check if there is an obstacle blocking the line of sight
-		if((m_pNodes[y][x].IsObstacle() && steep) || (m_pNodes[x][y].IsObstacle() && !steep))
-		{
-			return false;
-		}
-
-        error += deltaY;
-        if(2 * error >= deltaX) 
-		{
-            y += yStep;
-            error -= deltaX;
-        }
-    }
-
-	return true;
-
-
-	/*
-	// Prepare the coordinates for the calculation according to the properties of the line 
-	// connecting drawn between them.
-    bool steep = std::abs(endGridY - startGridY) > std::abs(endGridX - startGridX);
-    if(steep) 
-	{
-		std::swap(startGridX, startGridY);
-		std::swap(endGridX, endGridY);
-    }
-    if(startGridX > endGridX) 
-	{
-		std::swap(startGridX, endGridX);
-		std::swap(startGridY, endGridY);
-    }
-
-    int deltaX = endGridX - startGridX;
-    int deltaY = std::abs(endGridY - startGridY);
-    int error = 0;
-    int yStep;
-    int y = startGridY;
-
-    if (startGridY < endGridY)
-	{
-		yStep = 1;
-	}else 
-	{
-		yStep = -1;
-	}
-
-	for(int x = startGridX; x <= endGridX; x++) 
-	{
-		// Check if there is an obstacle blocking the line of sight
-		if((!m_pGrid[y][x].m_isEmpty > 0 && steep && (m_pGrid[y][x].m_type == ObstacleType)) || (!m_pGrid[x][y].m_isEmpty > 0 && !steep && (m_pGrid[x][y].m_type == ObstacleType)))
-		{
-			return false;
-		}
-
-        error += deltaY;
-        if(2 * error >= deltaX) 
-		{
-            y += yStep;
-            error -= deltaX;
-        }
-    }
-
-	return true;
-	*/
-}
-
-//--------------------------------------------------------------------------------------
-// Starts the simulation, switches from edit to simulation mode.
-// Returns true if the simulation could be started successfully.
-//--------------------------------------------------------------------------------------
-bool TestEnvironment::StartSimulation(void)
-{
-	/*
-	for(std::list<Soldier>::iterator it = m_teamA.begin(); it != m_teamA.end(); ++it)
-	{
-		it->Activate();
-	}
-
-	for(std::list<Soldier>::iterator it = m_teamB.begin(); it != m_teamB.end(); ++it)
-	{
-		it->Activate();
-	}
-	*/
-
-	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
-	{
-		if(!m_flagSet[i] || m_soldierCount[i] < g_kSoldiersPerTeam || m_spawnPointCount[i] < 1)
-		{
-			return false;
-		}
-	}
-
-	PrepareSimulation();
-
-	for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
-	{
-		m_soldiers[i].Activate();
-	}
-
-	m_isInEditMode = false;
-	m_isPaused = false;
-
-	return true;
-}
-
-//--------------------------------------------------------------------------------------
-// Stops the simulation and resets the test environment into its starting state.
-//--------------------------------------------------------------------------------------
-void TestEnvironment::EndSimulation(void)
-{
-	/*
-	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
-	{
-		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
-		{
-			if(!m_pGrid[i][k].m_isEmpty)
-			{
-				if(m_pGrid[i][k].m_type == RedSoldierType || m_pGrid[i][k].m_type == BlueSoldierType)
-				{
-					XMFLOAT2 position;
-					GridToWorldPosition(XMFLOAT2(static_cast<float>(i), static_cast<float>(k)), position);
-					m_pGrid[i][k].m_pEntity->SetPosition(position);
-					m_pGrid[i][k].m_pEntity->SetRotation(m_pGrid[i][k].m_rotation);
-					m_pGrid[i][k].m_pEntity->Reset();
-				}
-			}
-		}
-	}*/
-
-	// Delete all projectiles
-	m_projectiles.clear();
-	m_obstacles.clear();
-
-	for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
-	{
-		m_soldiers[i].Reset();
-	}
-
-	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
-	{
-		// not sure if needed
-		//m_flags[i].OnReset();
-	}
-
-//-----	// TODO:
-//-----	// delete obstacles/spawn points, reset soldiers, flags, etc
-
-	m_isInEditMode = true;
-	m_isPaused = true;
-}
-
-//--------------------------------------------------------------------------------------
-// Pauses the simulation.
-//--------------------------------------------------------------------------------------
-void TestEnvironment::PauseSimulation(void)
-{
-	m_isPaused = true;
-}
-
-//--------------------------------------------------------------------------------------
-// Resumes the simulation from paused state.
-//--------------------------------------------------------------------------------------
-void TestEnvironment::ResumeSimulation(void)
-{
-	m_isPaused = false;
-}
-
-//--------------------------------------------------------------------------------------
-// Initialise the grid containing the test environment
-// Returns true if the grid was successfully initialised, false otherwise.
-//--------------------------------------------------------------------------------------
-bool TestEnvironment::InitialiseGrid()
-{
-	m_gridSpacing = m_gridSize / static_cast<float>(m_numberOfGridPartitions);
-
-	// Initialise the grid
-	/*
-	m_pGrid = new GridField*[m_numberOfGridPartitions];
-
-	if(!m_pGrid)
-	{
-		return false;
-	}
-
-	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
-	{
-		m_pGrid[i] = new GridField[m_numberOfGridPartitions];
-		
-		if(!m_pGrid[i])
-		{
-			return false;
-		}
-
-		// All grid fields are initially empty
-		m_pGrid[i]->m_isEmpty = true;
-	}
-	*/
-	// Initialise the nodes
-
-	m_pNodes = new Node*[m_numberOfGridPartitions];
-
-	if(!m_pNodes)
-	{
-		return false;
-	}
-
-	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
-	{
-		m_pNodes[i] = new Node[m_numberOfGridPartitions];
-		
-		if(!m_pNodes[i])
-		{
-			return false;
-		}
-	}
-
-	// Initialise the nodes
-
-	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
-	{
-		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
-		{
-			XMFLOAT2 gridPos(static_cast<float>(i), static_cast<float>(k));
-			XMFLOAT2 worldPos;
-
-			GridToWorldPosition(gridPos, worldPos);
-
-			// Use the array position as node ID
-			m_pNodes[i][k].Initialise(i * m_numberOfGridPartitions + k, gridPos, worldPos, false);
-		}
-	}
-
-	// Set up adjacency information for the nodes
-	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
-	{
-		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
-		{
-			if(i > 0)
-			{
-				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k]);
-				if(k > 0)
-				{
-					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k-1]);
-				}
-				if(k < m_numberOfGridPartitions-1)
-				{
-					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i-1][k+1]);
-				}
-			}
-
-			if(i < m_numberOfGridPartitions-1)
-			{
-				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k]);
-				if(k > 0)
-				{
-					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k-1]);
-				}
-				if(k < m_numberOfGridPartitions-1)
-				{
-					m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i+1][k+1]);
-				}
-			}
-
-			if(k > 0)
-			{
-				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k-1]);
-			}
-
-			if(k < m_numberOfGridPartitions-1)
-			{
-				m_pNodes[i][k].AddAdjacentNode(&m_pNodes[i][k+1]);
-			}
-		}
-	}
-
-	
-
-	return true;
-}
-
-//--------------------------------------------------------------------------------------
-// Releases resources allocated for the grid of the test environment.
-//--------------------------------------------------------------------------------------
-void TestEnvironment::CleanupGrid()
-{
-	/*
-	if(m_pGrid)
-	{
-		for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
-		{
-			delete[] m_pGrid[i];
-			m_pGrid[i] = nullptr;
-		}
-
-		delete[] m_pGrid;
-		m_pGrid = nullptr;
-	}*/
-
-	if(m_pNodes)
-	{
-		for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
-		{
-			delete[] m_pNodes[i];
-			m_pNodes[i] = nullptr;
-		}
-
-		delete[] m_pNodes;
-		m_pNodes = nullptr;
-	}
-}
-
-//--------------------------------------------------------------------------------------
-// Updates the node graph underlying the test environment. During simulation the graph will 
-// be used for pathfinding, some collision detection and other things.
-//--------------------------------------------------------------------------------------
-void TestEnvironment::UpdateNodeGraph(void)
-{
-	// Update cover positions
-	for(std::list<Obstacle>::iterator it = m_obstacles.begin(); it != m_obstacles.end(); ++it)
-	{
-		UpdateCoverSpots(&(*it));
-	}
-
-	// Update team base territories
-	for(std::vector<EditModeObject>::iterator it = m_staticObjects.begin(); it != m_staticObjects.end(); ++it)
-	{
-		if(it->GetType() == RedBaseAreaType)
-		{
-			XMFLOAT2 gridPos(0.0f, 0.0f);
-			WorldToGridPosition(it->GetPosition(), gridPos);
-			m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].SetTerritoryOwner(TeamRed);
-		}else if(it->GetType() == BlueBaseAreaType)
-		{
-			XMFLOAT2 gridPos(0.0f, 0.0f);
-			WorldToGridPosition(it->GetPosition(), gridPos);
-			m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].SetTerritoryOwner(TeamBlue);
-		}
-	}
-
-	// Update base entrances
-	UpdateBaseEntrances();
-
-}
-
-
-//--------------------------------------------------------------------------------------
-// Updates the nodes of the graph according to the new obstacle added to the environment.
-// Nodes next to the new obstacle node are registered as providing cover towards some
-// directions, based on the relative position of the obstacle.
-// Param1: A pointer to the collidable object (obstacle) blocking this node for traversal.
-//--------------------------------------------------------------------------------------
-void TestEnvironment::UpdateCoverSpots(CollidableObject* obstacle)
-{
-	if(!obstacle)
-	{
-		return;
-	}
-
-	// Determine the node that the obstacle is placed in.
-	XMFLOAT2 gridPos;
-	WorldToGridPosition(obstacle->GetPosition(), gridPos);
-
-	unsigned int gridX = static_cast<unsigned int>(gridPos.x);
-	unsigned int gridY = static_cast<unsigned int>(gridPos.y);
-
-	m_pNodes[gridX][gridY].SetObstacle(obstacle);
-
-	// Update the adjacent nodes with regard to the added/deleted cover spot
-
-	if(gridX > 0)
-	{
-		m_pNodes[gridX-1][gridY].SetCovered(East, true);
-		if(gridY > 0)
-		{
-			m_pNodes[gridX-1][gridY-1].SetCovered(NorthEast, true);
-		}
-		if(gridY < m_numberOfGridPartitions-1)
-		{
-			m_pNodes[gridX-1][gridY+1].SetCovered(SouthEast, true);
-		}
-	}
-
-	if(gridX < m_numberOfGridPartitions-1)
-	{
-		m_pNodes[gridX+1][gridY].SetCovered(West, true);
-		if(gridY > 0)
-		{
-			m_pNodes[gridX+1][gridY-1].SetCovered(NorthWest, true);
-		}
-		if(gridY < m_numberOfGridPartitions-1)
-		{
-			m_pNodes[gridX+1][gridY+1].SetCovered(SouthWest, true);
-		}
-	}
-
-	if(gridY > 0)
-	{
-		m_pNodes[gridX][gridY-1].SetCovered(North, true);
-	}
-
-	if(gridY < m_numberOfGridPartitions-1)
-	{
-		m_pNodes[gridX][gridY+1].SetCovered(South, true);
-	}
-}
-
-//--------------------------------------------------------------------------------------
-// Updates the nodes of the graph according to the base territories and marks nodes that
-// are entrances into the territory of each team.
-//--------------------------------------------------------------------------------------
-void TestEnvironment::UpdateBaseEntrances(void)
-{
-	for(unsigned int x = 0; x < m_numberOfGridPartitions; ++x)
-	{
-		for(unsigned int y = 0; y < m_numberOfGridPartitions; ++y)
-		{
-			if(!m_pNodes[x][y].IsObstacle() && m_pNodes[x][y].GetTerritoryOwner() == None)
-			{
-				// Note: Look for a better way of doing this.
-
-				// Check if the node is provides entrance to the red base. 
-				// Check all eight neighbour nodes
-				if((x > 0) && (m_pNodes[x-1][y].GetTerritoryOwner() == TeamRed) ||
-								  (x > 0) && (y > 0) && (m_pNodes[x-1][y-1].GetTerritoryOwner() == TeamRed) ||
-								  (x > 0) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x-1][y+1].GetTerritoryOwner() == TeamRed) ||
-								  (x < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y].GetTerritoryOwner() == TeamRed) ||
-								  (x < m_numberOfGridPartitions-1) && (y > 0) && (m_pNodes[x+1][y-1].GetTerritoryOwner() == TeamRed) ||
-								  (x < m_numberOfGridPartitions-1) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y+1].GetTerritoryOwner() == TeamRed) ||
-								  (y > 0) && (m_pNodes[x][y-1].GetTerritoryOwner() == TeamRed) ||
-								  (y < m_numberOfGridPartitions-1) && (m_pNodes[x][y+1].GetTerritoryOwner() == TeamRed))
-				{
-					m_pNodes[x][y].SetEntranceToBase(RedEntrance);
-				}
-	
-				// Check if the node is provides entrance to the blue base.
-				if((x > 0) && (m_pNodes[x-1][y].GetTerritoryOwner() == TeamBlue) ||
-								  (x > 0) && (y > 0) && (m_pNodes[x-1][y-1].GetTerritoryOwner() == TeamBlue) ||
-								  (x > 0) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x-1][y+1].GetTerritoryOwner() == TeamBlue) ||
-								  (x < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y].GetTerritoryOwner() == TeamBlue) ||
-								  (x < m_numberOfGridPartitions-1) && (y > 0) && (m_pNodes[x+1][y-1].GetTerritoryOwner() == TeamBlue) ||
-								  (x < m_numberOfGridPartitions-1) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y+1].GetTerritoryOwner() == TeamBlue) ||
-								  (y > 0) && (m_pNodes[x][y-1].GetTerritoryOwner() == TeamBlue) ||
-								  (y < m_numberOfGridPartitions-1) && (m_pNodes[x][y+1].GetTerritoryOwner() == TeamBlue))
-				{
-					if(m_pNodes[x][y].GetEntranceToBase() == RedEntrance)
-					{
-						m_pNodes[x][y].SetEntranceToBase(RedAndBlueEntrance);
-					}else
-					{
-						m_pNodes[x][y].SetEntranceToBase(BlueEntrance);
-					}
-				}
-			}
-		}
-	}
-}
-
-// Data access functions
-	
-bool TestEnvironment::IsPaused(void) const
-{
-	return m_isPaused;
-}
-
-float TestEnvironment::GetGridSize(void) const
-{
-	return m_gridSize;
-}
-	
-unsigned int TestEnvironment::GetNumberOfGridPartitions(void) const
-{
-	return m_numberOfGridPartitions;
-}
-	
-float TestEnvironment::GetGridSpacing(void) const
-{
-	return m_gridSpacing;
-}
-
-Pathfinder& TestEnvironment::GetPathfinder(void) 
-{
-	return m_pathfinder;
-}
-
-Node** TestEnvironment::GetNodes(void)
-{
-	return m_pNodes;
-}
-
-/*
-const std::list<Soldier>& TestEnvironment::GetTeamA(void) const
-{
-	return m_teamA;
-}
-
-const std::list<Soldier>& TestEnvironment::GetTeamB(void) const
-{
-	return m_teamB;
-}
-
-const std::list<CoverPosition>& TestEnvironment::GetCoverSpots(void) const
-{
-	return m_coverSpots;
-}
-*/

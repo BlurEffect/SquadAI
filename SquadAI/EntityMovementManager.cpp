@@ -116,12 +116,7 @@ void EntityMovementManager::UpdatePosition(float deltaTime, float maxSpeed, floa
 	{
 		XMFLOAT2 lookAtPoint(0.0f, 0.0f);
 		XMStoreFloat2(&lookAtPoint, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity));
-
 		LookAt(lookAtPoint);
-
-		//m_viewDirection = newVelocity;
-		//float rotation = (atan2(m_viewDirection.x, m_viewDirection.y)) * 180 / XM_PI;
-		//m_pEntity->SetRotation(rotation);
 	}
 
 	// Reset the steering force for the next frame
@@ -242,23 +237,12 @@ bool EntityMovementManager::FollowPath(float nodeReachedRadius, float speed)
 				// Final destination reached, clear the path
 				m_path.clear();
 				m_velocity = XMFLOAT2(0.0f, 0.0f);
-
-				// Debug, remove this
-				//m_pEntity->GetTestEnvironment()->AddProjectile(m_pEntity->GetPosition(), XMFLOAT2(m_pEntity->GetPosition().x + 10, m_pEntity->GetPosition().y + 10));
 			
 				return true;
 			}
 		}else
 		{
-			if(m_currentNode < m_path.size() - 1)
-			{
-				Seek(m_path[m_currentNode], nodeReachedRadius, speed);
-			}else
-			{
-				// Slow arrival for the last node
-				Seek(m_path[m_currentNode], nodeReachedRadius, speed);
-			}
-
+			Seek(m_path[m_currentNode], nodeReachedRadius, speed);
 			return false;
 		}
 	}
@@ -284,7 +268,7 @@ void EntityMovementManager::AvoidCollisions(float seeAheadDistance, float maxima
 	m_pEnvironment->GetNearbyObjects(m_pEntity->GetPosition(), seeAheadDistance, GroupAllSoldiersAndObstacles, nearbyObjects);
 
 	// One element is entity itself -> Check if there are more than one
-	if(nearbyObjects.size() > 0)
+	if(nearbyObjects.size() > 1)
 	{
 		XMFLOAT2 lineEndPoint(0.0f, 0.0f);
 		XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_viewDirection)) * seeAheadDistance);
@@ -388,8 +372,8 @@ void EntityMovementManager::Separate(float separationRadius, float maximalForce)
 	std::multimap<float, CollidableObject*> nearbySoldiers;
 	m_pEnvironment->GetNearbyObjects(m_pEntity->GetPosition(), separationRadius, GroupAllSoldiers, nearbySoldiers);
 
-	// check for identity with itself
-	if(!nearbySoldiers.empty())
+	// The entity itself will be included in the list of soldiers -> check if there are others as well
+	if(nearbySoldiers.size() > 1)
 	{
 		for(std::multimap<float, CollidableObject*>::const_iterator it = nearbySoldiers.begin(); it !=  nearbySoldiers.end(); ++it)
 		{

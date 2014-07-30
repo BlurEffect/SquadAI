@@ -349,7 +349,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[RedSoldierType] * 0.5f);
 
 			if(!m_soldiers[soldierIndex++].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
-												      &colliderData, TeamRed, properties, this))
+												      &colliderData, this, TeamRed, properties))
 			{
 				return false;
 			}
@@ -374,7 +374,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[BlueSoldierType] * 0.5f);
 
 			if(!m_soldiers[soldierIndex++].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
-												      &colliderData, TeamBlue, properties, this))
+												      &colliderData, this, TeamBlue, properties))
 			{
 				return false;
 			}
@@ -465,11 +465,11 @@ bool TestEnvironment::AddObject(ObjectType type, const XMFLOAT2& position, float
 	std::vector<EditModeObject*> foundObjects;
 
 	// Find all objects with the given grid id
-	std::vector<EditModeObject>::iterator foundIt = std::find_if(m_staticObjects.begin(), m_staticObjects.end(), FindEditModeObjectByGridId(gridId));
+	std::vector<EditModeObject>::iterator foundIt = std::find_if(m_staticObjects.begin(), m_staticObjects.end(), EditModeObject::FindEditModeObjectByGridId(gridId));
 	while (foundIt != m_staticObjects.end()) {
 		foundObjects.push_back(&(*foundIt));
 		// Continue search from the position the last object was found.
-		foundIt = std::find_if(++foundIt, m_staticObjects.end(), FindEditModeObjectByGridId(gridId));
+		foundIt = std::find_if(++foundIt, m_staticObjects.end(), EditModeObject::FindEditModeObjectByGridId(gridId));
 	}
 
 	bool doAddObject = true;
@@ -623,11 +623,11 @@ bool TestEnvironment::RemoveObjects(const XMFLOAT2& position)
 	// Find all objects with the given grid id to be removed
 
 	std::vector<EditModeObject*> foundObjects;
-	std::vector<EditModeObject>::iterator foundIt = std::find_if(m_staticObjects.begin(), m_staticObjects.end(), FindEditModeObjectByGridId(gridId));
+	std::vector<EditModeObject>::iterator foundIt = std::find_if(m_staticObjects.begin(), m_staticObjects.end(), EditModeObject::FindEditModeObjectByGridId(gridId));
 	while (foundIt != m_staticObjects.end()) {
 		foundObjects.push_back(&(*foundIt));
 		// Continue search from the position the last object was found.
-		foundIt = std::find_if(++foundIt, m_staticObjects.end(), FindEditModeObjectByGridId(gridId));
+		foundIt = std::find_if(++foundIt, m_staticObjects.end(), EditModeObject::FindEditModeObjectByGridId(gridId));
 	}
 
 	if(foundObjects.empty())
@@ -660,7 +660,7 @@ bool TestEnvironment::RemoveObjects(const XMFLOAT2& position)
 	}
 
 	// Actual deletion of the objects
-	std::vector<EditModeObject>::iterator removeIt = std::remove_if(m_staticObjects.begin(), m_staticObjects.end(), FindEditModeObjectByGridId(gridId));
+	std::vector<EditModeObject>::iterator removeIt = std::remove_if(m_staticObjects.begin(), m_staticObjects.end(), EditModeObject::FindEditModeObjectByGridId(gridId));
 	m_staticObjects.erase(removeIt, m_staticObjects.end());
 	return true;
 
@@ -933,7 +933,7 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 	if(entityGroup != GroupObstacles) 
 	{
 		// Check soldiers
-		for(unsigned int i = 0; i < g_kSoldiersPerTeam * NumberOfTeams; ++i)
+		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 		{
 			if(m_soldiers[i].IsAlive())
 			{

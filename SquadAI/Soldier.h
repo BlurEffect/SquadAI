@@ -64,7 +64,7 @@ public:
 	Soldier(void);
 	~Soldier(void);
 
-	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team, const SoldierProperties& soldierProperties, TestEnvironment* pEnvironment);
+	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, EntityTeam team, const SoldierProperties& soldierProperties);
 	void Update(float deltaTime);
 	void Activate(void);
 	void Reset(void);
@@ -86,9 +86,6 @@ public:
 	const XMFLOAT2& GetViewDirection(void) const;
 	float			GetFieldOfView(void) const;
 	float			GetViewingDistance(void) const;
-	float			GetCurrentHealth(void) const;
-	float			GetMaximalHealth(void) const;
-	float			IsAlive(void) const;
 
 	void SetMaxSpeed(float speed);
 	void SetMaxTotalForce(float maxForce);
@@ -101,11 +98,8 @@ public:
 	void SetSeparationRadius(float separationRadius);
 	void SetFieldOfView(float fieldOfView);
 	void SetViewingDistance(float viewingDistance);
-	void SetCurrentHealth(float health);
 
 private:
-
-	TestEnvironment*      m_pEnvironment;      // A pointer to the test environment that the soldier is part of
 
 	// Soldier components
 	EntityMovementManager m_movementManager;   // The movement manager used by this soldier
@@ -113,10 +107,6 @@ private:
 	EntitySensors         m_sensors;		   // The sensor component used by this soldier
 
 	SoldierProperties     m_soldierProperties; // Determines some properties of the soldier related to movement, combat and sensors
-
-	// Soldier state
-	bool				  m_isAlive;           // Tells whether the soldier is currently alive or dead
-	float				  m_currentHealth;	   // The current health of the soldier
 
 };
 

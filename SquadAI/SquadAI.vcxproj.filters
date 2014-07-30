@@ -174,9 +174,6 @@
     <ClCompile Include="ColliderFactory.cpp">
       <Filter>Source Files\Colliders</Filter>
     </ClCompile>
-    <ClCompile Include="EntityKnowledge.cpp">
-      <Filter>Source Files\EntityComponents</Filter>
-    </ClCompile>
     <ClCompile Include="Behaviour.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
@@ -352,9 +349,6 @@
     </ClInclude>
     <ClInclude Include="ColliderFactory.h">
       <Filter>Header Files\Colliders</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityKnowledge.h">
-      <Filter>Header Files\EntityComponents</Filter>
     </ClInclude>
     <ClInclude Include="Behaviour.h">
       <Filter>Header Files\BehaviourTree</Filter>

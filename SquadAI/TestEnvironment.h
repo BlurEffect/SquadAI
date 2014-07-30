@@ -114,21 +114,7 @@ private:
 	unsigned int m_spawnPointCount[NumberOfTeams-1];		// Keeps track of the spawn points that have been placed in edit mode
 	
 
-	//--------------------------------------------------------------------------------------
-	// Private functor used to find a basic object within a container based on the id of the
-	// grid field it is placed on.
-	//--------------------------------------------------------------------------------------
-	class FindEditModeObjectByGridId
-	{
-	public:
-		FindEditModeObjectByGridId(unsigned long gridId) : m_gridId(gridId){}
-		bool operator()(const EditModeObject& basicObject)
-		{
-			return basicObject.GetGridId() == m_gridId;
-		}
-	private:
-		unsigned long m_gridId;
-	};
+	
 };
 
 #endif // TEST_ENVIRONMENT_H

@@ -97,7 +97,6 @@
     <ClCompile Include="ColliderFactory.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityCombatManager.cpp" />
-    <ClCompile Include="EntityKnowledge.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
     <ClCompile Include="Flag.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
@@ -156,7 +155,6 @@
     <ClInclude Include="ColliderFactory.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityCombatManager.h" />
-    <ClInclude Include="EntityKnowledge.h" />
     <ClInclude Include="EntitySensors.h" />
     <ClInclude Include="Flag.h" />
     <ClInclude Include="FontPixelShader.h" />

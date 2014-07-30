@@ -7,8 +7,7 @@
 // Includes
 #include "Soldier.h"
 
-Soldier::Soldier(void) : Entity(),
-					     m_pEnvironment(nullptr)
+Soldier::Soldier(void) : Entity()
 {
 }
 
@@ -18,37 +17,30 @@ Soldier::~Soldier(void)
 
 //--------------------------------------------------------------------------------------
 // Initialises the soldier.
-// Param1: An ID uniquely identifying this entity.
-// Param2: The start position of the entity.
-// Param3: The initial rotation of the entity.
-// Param4: The uniform scale of the entity.
-// Param5: The category the object belongs to.
-// Param6: The type of the collider that should be created for this entity.
-// Param7: The collider data that should be used for the creation of the collider.
-// Param8: Identifies the team that this entity belongs to.
-// Param9: The bundled soldier-specific properties.
-// Param10: A pointer to the test environment the soldier is part of.
+// Param1:  An ID uniquely identifying this entity.
+// Param2:  The start position of the entity.
+// Param3:  The initial rotation of the entity.
+// Param4:  The uniform scale of the entity.
+// Param5:  The category the object belongs to.
+// Param6:  The type of the collider that should be created for this entity.
+// Param7:  The collider data that should be used for the creation of the collider.
+// Param8:  A pointer to the test environment the soldier is part of.
+// Param9:  Identifies the team that this entity belongs to.
+// Param10: The bundled soldier-specific properties.
 // Returns true if the soldier was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Soldier::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team, const SoldierProperties& soldierProperties, TestEnvironment* pEnvironment)
+bool Soldier::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, EntityTeam team, const SoldierProperties& soldierProperties)
 {
-	if(!Entity::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData, team))
+	if(!Entity::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData, pEnvironment, soldierProperties.m_maxHealth, team))
 	{
 		return false;
 	}
 
-	// Check for invalid values
-	if(!pEnvironment)
-	{
-		return false;
-	}
-
-	m_pEnvironment       = pEnvironment;
 	m_soldierProperties  = soldierProperties;
 
 	Reset();      
 
-	return (m_movementManager.Initialise(this, m_pEnvironment) && m_combatManager.Initialise(this, m_pEnvironment) && m_sensors.Initialise(this, m_pEnvironment));
+	return (m_movementManager.Initialise(this, GetTestEnvironment()) && m_combatManager.Initialise(this, GetTestEnvironment()) && m_sensors.Initialise(this, GetTestEnvironment()));
 }
 
 // Debug ->remove
@@ -119,8 +111,8 @@ void Soldier::Hit(float damage, const XMFLOAT2& direction)
 {
 	// add new suspected threat somewhere -> event queue?
 
-	m_currentHealth -= damage;
-	m_isAlive = m_currentHealth <= 0.0f;
+	SetCurrentHealth(GetCurrentHealth() - damage);
+
 }
 
 
@@ -132,8 +124,7 @@ void Soldier::Reset(void)
 	m_movementManager.Reset();
 	m_combatManager.Reset();
 
-	m_currentHealth = m_soldierProperties.m_maxHealth;
-	m_isAlive = (m_currentHealth > 0.0f);
+	Entity::Reset();
 }
 
 // Data access functions
@@ -205,21 +196,6 @@ float Soldier::GetViewingDistance(void) const
 	return m_soldierProperties.m_viewingDistance;
 }
 
-float Soldier::GetCurrentHealth(void) const
-{
-	return m_currentHealth;
-}
-
-float Soldier::GetMaximalHealth(void) const
-{
-	return m_soldierProperties.m_maxHealth;
-}
-
-float Soldier::IsAlive(void) const
-{
-	return m_isAlive;
-}
-
 void Soldier::SetMaxSpeed(float maxSpeed)
 {
 	m_soldierProperties.m_maxSpeed = maxSpeed;
@@ -273,11 +249,6 @@ void Soldier::SetFieldOfView(float fieldOfView)
 void Soldier::SetViewingDistance(float viewingDistance)
 {
 	m_soldierProperties.m_viewingDistance = viewingDistance;
-}
-
-void Soldier::SetCurrentHealth(float health)
-{
-	m_currentHealth = health;
 }
 
 /*

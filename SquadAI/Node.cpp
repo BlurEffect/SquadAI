@@ -69,6 +69,22 @@ bool Node::AddAdjacentNode(Node* pNode)
 	return true;
 }
 
+//--------------------------------------------------------------------------------------
+// Resets the node.
+//--------------------------------------------------------------------------------------
+void Node::Reset(void)
+{
+	m_isObstacle     = false;
+	m_pObstacle      = nullptr;
+	m_entranceToBase = NoEntrance;
+	m_territoryOwner = None;
+
+	for(unsigned int i = 0; i < NumberOfDirections; ++i)
+	{
+		m_coverProvided[i] = false;
+	}
+}
+
 // Data access functions
 
 unsigned long Node::GetId(void) const

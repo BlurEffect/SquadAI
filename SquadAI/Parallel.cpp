@@ -80,9 +80,12 @@ BehaviourStatus Parallel::Update(float deltaTime)
 
 //--------------------------------------------------------------------------------------
 // Terminates the behaviour.
+// Param1: The return code of the behaviour that is terminating.
 //--------------------------------------------------------------------------------------
-void Parallel::OnTerminate(void)
+void Parallel::OnTerminate(BehaviourStatus status)
 {
+	Composite::OnTerminate(status);
+	/*
 	for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
     {
 		// Abort all running child behaviours.
@@ -90,6 +93,6 @@ void Parallel::OnTerminate(void)
 		{
 			(*it)->Abort();
 		}
-    }
+    }*/
 }
 

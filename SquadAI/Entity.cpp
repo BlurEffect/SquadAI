@@ -10,6 +10,7 @@
 #include "TestEnvironment.h"
 
 Entity::Entity(void) : CollidableObject(),
+					   m_pBehaviour(nullptr),
 					   m_pEnvironment(nullptr),
 					   m_team(EntityTeam(None)),
 					   m_readyForAttack(false),
@@ -22,6 +23,10 @@ Entity::Entity(void) : CollidableObject(),
 
 Entity::~Entity(void)
 {
+	if(m_pBehaviour)
+	{
+		delete m_pBehaviour;
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -47,6 +52,12 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 
 	// Check for invalid values
 	if((team == None) || (!pEnvironment))
+	{
+		return false;
+	}
+
+	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleMovementTree, this);
+	if(!m_pBehaviour)
 	{
 		return false;
 	}
@@ -166,6 +177,11 @@ bool Entity::IsSuspectedThreat(unsigned long id)
 }
 
 // Data access functions
+
+Behaviour* Entity::GetBehaviour(void)
+{
+	return m_pBehaviour;
+}
 
 TestEnvironment* Entity::GetTestEnvironment(void)
 {

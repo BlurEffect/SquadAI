@@ -22,6 +22,8 @@ public:
 	virtual ~Decorator(void) = 0;
 
 protected:
+	virtual void OnTerminate(BehaviourStatus status);
+
 	Behaviour* m_pChild; // The single child behaviour that is being decorated
 
 };

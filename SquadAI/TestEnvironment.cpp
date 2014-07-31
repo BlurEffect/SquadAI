@@ -86,7 +86,6 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 //--------------------------------------------------------------------------------------
 void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 {
-
 	if(m_isInEditMode)
 	{
 		for(std::vector<EditModeObject>::iterator it = m_staticObjects.begin(); it != m_staticObjects.end(); ++it)
@@ -232,6 +231,8 @@ void TestEnvironment::Cleanup()
 //--------------------------------------------------------------------------------------
 bool TestEnvironment::PrepareSimulation(void)
 {
+	ResetNodeGraph();
+
 	// Initialise simulation mode objects
 
 	int soldierIndex = 0;
@@ -913,6 +914,20 @@ bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGr
 }
 
 //--------------------------------------------------------------------------------------
+// Resets the node graph as a preparation measure for the simulation.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::ResetNodeGraph(void)
+{
+	for(unsigned int i = 0; i < m_numberOfGridPartitions; ++i)
+	{
+		for(unsigned int k = 0; k < m_numberOfGridPartitions; ++k)
+		{
+			m_pNodes[i][k].Reset();
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Starts the simulation, switches from edit to simulation mode.
 // Returns true if the simulation could be started successfully.
 //--------------------------------------------------------------------------------------
@@ -960,6 +975,8 @@ void TestEnvironment::EndSimulation(void)
 		m_flags[i].OnReset();
 		m_spawnPoints[i].clear();
 	}
+
+	m_id = 0;
 
 	m_isInEditMode = true;
 	m_isPaused = true;

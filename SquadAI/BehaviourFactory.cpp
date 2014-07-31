@@ -39,7 +39,31 @@ Behaviour* BehaviourFactory::CreateSimpleMovementTree(Entity* pEntity)
 {
 	Behaviour* pRoot = CreateBehaviour(SelectorType, pEntity, "Root", nullptr);
 
-	return pRoot;
+	if(pRoot)
+	{
+		Behaviour* pPatrolSequence = CreateBehaviour(SequenceType, pEntity, "PatrolSequence", nullptr);
+		Behaviour* pIdleAction     = CreateBehaviour(IdleType, pEntity, "IdleAction", nullptr);
+		
+		if(pPatrolSequence && pIdleAction)
+		{
+			reinterpret_cast<Composite*>(pRoot)->AddChild(pPatrolSequence);
+			reinterpret_cast<Composite*>(pRoot)->AddChild(pIdleAction);
+
+			Behaviour* pDeterminePatrolTargetAction = CreateBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
+			Behaviour* pMovementTargetSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetSetCondition", nullptr);
+			Behaviour* pMoveToTargetAction = CreateBehaviour(MoveToTargetType, pEntity, "MoveToTargetAction", nullptr);
+		
+			if(pDeterminePatrolTargetAction && pMovementTargetSetCondition && pMoveToTargetAction)
+			{
+				reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pDeterminePatrolTargetAction);
+				reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMovementTargetSetCondition);
+				reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMoveToTargetAction);
+				return &(*pRoot);
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------

@@ -36,6 +36,8 @@ public:
 	void Initialise(unsigned long id, const XMFLOAT2& gridPos, const XMFLOAT2& worldPos, bool isObstacle);
 	bool AddAdjacentNode(Node* pNode);
 
+	void Reset(void);
+
 	// Data access functions
 	unsigned long			  GetId(void) const;
 	const Node*				  GetParent(void) const;

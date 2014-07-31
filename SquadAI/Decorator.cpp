@@ -21,5 +21,19 @@ Decorator::Decorator(Entity* pEntity, const char* name, Behaviour* pChild) : Beh
 
 Decorator::~Decorator(void)
 {
+	if(m_pChild)
+	{
+		delete m_pChild;
+		m_pChild = nullptr;
+	}
+}
 
+//--------------------------------------------------------------------------------------
+// Terminates the behaviour.
+// Param1: The return code of the behaviour that is terminating.
+//--------------------------------------------------------------------------------------
+void Decorator::OnTerminate(BehaviourStatus status)
+{
+	Behaviour::Reset();
+	//m_pChild->Reset();
 }

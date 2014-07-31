@@ -129,6 +129,7 @@ void EntityMovementManager::UpdatePosition(float deltaTime, float maxSpeed, floa
 //--------------------------------------------------------------------------------------
 void EntityMovementManager::Reset(void)
 {
+	m_path.clear();
 	m_velocity = XMFLOAT2(0.0f, 0.0f);
 	m_currentNode = 0;
 }
@@ -146,6 +147,9 @@ bool EntityMovementManager::SetPathTo(const XMFLOAT2& targetPosition)
 	if(result)
 	{
 		m_currentNode = 0;
+	}else
+	{
+		int a  = 2;
 	}
 
 	return result;

@@ -72,6 +72,7 @@ public:
 
 	//const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
 	bool          CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);
+	void ResetNodeGraph(void);
 
 	// Data access functions
 	float		 GetGridSize(void) const;

@@ -58,6 +58,9 @@ void Soldier::Update(float deltaTime)
 		return;
 	}
 
+	GetBehaviour()->Tick(deltaTime);
+
+	/*
 	m_movementManager.FollowPath(GetTargetReachedRadius(), m_soldierProperties.m_maxSpeed);
 	m_movementManager.AvoidCollisions(m_soldierProperties.m_maxCollisionSeeAhead, m_soldierProperties.m_maxCollisionAvoidanceForce);
 	m_movementManager.Separate(m_soldierProperties.m_separationRadius, m_soldierProperties.m_maxSeparationForce);
@@ -85,6 +88,7 @@ void Soldier::Update(float deltaTime)
 	}
 
 	m_movementManager.UpdatePosition(deltaTime, m_soldierProperties.m_maxSpeed, m_soldierProperties.m_maxTotalForce);
+	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -169,6 +173,7 @@ BehaviourStatus Soldier::DeterminePatrolTarget(float deltaTime)
 		return StatusSuccess;
 	}
 
+	SetMovementTargetSet(false);
 	return StatusFailure;
 }
 
@@ -221,10 +226,10 @@ void Soldier::Activate(void)
 
 	if(GetTeam() == TeamRed)
 	{
-		m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
+		//m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
 	}else
 	{
-		m_movementManager.SetPathTo(XMFLOAT2(-20.0f, -20.0f));
+		//m_movementManager.SetPathTo(XMFLOAT2(-20.0f, -20.0f));
 	}
 }
 
@@ -249,6 +254,8 @@ void Soldier::Reset(void)
 {
 	m_movementManager.Reset();
 	m_combatManager.Reset();
+
+	
 
 	Entity::Reset();
 }

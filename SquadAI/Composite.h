@@ -23,8 +23,11 @@ public:
 	void AddChild(Behaviour* pChild);
 	void RemoveChild(Behaviour* pChild);
 	void ClearChildren(void);
-
+	
 protected:
+	void ResetChildren(void);
+	virtual void OnTerminate(BehaviourStatus status);
+
 	std::vector<Behaviour*> m_children; // The child behaviours encompassed by this composite behaviour
 
 };

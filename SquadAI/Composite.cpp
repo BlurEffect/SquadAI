@@ -15,6 +15,14 @@ Composite::Composite(Entity* pEntity, const char* name) : Behaviour(pEntity, nam
 
 Composite::~Composite(void)
 {
+	for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
+	{
+		if(*it)
+		{
+			delete (*it);
+			*it = nullptr;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -53,4 +61,25 @@ void Composite::RemoveChild(Behaviour* pChild)
 void Composite::ClearChildren(void)
 {
 	m_children.clear();
+}
+
+//--------------------------------------------------------------------------------------
+// Terminates the behaviour.
+// Param1: The return code of the behaviour that is terminating.
+//--------------------------------------------------------------------------------------
+void Composite::OnTerminate(BehaviourStatus status)
+{
+	Behaviour::Reset();
+	//ResetChildren();
+}
+
+//--------------------------------------------------------------------------------------
+// Resets all children of the composite.
+//--------------------------------------------------------------------------------------
+void Composite::ResetChildren(void)
+{
+	for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
+	{
+		(*it)->Reset();
+	}
 }

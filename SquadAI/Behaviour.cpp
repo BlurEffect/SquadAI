@@ -114,7 +114,7 @@ void Behaviour::OnInitialise(void)
 //--------------------------------------------------------------------------------------
 void Behaviour::OnTerminate(BehaviourStatus status)
 {
-
+	Reset();
 }
 
 Entity* Behaviour::GetEntity(void)

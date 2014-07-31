@@ -14,6 +14,7 @@
 #include "CollidableObject.h"
 #include "ObjectTypes.h"
 #include "Behaviour.h"
+#include "BehaviourFactory.h"
 
 // Forward declarations
 class TestEnvironment;
@@ -67,6 +68,7 @@ public:
 	bool IsSuspectedThreat(unsigned long id);
 
 	// Data access functions
+	Behaviour*						    GetBehaviour(void);
 	TestEnvironment*					GetTestEnvironment(void);
 	EntityTeam							GetTeam(void) const;
 	bool								IsAlive(void) const;
@@ -121,6 +123,9 @@ public:
 	};
 
 private:
+
+	Behaviour*       m_pBehaviour;   // The behaviour tree controlling the behaviour of this entity
+
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 	EntityTeam       m_team;		 // The team the entity belongs to
 

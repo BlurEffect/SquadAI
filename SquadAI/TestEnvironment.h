@@ -18,6 +18,8 @@
 #include <sstream>
 #include <algorithm>
 #include <limits>
+#include <stdlib.h>     
+#include <time.h>      
 
 #include "RenderContext.h"
 #include "TestEnvironmentData.h"
@@ -66,6 +68,7 @@ public:
 	void GridToWorldPosition(const XMFLOAT2& gridPos, XMFLOAT2& worldPos) const;
 
 	void GetNearbyObjects(const XMFLOAT2& position, float radius, EntityGroup entityGroup, std::multimap<float, CollidableObject*>& collisionObjects);
+	bool GetRandomUnblockedTarget(XMFLOAT2& outPosition) const;
 
 	//const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
 	bool          CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);

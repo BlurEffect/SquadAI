@@ -12,7 +12,7 @@
 // Includes
 #include "Sequence.h"
 
-Sequence::Sequence(const char* name) : Composite(name)
+Sequence::Sequence(Entity* pEntity, const char* name) : Composite(pEntity, name)
 {
 }
 
@@ -31,9 +31,10 @@ void Sequence::OnInitialise(void)
 
 //--------------------------------------------------------------------------------------
 // Updates the sequence.
+// Param1: The time in seconds passed since the last frame.
 // Returns the state of the sequence.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Sequence::Update(void)
+BehaviourStatus Sequence::Update(float deltaTime)
 {
 	if(m_children.size() < 1)
 	{
@@ -45,7 +46,7 @@ BehaviourStatus Sequence::Update(void)
 	// might complete within a single update.
 	while(true)
 	{
-		BehaviourStatus status = (*m_currentChild)->Tick();
+		BehaviourStatus status = (*m_currentChild)->Tick(deltaTime);
 
 		// If the current child failed or is still running, this equals the 
 		// current state of the whole sequence.

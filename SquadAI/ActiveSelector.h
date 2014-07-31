@@ -16,12 +16,12 @@
 class ActiveSelector : public Selector
 {
 public:
-	ActiveSelector(const char* name);
+	ActiveSelector(Entity* pEntity, const char* name);
 	virtual ~ActiveSelector(void);
 
 protected:
 	virtual void OnInitialise(void);
-	virtual BehaviourStatus Update(void);
+	virtual BehaviourStatus Update(float deltaTime);
 
 };
 

@@ -393,6 +393,15 @@ void EntityMovementManager::Separate(float separationRadius, float maximalForce)
 	}
 }
 
+//--------------------------------------------------------------------------------------
+// Tells whether there currently is a path set for the entity to follow.
+// Returns true if there is a patn set, false otherwise.
+//--------------------------------------------------------------------------------------
+bool EntityMovementManager::IsPathSet(void) const
+{
+	return (!m_path.empty());
+}
+
 // Data access functions
 
 const XMFLOAT2& EntityMovementManager::GetVelocity(void) const

@@ -18,12 +18,12 @@
 class Sequence : public Composite
 {
 public:
-	Sequence(const char* name);
+	Sequence(Entity* pEntity, const char* name);
 	virtual ~Sequence(void);
 
 protected:
 	virtual void OnInitialise(void);
-	virtual BehaviourStatus Update(void);
+	virtual BehaviourStatus Update(float deltaTime);
 
 	std::vector<Behaviour*>::iterator m_currentChild; // The currently active child behaviour of the sequence
 };

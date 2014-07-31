@@ -11,9 +11,10 @@
 
 unsigned long Behaviour::s_BehaviourId = 0;
 
-Behaviour::Behaviour(const char* name) : m_id(++s_BehaviourId),
-										 m_name(name),
-										 m_status(StatusInvalid)
+Behaviour::Behaviour(Entity* pEntity, const char* name) : m_pEntity(pEntity),
+														  m_id(++s_BehaviourId),
+														  m_name(name),
+														  m_status(StatusInvalid)
 {
 }
 
@@ -43,10 +44,16 @@ Behaviour::~Behaviour(void)
 
 //--------------------------------------------------------------------------------------
 // Updates the behaviour and ensures it is properly intialised and terminated.
+// Param1: The time in seconds passed since the last frame.
 // Returns the current status of the behaviour.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Behaviour::Tick(void)
+BehaviourStatus Behaviour::Tick(float deltaTime)
 {
+	if(!m_pEntity)
+	{
+		return StatusInvalid;
+	}
+
 	// When the behaviour is ticked the first time, make sure it is
 	// initialised properly.
 	if(m_status == StatusInvalid)
@@ -55,7 +62,7 @@ BehaviourStatus Behaviour::Tick(void)
 	}
 
 	// Get the current state of the behaviour.
-	m_status = Update();
+	m_status = Update(deltaTime);
 
 	// When the behaviour is completed (fail or success), terminate
 	// it properly.
@@ -108,6 +115,11 @@ void Behaviour::OnInitialise(void)
 void Behaviour::OnTerminate(BehaviourStatus status)
 {
 
+}
+
+Entity* Behaviour::GetEntity(void)
+{
+	return m_pEntity;
 }
 
 unsigned long Behaviour::GetId(void) const

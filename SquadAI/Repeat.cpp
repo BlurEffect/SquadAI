@@ -10,9 +10,9 @@
 #include "Repeat.h"
 
 
-Repeat::Repeat(const char* name, Behaviour* pChild) : Decorator(name, pChild),
-												      m_numberOfRepeats(0),
-													  m_counter(0)		
+Repeat::Repeat(Entity* pEntity, const char* name, Behaviour* pChild, unsigned int numberOfRepeats) : Decorator(pEntity, name, pChild),
+																								     m_numberOfRepeats(numberOfRepeats),
+																								     m_counter(0)		
 {
 }
 
@@ -30,9 +30,10 @@ void Repeat::OnInitialise(void)
 
 //--------------------------------------------------------------------------------------
 // Updates the repeat decorator.
+// Param1: The time in seconds passed since the last frame.
 // Returns the state of the repeat decorator.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Repeat::Update(void)
+BehaviourStatus Repeat::Update(float deltaTime)
 {
 	if(!m_pChild)
 	{
@@ -42,7 +43,7 @@ BehaviourStatus Repeat::Update(void)
 
 	while(true)
 	{
-		BehaviourStatus status = m_pChild->Tick();
+		BehaviourStatus status = m_pChild->Tick(deltaTime);
 
 		// If the child failed or is still running this is also the return state
 		// of the repeat decorator.

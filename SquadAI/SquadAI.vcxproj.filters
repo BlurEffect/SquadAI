@@ -97,6 +97,12 @@
     <Filter Include="Source Files\Other">
       <UniqueIdentifier>{003547f2-05fb-4377-bf25-6b28592f2c64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\BehaviourTree\PrimitiveBehaviours">
+      <UniqueIdentifier>{b7d4ac7e-caa2-448a-b2d4-7cc18a2bc9db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\PrimitiveBehaviours">
+      <UniqueIdentifier>{170f1d6a-16bd-43f0-87af-acec4277b931}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SimplePixelShader.cpp">
@@ -248,6 +254,21 @@
     </ClCompile>
     <ClCompile Include="PerformanceTimer.cpp">
       <Filter>Source Files\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="DeterminePatrolTarget.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="Idle.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="MovementTargetSet.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveToTarget.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="BehaviourFactory.cpp">
+      <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -442,6 +463,21 @@
     </ClInclude>
     <ClInclude Include="PerformanceTimer.h">
       <Filter>Header Files\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveToTarget.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="Idle.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="DeterminePatrolTarget.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="MovementTargetSet.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviourFactory.h">
+      <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

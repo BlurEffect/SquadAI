@@ -6,6 +6,7 @@
 
 // Includes
 #include "Soldier.h"
+#include "TestEnvironment.h"
 
 Soldier::Soldier(void) : Entity()
 {
@@ -89,76 +90,127 @@ void Soldier::Update(float deltaTime)
 //--------------------------------------------------------------------------------------
 // Moves the soldier entity towards a given target.
 // Param1: The time in seconds passed since the last frame.
-// Param2: The position, to which the soldier should move.
-// Returns true if the target was reached, false otherwise.
+// Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-bool Soldier::MoveTo(float deltaTime, const XMFLOAT2& targetPosition)
+BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 {
-	return true;
+	if(!m_movementManager.IsPathSet())
+	{
+		// There is no path set, create a new one
+		if(!m_movementManager.SetPathTo(GetMovementTarget()))
+		{
+			// No valid path exists to the target position
+			return StatusFailure;
+		}
+	}
+
+	if(m_movementManager.FollowPath(m_soldierProperties.m_targetReachedRadius, m_soldierProperties.m_maxSpeed))
+	{
+		// The target was reached
+		return StatusSuccess;
+	}
+
+	// Target not yet reached -> move the entity along the path avoiding obstacles and intersection with other soldiers
+	m_movementManager.AvoidCollisions(m_soldierProperties.m_maxCollisionSeeAhead, m_soldierProperties.m_maxCollisionAvoidanceForce);
+	m_movementManager.Separate(m_soldierProperties.m_separationRadius, m_soldierProperties.m_maxSeparationForce);
+	m_movementManager.StayAwayFromWalls(m_soldierProperties.m_avoidWallsRadius, m_soldierProperties.m_maxAvoidWallsForce);
+
+	m_movementManager.UpdatePosition(deltaTime, m_soldierProperties.m_maxSpeed, m_soldierProperties.m_maxTotalForce);
+
+	return StatusRunning;
 }
 
 //--------------------------------------------------------------------------------------
 // Makes the soldier attack a target at the given position.
 // Param1: The time in seconds passed since the last frame.
 // Param2: The position, that the soldier should attack.
-// Returns true if the attack was successfully executed, false otherwise.
+// Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-bool Soldier::Attack(float deltaTime, const XMFLOAT2& targetPosition)
+BehaviourStatus Soldier::Attack(float deltaTime, const XMFLOAT2& targetPosition)
 {
-	return true;
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
 // Makes the soldier aim at a given position.
 // Param1: The time in seconds passed since the last frame.
 // Param2: The position, at which the soldier should aim.
-// Returns true if the soldier is now aiming at the given position, false otherwise.
+// Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-bool Soldier::AimAt(float deltaTime, const XMFLOAT2& aimAtPosition)
+BehaviourStatus Soldier::AimAt(float deltaTime, const XMFLOAT2& aimAtPosition)
 {
-	return true;
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Makes the soldier wait at the position he is currently at.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::Idle(float deltaTime)
+{
+	// Do nothing
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
 // Determines and sets a patrol target position for the soldier.
 // Param1: The time in seconds passed since the last frame.
-// Returns true if a valid target position was found and set, false otherwise.
+// Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-bool Soldier::DeterminePatrolTarget(float deltaTime)
+BehaviourStatus Soldier::DeterminePatrolTarget(float deltaTime)
 {
-	return true;
+	// Get a new random target position within the test environment
+	XMFLOAT2 patrolTarget(0.0f, 0.0f);
+	if(GetTestEnvironment()->GetRandomUnblockedTarget(patrolTarget))
+	{
+		SetMovementTarget(patrolTarget);
+		SetMovementTargetSet(true);
+		return StatusSuccess;
+	}
+
+	return StatusFailure;
 }
 
 //--------------------------------------------------------------------------------------
 // Determines and sets a target position for the soldier to move to in order to approach threats.
 // Param1: The time in seconds passed since the last frame.
-// Returns true if a valid target position was found and set, false otherwise.
+// Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-bool Soldier::DetermineApproachThreatTarget(float deltaTime)
+BehaviourStatus Soldier::DetermineApproachThreatTarget(float deltaTime)
 {
-	return true;
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
 // Updates the known and suspected threats for the soldier.
 // Param1: The time in seconds passed since the last frame.
-// Returns true if the threats were updated successfully, false otherwise.
+// Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-bool Soldier::UpdateThreats(float deltaTime)
+BehaviourStatus Soldier::UpdateThreats(float deltaTime)
 {
-	return true;
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines and sets the currently greatest threat to the Soldier.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::DetermineGreatestThreat(float deltaTime)
+{
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
 // Updates the attack readiness of the soldier.
 // Param1: The time in seconds passed since the last frame.
-// Returns true if the attack readiness was updated successfully, false otherwise.
+// Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-bool Soldier::UpdateAttackReadiness(float deltaTime)
+BehaviourStatus Soldier::UpdateAttackReadiness(float deltaTime)
 {
-	return true;
+	return StatusSuccess;
 }
-
 
 //--------------------------------------------------------------------------------------
 // Activates the soldier entity.

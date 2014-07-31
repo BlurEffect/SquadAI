@@ -13,6 +13,7 @@
 #include <vector>
 #include "CollidableObject.h"
 #include "ObjectTypes.h"
+#include "Behaviour.h"
 
 // Forward declarations
 class TestEnvironment;
@@ -47,13 +48,15 @@ public:
 	virtual void Reset(void);
 
 	// Basic actions
-	virtual bool MoveTo(float deltaTime, const XMFLOAT2& targetPosition) = 0;
-	virtual bool Attack(float deltaTime, const XMFLOAT2& targetPosition) = 0;
-	virtual bool AimAt(float deltaTime, const XMFLOAT2& aimAtPosition)   = 0;
-	virtual bool DeterminePatrolTarget(float deltaTime)			         = 0;
-	virtual bool DetermineApproachThreatTarget(float deltaTime)          = 0;
-	virtual bool UpdateThreats(float deltaTime)					         = 0;
-	virtual bool UpdateAttackReadiness(float deltaTime)					 = 0;
+	virtual BehaviourStatus MoveToTarget(float deltaTime)						    = 0;
+	virtual BehaviourStatus Attack(float deltaTime, const XMFLOAT2& targetPosition) = 0;
+	virtual BehaviourStatus AimAt(float deltaTime, const XMFLOAT2& aimAtPosition)   = 0;
+	virtual BehaviourStatus Idle(float deltaTime)									= 0;
+	virtual BehaviourStatus DeterminePatrolTarget(float deltaTime)			        = 0;
+	virtual BehaviourStatus DetermineApproachThreatTarget(float deltaTime)          = 0;
+	virtual BehaviourStatus UpdateThreats(float deltaTime)					        = 0;
+	virtual BehaviourStatus DetermineGreatestThreat(float deltaTime)                = 0;
+	virtual BehaviourStatus UpdateAttackReadiness(float deltaTime)					= 0;
 
 	// Threat management
 	void AddKnownThreat(Entity* pThreat);

@@ -10,9 +10,9 @@
 // Includes
 #include "Parallel.h"
 
-Parallel::Parallel(const char* name, Policy successPolicy, Policy failurePolicy) : Composite(name),
-																		  		   m_successPolicy(successPolicy),
-																				   m_failurePolicy(failurePolicy)
+Parallel::Parallel(Entity* pEntity, const char* name, ParallelPolicy successPolicy, ParallelPolicy failurePolicy) : Composite(pEntity, name),
+																		  											m_successPolicy(successPolicy),
+																													m_failurePolicy(failurePolicy)
 {
 }
 
@@ -22,9 +22,10 @@ Parallel::~Parallel(void)
 
 //--------------------------------------------------------------------------------------
 // Updates the sequence.
+// Param1: The time in seconds passed since the last frame.
 // Returns the state of the sequence.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Parallel::Update(void)
+BehaviourStatus Parallel::Update(float deltaTime)
 {
 	if(m_children.size() < 1)
 	{
@@ -38,7 +39,7 @@ BehaviourStatus Parallel::Update(void)
     {
         if(!(*it)->IsTerminated())
         {
-            (*it)->Tick();
+            (*it)->Tick(deltaTime);
         }
 
 		if((*it)->GetStatus() == StatusSuccess)

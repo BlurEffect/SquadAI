@@ -19,12 +19,12 @@
 class Selector : public Composite
 {
 public:
-	Selector(const char* name);
+	Selector(Entity* pEntity, const char* name);
 	virtual ~Selector(void);
 
 protected:
 	virtual void OnInitialise(void);
-	virtual BehaviourStatus Update(void);
+	virtual BehaviourStatus Update(float deltaTime);
 
 	std::vector<Behaviour*>::iterator m_currentChild; // The currently active child behaviour of the sequence
 };

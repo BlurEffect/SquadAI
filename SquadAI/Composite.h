@@ -17,7 +17,7 @@
 class Composite : public Behaviour
 {
 public:
-	Composite(const char* name);
+	Composite(Entity* pEntity, const char* name);
 	virtual ~Composite(void);
 
 	void AddChild(Behaviour* pChild);

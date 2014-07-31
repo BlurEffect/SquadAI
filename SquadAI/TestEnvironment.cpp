@@ -73,6 +73,9 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 		m_spawnPointCount[i] = 0;
 	}
 
+	// initialise the random number generator
+	srand(static_cast<unsigned int>(time(NULL)));
+
 	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
 
@@ -728,6 +731,34 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 		}
 	}
 }
+
+//--------------------------------------------------------------------------------------
+// Randomly determines a position within the test environment that is not occupied by
+// an obstacle.
+// Param1: Out paramter that will hold the randomly determined target position.
+// Returns true if a position was found false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::GetRandomUnblockedTarget(XMFLOAT2& outPosition) const
+{
+	if(m_obstacles.size() >= m_numberOfGridPartitions * m_numberOfGridPartitions)
+	{
+		return false;
+	}
+
+	unsigned int gridX = 0;
+	unsigned int gridY = 0;
+
+	do
+	{
+		gridX = rand() % m_numberOfGridPartitions;
+		gridY = rand() % m_numberOfGridPartitions;
+	}while(m_pNodes[gridX][gridY].IsObstacle());
+
+	outPosition = m_pNodes[gridX][gridY].GetWorldPosition();
+
+	return true;
+}
+
 
 //--------------------------------------------------------------------------------------
 // Checks for collisions between an entity and a specified group of other entities. Collision

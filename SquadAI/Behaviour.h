@@ -9,6 +9,9 @@
 #ifndef BEHAVIOUR_H
 #define BEHAVIOUR_H
 
+// Forward declarations
+class Entity;
+
 //--------------------------------------------------------------------------------------
 // Possible states for behaviours. Used as return codes.
 //--------------------------------------------------------------------------------------
@@ -21,16 +24,17 @@ enum BehaviourStatus
 	StatusAborted  // The behaviour was aborted
 };
 
+
 class Behaviour
 {
 public:
-	Behaviour(const char* name);
+	Behaviour(Entity* pEntity, const char* name);
 	Behaviour(const Behaviour& sourceBehaviour);
 	virtual ~Behaviour(void);
 
 	Behaviour& Behaviour::operator= (const Behaviour& sourceBehaviour);
 
-	BehaviourStatus Tick(void);
+	BehaviourStatus Tick(float deltaTime);
 
 	void Abort(void);
 	void Reset(void);
@@ -38,12 +42,29 @@ public:
 	bool IsTerminated(void) const;
 	bool IsRunning(void) const;
 	
+	Entity*         GetEntity(void);
 	unsigned long   GetId(void) const;
 	const char*     GetName(void) const;
 	BehaviourStatus GetStatus(void) const;
 	
+	//--------------------------------------------------------------------------------------
+	// A functor that can be used to find a behaviour based on its unique id.
+	//--------------------------------------------------------------------------------------
+	class FindBehaviourById
+	{
+	public:
+
+		FindBehaviourById(unsigned long id) : m_id(id){}
+		bool operator()(Behaviour* pBehaviour) const
+		{
+			return m_id == pBehaviour->GetId();
+		}
+	private:
+		unsigned long m_id; // The id that is being looked for
+	};
+
 protected:
-	virtual BehaviourStatus Update() = 0;
+	virtual BehaviourStatus Update(float deltaTime) = 0;
 
 	virtual void OnInitialise(void);
 	virtual void OnTerminate(BehaviourStatus status);
@@ -52,26 +73,11 @@ private:
 
 	static unsigned long s_BehaviourId; // This id is incremented with each created object and assigned to the new behaviour, 0 is an invalid value
 
-	unsigned long   m_id;     // Each behaviour is assigned a unique id
-	const char*     m_name;   // The name of this behaviour
-	BehaviourStatus m_status; // The current state of the behaviour
+	Entity*         m_pEntity; // The entity that this behaviour belongs to
+	unsigned long   m_id;      // Each behaviour is assigned a unique id
+	const char*     m_name;    // The name of this behaviour
+	BehaviourStatus m_status;  // The current state of the behaviour
 
-};
-
-//--------------------------------------------------------------------------------------
-// A functor that can be used to find a behaviour based on its unique id.
-//--------------------------------------------------------------------------------------
-class FindBehaviourById
-{
-public:
-
-	FindBehaviourById(unsigned long id) : m_id(id){}
-	bool operator()(Behaviour* pBehaviour) const
-	{
-		return m_id == pBehaviour->GetId();
-	}
-private:
-	unsigned long m_id; // The id that is being looked for
 };
 
 #endif // BEHAVIOUR_H

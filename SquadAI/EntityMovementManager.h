@@ -39,8 +39,10 @@ public:
 	void StayAwayFromWalls(float avoidWallsRadius, float maximalForce);
 	void Separate(float separationRadius, float maximalForce);
 
-	// Data access functions
+	bool IsPathSet(void) const;
 
+	// Data access functions
+	
 	const XMFLOAT2& GetVelocity(void) const;
 	const XMFLOAT2& GetViewDirection(void) const;
 

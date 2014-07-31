@@ -70,13 +70,15 @@ public:
 	void Reset(void);
 
 	// Basic actions as inherited from Entity
-	bool MoveTo(float deltaTime, const XMFLOAT2& targetPosition);
-	bool Attack(float deltaTime, const XMFLOAT2& targetPosition);
-	bool AimAt(float deltaTime, const XMFLOAT2& aimAtPosition);
-	bool DeterminePatrolTarget(float deltaTime);
-	bool DetermineApproachThreatTarget(float deltaTime);
-	bool UpdateThreats(float deltaTime);
-	bool UpdateAttackReadiness(float deltaTime);
+	BehaviourStatus MoveToTarget(float deltaTime);
+	BehaviourStatus Attack(float deltaTime, const XMFLOAT2& targetPosition);
+	BehaviourStatus AimAt(float deltaTime, const XMFLOAT2& aimAtPosition);
+	BehaviourStatus Idle(float deltaTime);
+	BehaviourStatus DeterminePatrolTarget(float deltaTime);
+	BehaviourStatus DetermineApproachThreatTarget(float deltaTime);
+	BehaviourStatus UpdateThreats(float deltaTime);
+	BehaviourStatus DetermineGreatestThreat(float deltaTime);
+	BehaviourStatus UpdateAttackReadiness(float deltaTime);
 
 	// Events
 	void Hit(float damage, const XMFLOAT2& direction);

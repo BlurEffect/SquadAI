@@ -12,17 +12,30 @@
 // Includes
 #include "Decorator.h"
 
+//--------------------------------------------------------------------------------------
+// Contains all additional data required for the creation of a parallel behaviour.
+//--------------------------------------------------------------------------------------
+struct RepeatInitData
+{
+	RepeatInitData(Behaviour* pChild, unsigned int numberOfRepeats) : m_pChild(pChild),
+																	  m_numberOfRepeats(numberOfRepeats)
+	{}
+
+	Behaviour* m_pChild;
+	unsigned int m_numberOfRepeats;
+};
+
 class Repeat : public Decorator
 {
 public:
-	Repeat(const char* name, Behaviour* pChild);
+	Repeat(Entity* pEntity, const char* name, Behaviour* pChild, unsigned int numberOfRepeats);
 	~Repeat(void);
 
 	void SetNumberOfRepeats(unsigned int count);
 
 private:
 	void OnInitialise(void);
-	BehaviourStatus Update(void);
+	BehaviourStatus Update(float deltaTime);
 
 	unsigned int m_numberOfRepeats;
 	unsigned int m_counter;

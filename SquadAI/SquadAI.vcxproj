@@ -88,9 +88,11 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AxisAlignedRectangleCollider.cpp" />
     <ClCompile Include="Behaviour.cpp" />
+    <ClCompile Include="BehaviourFactory.cpp" />
     <ClCompile Include="CollidableObject.cpp" />
     <ClCompile Include="Composite.cpp" />
     <ClCompile Include="Decorator.cpp" />
+    <ClCompile Include="DeterminePatrolTarget.cpp" />
     <ClCompile Include="EditModeObject.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
@@ -102,7 +104,10 @@
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="EntityMovementManager.cpp" />
+    <ClCompile Include="Idle.cpp" />
     <ClCompile Include="Monitor.cpp" />
+    <ClCompile Include="MovementTargetSet.cpp" />
+    <ClCompile Include="MoveToTarget.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Obstacle.cpp" />
@@ -146,9 +151,11 @@
     <ClInclude Include="ApplicationSettings.h" />
     <ClInclude Include="AxisAlignedRectangleCollider.h" />
     <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="BehaviourFactory.h" />
     <ClInclude Include="CollidableObject.h" />
     <ClInclude Include="Composite.h" />
     <ClInclude Include="Decorator.h" />
+    <ClInclude Include="DeterminePatrolTarget.h" />
     <ClInclude Include="EditModeObject.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
@@ -160,7 +167,10 @@
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
     <ClInclude Include="EntityMovementManager.h" />
+    <ClInclude Include="Idle.h" />
     <ClInclude Include="Monitor.h" />
+    <ClInclude Include="MovementTargetSet.h" />
+    <ClInclude Include="MoveToTarget.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Obstacle.h" />

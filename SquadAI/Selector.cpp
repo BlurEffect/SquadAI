@@ -13,7 +13,7 @@
 // Includes
 #include "Selector.h"
 
-Selector::Selector(const char* name) : Composite(name)
+Selector::Selector(Entity* pEntity, const char* name) : Composite(pEntity, name)
 {
 }
 
@@ -32,9 +32,10 @@ void Selector::OnInitialise(void)
 
 //--------------------------------------------------------------------------------------
 // Updates the selector.
+// Param1: The time in seconds passed since the last frame.
 // Returns the state of the selector.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Selector::Update(void)
+BehaviourStatus Selector::Update(float deltaTime)
 {
 	if(m_children.size() < 1)
 	{
@@ -46,7 +47,7 @@ BehaviourStatus Selector::Update(void)
 	// might complete within a single update.
 	while(true)
 	{
-		BehaviourStatus status = (*m_currentChild)->Tick();
+		BehaviourStatus status = (*m_currentChild)->Tick(deltaTime);
 
 		// If the current child succeeded or is still running, this equals the 
 		// current state of the whole selector.

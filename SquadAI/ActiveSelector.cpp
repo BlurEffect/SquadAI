@@ -10,7 +10,7 @@
 // Includes
 #include "ActiveSelector.h"
 
-ActiveSelector::ActiveSelector(const char* name) : Selector(name)
+ActiveSelector::ActiveSelector(Entity* pEntity, const char* name) : Selector(pEntity, name)
 {
 
 }
@@ -30,16 +30,17 @@ void ActiveSelector::OnInitialise(void)
 
 //--------------------------------------------------------------------------------------
 // Updates the active selector.
+// Param1: The time in seconds passed since the last frame.
 // Returns the state of the active selector.
 //--------------------------------------------------------------------------------------
-BehaviourStatus ActiveSelector::Update(void)
+BehaviourStatus ActiveSelector::Update(float deltaTime)
 {
 	std::vector<Behaviour*>::iterator previous = m_currentChild;
 
 	// Run the normal selector behaviour to determine the highest priority
 	// child that is currently executable.
     Selector::OnInitialise();
-    BehaviourStatus result = Selector::Update();
+    BehaviourStatus result = Selector::Update(deltaTime);
 
     if(previous != m_children.end() && m_currentChild != previous)
     {

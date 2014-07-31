@@ -1,0 +1,50 @@
+/* 
+*  Kevin Meergans, SquadAI, 2014
+*  MovementTargetSet.cpp
+*  An condition behaviour that checks whether a movement target was set
+*  for the entity or not.
+*/
+
+// Includes
+#include "MovementTargetSet.h"
+#include "Entity.h"
+
+MovementTargetSet::MovementTargetSet(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+{
+}
+
+MovementTargetSet::~MovementTargetSet(void)
+{
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the behaviour.
+// Param1: The time in seconds passed since the last frame.
+// Returns the state of the behaviour.
+//--------------------------------------------------------------------------------------
+BehaviourStatus MovementTargetSet::Update(float deltaTime)
+{
+	if(GetEntity()->IsMovementTargetSet())
+	{
+		return StatusSuccess;
+	}else
+	{
+		return StatusFailure;
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Initialises the behaviour.
+//--------------------------------------------------------------------------------------
+void MovementTargetSet::OnInitialise(void)
+{
+
+}
+
+//--------------------------------------------------------------------------------------
+// Terminates the behaviour.
+//--------------------------------------------------------------------------------------
+void MovementTargetSet::OnTerminate(BehaviourStatus status)
+{
+
+}

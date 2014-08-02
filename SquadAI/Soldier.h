@@ -30,8 +30,7 @@ struct SoldierProperties
 							  m_targetReachedRadius(0.0f),		
 							  m_avoidWallsRadius(0.0f),		 
 							  m_separationRadius(0.0f),
-
-							  // add combat stuff here
+							  m_fireWeaponInterval(0.0f),
 							  m_fieldOfView(0.0f),
 							  m_viewingDistance(0.0f),
 							  m_maxHealth(0.0f)
@@ -49,6 +48,7 @@ struct SoldierProperties
 	float m_separationRadius;		    // When a soldier registers other entities within this radius it will steer for separation from them
 	
 	// Combat
+	float m_fireWeaponInterval;			// After every shot, the soldier has to wait this many seconds before he can fire his weapon again
 
 	// Sensors
 	float m_fieldOfView;				// The angle determining the field of view in radians
@@ -71,13 +71,14 @@ public:
 
 	// Basic actions as inherited from Entity
 	BehaviourStatus MoveToTarget(float deltaTime);
-	BehaviourStatus Attack(float deltaTime, const XMFLOAT2& targetPosition);
-	BehaviourStatus AimAt(float deltaTime, const XMFLOAT2& aimAtPosition);
+	BehaviourStatus Attack(float deltaTime);
+	BehaviourStatus AimAt(float deltaTime);
+	BehaviourStatus DetermineAttackTargetPosition(float deltaTime);
 	BehaviourStatus Idle(float deltaTime);
 	BehaviourStatus DeterminePatrolTarget(float deltaTime);
 	BehaviourStatus DetermineApproachThreatTarget(float deltaTime);
 	BehaviourStatus UpdateThreats(float deltaTime);
-	BehaviourStatus DetermineGreatestThreat(float deltaTime);
+	BehaviourStatus DetermineGreatestThreats(float deltaTime);
 	BehaviourStatus UpdateAttackReadiness(float deltaTime);
 
 	// Events
@@ -95,6 +96,7 @@ public:
 	float           GetTargetReachedRadius(void) const;
 	float           GetAvoidWallsRadius(void) const;
 	float           GetSeparationRadius(void) const;
+	float           GetFireWeaponInterval(void) const;
 	const XMFLOAT2& GetViewDirection(void) const;
 	float			GetFieldOfView(void) const;
 	float			GetViewingDistance(void) const;
@@ -108,6 +110,7 @@ public:
 	void SetTargetReachedRadius(float targetReachedRadius);
 	void SetAvoidWallsRadius(float slowArrivalRadius);
 	void SetSeparationRadius(float separationRadius);
+	void SetFireWeaponInterval(float fireWeaponInterval);
 	void SetFieldOfView(float fieldOfView);
 	void SetViewingDistance(float viewingDistance);
 
@@ -119,6 +122,8 @@ private:
 	EntitySensors         m_sensors;		   // The sensor component used by this soldier
 
 	SoldierProperties     m_soldierProperties; // Determines some properties of the soldier related to movement, combat and sensors
+
+	float                 m_fireWeaponTimer;   // Used to determine when the soldier is ready to fire his weapon
 
 };
 

@@ -8,7 +8,8 @@
 #include "Soldier.h"
 #include "TestEnvironment.h"
 
-Soldier::Soldier(void) : Entity()
+Soldier::Soldier(void) : Entity(),
+						 m_fireWeaponTimer(0.0f)
 {
 }
 
@@ -127,22 +128,42 @@ BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 //--------------------------------------------------------------------------------------
 // Makes the soldier attack a target at the given position.
 // Param1: The time in seconds passed since the last frame.
-// Param2: The position, that the soldier should attack.
 // Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Soldier::Attack(float deltaTime, const XMFLOAT2& targetPosition)
+BehaviourStatus Soldier::Attack(float deltaTime)
 {
+	m_combatManager.ShootAt(GetAttackTarget());
 	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
 // Makes the soldier aim at a given position.
 // Param1: The time in seconds passed since the last frame.
-// Param2: The position, at which the soldier should aim.
 // Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Soldier::AimAt(float deltaTime, const XMFLOAT2& aimAtPosition)
+BehaviourStatus Soldier::AimAt(float deltaTime)
 {
+	m_movementManager.LookAt(GetAttackTarget());
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines the attack target for the soldier based on current threats and other 
+// factors.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::DetermineAttackTargetPosition(float deltaTime)
+{
+	if(GetGreatestKnownThreat())
+	{
+		SetAttackTarget(GetGreatestKnownThreat()->GetPosition());
+		SetAttackTargetSet(true);
+	}else
+	{
+		SetAttackTargetSet(false);
+	}
+
 	return StatusSuccess;
 }
 
@@ -170,11 +191,13 @@ BehaviourStatus Soldier::DeterminePatrolTarget(float deltaTime)
 	{
 		SetMovementTarget(patrolTarget);
 		SetMovementTargetSet(true);
-		return StatusSuccess;
+	}else
+	{
+		SetMovementTargetSet(false);
 	}
 
-	SetMovementTargetSet(false);
-	return StatusFailure;
+	// Always succeeds
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
@@ -184,6 +207,17 @@ BehaviourStatus Soldier::DeterminePatrolTarget(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::DetermineApproachThreatTarget(float deltaTime)
 {
+	// Approach the greatest suspected threat
+
+	if(GetGreatestSuspectedThreat())
+	{
+		SetMovementTarget(GetGreatestSuspectedThreat()->m_lastKnownPosition);
+		SetMovementTargetSet(true);
+	}else
+	{
+		SetMovementTargetSet(false);
+	}
+
 	return StatusSuccess;
 }
 
@@ -194,6 +228,7 @@ BehaviourStatus Soldier::DetermineApproachThreatTarget(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::UpdateThreats(float deltaTime)
 {
+	m_sensors.CheckForThreats(GetViewDirection(), m_soldierProperties.m_viewingDistance, m_soldierProperties.m_fieldOfView);
 	return StatusSuccess;
 }
 
@@ -202,8 +237,9 @@ BehaviourStatus Soldier::UpdateThreats(float deltaTime)
 // Param1: The time in seconds passed since the last frame.
 // Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Soldier::DetermineGreatestThreat(float deltaTime)
+BehaviourStatus Soldier::DetermineGreatestThreats(float deltaTime)
 {
+	m_combatManager.DetermineGreatestThreats();
 	return StatusSuccess;
 }
 
@@ -214,6 +250,17 @@ BehaviourStatus Soldier::DetermineGreatestThreat(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::UpdateAttackReadiness(float deltaTime)
 {
+	m_fireWeaponTimer += deltaTime;
+
+	if(m_fireWeaponTimer >= m_soldierProperties.m_fireWeaponInterval)
+	{
+		SetReadyForAttack(true);
+		m_fireWeaponTimer = 0.0f;
+	}else
+	{
+		SetReadyForAttack(false);
+	}
+
 	return StatusSuccess;
 }
 
@@ -314,6 +361,11 @@ float Soldier::GetSeparationRadius(void) const
 	return m_soldierProperties.m_separationRadius;
 }
 
+float Soldier::GetFireWeaponInterval(void) const
+{
+	return m_soldierProperties.m_fireWeaponInterval;
+}
+
 const XMFLOAT2& Soldier::GetViewDirection(void) const
 {
 	return m_movementManager.GetViewDirection();
@@ -372,6 +424,11 @@ void Soldier::SetAvoidWallsRadius(float avoidWallsRadius)
 void Soldier::SetSeparationRadius(float separationRadius)
 {
 	m_soldierProperties.m_separationRadius = separationRadius;
+}
+
+void Soldier::SetFireWeaponInterval(float fireWeaponInterval)
+{
+	m_soldierProperties.m_fireWeaponInterval = fireWeaponInterval;
 }
 
 void Soldier::SetFieldOfView(float fieldOfView)

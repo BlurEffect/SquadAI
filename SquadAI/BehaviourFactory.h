@@ -10,16 +10,30 @@
 
 // Includes
 
+// Parent Nodes and Composites
 #include "Parallel.h"
 #include "Monitor.h"
 #include "Repeat.h"
 #include "Selector.h"
 #include "ActiveSelector.h"
 #include "Sequence.h"
-
-#include "DeterminePatrolTarget.h"
-#include "Idle.h"
+#include "ReturnSpecificStatus.h"
+// Conditions
 #include "MovementTargetSet.h"
+#include "ReadyToAttack.h"
+#include "AttackTargetSet.h"
+#include "GreatestKnownThreatSet.h"
+#include "GreatestSuspectedThreatSet.h"
+// Actions
+#include "DeterminePatrolTarget.h"
+#include "DetermineApproachThreatPosition.h"
+#include "DetermineAttackTarget.h"
+#include "DetermineGreatestThreats.h"
+#include "AttackTarget.h"
+#include "AimAtTarget.h"
+#include "UpdateThreats.h"
+#include "UpdateAttackReadiness.h"
+#include "Idle.h"
 #include "MoveToTarget.h"
 
 // Forward declarations
@@ -36,9 +50,23 @@ enum BehaviourType
 	ParallelType,
 	MonitorType,
 	RepeatType,
-	DeterminePatrolTargetType,
-	IdleType,
+	ReturnSpecificStatusType,
+
 	MovementTargetSetType,
+	ReadyToAttackType,
+	AttackTargetSetType,
+	GreatestKnownThreatSetType,
+	GreatestSuspectedThreatSetType,
+
+	DeterminePatrolTargetType,
+	DetermineApproachThreatPositionType,
+	DetermineAttackTargetType,
+	DetermineGreatestThreatsType,
+	AttackTargetType,
+	AimAtTargetType,
+	UpdateThreatsType,
+	UpdateAttackReadinessType,
+	IdleType,
 	MoveToTargetType
 };
 
@@ -47,7 +75,8 @@ enum BehaviourType
 //--------------------------------------------------------------------------------------
 enum BehaviourTreeType
 {
-	SimpleMovementTree
+	SimpleMovementTree,
+	SimpleCombatTree
 };
 
 
@@ -57,6 +86,7 @@ public:
 	static Behaviour* CreateBehaviourTree(BehaviourTreeType entityType, Entity* pEntity);
 private:
 	static Behaviour* CreateSimpleMovementTree(Entity* pEntity);
+	static Behaviour* CreateSimpleCombatTree(Entity* pEntity);
 	static Behaviour* CreateBehaviour(BehaviourType behaviourType, Entity* pEntity, const char* name, void* pInitData);
 };
 

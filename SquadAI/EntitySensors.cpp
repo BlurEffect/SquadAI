@@ -64,6 +64,8 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 
 	if(!enemies.empty())
 	{
+		std::vector<Entity*> newKnownThreats;
+
 		XMFLOAT2 gridPos;
 		m_pEnvironment->WorldToGridPosition(m_pEntity->GetPosition(), gridPos);
 
@@ -93,11 +95,41 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 					// Check if enemy is visible or hidden behind an obstacle
 					if(m_pEnvironment->CheckLineOfSight(static_cast<int>(gridPos.x), static_cast<int>(gridPos.y), static_cast<int>(enemyGridPos.x), static_cast<int>(enemyGridPos.y)))
 					{
-						return;
-						// Add threat
+						// Remember this enemy as a known threat
+						newKnownThreats.push_back(reinterpret_cast<Entity*>(it->second));
 					}
 				}	
 			}
 		}
+
+		// Update the entity's threats
+
+		// Check for any previously known threats that are no longer visible and move them to the list of
+		// suspected threats.
+
+		for(std::vector<Entity*>::const_iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
+		{
+			std::vector<Entity*>::const_iterator foundIt = std::find_if(newKnownThreats.begin(), newKnownThreats.end(), Entity::FindEntityById((*it)->GetId()));
+			if(foundIt == newKnownThreats.end())
+			{
+				// The previously known threat can no longer be seen -> add to suspected threats
+				m_pEntity->AddSuspectedThreat((*it)->GetId(), (*it)->GetPosition());
+			}
+		}
+
+		// Set new known threats
+		m_pEntity->ClearKnownThreats();
+		for(std::vector<Entity*>::iterator it = newKnownThreats.begin(); it != newKnownThreats.end(); ++it)
+		{
+			if(m_pEntity->IsSuspectedThreat((*it)->GetId()))
+			{
+				// If this known threat previously was a suspected threat (that has become visible now), remove it
+				// from the list of suspected threats.
+				m_pEntity->RemoveSuspectedThreat((*it)->GetId());
+			}
+
+			m_pEntity->AddKnownThreat((*it));
+		}
+
 	}
 }

@@ -103,6 +103,18 @@
     <Filter Include="Source Files\BehaviourTree\PrimitiveBehaviours">
       <UniqueIdentifier>{170f1d6a-16bd-43f0-87af-acec4277b931}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\BehaviourTree\PrimitiveBehaviours\Actions">
+      <UniqueIdentifier>{c1a110d2-8cf7-4a01-b473-56874b3729cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BehaviourTree\PrimitiveBehaviours\Conditions">
+      <UniqueIdentifier>{b4dbc500-ff9e-4c4d-bf38-ebae69fd13ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\PrimitiveBehaviours\Conditions">
+      <UniqueIdentifier>{b05ff540-b4a3-476c-8dd5-9387ddff4cce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\PrimitiveBehaviours\Actions">
+      <UniqueIdentifier>{91cc1760-4be1-47e1-ac85-02966fca51c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SimplePixelShader.cpp">
@@ -255,19 +267,55 @@
     <ClCompile Include="PerformanceTimer.cpp">
       <Filter>Source Files\Other</Filter>
     </ClCompile>
+    <ClCompile Include="BehaviourFactory.cpp">
+      <Filter>Source Files\BehaviourTree</Filter>
+    </ClCompile>
     <ClCompile Include="DeterminePatrolTarget.cpp">
-      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Idle.cpp">
-      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
-    </ClCompile>
-    <ClCompile Include="MovementTargetSet.cpp">
-      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
     <ClCompile Include="MoveToTarget.cpp">
-      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours</Filter>
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="BehaviourFactory.cpp">
+    <ClCompile Include="MovementTargetSet.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadyToAttack.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackTargetSet.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="GreatestSuspectedThreatSet.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="GreatestKnownThreatSet.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="AimAtTarget.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackTarget.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="DetermineAttackTarget.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateThreats.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="DetermineGreatestThreats.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateAttackReadiness.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="DetermineApproachThreatPosition.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="ReturnSpecificStatus.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
   </ItemGroup>
@@ -464,19 +512,55 @@
     <ClInclude Include="PerformanceTimer.h">
       <Filter>Header Files\Other</Filter>
     </ClInclude>
-    <ClInclude Include="MoveToTarget.h">
-      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
-    </ClInclude>
-    <ClInclude Include="Idle.h">
-      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
-    </ClInclude>
-    <ClInclude Include="DeterminePatrolTarget.h">
-      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
+    <ClInclude Include="BehaviourFactory.h">
+      <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
     <ClInclude Include="MovementTargetSet.h">
-      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours</Filter>
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="BehaviourFactory.h">
+    <ClInclude Include="DeterminePatrolTarget.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Idle.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveToTarget.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadyToAttack.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackTargetSet.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="GreatestKnownThreatSet.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="GreatestSuspectedThreatSet.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackTarget.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="AimAtTarget.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateThreats.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="DetermineGreatestThreats.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateAttackReadiness.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="DetermineAttackTarget.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="DetermineApproachThreatPosition.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ReturnSpecificStatus.h">
       <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
   </ItemGroup>

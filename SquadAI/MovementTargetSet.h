@@ -1,7 +1,7 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
 *  MovementTargetSet.h
-*  An condition behaviour that checks whether a movement target was set
+*  A condition behaviour that checks whether a movement target was set
 *  for the entity or not.
 */
 

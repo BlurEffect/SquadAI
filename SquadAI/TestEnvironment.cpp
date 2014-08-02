@@ -281,6 +281,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			properties.m_separationRadius			= m_gridSpacing;
 			properties.m_fieldOfView				= g_kSoldierFieldOfView;
 			properties.m_viewingDistance			= g_kSoldierViewingDistance;
+			properties.m_fireWeaponInterval         = g_kFireWeaponInterval;
 			properties.m_maxHealth					= g_kSoldierMaxHealth;
 
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[BlueSoldierType] * 0.5f);

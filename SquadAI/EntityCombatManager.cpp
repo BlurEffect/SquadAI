@@ -47,6 +47,60 @@ void EntityCombatManager::Reset(void)
 }
 
 //--------------------------------------------------------------------------------------
+// Determines and sets the currently greatest threat based on the distance of the
+// threats to the entity.
+//--------------------------------------------------------------------------------------
+void EntityCombatManager::DetermineGreatestThreats(void)
+{
+
+	if(!m_pEntity->GetKnownThreats().empty())
+	{
+		float shortestSquareDistance = std::numeric_limits<float>::max();
+		Entity* pGreatestKnownThreat = nullptr;
+
+		for(std::vector<Entity*>::const_iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
+		{
+			float squareDistance = 0.0f;
+			XMVECTOR vector = XMLoadFloat2(&(*it)->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition());
+			XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
+			
+			if(squareDistance < shortestSquareDistance)
+			{
+				pGreatestKnownThreat = (*it);
+			}
+		}
+
+		m_pEntity->SetGreatestKnownThreat(pGreatestKnownThreat);
+	}else
+	{
+		m_pEntity->SetGreatestKnownThreat(nullptr);
+	}
+
+	if(!m_pEntity->GetSuspectedThreats().empty())
+	{
+		float shortestSquareDistance = std::numeric_limits<float>::max();
+		SuspectedThreat* pGreatestSuspectedThreat = nullptr;
+
+		for(std::vector<SuspectedThreat>::iterator it = m_pEntity->GetSuspectedThreats().begin(); it != m_pEntity->GetSuspectedThreats().end(); ++it)
+		{
+			float squareDistance = 0.0f;
+			XMVECTOR vector = XMLoadFloat2(&it->m_lastKnownPosition) - XMLoadFloat2(&m_pEntity->GetPosition());
+			XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
+			
+			if(squareDistance < shortestSquareDistance)
+			{
+				pGreatestSuspectedThreat = &(*it);
+			}
+		}
+
+		m_pEntity->SetGreatestSuspectedThreat(pGreatestSuspectedThreat);
+	}else
+	{
+		m_pEntity->SetGreatestSuspectedThreat(nullptr);
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Fires a projectile towards a specified target position.
 // Param1: The target position to shoot at.
 //--------------------------------------------------------------------------------------

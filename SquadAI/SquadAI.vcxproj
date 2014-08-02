@@ -85,13 +85,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
+    <ClCompile Include="AimAtTarget.cpp" />
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="AttackTarget.cpp" />
+    <ClCompile Include="AttackTargetSet.cpp" />
     <ClCompile Include="AxisAlignedRectangleCollider.cpp" />
     <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="BehaviourFactory.cpp" />
     <ClCompile Include="CollidableObject.cpp" />
     <ClCompile Include="Composite.cpp" />
     <ClCompile Include="Decorator.cpp" />
+    <ClCompile Include="DetermineApproachThreatPosition.cpp" />
+    <ClCompile Include="DetermineAttackTarget.cpp" />
+    <ClCompile Include="DetermineGreatestThreats.cpp" />
     <ClCompile Include="DeterminePatrolTarget.cpp" />
     <ClCompile Include="EditModeObject.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
@@ -104,6 +110,8 @@
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="EntityMovementManager.cpp" />
+    <ClCompile Include="GreatestKnownThreatSet.cpp" />
+    <ClCompile Include="GreatestSuspectedThreatSet.cpp" />
     <ClCompile Include="Idle.cpp" />
     <ClCompile Include="Monitor.cpp" />
     <ClCompile Include="MovementTargetSet.cpp" />
@@ -125,8 +133,10 @@
     <ClCompile Include="PerformanceTimer.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="ReadyToAttack.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="Repeat.cpp" />
+    <ClCompile Include="ReturnSpecificStatus.cpp" />
     <ClCompile Include="Selector.cpp" />
     <ClCompile Include="SentenceDrawable.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -142,19 +152,27 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
     <ClCompile Include="TriangleDrawable.cpp" />
+    <ClCompile Include="UpdateAttackReadiness.cpp" />
+    <ClCompile Include="UpdateThreats.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActiveSelector.h" />
+    <ClInclude Include="AimAtTarget.h" />
     <ClInclude Include="AppData.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />
+    <ClInclude Include="AttackTarget.h" />
+    <ClInclude Include="AttackTargetSet.h" />
     <ClInclude Include="AxisAlignedRectangleCollider.h" />
     <ClInclude Include="Behaviour.h" />
     <ClInclude Include="BehaviourFactory.h" />
     <ClInclude Include="CollidableObject.h" />
     <ClInclude Include="Composite.h" />
     <ClInclude Include="Decorator.h" />
+    <ClInclude Include="DetermineApproachThreatPosition.h" />
+    <ClInclude Include="DetermineAttackTarget.h" />
+    <ClInclude Include="DetermineGreatestThreats.h" />
     <ClInclude Include="DeterminePatrolTarget.h" />
     <ClInclude Include="EditModeObject.h" />
     <ClInclude Include="CircleCollider.h" />
@@ -167,6 +185,8 @@
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
     <ClInclude Include="EntityMovementManager.h" />
+    <ClInclude Include="GreatestKnownThreatSet.h" />
+    <ClInclude Include="GreatestSuspectedThreatSet.h" />
     <ClInclude Include="Idle.h" />
     <ClInclude Include="Monitor.h" />
     <ClInclude Include="MovementTargetSet.h" />
@@ -191,9 +211,11 @@
     <ClInclude Include="GridDrawable.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PixelShader.h" />
+    <ClInclude Include="ReadyToAttack.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RendererData.h" />
     <ClInclude Include="Repeat.h" />
+    <ClInclude Include="ReturnSpecificStatus.h" />
     <ClInclude Include="Selector.h" />
     <ClInclude Include="SentenceDrawable.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -216,6 +238,8 @@
     </ClInclude>
     <ClInclude Include="TriangleDrawable.h" />
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="UpdateAttackReadiness.h" />
+    <ClInclude Include="UpdateThreats.h" />
     <ClInclude Include="VertexData.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="VS_FontCompiled.h" />

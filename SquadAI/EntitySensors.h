@@ -10,7 +10,8 @@
 
 // Includes
 #include <DirectXMath.h>
-#include <list>
+#include <vector>
+#include <algorithm>
 
 // Forward declarations
 class Entity;

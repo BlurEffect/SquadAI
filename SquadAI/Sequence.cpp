@@ -41,6 +41,16 @@ BehaviourStatus Sequence::Update(float deltaTime)
 		return StatusInvalid;
 	}
 
+	if(GetName() == "Root")
+	{
+		int a = 3;
+	}
+
+	if(GetName() == "ThreatManagementSequence")
+	{
+		int a = 3;
+	}
+
 	// Keep executing child behaviours until one returns a running
 	// status. This is required as some children, such as conditions,
 	// might complete within a single update.

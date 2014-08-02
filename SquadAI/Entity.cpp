@@ -56,7 +56,7 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
-	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleMovementTree, this);
+	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree, this);
 	if(!m_pBehaviour)
 	{
 		return false;
@@ -128,6 +128,14 @@ void Entity::RemoveKnownThreat(unsigned long id)
 }
 
 //--------------------------------------------------------------------------------------
+// Removes all known threats.
+//--------------------------------------------------------------------------------------
+void Entity::ClearKnownThreats(void)
+{
+	m_knownThreats.clear();
+}
+
+//--------------------------------------------------------------------------------------
 // Tells whether the entity associated to the passed in ID is a known threat to this entity.
 // Param1: The id of the entity that should be checked whether it is a known threat.
 // Returns true if the entity associated to the passed in ID is a known threat to this entity,
@@ -143,10 +151,11 @@ bool Entity::IsKnownThreat(unsigned long id)
 //--------------------------------------------------------------------------------------
 // Adds a new threat to the entity's list of known threats.
 // Param1: The id of the entity that is no longer a known threat to this entity.
+// Param2: The last known position of the threat.
 //--------------------------------------------------------------------------------------
-void Entity::AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, const XMFLOAT2& lastKnownVelocity)
+void Entity::AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition)
 {
-	m_suspectedThreats.push_back(SuspectedThreat(id, lastKnownPosition, lastKnownVelocity));
+	m_suspectedThreats.push_back(SuspectedThreat(id, lastKnownPosition));
 }
 
 //--------------------------------------------------------------------------------------
@@ -161,6 +170,14 @@ void Entity::RemoveSuspectedThreat(unsigned long id)
 	{
 		m_suspectedThreats.erase(foundIt);
 	}
+}
+
+//--------------------------------------------------------------------------------------
+// Removes all suspected threats.
+//--------------------------------------------------------------------------------------
+void Entity::ClearSuspectedThreats(void)
+{
+	m_suspectedThreats.clear();
 }
 
 //--------------------------------------------------------------------------------------
@@ -198,12 +215,12 @@ bool Entity::IsAlive(void) const
 	return m_currentHealth > 0.0f;
 }
 
-const std::vector<Entity*>& Entity::GetKnownThreats(void) const
+std::vector<Entity*>& Entity::GetKnownThreats(void)
 {
 	return m_knownThreats;
 }
 
-const std::vector<SuspectedThreat>& Entity::GetSuspectedThreats(void) const
+std::vector<SuspectedThreat>& Entity::GetSuspectedThreats(void)
 {
 	return m_suspectedThreats;
 }
@@ -221,6 +238,16 @@ const SuspectedThreat* Entity::GetGreatestSuspectedThreat(void) const
 bool Entity::IsReadyForAttack(void) const
 {
 	return m_readyForAttack;
+}
+
+bool Entity::IsAttackTargetSet(void) const
+{
+	return m_attackTargetSet;
+}
+
+const XMFLOAT2& Entity::GetAttackTarget(void) const
+{
+	return m_attackTarget;
 }
 
 bool Entity::IsMovementTargetSet(void) const
@@ -269,6 +296,16 @@ void Entity::SetGreatestSuspectedThreat(SuspectedThreat* pThreat)
 void Entity::SetReadyForAttack(bool readyForAttack)
 {
 	m_readyForAttack = readyForAttack;
+}
+
+void Entity::SetAttackTargetSet(bool targetSet)
+{
+	m_attackTargetSet = targetSet;
+}
+
+void Entity::SetAttackTarget(const XMFLOAT2& target)
+{
+	m_attackTarget = target;
 }
 
 void Entity::SetMovementTargetSet(bool targetSet)

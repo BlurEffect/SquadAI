@@ -64,6 +64,7 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 
 	if(!enemies.empty())
 	{
+		
 		std::vector<Entity*> newKnownThreats;
 
 		XMFLOAT2 gridPos;

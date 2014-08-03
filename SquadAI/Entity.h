@@ -11,6 +11,7 @@
 // Includes
 #include <DirectXMath.h>
 #include <vector>
+#include <queue>
 #include "CollidableObject.h"
 #include "ObjectTypes.h"
 #include "Behaviour.h"
@@ -18,6 +19,7 @@
 
 // Forward declarations
 class TestEnvironment;
+class Message;
 
 //--------------------------------------------------------------------------------------
 // Bundles information associated to a suspected threat to an entity.
@@ -55,8 +57,11 @@ public:
 	virtual BehaviourStatus DeterminePatrolTarget(float deltaTime)			        = 0;
 	virtual BehaviourStatus DetermineApproachThreatTarget(float deltaTime)          = 0;
 	virtual BehaviourStatus UpdateThreats(float deltaTime)					        = 0;
-	virtual BehaviourStatus DetermineGreatestThreats(float deltaTime)                = 0;
+	virtual BehaviourStatus DetermineGreatestThreats(float deltaTime)               = 0;
 	virtual BehaviourStatus UpdateAttackReadiness(float deltaTime)					= 0;
+	virtual BehaviourStatus ProcessMessages(float deltaTime)					    = 0;
+
+	void AddMessage(Message* pMessage);
 
 	// Threat management
 	void AddKnownThreat(Entity* pThreat);
@@ -72,6 +77,8 @@ public:
 	Behaviour*						    GetBehaviour(void);
 	TestEnvironment*					GetTestEnvironment(void);
 	EntityTeam							GetTeam(void) const;
+	std::queue<Message*>&				GetActiveMessages(void);
+	bool                                ActiveMessagesAvailable(void) const;
 	bool								IsAlive(void) const;
 	std::vector<Entity*>&				GetKnownThreats(void);
 	std::vector<SuspectedThreat>&		GetSuspectedThreats(void);
@@ -133,6 +140,8 @@ private:
 
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 	EntityTeam       m_team;		 // The team the entity belongs to
+
+	std::queue<Message*> m_activeMessages; // Messages received by this entity
 
 	// This is pretty much used like a blackboard to communicate between different
 	// nodes of the behaviour tree

@@ -132,6 +132,7 @@
     <ClCompile Include="Pathfinder.cpp" />
     <ClCompile Include="PerformanceTimer.cpp" />
     <ClCompile Include="PixelShader.cpp" />
+    <ClCompile Include="ProcessMessages.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ReadyToAttack.cpp" />
     <ClCompile Include="RenderContext.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="GreatestKnownThreatSet.h" />
     <ClInclude Include="GreatestSuspectedThreatSet.h" />
     <ClInclude Include="Idle.h" />
+    <ClInclude Include="MessageDataStructures.h" />
     <ClInclude Include="Monitor.h" />
     <ClInclude Include="MovementTargetSet.h" />
     <ClInclude Include="MoveToTarget.h" />
@@ -204,6 +206,7 @@
     <ClInclude Include="Parallel.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="PerformanceTimer.h" />
+    <ClInclude Include="ProcessMessages.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="PS_FontCompiled.h" />
     <ClInclude Include="PS_SimpleCompiled.h" />

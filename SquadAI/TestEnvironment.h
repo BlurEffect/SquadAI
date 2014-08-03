@@ -34,6 +34,7 @@
 #include "ApplicationSettings.h"
 #include "Flag.h"
 #include "Obstacle.h"
+#include "MessageDataStructures.h"
 
 class FightingEntity;
 class MovingEntity;
@@ -54,7 +55,7 @@ public:
 	bool AddObject(ObjectType type, const XMFLOAT2& position, float rotation);
 	bool RemoveObjects(const XMFLOAT2& position);
 
-	bool AddProjectile(EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target);
+	bool AddProjectile(unsigned long shooterId, EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target);
 
 	bool Save(std::string filename);
 	bool Load(std::string filename);
@@ -116,9 +117,7 @@ private:
 	unsigned int m_soldierCount[NumberOfTeams-1];			// Keeps track of how many soldiers have been placed in edit mode
 	bool		 m_flagSet[NumberOfTeams-1];				// Keeps track of the flags that have been placed in edit mode
 	unsigned int m_spawnPointCount[NumberOfTeams-1];		// Keeps track of the spawn points that have been placed in edit mode
-	
-
-	
+		
 };
 
 #endif // TEST_ENVIRONMENT_H

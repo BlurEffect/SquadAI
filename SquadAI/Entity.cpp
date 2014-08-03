@@ -8,6 +8,7 @@
 // Includes
 #include "Entity.h"
 #include "TestEnvironment.h"
+#include "MessageDataStructures.h"
 
 Entity::Entity(void) : CollidableObject(),
 					   m_pBehaviour(nullptr),
@@ -100,6 +101,17 @@ void Entity::Reset(void)
 	m_currentHealth = m_maximalHealth;
 }
 
+//--------------------------------------------------------------------------------------
+// Adds a new message to this entity's queue of active messages.
+// Param1: A pointer to the new message.
+//--------------------------------------------------------------------------------------
+void Entity::AddMessage(Message* pMessage)
+{
+	if(pMessage)
+	{
+		m_activeMessages.push(pMessage);
+	}
+}
 
 //--------------------------------------------------------------------------------------
 // Adds a new threat to the entity's list of known threats.
@@ -208,6 +220,16 @@ TestEnvironment* Entity::GetTestEnvironment(void)
 EntityTeam Entity::GetTeam(void) const
 {
 	return m_team;
+}
+
+std::queue<Message*>& Entity::GetActiveMessages(void)
+{
+	return m_activeMessages;
+}
+
+bool Entity::ActiveMessagesAvailable(void) const
+{
+	return !m_activeMessages.empty();
 }
 
 bool Entity::IsAlive(void) const

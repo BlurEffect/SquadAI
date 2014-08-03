@@ -7,6 +7,7 @@
 // Includes
 #include "Soldier.h"
 #include "TestEnvironment.h"
+#include "MessageDataStructures.h"
 
 Soldier::Soldier(void) : Entity(),
 						 m_fireWeaponTimer(0.0f)
@@ -133,6 +134,8 @@ BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 BehaviourStatus Soldier::Attack(float deltaTime)
 {
 	m_combatManager.ShootAt(GetAttackTarget());
+	// Wait until the weapon is ready again for the next shot
+	SetReadyForAttack(false);
 	return StatusSuccess;
 }
 
@@ -250,15 +253,48 @@ BehaviourStatus Soldier::DetermineGreatestThreats(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::UpdateAttackReadiness(float deltaTime)
 {
-	m_fireWeaponTimer += deltaTime;
+	if(!IsReadyForAttack())
+	{
+		m_fireWeaponTimer += deltaTime;
 
-	if(m_fireWeaponTimer >= m_soldierProperties.m_fireWeaponInterval)
+		if(m_fireWeaponTimer >= m_soldierProperties.m_fireWeaponInterval)
+		{
+			SetReadyForAttack(true);
+			m_fireWeaponTimer = 0.0f;
+		}
+	}
+
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Process all messages that the entity received since the last processing.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::ProcessMessages(float deltaTime)
+{
+	while(!GetActiveMessages().empty())
 	{
-		SetReadyForAttack(true);
-		m_fireWeaponTimer = 0.0f;
-	}else
-	{
-		SetReadyForAttack(false);
+		switch(GetActiveMessages().front()->GetType())
+		{
+		case HitMessageType:
+			{
+			HitMessage* pMsg = reinterpret_cast<HitMessage*>(GetActiveMessages().front());
+			m_combatManager.Hit(pMsg->GetDamage(), pMsg->GetShooterId(), pMsg->GetPosition());
+			break;
+			}
+		case EntityKilledMessageType:
+			{
+			EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(GetActiveMessages().front());
+			RemoveKnownThreat(pMsg->GetId());
+			RemoveSuspectedThreat(pMsg->GetId());
+			break;
+			}
+		}
+		
+		delete GetActiveMessages().front();
+		GetActiveMessages().pop();
 	}
 
 	return StatusSuccess;
@@ -288,8 +324,8 @@ void Soldier::Activate(void)
 void Soldier::Hit(float damage, const XMFLOAT2& direction)
 {
 	// add new suspected threat somewhere -> event queue?
-
-	SetCurrentHealth(GetCurrentHealth() - damage);
+	//m_combatManager.Hit(damage, direction);
+	//SetCurrentHealth(GetCurrentHealth() - damage);
 
 }
 

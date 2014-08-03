@@ -49,6 +49,15 @@ Behaviour::~Behaviour(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Behaviour::Tick(float deltaTime)
 {
+	if(GetName() == "UpdateThreatsAction")
+	{
+		int a = 4;
+	}
+	if(GetName() == "DetermineGreatestThreatsType")
+	{
+		int a = 2;
+	}
+
 	if(!m_pEntity)
 	{
 		return StatusInvalid;
@@ -66,12 +75,13 @@ BehaviourStatus Behaviour::Tick(float deltaTime)
 
 	// When the behaviour is completed (fail or success), terminate
 	// it properly.
+	BehaviourStatus returnStatus = m_status;
 	if(m_status != StatusRunning)
 	{
 		OnTerminate(m_status);
 	}
 
-	return m_status;
+	return returnStatus;//m_status;
 }
 
 //--------------------------------------------------------------------------------------

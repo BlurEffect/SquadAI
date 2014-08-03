@@ -318,6 +318,9 @@
     <ClCompile Include="ReturnSpecificStatus.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
+    <ClCompile Include="ProcessMessages.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -562,6 +565,12 @@
     </ClInclude>
     <ClInclude Include="ReturnSpecificStatus.h">
       <Filter>Header Files\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageDataStructures.h">
+      <Filter>Header Files\TestEnvironment</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessMessages.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

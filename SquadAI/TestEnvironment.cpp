@@ -195,15 +195,26 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 			// The entity that was hit by the projectile
 			CollidableObject* pHitEntity = nullptr;
 
-			if(CheckCollision(&(*it), oldPos, GroupTeamBlueAndObstacles, pHitEntity))
+			if((*it).GetFriendlyTeam() == TeamRed && CheckCollision(&(*it), oldPos, GroupTeamBlueAndObstacles, pHitEntity))
 			{
-				if(pHitEntity->GetCategory() == CategoryEntity && ((reinterpret_cast<Entity*>(pHitEntity)->GetTeam() == TeamRed && it->GetFriendlyTeam() != TeamRed) ||
-				   (reinterpret_cast<Entity*>(pHitEntity)->GetTeam() == TeamBlue && it->GetFriendlyTeam() != TeamBlue)))
+				if(pHitEntity->GetCategory() == CategoryEntity)
+				{
+					{
+						reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
+					}
+				}
+
+				m_projectiles.erase(it++);
+			}else if((*it).GetFriendlyTeam() == TeamBlue && CheckCollision(&(*it), oldPos, GroupTeamRedAndObstacles, pHitEntity))
+			{
+				if(pHitEntity->GetCategory() == CategoryEntity)
 				{
 					{
 						// todo: change this when hit method is moved to entity from soldier
-						Soldier* pSoldier = reinterpret_cast<Soldier*>(pHitEntity);
-						pSoldier->Hit(g_kProjectileDamage, it->GetDirection());
+						reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
+
+						//Soldier* pSoldier = reinterpret_cast<Soldier*>(pHitEntity);
+						//pSoldier->Hit(g_kProjectileDamage, it->GetDirection());
 					}
 				}
 
@@ -256,6 +267,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			properties.m_separationRadius			= m_gridSpacing;
 			properties.m_fieldOfView				= g_kSoldierFieldOfView;
 			properties.m_viewingDistance			= g_kSoldierViewingDistance;
+			properties.m_fireWeaponInterval         = g_kFireWeaponInterval;
 			properties.m_maxHealth					= g_kSoldierMaxHealth;
 
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[RedSoldierType] * 0.5f);
@@ -511,13 +523,19 @@ bool TestEnvironment::RemoveObjects(const XMFLOAT2& position)
 
 //--------------------------------------------------------------------------------------
 // Adds a new projectile entity to the test environment.
-// Param1: The team that fired the projectile.
-// Param2: The position from which the projectile is being fired.
-// Param3: The target position towards which the projectile is being fired.
+// Param1: The id of the entity that shot the projectile.
+// Param2: The team that fired the projectile.
+// Param3: The position from which the projectile is being fired.
+// Param4: The target position towards which the projectile is being fired.
 // Returns true if the projectile was successfully added and initialised, false otherwise.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::AddProjectile(EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target)
+bool TestEnvironment::AddProjectile(unsigned long shooterId, EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target)
 {
+	if(friendlyTeam == TeamBlue)
+	{
+		int s = 4;
+	}
+
 	if((origin.x == target.x) && (origin.y == target.y))
 	{
 		return false;
@@ -532,7 +550,7 @@ bool TestEnvironment::AddProjectile(EntityTeam friendlyTeam, const XMFLOAT2& ori
 	XMStoreFloat2(&direction, XMLoadFloat2(&target) - XMLoadFloat2(&origin));
 
 	CircleColliderData colliderData(origin, m_gridSpacing * m_objectScaleFactors[ProjectileType] * 0.5f);
-	if(!m_projectiles.back().Initialise(++m_id, origin, 0.0f, m_objectScaleFactors[ProjectileType] * m_gridSpacing, CategoryProjectile, CircleColliderType, &colliderData, direction, g_kProjectileSpeed, friendlyTeam))
+	if(!m_projectiles.back().Initialise(++m_id, origin, 0.0f, m_objectScaleFactors[ProjectileType] * m_gridSpacing, CategoryProjectile, CircleColliderType, &colliderData, origin, direction, g_kProjectileSpeed, shooterId, friendlyTeam))
 	{
 		m_projectiles.pop_back();
 		return false;
@@ -688,15 +706,46 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 
 	if(entityGroup != GroupObstacles) 
 	{
-		// Check soldiers
-		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+		if(entityGroup == GroupTeamRed || entityGroup == GroupTeamRedAndObstacles)
 		{
-			if(m_soldiers[i].IsAlive())
+			// Check all soldiers
+			for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 			{
-				XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&position)));
-				if(squareDistance <= squareRadius)
+				if(m_soldiers[i].GetTeam() == TeamRed && m_soldiers[i].IsAlive())
 				{
-					collisionObjects.insert(std::pair<float, CollidableObject*>(squareDistance,(&(m_soldiers[i]))));
+					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&position)));
+					if(squareDistance <= squareRadius)
+					{
+						collisionObjects.insert(std::pair<float, CollidableObject*>(squareDistance,(&(m_soldiers[i]))));
+					}
+				}
+			}
+		}else if(entityGroup == GroupTeamBlue || entityGroup == GroupTeamBlueAndObstacles)
+		{
+			// Check all soldiers
+			for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+			{
+				if(m_soldiers[i].GetTeam() == TeamBlue && m_soldiers[i].IsAlive())
+				{
+					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&position)));
+					if(squareDistance <= squareRadius)
+					{
+						collisionObjects.insert(std::pair<float, CollidableObject*>(squareDistance,(&(m_soldiers[i]))));
+					}
+				}
+			}
+		}else
+		{
+			// Check all soldiers
+			for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+			{
+				if(m_soldiers[i].IsAlive())
+				{
+					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&position)));
+					if(squareDistance <= squareRadius)
+					{
+						collisionObjects.insert(std::pair<float, CollidableObject*>(squareDistance,(&(m_soldiers[i]))));
+					}
 				}
 			}
 		}

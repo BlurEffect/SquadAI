@@ -29,6 +29,8 @@ public:
 	void DetermineGreatestThreats(void);
 	void ShootAt(const XMFLOAT2& target);
 
+	void Hit(float damage, unsigned long id, const XMFLOAT2& position);
+
 private:
 	Entity*          m_pEntity;      // The entity that this combat manager is associated to
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of

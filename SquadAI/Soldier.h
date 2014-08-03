@@ -80,9 +80,13 @@ public:
 	BehaviourStatus UpdateThreats(float deltaTime);
 	BehaviourStatus DetermineGreatestThreats(float deltaTime);
 	BehaviourStatus UpdateAttackReadiness(float deltaTime);
+	BehaviourStatus ProcessMessages(float deltaTime);
 
 	// Events
 	void Hit(float damage, const XMFLOAT2& direction);
+
+		
+
 
 	// Data access functions
 	 

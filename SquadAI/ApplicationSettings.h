@@ -35,7 +35,7 @@ const float    g_kBackgroundColour[4] = {0.0f, 0.0f, 0.0f, 1.0f}; // The colour 
 const XMFLOAT4 g_kGridColour(1.0f, 1.0f, 1.0f, 1.0f);			  // The colour of the grid representing the test environment
 
 // Test environment settings
-const unsigned int g_kSoldiersPerTeam = 1; // The number of soldiers forming a team during the matches
+const unsigned int g_kSoldiersPerTeam = 8; // The number of soldiers forming a team during the matches
 
 // Game settings
 const float g_kPickupFlagRadiusRelative = 0.25f; // An entity has to approach a flag this close (in relation to the grid spacing) in order to pick it up or return it

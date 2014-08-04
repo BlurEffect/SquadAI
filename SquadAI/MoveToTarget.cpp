@@ -48,5 +48,10 @@ void MoveToTarget::OnInitialise(void)
 //--------------------------------------------------------------------------------------
 void MoveToTarget::OnTerminate(BehaviourStatus status)
 {
+	if(status == StatusSuccess || status == StatusAborted)
+	{
+		GetEntity()->SetMovementTargetSet(false);
+	}
 
+	Reset();
 }

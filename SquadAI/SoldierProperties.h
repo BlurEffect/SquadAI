@@ -19,12 +19,12 @@ const float g_kSoldierMaxSpeed(10.0f);				     // Determines how fast soldiers c
 const float g_kSoldierMaxForce(1.0f);					 // Determines the maximum amount of forces that can impact the character
 const float g_kSoldierMaxSeeAhead(6.0f);				 // Determines how far the soldier can look ahead in order to check for collisions
 const float g_kSoldierMaxCollisionAvoidanceForce(0.6f);  // The maximal force that can result from avoiding collisions
-const float g_kSoldierMaxAvoidWallsForce(1.2f);          // The maximal force that can result from being pushed away from walls
+const float g_kSoldierMaxAvoidWallsForce(2.0f); //1.2         // The maximal force that can result from being pushed away from walls
 const float g_kSoldierMaxSeparationForce(1.2f);          // The maximal force that can result from separation from other entities
 const float g_kSoldierTargetReachedRadius(2.0f);		 // When the distance between an entity and its target is lower than this, latter one counts as reached
 
 // Combat
-const float g_kFireWeaponInterval(0.2f);					 // After every shot, the soldier has to wait this many seconds before he can fire his weapon again
+const float g_kFireWeaponInterval(0.5f);					 // After every shot, the soldier has to wait this many seconds before he can fire his weapon again
 
 // Sensors
 const float g_kSoldierFieldOfView(XM_PI/6.0f);	// /6.0f	     // Determines the field of view of soldiers

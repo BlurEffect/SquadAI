@@ -12,10 +12,10 @@ AxisAlignedRectangleCollider::AxisAlignedRectangleCollider(const XMFLOAT2& centr
 																												m_height(height)
 {
 	// Define the four corners of the rectangle
-	m_topLeft	  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
-	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
-	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
-	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
+	m_topLeft	  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f + 25.0f, GetCentre().y + GetHeight() * 0.5f + 25.0f);
+	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + 25.0f, GetCentre().y + GetHeight() * 0.5f + 25.0f);
+	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f + 25.0f, GetCentre().y - GetHeight() * 0.5f + 25.0f);
+	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + 25.0f, GetCentre().y - GetHeight() * 0.5f + 25.0f);
 }
 
 AxisAlignedRectangleCollider::~AxisAlignedRectangleCollider(void)

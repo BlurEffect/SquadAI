@@ -70,7 +70,8 @@ public:
 	bool GetRandomUnblockedTarget(XMFLOAT2& outPosition) const;
 
 	//const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
-	bool CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);
+	bool CheckLineOfSightGrid(int startGridX, int startGridY, int endGridX, int endGridY);
+	bool CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& end);
 	void ResetNodeGraph(void);
 
 	void AddDeadEntity(Entity* pEntity);

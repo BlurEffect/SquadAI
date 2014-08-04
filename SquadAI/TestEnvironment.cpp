@@ -889,7 +889,7 @@ bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject, 
 			{
 				if(m_pNodes[i][k].IsObstacle())
 				{
-					if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(start, end))
+					if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(XMFLOAT2(start.x + 25.0f, start.y + 25.0f), XMFLOAT2(end.x + 25.0f, end.y + 25.0f)))
 					{
 						float squareDistance = 0.0f;
 						XMVECTOR vector = XMLoadFloat2(&m_pNodes[i][k].GetWorldPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
@@ -945,7 +945,7 @@ void TestEnvironment::UpdateRespawns(float deltaTime)
 // Param4: The y-coordinate of the end grid field in grid units.
 // Returns true if a direct line of sight exists, false if an obstacle obstructs the view.
 //--------------------------------------------------------------------------------------
-bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY)
+bool TestEnvironment::CheckLineOfSightGrid(int startGridX, int startGridY, int endGridX, int endGridY)
 {
 	// Prepare the coordinates for the calculation according to the properties of the line 
 	// connecting drawn between them.
@@ -990,6 +990,47 @@ bool TestEnvironment::CheckLineOfSight(int startGridX, int startGridY, int endGr
             error -= deltaX;
         }
     }
+	
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines whether there is a direct line of sight between two points.
+// Param1: The start position of the line.
+// Param2: The end position of the line.
+// Returns true if a direct line of sight exists, false if an obstacle obstructs the view.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& end)
+{
+	float distance = 0.0f;
+	XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&end) - XMLoadFloat2(&start)));
+
+	// Only check nearby obstacles for collision
+	unsigned int maxGridDistance = static_cast<unsigned int>(distance / m_gridSpacing) + 1;
+
+	// Get the current grid position of the entity
+	XMFLOAT2 gridPos;
+	WorldToGridPosition(start, gridPos);
+
+	unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
+	unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
+	unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+	unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+
+	// Check the grid within that distance for colliding obstacles
+	for(unsigned int i = startX; i <= endX; ++i)
+	{
+		for(unsigned int k = startY; k <= endY; ++k)
+		{
+			if(m_pNodes[i][k].IsObstacle())
+			{
+				if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(XMFLOAT2(start.x + 25.0f, start.y + 25.0f), XMFLOAT2(end.x + 25.0f, end.y + 25.0f)))
+				{
+					return false;
+				}
+			}
+		}
+	}
 
 	return true;
 }

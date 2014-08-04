@@ -70,6 +70,13 @@ void Composite::ClearChildren(void)
 void Composite::OnTerminate(BehaviourStatus status)
 {
 	Behaviour::Reset();
+	if(status == StatusAborted)
+	{
+		ResetChildren();
+	}//else
+	//{
+	//	Behaviour::Reset();
+	//}
 	//ResetChildren();
 }
 

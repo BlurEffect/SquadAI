@@ -57,7 +57,7 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
-	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree, this);
+	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree2, this);
 	if(!m_pBehaviour)
 	{
 		return false;
@@ -95,10 +95,20 @@ void Entity::Reset(void)
 {
 	m_knownThreats.clear();
 	m_suspectedThreats.clear();
+	m_pGreatestKnownThreat = nullptr;
+	m_pGreatestSuspectedThreat = nullptr;
 	m_readyForAttack = false;
 	m_movementTargetSet = false;
 	m_movementTarget = XMFLOAT2(0.0f, 0.0f);
 	m_currentHealth = m_maximalHealth;
+}
+
+void Entity::Respawn(const XMFLOAT2& respawnPosition)
+{
+	Reset();
+	SetPosition(respawnPosition);
+	UpdateColliderPosition(respawnPosition);
+	SetRotation(static_cast<float>(rand() % 360));
 }
 
 //--------------------------------------------------------------------------------------

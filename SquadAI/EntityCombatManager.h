@@ -26,7 +26,9 @@ public:
 	bool Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment);
 	void Reset(void);
 
-	void DetermineGreatestThreats(void);
+	void DetermineGreatestKnownThreat(void);
+	void DetermineGreatestSuspectedThreat(void);
+
 	void ShootAt(const XMFLOAT2& target);
 
 	void Hit(float damage, unsigned long id, const XMFLOAT2& position);

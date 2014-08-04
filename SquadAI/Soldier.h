@@ -78,7 +78,8 @@ public:
 	BehaviourStatus DeterminePatrolTarget(float deltaTime);
 	BehaviourStatus DetermineApproachThreatTarget(float deltaTime);
 	BehaviourStatus UpdateThreats(float deltaTime);
-	BehaviourStatus DetermineGreatestThreats(float deltaTime);
+	BehaviourStatus DetermineGreatestKnownThreat(float deltaTime);
+	BehaviourStatus DetermineGreatestSuspectedThreat(float deltaTime);
 	BehaviourStatus UpdateAttackReadiness(float deltaTime);
 	BehaviourStatus ProcessMessages(float deltaTime);
 

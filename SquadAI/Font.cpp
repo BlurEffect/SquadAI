@@ -69,12 +69,12 @@ void Font::BuildVertexArray(void* outVertices, void* outIndices, const std::stri
 	unsigned long* pIndices  = reinterpret_cast<unsigned long*>(outIndices);
 
 	// Get the length of the text
-	UINT numCharacters = text.length();
+	unsigned int numCharacters = text.length();
 
 	int letter = 0;
 
 	// Build the vertex array by creating a quad for every character in the given text
-	for(int i = 0; i < numCharacters; ++i)
+	for(unsigned int i = 0; i < numCharacters; ++i)
 	{
 		letter = (static_cast<int>(text[i])) - m_startCharacter;
 
@@ -213,7 +213,7 @@ bool Font::LoadFontData( const std::string& filename )
 
 	// Read until the beginning of the start character, skip the ones before
 	int garbage = 0;
-	for(int i = 0; i < m_startCharacter + m_numberOfCharacters; ++i)
+	for(unsigned int i = 0; i < m_startCharacter + m_numberOfCharacters; ++i)
 	{
 		while(temp != ',')
 		{

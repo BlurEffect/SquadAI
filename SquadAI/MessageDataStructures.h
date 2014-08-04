@@ -10,6 +10,7 @@
 
 // Includes
 #include <DirectXMath.h>
+#include "ObjectTypes.h"
 
 using namespace DirectX;
 
@@ -67,14 +68,17 @@ private:
 struct EntityKilledMessage : Message
 {
 public:
-	EntityKilledMessage(unsigned long id) : Message(EntityKilledMessageType),
-										    m_id(id)
+	EntityKilledMessage(EntityTeam team, unsigned long id) : Message(EntityKilledMessageType),
+															 m_team(team),
+														     m_id(id)
 	{}
 
+	EntityTeam    GetTeam(void) const { return m_team; }
 	unsigned long GetId(void) const { return m_id; }
 
 private:
-	unsigned long m_id; // The id of the entity that was killed
+	EntityTeam    m_team; // The team that the killed entity belongs to
+	unsigned long m_id;   // The id of the entity that was killed
 };
 
 

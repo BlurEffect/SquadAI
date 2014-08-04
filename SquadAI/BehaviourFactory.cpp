@@ -24,8 +24,11 @@ Behaviour* BehaviourFactory::CreateBehaviourTree(BehaviourTreeType behaviourTree
 	case SimpleMovementTree:
 		return CreateSimpleMovementTree(pEntity);
 		break;
-	case SimpleCombatTree:
-		return CreateSimpleCombatTree(pEntity);
+	case SimpleCombatTree1:
+		return CreateSimpleCombatTree1(pEntity);
+		break;
+	case SimpleCombatTree2:
+		return CreateSimpleCombatTree2(pEntity);
 		break;
 	default:
 		return nullptr;
@@ -75,7 +78,7 @@ Behaviour* BehaviourFactory::CreateSimpleMovementTree(Entity* pEntity)
 // Returns a pointer to the root behaviour of the created tree. The pointer is null if 
 // something failed during creation.
 //--------------------------------------------------------------------------------------
-Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
+Behaviour* BehaviourFactory::CreateSimpleCombatTree1(Entity* pEntity)
 {
 	Behaviour* pRoot = CreateBehaviour(SequenceType, pEntity, "Root", nullptr);
 
@@ -86,19 +89,16 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 		if(pUpdateEntitySequence)
 		{
 			Behaviour* pProcessMessagesAction		    = CreateBehaviour(ProcessMessagesType, pEntity, "ProcessMessagesAction", nullptr);
+			Behaviour* pEntityAliveCondition		    = CreateBehaviour(EntityAliveType, pEntity, "EntityAliveCondition", nullptr);
 			Behaviour* pUpdateThreatsAction				= CreateBehaviour(UpdateThreatsType, pEntity, "UpdateThreatsAction", nullptr);
-			Behaviour* pDetermineGreatestThreatsAction  = CreateBehaviour(DetermineGreatestThreatsType, pEntity, "DetermineGreatestThreatsAction", nullptr);
 			Behaviour* pUpdateAttackReadinessAction		= CreateBehaviour(UpdateAttackReadinessType, pEntity, "UpdateAttackReadinessAction", nullptr);
 
-			ReturnSpecificStatusInitData initData(pUpdateEntitySequence, StatusSuccess);
-			Behaviour* pSuccessDecorator = CreateBehaviour(ReturnSpecificStatusType, pEntity, "SuccessDecorator", &initData);
-
-			if(pProcessMessagesAction && pUpdateThreatsAction && pDetermineGreatestThreatsAction && pUpdateAttackReadinessAction && pSuccessDecorator)
+			if(pProcessMessagesAction && pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
 			{
-				reinterpret_cast<Composite*>(pRoot)->AddChild(pSuccessDecorator);
+				reinterpret_cast<Composite*>(pRoot)->AddChild(pUpdateEntitySequence);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pProcessMessagesAction);
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pEntityAliveCondition);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateThreatsAction);
-				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pDetermineGreatestThreatsAction);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateAttackReadinessAction);
 
 				Behaviour* pMainSelector		   = CreateBehaviour(SelectorType, pEntity, "MainSelector", nullptr);
@@ -115,9 +115,11 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 					reinterpret_cast<Composite*>(pMainSelector)->AddChild(pPatrolSequence);
 					reinterpret_cast<Composite*>(pMainSelector)->AddChild(pIdleAction);
 
+					Behaviour* pDetermineGreatestKnownThreatAction = CreateBehaviour(DetermineGreatestKnownThreatType, pEntity, "DetermineGreatestKnownThreatAction", nullptr);
 					Behaviour* pGreatestKnownThreatSetCondition = CreateBehaviour(GreatestKnownThreatSetType, pEntity, "GreatestKnownThreatSetCondition", nullptr);
 					Behaviour* pAttackSelector		            = CreateBehaviour(SelectorType, pEntity, "AttackSelector", nullptr);
-		
+						
+					Behaviour* pDetermineGreatestSuspectedThreatAction = CreateBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatAction", nullptr);
 					Behaviour* pGreatestSuspectedThreatSetCondition	     = CreateBehaviour(GreatestSuspectedThreatSetType, pEntity, "GreatestSuspectedThreatSetCondition", nullptr);
 					Behaviour* pDetermineApproachThreatPositionAction    = CreateBehaviour(DetermineApproachThreatPositionType, pEntity, "DetermineApproachThreatPositionAction", nullptr);
 					Behaviour* pMovementTargetApproachThreatSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetApproachThreatSetCondition", nullptr);
@@ -127,13 +129,129 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 					Behaviour* pMovementTargetPatrolSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetPatrolSetCondition", nullptr);
 					Behaviour* pMoveToPatrolTargetAction		 = CreateBehaviour(MoveToTargetType, pEntity, "MoveToPatrolTargetAction", nullptr);
 		
-					if(pGreatestKnownThreatSetCondition && pAttackSelector && pGreatestSuspectedThreatSetCondition &&
+					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
 					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pMoveToApproachThreatTargetAction && pDeterminePatrolTargetAction &&
 					   pMovementTargetPatrolSetCondition && pMoveToPatrolTargetAction)
 					{
+						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pAttackSelector);
 
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDetermineGreatestSuspectedThreatAction);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pGreatestSuspectedThreatSetCondition);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDetermineApproachThreatPositionAction);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMovementTargetApproachThreatSetCondition);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMoveToApproachThreatTargetAction);
+
+						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pDeterminePatrolTargetAction);
+						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMovementTargetPatrolSetCondition);
+						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMoveToPatrolTargetAction);
+
+						Behaviour* pAttackSequence = CreateBehaviour(SequenceType, pEntity, "AttackSequence", nullptr);
+						Behaviour* pWaitForAttackReadinessIdleAction = CreateBehaviour(IdleType, pEntity, "WaitForAttackReadinessIdleAction", nullptr);
+
+						if(pAttackSequence && pWaitForAttackReadinessIdleAction)
+						{
+							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pAttackSequence);
+							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pWaitForAttackReadinessIdleAction);
+
+							Behaviour* pReadyToAttackCondition		    = CreateBehaviour(ReadyToAttackType, pEntity, "ReadyToAttackCondition", nullptr);
+							Behaviour* pDetermineAttackTargetAction		= CreateBehaviour(DetermineAttackTargetType, pEntity, "DetermineAttackTargetAction", nullptr);
+							Behaviour* pAttackTargetSetCondition		= CreateBehaviour(AttackTargetSetType, pEntity, "AttackTargetSetCondition", nullptr);
+							Behaviour* pAimAtTargetAction				= CreateBehaviour(AimAtTargetType, pEntity, "AimAtTargetAction", nullptr);
+							Behaviour* pAttackTargetAction				= CreateBehaviour(AttackTargetType, pEntity, "AttackTargetAction", nullptr);
+	
+							if(pReadyToAttackCondition && pDetermineAttackTargetAction && pAttackTargetSetCondition && 
+							   pAimAtTargetAction && pAttackTargetAction)
+							{
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pReadyToAttackCondition);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pDetermineAttackTargetAction);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAttackTargetSetCondition);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAimAtTargetAction);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAttackTargetAction);
+
+								return &(*pRoot);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+//--------------------------------------------------------------------------------------
+// Creates a simple behaviour tree controlling basic movement and combat for an entity.
+// Improved CombatTree1 with better reactiveness towards events and higher priority behaviours
+// becoming available. Also guaranteed updates of threats etc every tick.
+// Param1: A pointer to the entity that the behaviour tree should be created for.
+// Returns a pointer to the root behaviour of the created tree. The pointer is null if 
+// something failed during creation.
+//--------------------------------------------------------------------------------------
+Behaviour* BehaviourFactory::CreateSimpleCombatTree2(Entity* pEntity)
+{
+	Behaviour* pRoot = CreateBehaviour(ActiveSelectorType, pEntity, "Root", nullptr);
+
+	if(pRoot)
+	{
+		Behaviour* pUpdateEntitySequence = CreateBehaviour(SequenceType, pEntity, "UpdateEntitySequence", nullptr);
+		
+		if(pUpdateEntitySequence)
+		{
+			ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
+			Behaviour* pAlwaysFailDecorator = CreateBehaviour(ReturnSpecificStatusType, pEntity, "AlwaysFailDecorator", &data);
+
+			Behaviour* pProcessMessagesAction		    = CreateBehaviour(ProcessMessagesType, pEntity, "ProcessMessagesAction", nullptr);
+			Behaviour* pEntityAliveCondition		    = CreateBehaviour(EntityAliveType, pEntity, "EntityAliveCondition", nullptr);
+			Behaviour* pUpdateThreatsAction				= CreateBehaviour(UpdateThreatsType, pEntity, "UpdateThreatsAction", nullptr);
+			Behaviour* pUpdateAttackReadinessAction		= CreateBehaviour(UpdateAttackReadinessType, pEntity, "UpdateAttackReadinessAction", nullptr);
+
+			if(pAlwaysFailDecorator && pProcessMessagesAction && pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
+			{
+				reinterpret_cast<Composite*>(pRoot)->AddChild(pAlwaysFailDecorator);
+
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pProcessMessagesAction);
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pEntityAliveCondition);
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateThreatsAction);
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateAttackReadinessAction);
+
+				Behaviour* pFightSequence		   = CreateBehaviour(SequenceType, pEntity, "FightSequence", nullptr);
+				Behaviour* pApproachThreatSequence = CreateBehaviour(SequenceType, pEntity, "ApproachThreatSequence", nullptr);
+				Behaviour* pPatrolSequence		   = CreateBehaviour(SequenceType, pEntity, "PatrolSequence", nullptr);
+				Behaviour* pIdleAction			   = CreateBehaviour(IdleType, pEntity, "IdleAction", nullptr);
+
+				if(pFightSequence && pApproachThreatSequence && pPatrolSequence && pIdleAction)
+				{
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pFightSequence);
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pApproachThreatSequence);
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pPatrolSequence);
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pIdleAction);
+
+					Behaviour* pDetermineGreatestKnownThreatAction = CreateBehaviour(DetermineGreatestKnownThreatType, pEntity, "DetermineGreatestKnownThreatAction", nullptr);
+					Behaviour* pGreatestKnownThreatSetCondition = CreateBehaviour(GreatestKnownThreatSetType, pEntity, "GreatestKnownThreatSetCondition", nullptr);
+					Behaviour* pAttackSelector		            = CreateBehaviour(SelectorType, pEntity, "AttackSelector", nullptr);
+						
+					Behaviour* pDetermineGreatestSuspectedThreatAction = CreateBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatAction", nullptr);
+					Behaviour* pGreatestSuspectedThreatSetCondition	     = CreateBehaviour(GreatestSuspectedThreatSetType, pEntity, "GreatestSuspectedThreatSetCondition", nullptr);
+					Behaviour* pDetermineApproachThreatPositionAction    = CreateBehaviour(DetermineApproachThreatPositionType, pEntity, "DetermineApproachThreatPositionAction", nullptr);
+					Behaviour* pMovementTargetApproachThreatSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetApproachThreatSetCondition", nullptr);
+					Behaviour* pMoveToApproachThreatTargetAction		 = CreateBehaviour(MoveToTargetType, pEntity, "MoveToApproachThreatTargetAction", nullptr);
+
+					Behaviour* pDeterminePatrolTargetAction      = CreateBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
+					Behaviour* pMovementTargetPatrolSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetPatrolSetCondition", nullptr);
+					Behaviour* pMoveToPatrolTargetAction		 = CreateBehaviour(MoveToTargetType, pEntity, "MoveToPatrolTargetAction", nullptr);
+		
+					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
+					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pMoveToApproachThreatTargetAction && pDeterminePatrolTargetAction &&
+					   pMovementTargetPatrolSetCondition && pMoveToPatrolTargetAction)
+					{
+						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
+						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
+						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pAttackSelector);
+
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDetermineGreatestSuspectedThreatAction);
 						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pGreatestSuspectedThreatSetCondition);
 						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDetermineApproachThreatPositionAction);
 						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMovementTargetApproachThreatSetCondition);
@@ -236,6 +354,9 @@ Behaviour* BehaviourFactory::CreateBehaviour(BehaviourType behaviourType, Entity
 	case GreatestSuspectedThreatSetType:
 		return new GreatestSuspectedThreatSet(pEntity, name);
 		break;
+	case EntityAliveType:
+		return new EntityAlive(pEntity, name);
+		break;
 	case DeterminePatrolTargetType:
 		return new DeterminePatrolTarget(pEntity, name);
 		break;
@@ -245,8 +366,11 @@ Behaviour* BehaviourFactory::CreateBehaviour(BehaviourType behaviourType, Entity
 	case DetermineAttackTargetType:
 		return new DetermineAttackTarget(pEntity, name);
 		break;
-	case DetermineGreatestThreatsType:
-		return new DetermineGreatestThreats(pEntity, name);
+	case DetermineGreatestKnownThreatType:
+		return new DetermineGreatestKnownThreat(pEntity, name);
+		break;
+	case DetermineGreatestSuspectedThreatType:
+		return new DetermineGreatestSuspectedThreat(pEntity, name);
 		break;
 	case AttackTargetType:
 		return new AttackTarget(pEntity, name);

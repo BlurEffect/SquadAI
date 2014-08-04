@@ -113,8 +113,11 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 			std::vector<Entity*>::const_iterator foundIt = std::find_if(newKnownThreats.begin(), newKnownThreats.end(), Entity::FindEntityById((*it)->GetId()));
 			if(foundIt == newKnownThreats.end())
 			{
-				// The previously known threat can no longer be seen -> add to suspected threats
-				m_pEntity->AddSuspectedThreat((*it)->GetId(), (*it)->GetPosition());
+				if(!m_pEntity->IsSuspectedThreat((*it)->GetId()))
+				{
+					// The previously known threat can no longer be seen -> add to suspected threats
+					m_pEntity->AddSuspectedThreat((*it)->GetId(), (*it)->GetPosition());
+				}
 			}
 		}
 

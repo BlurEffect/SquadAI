@@ -236,13 +236,24 @@ BehaviourStatus Soldier::UpdateThreats(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
-// Determines and sets the currently greatest threat to the Soldier.
+// Determines and sets the currently greatest known threat to the Soldier.
 // Param1: The time in seconds passed since the last frame.
 // Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Soldier::DetermineGreatestThreats(float deltaTime)
+BehaviourStatus Soldier::DetermineGreatestKnownThreat(float deltaTime)
 {
-	m_combatManager.DetermineGreatestThreats();
+	m_combatManager.DetermineGreatestKnownThreat();
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines and sets the currently greatest suspected threat to the Soldier.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::DetermineGreatestSuspectedThreat(float deltaTime)
+{
+	m_combatManager.DetermineGreatestSuspectedThreat();
 	return StatusSuccess;
 }
 
@@ -274,6 +285,10 @@ BehaviourStatus Soldier::UpdateAttackReadiness(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::ProcessMessages(float deltaTime)
 {
+	// Used to prevent the death notice from being sent multiple times if the
+	// entity was hit by several projectiles during the same frame.
+	bool notifiedDeath = false;
+
 	while(!GetActiveMessages().empty())
 	{
 		switch(GetActiveMessages().front()->GetType())
@@ -282,13 +297,21 @@ BehaviourStatus Soldier::ProcessMessages(float deltaTime)
 			{
 			HitMessage* pMsg = reinterpret_cast<HitMessage*>(GetActiveMessages().front());
 			m_combatManager.Hit(pMsg->GetDamage(), pMsg->GetShooterId(), pMsg->GetPosition());
+			if(!IsAlive() && !notifiedDeath)
+			{
+				GetTestEnvironment()->AddDeadEntity(this);
+				notifiedDeath = true;
+			}
 			break;
 			}
 		case EntityKilledMessageType:
 			{
 			EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(GetActiveMessages().front());
-			RemoveKnownThreat(pMsg->GetId());
-			RemoveSuspectedThreat(pMsg->GetId());
+			if(pMsg->GetTeam() != GetTeam())
+			{
+				RemoveKnownThreat(pMsg->GetId());
+				RemoveSuspectedThreat(pMsg->GetId());
+			}
 			break;
 			}
 		}

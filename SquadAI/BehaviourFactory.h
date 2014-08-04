@@ -24,11 +24,13 @@
 #include "AttackTargetSet.h"
 #include "GreatestKnownThreatSet.h"
 #include "GreatestSuspectedThreatSet.h"
+#include "EntityAlive.h"
 // Actions
 #include "DeterminePatrolTarget.h"
 #include "DetermineApproachThreatPosition.h"
 #include "DetermineAttackTarget.h"
-#include "DetermineGreatestThreats.h"
+#include "DetermineGreatestKnownThreat.h"
+#include "DetermineGreatestSuspectedThreat.h"
 #include "AttackTarget.h"
 #include "AimAtTarget.h"
 #include "UpdateThreats.h"
@@ -58,11 +60,13 @@ enum BehaviourType
 	AttackTargetSetType,
 	GreatestKnownThreatSetType,
 	GreatestSuspectedThreatSetType,
+	EntityAliveType,
 
 	DeterminePatrolTargetType,
 	DetermineApproachThreatPositionType,
 	DetermineAttackTargetType,
-	DetermineGreatestThreatsType,
+	DetermineGreatestKnownThreatType,
+	DetermineGreatestSuspectedThreatType,
 	AttackTargetType,
 	AimAtTargetType,
 	UpdateThreatsType,
@@ -78,7 +82,8 @@ enum BehaviourType
 enum BehaviourTreeType
 {
 	SimpleMovementTree,
-	SimpleCombatTree
+	SimpleCombatTree1,
+	SimpleCombatTree2
 };
 
 
@@ -88,7 +93,8 @@ public:
 	static Behaviour* CreateBehaviourTree(BehaviourTreeType entityType, Entity* pEntity);
 private:
 	static Behaviour* CreateSimpleMovementTree(Entity* pEntity);
-	static Behaviour* CreateSimpleCombatTree(Entity* pEntity);
+	static Behaviour* CreateSimpleCombatTree1(Entity* pEntity);
+	static Behaviour* CreateSimpleCombatTree2(Entity* pEntity);
 	static Behaviour* CreateBehaviour(BehaviourType behaviourType, Entity* pEntity, const char* name, void* pInitData);
 };
 

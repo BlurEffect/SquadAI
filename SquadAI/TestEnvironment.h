@@ -13,6 +13,7 @@
 // Includes
 #include <DirectXMath.h>
 #include <list>
+#include <vector>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -35,10 +36,7 @@
 #include "Flag.h"
 #include "Obstacle.h"
 #include "MessageDataStructures.h"
-
-class FightingEntity;
-class MovingEntity;
-class Entity;
+#include "Entity.h"
 
 using namespace DirectX;
 
@@ -72,8 +70,10 @@ public:
 	bool GetRandomUnblockedTarget(XMFLOAT2& outPosition) const;
 
 	//const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
-	bool          CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);
+	bool CheckLineOfSight(int startGridX, int startGridY, int endGridX, int endGridY);
 	void ResetNodeGraph(void);
+
+	void AddDeadEntity(Entity* pEntity);
 
 	// Data access functions
 	float		 GetGridSize(void) const;
@@ -93,16 +93,20 @@ private:
 	void UpdateBaseEntrances(void);
 	void UpdateNodeGraph(void);
 	bool CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject);
+	void UpdateRespawns(float deltaTime);
 
 	unsigned long m_id;           // An id is assigned to each entity being created in the environment
 	bool          m_isPaused;     // Tells whether the simulation running in the environment is currently paused
 	bool          m_isInEditMode; // Tells whether the environment is in edit or simulation mode
 	
+	std::list<std::pair<float, Entity*>> m_deadEntities;  // Contains pointers to currently dead entities and the duration of their absence from the game
+
 	// Grid
 	float               m_gridSize;               // The size of the grid along x and y axis
 	unsigned int        m_numberOfGridPartitions; // The number of grid fields along x and y axis
 	float               m_gridSpacing;			  // The size of a grid field along x and y axis
 	Node**              m_pNodes;                 // The graph made up of nodes representing the test environment when in simulation mode
+
 
 	// Objects
 	std::vector<EditModeObject> m_staticObjects;									// The static test environment objects, as set up by the user in edit mode

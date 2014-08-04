@@ -306,9 +306,6 @@
     <ClCompile Include="UpdateThreats.cpp">
       <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="DetermineGreatestThreats.cpp">
-      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
-    </ClCompile>
     <ClCompile Include="UpdateAttackReadiness.cpp">
       <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
@@ -319,6 +316,15 @@
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
     <ClCompile Include="ProcessMessages.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityAlive.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="DetermineGreatestKnownThreat.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="DetermineGreatestSuspectedThreat.cpp">
       <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
   </ItemGroup>
@@ -551,9 +557,6 @@
     <ClInclude Include="UpdateThreats.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="DetermineGreatestThreats.h">
-      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="UpdateAttackReadiness.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClInclude>
@@ -570,6 +573,15 @@
       <Filter>Header Files\TestEnvironment</Filter>
     </ClInclude>
     <ClInclude Include="ProcessMessages.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityAlive.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="DetermineGreatestKnownThreat.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="DetermineGreatestSuspectedThreat.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClInclude>
   </ItemGroup>

@@ -278,7 +278,7 @@ bool Input::MiddleMouseButtonDown(void) const
 //--------------------------------------------------------------------------------------
 bool Input::LeftMouseButtonPressed(void) const
 {
-	return (m_mouseState.rgbButtons[0] & 0x80);
+	return (m_mouseState.rgbButtons[0] & 0x80) != 0;
 }
 
 //--------------------------------------------------------------------------------------
@@ -286,7 +286,7 @@ bool Input::LeftMouseButtonPressed(void) const
 //--------------------------------------------------------------------------------------
 bool Input::RightMouseButtonPressed(void) const
 {
-	return (m_mouseState.rgbButtons[1] & 0x80);
+	return (m_mouseState.rgbButtons[1] & 0x80) != 0;
 }
 
 //--------------------------------------------------------------------------------------
@@ -294,7 +294,7 @@ bool Input::RightMouseButtonPressed(void) const
 //--------------------------------------------------------------------------------------
 bool Input::MiddleMouseButtonPressed(void) const
 {
-	return (m_mouseState.rgbButtons[2] & 0x80);
+	return (m_mouseState.rgbButtons[2] & 0x80) != 0;
 }
 
 //--------------------------------------------------------------------------------------
@@ -358,7 +358,7 @@ bool Input::KeyDownDown(void) const
 //--------------------------------------------------------------------------------------
 bool Input::KeyLeftPressed(void) const
 {
-	return (KEYDOWN(m_keyboardState, DIK_LEFT));
+	return (KEYDOWN(m_keyboardState, DIK_LEFT) != 0);
 }
 
 //--------------------------------------------------------------------------------------
@@ -366,7 +366,7 @@ bool Input::KeyLeftPressed(void) const
 //--------------------------------------------------------------------------------------
 bool Input::KeyRightPressed(void) const
 {
-	return (KEYDOWN(m_keyboardState, DIK_RIGHT));
+	return (KEYDOWN(m_keyboardState, DIK_RIGHT) != 0);
 }
 
 //--------------------------------------------------------------------------------------
@@ -374,7 +374,7 @@ bool Input::KeyRightPressed(void) const
 //--------------------------------------------------------------------------------------
 bool Input::KeyUpPressed(void) const
 {
-	return (KEYDOWN(m_keyboardState, DIK_UP));
+	return (KEYDOWN(m_keyboardState, DIK_UP) != 0);
 }
 
 //--------------------------------------------------------------------------------------
@@ -382,7 +382,7 @@ bool Input::KeyUpPressed(void) const
 //--------------------------------------------------------------------------------------
 bool Input::KeyDownPressed(void) const
 {
-	return (KEYDOWN(m_keyboardState, DIK_DOWN));
+	return (KEYDOWN(m_keyboardState, DIK_DOWN) != 0);
 }
 
 //--------------------------------------------------------------------------------------
@@ -422,7 +422,7 @@ bool Input::KeyDownReleased(void) const
 //--------------------------------------------------------------------------------------
 bool Input::KeyLeftCtrlPressed(void) const
 {
-	return (KEYDOWN(m_keyboardState, DIK_LCONTROL));
+	return (KEYDOWN(m_keyboardState, DIK_LCONTROL) != 0);
 }
 	
 //--------------------------------------------------------------------------------------

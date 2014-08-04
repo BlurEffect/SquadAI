@@ -1,19 +1,19 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  MoveToTarget.cpp
-*  An action behaviour that has the entity move to the current movement
-*  target position.
+*  DetermineGreatestKnownThreat.cpp
+*  An action behaviour that determines and sets the greatest known
+*  threat for the entity.
 */
 
 // Includes
-#include "MoveToTarget.h"
+#include "DetermineGreatestKnownThreat.h"
 #include "Entity.h"
 
-MoveToTarget::MoveToTarget(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+DetermineGreatestKnownThreat::DetermineGreatestKnownThreat(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
 {
 }
 
-MoveToTarget::~MoveToTarget(void)
+DetermineGreatestKnownThreat::~DetermineGreatestKnownThreat(void)
 {
 }
 
@@ -22,23 +22,15 @@ MoveToTarget::~MoveToTarget(void)
 // Param1: The time in seconds passed since the last frame.
 // Returns the state of the behaviour.
 //--------------------------------------------------------------------------------------
-BehaviourStatus MoveToTarget::Update(float deltaTime)
+BehaviourStatus DetermineGreatestKnownThreat::Update(float deltaTime)
 {
-	if(GetEntity()->GetTeam() == TeamRed)
-	{
-		int a  = 2;
-	}else
-	{
-		int b = 3;
-	}
-
-	return GetEntity()->MoveToTarget(deltaTime);
+	return GetEntity()->DetermineGreatestKnownThreat(deltaTime);
 }
 
 //--------------------------------------------------------------------------------------
 // Initialises the behaviour.
 //--------------------------------------------------------------------------------------
-void MoveToTarget::OnInitialise(void)
+void DetermineGreatestKnownThreat::OnInitialise(void)
 {
 
 }
@@ -46,7 +38,7 @@ void MoveToTarget::OnInitialise(void)
 //--------------------------------------------------------------------------------------
 // Terminates the behaviour.
 //--------------------------------------------------------------------------------------
-void MoveToTarget::OnTerminate(BehaviourStatus status)
+void DetermineGreatestKnownThreat::OnTerminate(BehaviourStatus status)
 {
 
 }

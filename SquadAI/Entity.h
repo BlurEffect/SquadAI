@@ -47,7 +47,8 @@ public:
 	virtual void Update(float deltaTime) = 0;
 	virtual void Activate(void) = 0;
 	virtual void Reset(void);
-
+	virtual void Respawn(const XMFLOAT2& respawnPosition);
+	
 	// Basic actions
 	virtual BehaviourStatus MoveToTarget(float deltaTime)						    = 0;
 	virtual BehaviourStatus Attack(float deltaTime)									= 0;
@@ -57,7 +58,8 @@ public:
 	virtual BehaviourStatus DeterminePatrolTarget(float deltaTime)			        = 0;
 	virtual BehaviourStatus DetermineApproachThreatTarget(float deltaTime)          = 0;
 	virtual BehaviourStatus UpdateThreats(float deltaTime)					        = 0;
-	virtual BehaviourStatus DetermineGreatestThreats(float deltaTime)               = 0;
+	virtual BehaviourStatus DetermineGreatestKnownThreat(float deltaTime)           = 0;
+	virtual BehaviourStatus DetermineGreatestSuspectedThreat(float deltaTime)       = 0;
 	virtual BehaviourStatus UpdateAttackReadiness(float deltaTime)					= 0;
 	virtual BehaviourStatus ProcessMessages(float deltaTime)					    = 0;
 

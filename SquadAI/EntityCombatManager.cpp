@@ -47,12 +47,11 @@ void EntityCombatManager::Reset(void)
 }
 
 //--------------------------------------------------------------------------------------
-// Determines and sets the currently greatest threat based on the distance of the
+// Determines and sets the currently greatest known threat based on the distance of the
 // threats to the entity.
 //--------------------------------------------------------------------------------------
-void EntityCombatManager::DetermineGreatestThreats(void)
+void EntityCombatManager::DetermineGreatestKnownThreat(void)
 {
-
 	if(!m_pEntity->GetKnownThreats().empty())
 	{
 		float shortestSquareDistance = std::numeric_limits<float>::max();
@@ -75,7 +74,14 @@ void EntityCombatManager::DetermineGreatestThreats(void)
 	{
 		m_pEntity->SetGreatestKnownThreat(nullptr);
 	}
+}
 
+//--------------------------------------------------------------------------------------
+// Determines and sets the currently greatest suspected threat based on the distance of the
+// threats to the entity.
+//--------------------------------------------------------------------------------------
+void EntityCombatManager::DetermineGreatestSuspectedThreat(void)
+{
 	if(!m_pEntity->GetSuspectedThreats().empty())
 	{
 		float shortestSquareDistance = std::numeric_limits<float>::max();

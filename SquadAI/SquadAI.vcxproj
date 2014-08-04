@@ -85,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
+    <ClCompile Include="DetermineGreatestKnownThreat.cpp" />
     <ClCompile Include="AimAtTarget.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AttackTarget.cpp" />
@@ -97,13 +98,14 @@
     <ClCompile Include="Decorator.cpp" />
     <ClCompile Include="DetermineApproachThreatPosition.cpp" />
     <ClCompile Include="DetermineAttackTarget.cpp" />
-    <ClCompile Include="DetermineGreatestThreats.cpp" />
+    <ClCompile Include="DetermineGreatestSuspectedThreat.cpp" />
     <ClCompile Include="DeterminePatrolTarget.cpp" />
     <ClCompile Include="EditModeObject.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="ColliderFactory.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityAlive.cpp" />
     <ClCompile Include="EntityCombatManager.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
     <ClCompile Include="Flag.cpp" />
@@ -173,13 +175,15 @@
     <ClInclude Include="Decorator.h" />
     <ClInclude Include="DetermineApproachThreatPosition.h" />
     <ClInclude Include="DetermineAttackTarget.h" />
-    <ClInclude Include="DetermineGreatestThreats.h" />
+    <ClInclude Include="DetermineGreatestKnownThreat.h" />
+    <ClInclude Include="DetermineGreatestSuspectedThreat.h" />
     <ClInclude Include="DeterminePatrolTarget.h" />
     <ClInclude Include="EditModeObject.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="ColliderFactory.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityAlive.h" />
     <ClInclude Include="EntityCombatManager.h" />
     <ClInclude Include="EntitySensors.h" />
     <ClInclude Include="Flag.h" />

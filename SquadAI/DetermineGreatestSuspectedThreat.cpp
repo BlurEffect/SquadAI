@@ -1,19 +1,19 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  MoveToTarget.cpp
-*  An action behaviour that has the entity move to the current movement
-*  target position.
+*  DetermineGreatestSuspectedThreat.cpp
+*  An action behaviour that determines and sets the greatest suspected
+*  threat for the entity.
 */
 
 // Includes
-#include "MoveToTarget.h"
+#include "DetermineGreatestSuspectedThreat.h"
 #include "Entity.h"
 
-MoveToTarget::MoveToTarget(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+DetermineGreatestSuspectedThreat::DetermineGreatestSuspectedThreat(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
 {
 }
 
-MoveToTarget::~MoveToTarget(void)
+DetermineGreatestSuspectedThreat::~DetermineGreatestSuspectedThreat(void)
 {
 }
 
@@ -22,23 +22,15 @@ MoveToTarget::~MoveToTarget(void)
 // Param1: The time in seconds passed since the last frame.
 // Returns the state of the behaviour.
 //--------------------------------------------------------------------------------------
-BehaviourStatus MoveToTarget::Update(float deltaTime)
+BehaviourStatus DetermineGreatestSuspectedThreat::Update(float deltaTime)
 {
-	if(GetEntity()->GetTeam() == TeamRed)
-	{
-		int a  = 2;
-	}else
-	{
-		int b = 3;
-	}
-
-	return GetEntity()->MoveToTarget(deltaTime);
+	return GetEntity()->DetermineGreatestSuspectedThreat(deltaTime);
 }
 
 //--------------------------------------------------------------------------------------
 // Initialises the behaviour.
 //--------------------------------------------------------------------------------------
-void MoveToTarget::OnInitialise(void)
+void DetermineGreatestSuspectedThreat::OnInitialise(void)
 {
 
 }
@@ -46,7 +38,7 @@ void MoveToTarget::OnInitialise(void)
 //--------------------------------------------------------------------------------------
 // Terminates the behaviour.
 //--------------------------------------------------------------------------------------
-void MoveToTarget::OnTerminate(BehaviourStatus status)
+void DetermineGreatestSuspectedThreat::OnTerminate(BehaviourStatus status)
 {
 
 }

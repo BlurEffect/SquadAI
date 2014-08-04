@@ -1,19 +1,18 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  DetermineGreatestThreats.cpp
-*  An action behaviour that determines and sets the greatest known and suspected
-*  threat for the entity.
+*  EntityAlive.h
+*  A condition behaviour that checks whether the entity is alive or dead.
 */
 
 // Includes
-#include "DetermineGreatestThreats.h"
+#include "EntityAlive.h"
 #include "Entity.h"
 
-DetermineGreatestThreats::DetermineGreatestThreats(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+EntityAlive::EntityAlive(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
 {
 }
 
-DetermineGreatestThreats::~DetermineGreatestThreats(void)
+EntityAlive::~EntityAlive(void)
 {
 }
 
@@ -22,15 +21,21 @@ DetermineGreatestThreats::~DetermineGreatestThreats(void)
 // Param1: The time in seconds passed since the last frame.
 // Returns the state of the behaviour.
 //--------------------------------------------------------------------------------------
-BehaviourStatus DetermineGreatestThreats::Update(float deltaTime)
+BehaviourStatus EntityAlive::Update(float deltaTime)
 {
-	return GetEntity()->DetermineGreatestThreats(deltaTime);
+	if(GetEntity()->IsAlive())
+	{
+		return StatusSuccess;
+	}else
+	{
+		return StatusFailure;
+	}
 }
 
 //--------------------------------------------------------------------------------------
 // Initialises the behaviour.
 //--------------------------------------------------------------------------------------
-void DetermineGreatestThreats::OnInitialise(void)
+void EntityAlive::OnInitialise(void)
 {
 
 }
@@ -38,7 +43,7 @@ void DetermineGreatestThreats::OnInitialise(void)
 //--------------------------------------------------------------------------------------
 // Terminates the behaviour.
 //--------------------------------------------------------------------------------------
-void DetermineGreatestThreats::OnTerminate(BehaviourStatus status)
+void EntityAlive::OnTerminate(BehaviourStatus status)
 {
 
 }

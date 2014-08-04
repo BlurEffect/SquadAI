@@ -385,7 +385,11 @@ void EntityMovementManager::Separate(float separationRadius, float maximalForce)
 			{
 				// Scale the force according to the proximity of the nearby entity. Thus the push from close objects will be
 				// stronger than that from objects that are farther away.
-				separationVector += (XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&it->second->GetPosition())) / it->first;
+
+				// Avoid possible division by zero
+				float proximity = (it->first != 0) ? it->first : 0.01;
+
+				separationVector += (XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&it->second->GetPosition())) / proximity;
 			}
 		}
 

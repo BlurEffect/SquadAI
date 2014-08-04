@@ -90,7 +90,7 @@ BehaviourStatus Behaviour::Tick(float deltaTime)
 void Behaviour::Abort(void)
 {
 	OnTerminate(StatusAborted);
-	m_status = StatusAborted;
+	//m_status = StatusAborted;
 }
 
 //--------------------------------------------------------------------------------------

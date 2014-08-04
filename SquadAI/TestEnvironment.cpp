@@ -101,6 +101,8 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		}
 	}else
 	{
+		UpdateRespawns(deltaTime);
+
 		// Update soldiers
 
 		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
@@ -703,7 +705,7 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 {
 	float squareRadius = radius * radius;
 	float squareDistance = 0.0f;
-
+ 
 	if(entityGroup != GroupObstacles) 
 	{
 		if(entityGroup == GroupTeamRed || entityGroup == GroupTeamRedAndObstacles)
@@ -772,6 +774,9 @@ void TestEnvironment::GetNearbyObjects(const XMFLOAT2& position, float radius, E
 			{
 				if(m_pNodes[i][k].IsObstacle())
 				{
+					int a = i;
+					int b = k;
+
 					XMStoreFloat(&squareDistance, XMVector2LengthSq(XMLoadFloat2(&m_pNodes[i][k].GetObstacle()->GetPosition()) - XMLoadFloat2(&position)));
 					if(squareDistance <= squareRadius)
 					{
@@ -905,6 +910,32 @@ bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject, 
 }
 
 //--------------------------------------------------------------------------------------
+// Update the respawn timers of all dead entites and respawn the ones, whose timer has
+// surpassed the defined respawn time limit.
+// Param1: The time passed since the last update.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::UpdateRespawns(float deltaTime)
+{
+	std::list<std::pair<float, Entity*>>::iterator it = m_deadEntities.begin();
+
+	while(it != m_deadEntities.end())
+	{
+		// Update the respawn timer
+		it->first += deltaTime;
+
+		if(it->first >= g_kRespawnTimer)
+		{
+			// Respawn the entity at a random respawn point and with a random rotation
+			it->second->Respawn(m_spawnPoints[it->second->GetTeam()][rand() % m_spawnPoints[it->second->GetTeam()].size()]);
+			m_deadEntities.erase(it++);
+		}else
+		{
+			++it;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Determines whether there is a direct line of sight between two fields on the grid.
 // Note: This only checks between the centre of the two given grid fields. Uses 
 //       Bresenham's line algorithm.
@@ -978,6 +1009,25 @@ void TestEnvironment::ResetNodeGraph(void)
 }
 
 //--------------------------------------------------------------------------------------
+// Registers the death of an entity and broadcasts the event to all other entities. 
+// Also prepares the respawn of the entity.
+// Param1: A pointer to the entity that just died.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::AddDeadEntity(Entity* pEntity)
+{
+	if(pEntity)
+	{
+		m_deadEntities.push_back(std::pair<float, Entity*>(0.0f, pEntity));
+		
+		// Broadcast message to other entities
+		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+		{
+			m_soldiers[i].AddMessage(new EntityKilledMessage(pEntity->GetTeam(), pEntity->GetId()));
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Starts the simulation, switches from edit to simulation mode.
 // Returns true if the simulation could be started successfully.
 //--------------------------------------------------------------------------------------
@@ -1014,6 +1064,7 @@ void TestEnvironment::EndSimulation(void)
 	// Delete all projectiles
 	m_projectiles.clear();
 	m_obstacles.clear();
+	m_deadEntities.clear();
 
 	for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 	{

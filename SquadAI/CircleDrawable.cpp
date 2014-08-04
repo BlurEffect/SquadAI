@@ -7,9 +7,9 @@
 // Includes
 #include "CircleDrawable.h"
 
-CircleDrawable::CircleDrawable(float radius, UINT segments) : Drawable(),
-															  m_radius(radius),
-															  m_segments(segments)
+CircleDrawable::CircleDrawable(float radius, unsigned int segments) : Drawable(),
+																	  m_radius(radius),
+																	  m_segments(segments)
 {
 	m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 }
@@ -55,7 +55,7 @@ bool CircleDrawable::Initialise(ID3D11Device* pDevice)
 	float y = 0.0f;
 
 	float angle = -XM_PIDIV2; 
-	for(unsigned int i = 0; i < m_segments/2; ++i)
+	for(unsigned int i = 0; i < static_cast<unsigned int>(m_segments/2); ++i)
 	{
 		x = m_radius * sin(angle);
 		y = m_radius * cos(angle);

@@ -69,10 +69,18 @@ void Composite::ClearChildren(void)
 //--------------------------------------------------------------------------------------
 void Composite::OnTerminate(BehaviourStatus status)
 {
+	ResetChildren();
+
 	Behaviour::Reset();
 	if(status == StatusAborted)
 	{
-		ResetChildren();
+		const char* name = GetName();
+		if(name == "ApproachThreatSequence")
+		{
+			int a = 4;
+		}
+		AbortChildren();
+		Behaviour::Reset();
 	}//else
 	//{
 	//	Behaviour::Reset();
@@ -88,5 +96,16 @@ void Composite::ResetChildren(void)
 	for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
 	{
 		(*it)->Reset();
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Aborts all children of the composite.
+//--------------------------------------------------------------------------------------
+void Composite::AbortChildren(void)
+{
+	for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
+	{
+		(*it)->Abort();
 	}
 }

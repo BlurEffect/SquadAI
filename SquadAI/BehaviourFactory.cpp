@@ -237,15 +237,21 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree2(Entity* pEntity)
 					Behaviour* pGreatestSuspectedThreatSetCondition	     = CreateBehaviour(GreatestSuspectedThreatSetType, pEntity, "GreatestSuspectedThreatSetCondition", nullptr);
 					Behaviour* pDetermineApproachThreatPositionAction    = CreateBehaviour(DetermineApproachThreatPositionType, pEntity, "DetermineApproachThreatPositionAction", nullptr);
 					Behaviour* pMovementTargetApproachThreatSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetApproachThreatSetCondition", nullptr);
+					
+					ParallelInitData parallelInitData(ParallelPolicy::RequireAll, ParallelPolicy::RequireOne);
+					Behaviour* pCheckSuspectedThreatAliveMonitor             = CreateBehaviour(ParallelType, pEntity, "CheckSuspectedThreatAliveMonitor", &parallelInitData);   
+					
+					Behaviour* pGreatestSuspectedThreatSetMonitoredCondition	     = CreateBehaviour(GreatestSuspectedThreatSetType, pEntity, "GreatestSuspectedThreatSetMonitoredCondition", nullptr);
 					Behaviour* pMoveToApproachThreatTargetAction		 = CreateBehaviour(MoveToTargetType, pEntity, "MoveToApproachThreatTargetAction", nullptr);
+					Behaviour* pResolveSuspectedThreatAction		 = CreateBehaviour(ResolveSuspectedThreatType, pEntity, "ResolveSuspectedThreatAction", nullptr);
 
 					Behaviour* pDeterminePatrolTargetAction      = CreateBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
 					Behaviour* pMovementTargetPatrolSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetPatrolSetCondition", nullptr);
 					Behaviour* pMoveToPatrolTargetAction		 = CreateBehaviour(MoveToTargetType, pEntity, "MoveToPatrolTargetAction", nullptr);
 		
 					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
-					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pMoveToApproachThreatTargetAction && pDeterminePatrolTargetAction &&
-					   pMovementTargetPatrolSetCondition && pMoveToPatrolTargetAction)
+					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pCheckSuspectedThreatAliveMonitor && pGreatestSuspectedThreatSetMonitoredCondition && 
+					   pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDeterminePatrolTargetAction && pMovementTargetPatrolSetCondition && pMoveToPatrolTargetAction)
 					{
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
@@ -255,7 +261,13 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree2(Entity* pEntity)
 						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pGreatestSuspectedThreatSetCondition);
 						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDetermineApproachThreatPositionAction);
 						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMovementTargetApproachThreatSetCondition);
-						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMoveToApproachThreatTargetAction);
+						
+						// Alternatives
+						//reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pCheckSuspectedThreatAliveMonitor);
+						//reinterpret_cast<Composite*>(pCheckSuspectedThreatAliveMonitor)->AddChild(pGreatestSuspectedThreatSetMonitoredCondition);
+						//reinterpret_cast<Composite*>(pCheckSuspectedThreatAliveMonitor)->AddChild(pMoveToApproachThreatTargetAction);
+						reinterpret_cast<Monitor*>(pApproachThreatSequence)->AddAction(pMoveToApproachThreatTargetAction);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pResolveSuspectedThreatAction);
 
 						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pDeterminePatrolTargetAction);
 						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMovementTargetPatrolSetCondition);
@@ -392,6 +404,8 @@ Behaviour* BehaviourFactory::CreateBehaviour(BehaviourType behaviourType, Entity
 		break;
 	case ProcessMessagesType:
 		return new ProcessMessages(pEntity, name);
+	case ResolveSuspectedThreatType:
+		return new ResolveSuspectedThreat(pEntity, name);
 	default:
 		return nullptr;
 	}

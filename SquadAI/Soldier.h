@@ -82,6 +82,7 @@ public:
 	BehaviourStatus DetermineGreatestSuspectedThreat(float deltaTime);
 	BehaviourStatus UpdateAttackReadiness(float deltaTime);
 	BehaviourStatus ProcessMessages(float deltaTime);
+	BehaviourStatus ResolveSuspectedThreat(float deltaTime);
 
 	// Events
 	void Hit(float damage, const XMFLOAT2& direction);

@@ -63,18 +63,18 @@ void Soldier::Update(float deltaTime)
 	GetBehaviour()->Tick(deltaTime);
 
 	/*
-	m_movementManager.FollowPath(GetTargetReachedRadius(), m_soldierProperties.m_maxSpeed);
-	m_movementManager.AvoidCollisions(m_soldierProperties.m_maxCollisionSeeAhead, m_soldierProperties.m_maxCollisionAvoidanceForce);
-	m_movementManager.Separate(m_soldierProperties.m_separationRadius, m_soldierProperties.m_maxSeparationForce);
-	m_movementManager.StayAwayFromWalls(m_soldierProperties.m_avoidWallsRadius, m_soldierProperties.m_maxAvoidWallsForce);
+	//m_movementManager.FollowPath(GetTargetReachedRadius(), m_soldierProperties.m_maxSpeed);
+	m_movementManager.AvoidCollisions(m_soldierProperties.m_maxCollisionSeeAhead, 100.0f);//m_soldierProperties.m_maxCollisionAvoidanceForce);
+	//m_movementManager.Separate(m_soldierProperties.m_separationRadius, m_soldierProperties.m_maxSeparationForce);
+	//m_movementManager.StayAwayFromWalls(m_soldierProperties.m_avoidWallsRadius, m_soldierProperties.m_maxAvoidWallsForce);
 
 	if(GetTeam() == TeamRed)
 	{
 		//m_sensors.CheckForThreats();
-		//m_movementManager.Seek(XMFLOAT2(24.0f, 24.0f), 1.0f);
+		m_movementManager.Seek(XMFLOAT2(24.0f, 24.0f), 1.0f, GetMaxSpeed());
 	}else
 	{
-		//m_movementManager.Seek(XMFLOAT2(-24.0f, -24.0f), 1.0f);
+		m_movementManager.Seek(XMFLOAT2(-24.0f, -24.0f), 1.0f, GetMaxSpeed());
 	}
 	
 	g_time += deltaTime;
@@ -100,6 +100,8 @@ void Soldier::Update(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 {
+
+
 	if(!m_movementManager.IsPathSet())
 	{
 		// There is no path set, create a new one
@@ -117,7 +119,10 @@ BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 	}
 
 	// Target not yet reached -> move the entity along the path avoiding obstacles and intersection with other soldiers
-	m_movementManager.AvoidCollisions(m_soldierProperties.m_maxCollisionSeeAhead, m_soldierProperties.m_maxCollisionAvoidanceForce);
+	
+	// Note: Collision avoidance not really needed as pathfinding sufficient and avoidance of other entities not really
+	//       important at the moment.
+	// m_movementManager.AvoidCollisions(m_soldierProperties.m_maxCollisionSeeAhead, m_soldierProperties.m_maxCollisionAvoidanceForce);
 	m_movementManager.Separate(m_soldierProperties.m_separationRadius, m_soldierProperties.m_maxSeparationForce);
 	m_movementManager.StayAwayFromWalls(m_soldierProperties.m_avoidWallsRadius, m_soldierProperties.m_maxAvoidWallsForce);
 
@@ -309,6 +314,14 @@ BehaviourStatus Soldier::ProcessMessages(float deltaTime)
 			EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(GetActiveMessages().front());
 			if(pMsg->GetTeam() != GetTeam())
 			{
+				if(GetGreatestKnownThreat() && GetGreatestKnownThreat()->GetId() == pMsg->GetId())
+				{
+					SetGreatestKnownThreat(nullptr);
+				}else if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_enemyId == pMsg->GetId())
+				{
+					SetGreatestSuspectedThreat(nullptr);
+				}
+
 				RemoveKnownThreat(pMsg->GetId());
 				RemoveSuspectedThreat(pMsg->GetId());
 			}
@@ -320,6 +333,20 @@ BehaviourStatus Soldier::ProcessMessages(float deltaTime)
 		GetActiveMessages().pop();
 	}
 
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Removes the currently active suspected threat from the list of suspected threats.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::ResolveSuspectedThreat(float deltaTime)
+{
+	if(GetGreatestSuspectedThreat())
+	{
+		RemoveSuspectedThreat(GetGreatestSuspectedThreat()->m_enemyId);
+	}
 	return StatusSuccess;
 }
 

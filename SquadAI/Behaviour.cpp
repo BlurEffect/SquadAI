@@ -49,14 +49,6 @@ Behaviour::~Behaviour(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Behaviour::Tick(float deltaTime)
 {
-	if(GetName() == "UpdateThreatsAction")
-	{
-		int a = 4;
-	}
-	if(GetName() == "DetermineGreatestThreatsType")
-	{
-		int a = 2;
-	}
 
 	if(!m_pEntity)
 	{
@@ -90,7 +82,6 @@ BehaviourStatus Behaviour::Tick(float deltaTime)
 void Behaviour::Abort(void)
 {
 	OnTerminate(StatusAborted);
-	//m_status = StatusAborted;
 }
 
 //--------------------------------------------------------------------------------------

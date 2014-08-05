@@ -7,15 +7,27 @@
 // Includes
 #include "AxisAlignedRectangleCollider.h"
 
-AxisAlignedRectangleCollider::AxisAlignedRectangleCollider(const XMFLOAT2& centre, float width, float height) : Collider(AxisAlignedRectangleColliderType, centre),
-																								                m_width(width),
-																												m_height(height)
+AxisAlignedRectangleCollider::AxisAlignedRectangleCollider(const XMFLOAT2& centre, float width, float height, float gridSize) : Collider(AxisAlignedRectangleColliderType, centre),
+																																m_width(width),
+																																m_height(height),
+																																m_halfGridSize(gridSize * 0.5f)
 {
+	// Note: For some reason the collision detection is faulty when using the actual world coordinates
+	//       of the vertices of the collider bounding box. Thus, at the moment the relative coordinates with
+	//       respect to the origin of the grid (bottom left corner) are being used.
+	
 	// Define the four corners of the rectangle
-	m_topLeft	  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f + 25.0f, GetCentre().y + GetHeight() * 0.5f + 25.0f);
-	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + 25.0f, GetCentre().y + GetHeight() * 0.5f + 25.0f);
-	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f + 25.0f, GetCentre().y - GetHeight() * 0.5f + 25.0f);
-	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + 25.0f, GetCentre().y - GetHeight() * 0.5f + 25.0f);
+	m_topLeft	  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f + m_halfGridSize, GetCentre().y + GetHeight() * 0.5f + m_halfGridSize);
+	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + m_halfGridSize, GetCentre().y + GetHeight() * 0.5f + m_halfGridSize);
+	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f + m_halfGridSize, GetCentre().y - GetHeight() * 0.5f + m_halfGridSize);
+	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + m_halfGridSize, GetCentre().y - GetHeight() * 0.5f + m_halfGridSize);
+
+	/*
+	m_topLeft	  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
+	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
+	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
+	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
+	*/
 }
 
 AxisAlignedRectangleCollider::~AxisAlignedRectangleCollider(void)
@@ -31,11 +43,17 @@ AxisAlignedRectangleCollider::~AxisAlignedRectangleCollider(void)
 //--------------------------------------------------------------------------------------
 bool AxisAlignedRectangleCollider::CheckLineCollision(const XMFLOAT2& lineStart, const XMFLOAT2& lineEnd) const
 {
+	// Convert the coordinates to grid space (see note in constructor)
+	XMFLOAT2 lineStartGrid(lineStart.x + m_halfGridSize, lineStart.y + m_halfGridSize);
+	XMFLOAT2 lineEndGrid(lineEnd.x + m_halfGridSize, lineEnd.y + m_halfGridSize);
+	
+
+
 	// Determine intersections of the four lines making up the rectangle with the passed in line
 
 	// Check if the line is fully encompassed by the rectangle (if so the tests conducted below won't
 	// register an intersection).
-	if(CheckPointCollision(lineStart) && CheckPointCollision(lineEnd))
+	if(CheckPointCollision(lineStartGrid) && CheckPointCollision(lineEndGrid))
 	{
 		// Both line segment end points are encompassed by the rectangle
 		return true;
@@ -43,10 +61,10 @@ bool AxisAlignedRectangleCollider::CheckLineCollision(const XMFLOAT2& lineStart,
 
 	// Check the sides of the rectangle
 
-	return (CheckLineSegmentsIntersection(lineStart, lineEnd, m_bottomLeft, m_topLeft) ||     // left side
-			CheckLineSegmentsIntersection(lineStart, lineEnd, m_topLeft, m_topRight) ||       // top
-			CheckLineSegmentsIntersection(lineStart, lineEnd, m_bottomRight, m_topRight) ||   // right
-			CheckLineSegmentsIntersection(lineStart, lineEnd, m_bottomLeft, m_bottomRight));  // bottom
+	return (CheckLineSegmentsIntersection(lineStartGrid, lineEndGrid, m_bottomLeft, m_topLeft) ||     // left side
+			CheckLineSegmentsIntersection(lineStartGrid, lineEndGrid, m_topLeft, m_topRight) ||       // top
+			CheckLineSegmentsIntersection(lineStartGrid, lineEndGrid, m_bottomRight, m_topRight) ||   // right
+			CheckLineSegmentsIntersection(lineStartGrid, lineEndGrid, m_bottomLeft, m_bottomRight));  // bottom
 
 }
 

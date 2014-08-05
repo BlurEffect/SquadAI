@@ -62,6 +62,8 @@ public:
 	virtual BehaviourStatus DetermineGreatestSuspectedThreat(float deltaTime)       = 0;
 	virtual BehaviourStatus UpdateAttackReadiness(float deltaTime)					= 0;
 	virtual BehaviourStatus ProcessMessages(float deltaTime)					    = 0;
+	virtual BehaviourStatus ResolveSuspectedThreat(float deltaTime)					= 0;
+	
 
 	void AddMessage(Message* pMessage);
 

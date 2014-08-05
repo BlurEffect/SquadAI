@@ -309,7 +309,8 @@ bool TestEnvironment::PrepareSimulation(void)
 			}
 		case ObstacleType:
 			{
-			AxisAlignedRectangleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[ObstacleType], m_gridSpacing * m_objectScaleFactors[ObstacleType]);
+				AxisAlignedRectangleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[ObstacleType], m_gridSpacing * m_objectScaleFactors[ObstacleType], GetGridSize());
+			
 			m_obstacles.push_back(Obstacle());
 			if(!m_obstacles.back().Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObstacle, AxisAlignedRectangleColliderType, &colliderData))
 			{
@@ -889,7 +890,8 @@ bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject, 
 			{
 				if(m_pNodes[i][k].IsObstacle())
 				{
-					if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(XMFLOAT2(start.x + 25.0f, start.y + 25.0f), XMFLOAT2(end.x + 25.0f, end.y + 25.0f)))
+					//if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(XMFLOAT2(start.x + 25.0f, start.y + 25.0f), XMFLOAT2(end.x + 25.0f, end.y + 25.0f)))
+					if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(start, end))
 					{
 						float squareDistance = 0.0f;
 						XMVECTOR vector = XMLoadFloat2(&m_pNodes[i][k].GetWorldPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
@@ -1024,7 +1026,8 @@ bool TestEnvironment::CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& en
 		{
 			if(m_pNodes[i][k].IsObstacle())
 			{
-				if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(XMFLOAT2(start.x + 25.0f, start.y + 25.0f), XMFLOAT2(end.x + 25.0f, end.y + 25.0f)))
+				//if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(XMFLOAT2(start.x + 25.0f, start.y + 25.0f), XMFLOAT2(end.x + 25.0f, end.y + 25.0f)))
+				if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(start, end))
 				{
 					return false;
 				}

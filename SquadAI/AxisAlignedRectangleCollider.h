@@ -19,20 +19,22 @@ using namespace DirectX;
 //--------------------------------------------------------------------------------------
 struct AxisAlignedRectangleColliderData
 {
-	AxisAlignedRectangleColliderData(const XMFLOAT2& centre, float width, float height) : m_centre(centre),
-																						  m_width(width),
-																						  m_height(height)
+	AxisAlignedRectangleColliderData(const XMFLOAT2& centre, float width, float height, float gridSize) : m_centre(centre),
+																										  m_width(width),
+																										  m_height(height),
+																										  m_gridSize(gridSize)
 	{}
 
 	XMFLOAT2 m_centre;
-	float m_width;
-	float m_height;
+	float    m_width;
+	float    m_height;
+	float    m_gridSize;
 };
 
 class AxisAlignedRectangleCollider : public Collider
 {
 public:
-	AxisAlignedRectangleCollider(const XMFLOAT2& centre, float width, float height);
+	AxisAlignedRectangleCollider(const XMFLOAT2& centre, float width, float height, float gridSize);
 	~AxisAlignedRectangleCollider(void);
 
 	bool CheckLineCollision(const XMFLOAT2& lineStart, const XMFLOAT2& lineEnd) const;
@@ -48,8 +50,10 @@ private:
 
 	bool CheckLineSegmentsIntersection(const XMFLOAT2& line1Start, const XMFLOAT2& line1End, const XMFLOAT2& line2Start, const XMFLOAT2& line2End) const;
 
-	float	 m_width;		// The width of the rectangle making up the collider
-	float	 m_height;		// The height of the rectangle making up the collider
+	float	 m_width;		 // The width of the rectangle making up the collider
+	float	 m_height;		 // The height of the rectangle making up the collider
+	float    m_halfGridSize; // Only used internally to convert coordinates from world space to grid space
+
 
 	XMFLOAT2 m_topLeft;     // The upper left corner of the rectangle
 	XMFLOAT2 m_topRight;	// The upper right corner of the rectangle

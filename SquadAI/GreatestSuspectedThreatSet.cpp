@@ -24,11 +24,21 @@ GreatestSuspectedThreatSet::~GreatestSuspectedThreatSet(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus GreatestSuspectedThreatSet::Update(float deltaTime)
 {
+	if(GetName() == "GreatestSuspectedThreatSetMonitoredCondition")
+		{
+			int a = 9;
+		}
+
 	if(GetEntity()->GetGreatestSuspectedThreat())
 	{
 		return StatusSuccess;
 	}else
 	{
+		if(GetName() == "GreatestSuspectedThreatSetMonitoredCondition")
+		{
+			int a = 9;
+		}
+
 		return StatusFailure;
 	}
 }

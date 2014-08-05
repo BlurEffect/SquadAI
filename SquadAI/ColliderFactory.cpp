@@ -32,7 +32,7 @@ Collider* ColliderFactory::CreateCollider(ColliderType type, void* pColliderData
 	case AxisAlignedRectangleColliderType:
 		{
 		AxisAlignedRectangleColliderData* pData = reinterpret_cast<AxisAlignedRectangleColliderData*>(pColliderData);
-		return new AxisAlignedRectangleCollider(pData->m_centre, pData->m_width, pData->m_height);
+		return new AxisAlignedRectangleCollider(pData->m_centre, pData->m_width, pData->m_height, pData->m_gridSize);
 		break;
 		}
 	default:

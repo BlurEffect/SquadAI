@@ -139,6 +139,7 @@
     <ClCompile Include="ReadyToAttack.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="Repeat.cpp" />
+    <ClCompile Include="ResolveSuspectedThreat.cpp" />
     <ClCompile Include="ReturnSpecificStatus.cpp" />
     <ClCompile Include="Selector.cpp" />
     <ClCompile Include="SentenceDrawable.cpp">
@@ -222,6 +223,7 @@
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RendererData.h" />
     <ClInclude Include="Repeat.h" />
+    <ClInclude Include="ResolveSuspectedThreat.h" />
     <ClInclude Include="ReturnSpecificStatus.h" />
     <ClInclude Include="Selector.h" />
     <ClInclude Include="SentenceDrawable.h">

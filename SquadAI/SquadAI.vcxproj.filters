@@ -327,6 +327,9 @@
     <ClCompile Include="DetermineGreatestSuspectedThreat.cpp">
       <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="ResolveSuspectedThreat.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -582,6 +585,9 @@
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClInclude>
     <ClInclude Include="DetermineGreatestSuspectedThreat.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ResolveSuspectedThreat.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClInclude>
   </ItemGroup>

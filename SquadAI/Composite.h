@@ -26,6 +26,7 @@ public:
 	
 protected:
 	void ResetChildren(void);
+	void AbortChildren(void);
 	virtual void OnTerminate(BehaviourStatus status);
 
 	std::vector<Behaviour*> m_children; // The child behaviours encompassed by this composite behaviour

@@ -611,7 +611,4 @@
       <Filter>Header Files\ShaderFramework\HLSL Shaders</Filter>
     </FxCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-  </ItemGroup>
 </Project>

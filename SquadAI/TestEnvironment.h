@@ -77,7 +77,7 @@ public:
 	
 
 	void RecordEvent(EventType type, void* pObject1, void* pObject2);
-	void ReceiveMessage(Message* pMessage);
+	void ProcessMessage(Message* pMessage);
 
 	// Data access functions
 	float		 GetGridSize(void) const;

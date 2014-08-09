@@ -48,9 +48,6 @@ bool Soldier::Initialise(unsigned long id, const XMFLOAT2& position, float rotat
 	return (m_movementManager.Initialise(this, GetTestEnvironment()) && m_combatManager.Initialise(this, GetTestEnvironment()) && m_sensors.Initialise(this, GetTestEnvironment()));
 }
 
-// Debug ->remove
-float g_time = 0.0f;
-
 //--------------------------------------------------------------------------------------
 // Updates the soldier entity.
 // Param1: The time in seconds passed since the last frame.
@@ -59,40 +56,11 @@ void Soldier::Update(float deltaTime)
 {
 	if(deltaTime == 0.0f)
 	{
+		// No need to traverse the tree.
 		return;
 	}
 
 	GetBehaviour()->Tick(deltaTime);
-
-	/*
-	//m_movementManager.FollowPath(GetTargetReachedRadius(), m_soldierProperties.m_maxSpeed);
-	m_movementManager.AvoidCollisions(m_soldierProperties.m_maxCollisionSeeAhead, 100.0f);//m_soldierProperties.m_maxCollisionAvoidanceForce);
-	//m_movementManager.Separate(m_soldierProperties.m_separationRadius, m_soldierProperties.m_maxSeparationForce);
-	//m_movementManager.StayAwayFromWalls(m_soldierProperties.m_avoidWallsRadius, m_soldierProperties.m_maxAvoidWallsForce);
-
-	if(GetTeam() == TeamRed)
-	{
-		//m_sensors.CheckForThreats();
-		m_movementManager.Seek(XMFLOAT2(24.0f, 24.0f), 1.0f, GetMaxSpeed());
-	}else
-	{
-		m_movementManager.Seek(XMFLOAT2(-24.0f, -24.0f), 1.0f, GetMaxSpeed());
-	}
-	
-	g_time += deltaTime;
-
-	if((g_time >= 2.0f) && GetTeam() == TeamRed)
-	{
-		XMFLOAT2 target;
-		target.x = GetPosition().x + 1.0f;
-		target.y = GetPosition().y;
-
-		m_combatManager.ShootAt(target);
-		g_time = 0.0f;
-	}
-
-	m_movementManager.UpdatePosition(deltaTime, m_soldierProperties.m_maxSpeed, m_soldierProperties.m_maxTotalForce);
-	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -293,117 +261,6 @@ BehaviourStatus Soldier::UpdateAttackReadiness(float deltaTime)
 	return StatusSuccess;
 }
 
-
-//--------------------------------------------------------------------------------------
-// Receives and processes a given message.
-// Param1: A pointer to the message to process.
-//--------------------------------------------------------------------------------------
-void Soldier::ReceiveMessage(Message* pMessage)
-{
-	switch(pMessage->GetType())
-	{
-	case HitMessageType:
-		if(IsAlive())
-		{
-			HitMessage* pHitMessage = reinterpret_cast<HitMessage*>(pMessage);
-			m_combatManager.Hit(pHitMessage->GetDamage(), pHitMessage->GetShooterId(), pHitMessage->IsShooterAlive(), pHitMessage->GetPosition());
-
-			if(!IsAlive())
-			{
-				// The entity just died, send a message to the test environment
-				EntityKilledMessage entityKilledMessage(GetTeam(), GetId());
-				GetTestEnvironment()->ReceiveMessage(&entityKilledMessage);
-			}
-		}
-		break;
-	case EntityKilledMessageType:
-		EntityKilledMessage* pEntityKilledMessage = reinterpret_cast<EntityKilledMessage*>(pMessage);
-		if(pEntityKilledMessage->GetTeam() != GetTeam())
-		{
-			if(GetGreatestKnownThreat() && GetGreatestKnownThreat()->GetId() == pEntityKilledMessage->GetId())
-			{
-				SetGreatestKnownThreat(nullptr);
-			}else if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_enemyId == pEntityKilledMessage->GetId())
-			{
-				SetGreatestSuspectedThreat(nullptr);
-			}
-
-			RemoveKnownThreat(pEntityKilledMessage->GetId());
-			RemoveSuspectedThreat(pEntityKilledMessage->GetId());
-		}
-		break;
-	}
-}
-
-
-
-//--------------------------------------------------------------------------------------
-// Process all messages that the entity received since the last processing.
-// Param1: The time in seconds passed since the last frame.
-// Returns the current state of the action.
-//--------------------------------------------------------------------------------------
-BehaviourStatus Soldier::ProcessMessages(float deltaTime)
-{
-	// Used to prevent the death notice from being sent multiple times if the
-	// entity was hit by several projectiles during the same frame.
-	bool notifiedDeath = false;
-
-	//Soldier* pSoldier = this;
-
-	while(!GetActiveMessages().empty())
-	{
-		switch(GetActiveMessages().front()->GetType())
-		{
-		case HitMessageType:
-			{
-			HitMessage* pMsg = reinterpret_cast<HitMessage*>(GetActiveMessages().front());
-			//m_combatManager.Hit(pMsg->GetDamage(), pMsg->GetShooterId(), pMsg->GetPosition());
-
-#ifdef DEBUG
-			unsigned long shooterId = pMsg->GetShooterId();
-			GetTestEnvironment()->RecordEvent(EntityHitEvent, this, &shooterId);
-#endif
-
-			if(!IsAlive() && !notifiedDeath)
-			{
-				//GetTestEnvironment()->AddDeadEntity(this);
-				notifiedDeath = true;
-#ifdef DEBUG
-			unsigned long shooterId = pMsg->GetShooterId();
-			GetTestEnvironment()->RecordEvent(EntityKilledEvent, this, &shooterId);
-#endif
-			}
-			break;
-			}
-		case EntityKilledMessageType:
-			{
-			EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(GetActiveMessages().front());
-			if(pMsg->GetTeam() != GetTeam())
-			{
-				if(GetGreatestKnownThreat() && GetGreatestKnownThreat()->GetId() == pMsg->GetId())
-				{
-					SetGreatestKnownThreat(nullptr);
-				}else if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_enemyId == pMsg->GetId())
-				{
-					SetGreatestSuspectedThreat(nullptr);
-				}
-
-				RemoveKnownThreat(pMsg->GetId());
-				RemoveSuspectedThreat(pMsg->GetId());
-			}
-			break;
-			}
-		}
-		
-		delete GetActiveMessages().front();
-		GetActiveMessages().pop();
-	}
-
-	return StatusSuccess;
-}
-
-
-
 //--------------------------------------------------------------------------------------
 // Removes the currently active suspected threat from the list of suspected threats.
 // Param1: The time in seconds passed since the last frame.
@@ -419,22 +276,6 @@ BehaviourStatus Soldier::ResolveSuspectedThreat(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
-// Activates the soldier entity.
-//--------------------------------------------------------------------------------------
-void Soldier::Activate(void)
-{
-	//m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
-
-	if(GetTeam() == TeamRed)
-	{
-		//m_movementManager.SetPathTo(XMFLOAT2(20.0f, 20.0f));
-	}else
-	{
-		//m_movementManager.SetPathTo(XMFLOAT2(-20.0f, -20.0f));
-	}
-}
-
-//--------------------------------------------------------------------------------------
 // Resets the soldier entity.
 //--------------------------------------------------------------------------------------
 void Soldier::Reset(void)
@@ -442,14 +283,10 @@ void Soldier::Reset(void)
 	m_movementManager.Reset();
 	m_combatManager.Reset();
 
-	
-
 	Entity::Reset();
 }
 
 // Data access functions
-
-// Movement related
 
 const XMFLOAT2& Soldier::GetVelocity(void) const
 {

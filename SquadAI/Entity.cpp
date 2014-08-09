@@ -95,14 +95,53 @@ void Entity::Reset(void)
 {
 	m_knownThreats.clear();
 	m_suspectedThreats.clear();
-	m_pGreatestKnownThreat = nullptr;
+	m_pGreatestKnownThreat     = nullptr;
 	m_pGreatestSuspectedThreat = nullptr;
-	m_readyForAttack = false;
-	m_movementTargetSet = false;
-	m_movementTarget = XMFLOAT2(0.0f, 0.0f);
-	m_currentHealth = m_maximalHealth;
+	m_readyForAttack		   = false;
+	m_movementTargetSet		   = false;
+	m_movementTarget		   = XMFLOAT2(0.0f, 0.0f);
+	m_currentHealth			   = m_maximalHealth;
 }
 
+//--------------------------------------------------------------------------------------
+// Receives and processes a given message sent by the test environment.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessMessage(Message* pMessage)
+{
+	switch(pMessage->GetType())
+	{
+	case HitMessageType:
+		{
+			// Make sure the entity is actually alive (cannot be hit when dead but in the rare case that the
+			// entity is hit by two projectiles during the same frame this if-statement will prevent all hits
+			// after the fatal one to be processed)
+			if(IsAlive())
+			{
+				HitMessage* pHitMessage = reinterpret_cast<HitMessage*>(pMessage);
+				ProcessHit(pHitMessage->GetDamage(), pHitMessage->GetShooterId(), pHitMessage->IsShooterAlive(), pHitMessage->GetPosition());
+			}
+			break;
+		}
+	case EntityKilledMessageType:
+		{
+			EntityKilledMessage* pEntityKilledMessage = reinterpret_cast<EntityKilledMessage*>(pMessage);
+			if(pEntityKilledMessage->GetTeam() != GetTeam())
+			{
+				ProcessEnemyKilled(pEntityKilledMessage->GetTeam(), pEntityKilledMessage->GetId());
+			}
+			break;
+		}
+	case ReadyToRespawnMessageType:
+		{
+			ReadyToRespawnMessage* pReadyToRespawnMessage = reinterpret_cast<ReadyToRespawnMessage*>(pMessage);
+			ProcessRespawn(pReadyToRespawnMessage->GetRespawnPosition());
+			break;
+		}
+	}
+}
+
+/*
 //--------------------------------------------------------------------------------------
 // Respawns the entity at a given position.
 // Param1: The position of the respawn point, where the entity will reenter the game.
@@ -114,19 +153,7 @@ void Entity::Respawn(const XMFLOAT2& respawnPosition)
 	UpdateColliderPosition(respawnPosition);
 	SetRotation(static_cast<float>(rand() % 360));
 }
-
-
-//--------------------------------------------------------------------------------------
-// Adds a new message to this entity's queue of active messages.
-// Param1: A pointer to the new message.
-//--------------------------------------------------------------------------------------
-void Entity::AddMessage(Message* pMessage)
-{
-	if(pMessage)
-	{
-		m_activeMessages.push(pMessage);
-	}
-}
+*/
 
 //--------------------------------------------------------------------------------------
 // Adds a new threat to the entity's list of known threats.
@@ -244,6 +271,89 @@ bool Entity::IsInvestigatingGreatestSuspectedThreat(void)
 	return false;
 }
 
+// The following functions provide default implementations for the different events and
+// messages that the entity can receive from the test environment.
+
+//--------------------------------------------------------------------------------------
+// Processes a hit the entity suffered from a projectile. Default implementation.
+// Param1: The damage that the projectile will deal.
+// Param2: The id of the shooting entity.
+// Param3: Tells whether the entity that shot the projectile is still alive or dead.
+// Param4: The position, from which the projectile was originally shot.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessHit(float damage, unsigned long id, bool shooterAlive, const XMFLOAT2& position)
+{
+	// Update the health of the entity.
+	SetCurrentHealth(GetCurrentHealth() - damage);
+
+	// Only update threat state if the attacker is still alive.
+	if(shooterAlive)
+	{
+		// Check if the attacker is already in the list of known threats. If so, do nothing.
+		std::vector<Entity*>::iterator foundItKnown = std::find_if(GetKnownThreats().begin(), GetKnownThreats().end(), Entity::FindEntityById(id));
+		if(foundItKnown == GetKnownThreats().end())
+		{
+			// The shooter is not an already known threat -> check the suspected threats.
+
+			// Check if the shooter is already in the list of suspected threats
+			std::vector<SuspectedThreat>::iterator foundIt = std::find_if(GetSuspectedThreats().begin(), GetSuspectedThreats().end(), Entity::FindSuspectedThreatById(id));
+			if(foundIt == GetSuspectedThreats().end())
+			{
+				// The attacker is not in the list of suspected threats -> Add him to the list and set the priority
+				// flag to ensure the entity checks this one out first as soon as all known threats are gone.
+				AddSuspectedThreat(id, position, true);
+			}else
+			{
+				// The shooter is already a suspected threat, update the last known position and set the 
+				// priority flag.
+				foundIt->m_lastKnownPosition = position;
+				foundIt->m_hasHitEntity = true;
+			}
+		}
+	}
+
+	if(!IsAlive())
+	{
+		// The entity just died, send a message to the test environment
+		EntityKilledMessage entityKilledMessage(GetTeam(), GetId());
+		GetTestEnvironment()->ProcessMessage(&entityKilledMessage);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes the death of a hostile entity. Default implementation.
+// Param1: The team that the killed entity belongs to.
+// Param2: The id of the entity that was killed.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessEnemyKilled(EntityTeam team, unsigned long id)
+{
+	// Remove the killed enemy from the threat lists
+
+	if(GetGreatestKnownThreat() && GetGreatestKnownThreat()->GetId() == id)
+	{
+		SetGreatestKnownThreat(nullptr);
+	}else if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_enemyId == id)
+	{
+		SetGreatestSuspectedThreat(nullptr);
+	}
+
+	RemoveKnownThreat(id);
+	RemoveSuspectedThreat(id);
+}
+
+//--------------------------------------------------------------------------------------
+// Processes the respawn message and will reset the entity to reenter the game. Default
+// implementation.
+// Param1: The position, where the entity should respawn.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessRespawn(const XMFLOAT2& respawnPosition)
+{
+	Reset();
+	SetPosition(respawnPosition);
+	UpdateColliderPosition(respawnPosition);
+	SetRotation(static_cast<float>(rand() % 360));
+}
+
 // Data access functions
 
 Behaviour* Entity::GetBehaviour(void)
@@ -259,16 +369,6 @@ TestEnvironment* Entity::GetTestEnvironment(void)
 EntityTeam Entity::GetTeam(void) const
 {
 	return m_team;
-}
-
-std::queue<Message*>& Entity::GetActiveMessages(void)
-{
-	return m_activeMessages;
-}
-
-bool Entity::ActiveMessagesAvailable(void) const
-{
-	return !m_activeMessages.empty();
 }
 
 bool Entity::IsAlive(void) const

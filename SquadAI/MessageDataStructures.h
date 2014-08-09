@@ -21,7 +21,8 @@ enum MessageType
 {
 	ProjectileFiredMessageType, // A projectile was fired by an entity
 	HitMessageType,			    // The entity receiving this message was hit by a projectile
-	EntityKilledMessageType     // An entity was killed and other entities are notified of this event
+	EntityKilledMessageType,    // An entity was killed and other entities are notified of this event
+	ReadyToRespawnMessageType   // Tells an entity that it is ready to respawn
 };
 
 //--------------------------------------------------------------------------------------
@@ -111,6 +112,21 @@ private:
 	unsigned long m_id;   // The id of the entity that was killed
 };
 
+//--------------------------------------------------------------------------------------
+// Contains data required for a message sent when an entity is ready to respawn.
+//--------------------------------------------------------------------------------------
+class ReadyToRespawnMessage : public Message
+{
+public:
+	ReadyToRespawnMessage(const XMFLOAT2& respawnPosition) : Message(ReadyToRespawnMessageType),
+															 m_respawnPosition(respawnPosition)
+	{}
+
+	const XMFLOAT2& GetRespawnPosition(void) const { return m_respawnPosition; }
+
+private:
+	XMFLOAT2 m_respawnPosition; // The position, where the entity will reenter the game
+};
 
 
 #endif // MESSAGE_DATA_STRUCTURES_H

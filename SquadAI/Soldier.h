@@ -66,9 +66,7 @@ public:
 
 	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, EntityTeam team, const SoldierProperties& soldierProperties);
 	void Update(float deltaTime);
-	void Activate(void);
 	void Reset(void);
-	void ReceiveMessage(Message* pMessage);
 
 	// Basic actions as inherited from Entity
 	BehaviourStatus MoveToTarget(float deltaTime);
@@ -82,11 +80,7 @@ public:
 	BehaviourStatus DetermineGreatestKnownThreat(float deltaTime);
 	BehaviourStatus DetermineGreatestSuspectedThreat(float deltaTime);
 	BehaviourStatus UpdateAttackReadiness(float deltaTime);
-	BehaviourStatus ProcessMessages(float deltaTime);
 	BehaviourStatus ResolveSuspectedThreat(float deltaTime);
-
-	// Events
-	//void Hit(float damage, const XMFLOAT2& direction);
 
 	// Data access functions
 	 

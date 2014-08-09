@@ -207,7 +207,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 						Soldier* pDeadSoldier = std::find_if(std::begin(m_soldiers), std::end(m_soldiers), Soldier::FindSoldierById((*it).GetShooterId()));
 						
 						HitMessage hitMessage(g_kProjectileDamage, it->GetShooterId(), pDeadSoldier->IsAlive(), it->GetOrigin());
-						reinterpret_cast<Entity*>(pHitEntity)->ReceiveMessage(&hitMessage);
+						reinterpret_cast<Entity*>(pHitEntity)->ProcessMessage(&hitMessage);
 						//reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
 						//reinterpret_cast<Entity*>(pHitEntity)->ProcessMessages(0.0f);
 					}
@@ -222,7 +222,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 						Soldier* pDeadSoldier = std::find_if(std::begin(m_soldiers), std::end(m_soldiers), Soldier::FindSoldierById((*it).GetShooterId()));
 						
 						HitMessage hitMessage(g_kProjectileDamage, it->GetShooterId(), pDeadSoldier->IsAlive(), it->GetOrigin());
-						reinterpret_cast<Entity*>(pHitEntity)->ReceiveMessage(&hitMessage);
+						reinterpret_cast<Entity*>(pHitEntity)->ProcessMessage(&hitMessage);
 						// todo: change this when hit method is moved to entity from soldier
 						//reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
 						//reinterpret_cast<Entity*>(pHitEntity)->ProcessMessages(0.0f);
@@ -253,7 +253,7 @@ void TestEnvironment::Cleanup()
 // Receives and processes a given message.
 // Param1: A pointer to the message to process.
 //--------------------------------------------------------------------------------------
-void TestEnvironment::ReceiveMessage(Message* pMessage)
+void TestEnvironment::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -275,7 +275,7 @@ void TestEnvironment::ReceiveMessage(Message* pMessage)
 			if(m_soldiers[i].GetId() != pEntityKilledMessage->GetId())
 			{
 				// Forward the message.
-				m_soldiers[i].ReceiveMessage(pMessage);
+				m_soldiers[i].ProcessMessage(pMessage);
 			}
 		}
 		
@@ -975,7 +975,9 @@ void TestEnvironment::UpdateRespawns(float deltaTime)
 		if(it->first >= g_kRespawnTimer)
 		{
 			// Respawn the entity at a random respawn point and with a random rotation
-			it->second->Respawn(m_spawnPoints[it->second->GetTeam()][rand() % m_spawnPoints[it->second->GetTeam()].size()]);
+			
+			ReadyToRespawnMessage readyToRespawnMessage(m_spawnPoints[it->second->GetTeam()][rand() % m_spawnPoints[it->second->GetTeam()].size()]);
+			it->second->ProcessMessage(&readyToRespawnMessage);
 			m_deadEntities.erase(it++);
 		}else
 		{
@@ -1051,8 +1053,11 @@ bool TestEnvironment::CheckLineOfSightGrid(int startGridX, int startGridY, int e
 //--------------------------------------------------------------------------------------
 bool TestEnvironment::CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& end)
 {
+	XMFLOAT2 line(0.0f, 0.0f);
 	float distance = 0.0f;
-	XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&end) - XMLoadFloat2(&start)));
+
+	XMStoreFloat2(&line, XMLoadFloat2(&end) - XMLoadFloat2(&start));
+	XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&line)));
 
 	// Only check nearby obstacles for collision
 	unsigned int maxGridDistance = static_cast<unsigned int>(distance / m_gridSpacing) + 1;
@@ -1061,10 +1066,30 @@ bool TestEnvironment::CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& en
 	XMFLOAT2 gridPos;
 	WorldToGridPosition(start, gridPos);
 
-	unsigned int startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
-	unsigned int startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
-	unsigned int endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
-	unsigned int endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+	unsigned int startX = 0;
+	unsigned int endX   = 0;
+	unsigned int startY = 0;
+	unsigned int endY   = 0;
+
+	if(line.x >= 0.0f)
+	{
+		startX = gridPos.x;
+		endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+	}else
+	{
+		startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
+		endX = gridPos.x;
+	}
+
+	if(line.y >= 0.0f)
+	{
+		startY = gridPos.y;
+		endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
+	}else
+	{
+		startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
+		endY = gridPos.y;
+	}
 
 	// Check the grid within that distance for colliding obstacles
 	for(unsigned int i = startX; i <= endX; ++i)
@@ -1073,7 +1098,6 @@ bool TestEnvironment::CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& en
 		{
 			if(m_pNodes[i][k].IsObstacle())
 			{
-				//if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(XMFLOAT2(start.x + 25.0f, start.y + 25.0f), XMFLOAT2(end.x + 25.0f, end.y + 25.0f)))
 				if(m_pNodes[i][k].GetObstacle()->GetCollider()->CheckLineCollision(start, end))
 				{
 					return false;

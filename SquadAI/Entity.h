@@ -22,19 +22,33 @@ class TestEnvironment;
 class Message;
 
 //--------------------------------------------------------------------------------------
+// Bundles information associated to a known threat to an entity.
+//--------------------------------------------------------------------------------------
+struct KnownThreat
+{
+	KnownThreat(Entity* pEntity, bool hasHitEntity)
+		: m_pEntity(pEntity),
+		  m_hasHitEntity(hasHitEntity)
+	{}
+
+	Entity* m_pEntity;      // A pointer to the enemy entity
+	bool    m_hasHitEntity; // Tells whether this known threat has successfully attacked the entity
+};
+
+//--------------------------------------------------------------------------------------
 // Bundles information associated to a suspected threat to an entity.
 //--------------------------------------------------------------------------------------
 struct SuspectedThreat
 {
-	SuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasPriority)
+	SuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasHitEntity)
 		: m_enemyId(id),
 		  m_lastKnownPosition(lastKnownPosition),
-		  m_hasPriority(hasPriority)
+		  m_hasHitEntity(hasHitEntity)
 	{}
 
 	unsigned long m_enemyId;			// The id of the hostile entity that has now become a suspected threat
 	XMFLOAT2      m_lastKnownPosition;  // The position, where the enemy was last seen when it changed from a known to a suspected threat
-	bool          m_hasPriority;        // Can be used to give priority to some suspected threats despite them being less threatening when only considering the usual factors
+	bool          m_hasHitEntity;       // Tells whether this suspected threat has successfully attacked the entity
 };
 
 using namespace DirectX;
@@ -46,13 +60,13 @@ public:
 	virtual ~Entity(void) = 0;
 
 	bool         Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team);
-	virtual void Update(float deltaTime) = 0;
-	virtual void Activate(void) = 0;
-	virtual void Reset(void);
-	virtual void Respawn(const XMFLOAT2& respawnPosition);
-	virtual void ReceiveMessage(Message* pMessage) = 0;
+	void         ProcessMessage(Message* pMessage);
 
-	// Basic actions
+	virtual void Update(float deltaTime) = 0;
+	virtual void Activate(void);
+	virtual void Reset(void);
+
+	// Basic actions, to be implemented by concrete entities inheriting from this class
 	virtual BehaviourStatus MoveToTarget(float deltaTime)						    = 0;
 	virtual BehaviourStatus Attack(float deltaTime)									= 0;
 	virtual BehaviourStatus AimAt(float deltaTime)								    = 0;
@@ -64,12 +78,8 @@ public:
 	virtual BehaviourStatus DetermineGreatestKnownThreat(float deltaTime)           = 0;
 	virtual BehaviourStatus DetermineGreatestSuspectedThreat(float deltaTime)       = 0;
 	virtual BehaviourStatus UpdateAttackReadiness(float deltaTime)					= 0;
-	virtual BehaviourStatus ProcessMessages(float deltaTime)					    = 0;
 	virtual BehaviourStatus ResolveSuspectedThreat(float deltaTime)					= 0;
 	
-
-	void AddMessage(Message* pMessage);
-
 	// Threat management
 	void AddKnownThreat(Entity* pThreat);
 	void RemoveKnownThreat(unsigned long id);
@@ -79,15 +89,12 @@ public:
 	void RemoveSuspectedThreat(unsigned long id);
 	void ClearSuspectedThreats(void);
 	bool IsSuspectedThreat(unsigned long id);
-
 	bool IsInvestigatingGreatestSuspectedThreat(void);
 
 	// Data access functions
 	Behaviour*						    GetBehaviour(void);
 	TestEnvironment*					GetTestEnvironment(void);
 	EntityTeam							GetTeam(void) const;
-	std::queue<Message*>&				GetActiveMessages(void);
-	bool                                ActiveMessagesAvailable(void) const;
 	bool								IsAlive(void) const;
 	std::vector<Entity*>&				GetKnownThreats(void);
 	std::vector<SuspectedThreat>&		GetSuspectedThreats(void);
@@ -143,14 +150,18 @@ public:
 		unsigned long m_id;
 	};
 
+protected:
+
+	// Called to process events
+	virtual void ProcessHit(float damage, unsigned long id, bool shooterAlive, const XMFLOAT2& position);
+	virtual void ProcessEnemyKilled(EntityTeam team, unsigned long id);
+	virtual void ProcessRespawn(const XMFLOAT2& respawnPosition);
+
 private:
 
 	Behaviour*       m_pBehaviour;   // The behaviour tree controlling the behaviour of this entity
-
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 	EntityTeam       m_team;		 // The team the entity belongs to
-
-	std::queue<Message*> m_activeMessages; // Messages received by this entity
 
 	// This is pretty much used like a blackboard to communicate between different
 	// nodes of the behaviour tree
@@ -165,7 +176,6 @@ private:
 	XMFLOAT2                     m_attackTarget;			 // The position to attack
 	float						 m_currentHealth;			 // The current health state of the entity (percentage between 0.0 and 1.0 in relation to maximal health)
 	float                        m_maximalHealth;			 // The maximal amount of health for this entity
-
 
 };
 

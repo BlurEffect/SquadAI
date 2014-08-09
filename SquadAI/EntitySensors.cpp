@@ -50,9 +50,7 @@ bool EntitySensors::Initialise(Entity* pEntity, TestEnvironment* pTestEnvironmen
 //--------------------------------------------------------------------------------------
 void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewingRange, float fieldOfView)
 {
-	//std::list<FightingEntity*> enemies;
-
-	//m_pTestEnvironment->GetEnemies(m_pEntity, enemies);
+	// Find nearby hostile entities.
 
 	std::multimap<float, CollidableObject*> enemies;
 
@@ -66,7 +64,6 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 
 	if(!enemies.empty())
 	{
-		
 		std::vector<Entity*> newKnownThreats;
 
 		XMFLOAT2 gridPos;
@@ -96,7 +93,6 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 					m_pEnvironment->WorldToGridPosition(it->second->GetPosition(), enemyGridPos);
 
 					// Check if enemy is visible or hidden behind an obstacle
-					//if(m_pEnvironment->CheckLineOfSightGrid(static_cast<int>(gridPos.x), static_cast<int>(gridPos.y), static_cast<int>(enemyGridPos.x), static_cast<int>(enemyGridPos.y)))
 					if(m_pEnvironment->CheckLineOfSight(m_pEntity->GetPosition(), it->second->GetPosition()))
 					{
 						// Remember this enemy as a known threat
@@ -114,44 +110,83 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 		// Check for any previously known threats that are no longer visible and move them to the list of
 		// suspected threats.
 
-		for(std::vector<Entity*>::const_iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
+		if(m_pEntity->GetKnownThreats().size() > 0)
 		{
-			std::vector<Entity*>::const_iterator foundIt = std::find_if(newKnownThreats.begin(), newKnownThreats.end(), Entity::FindEntityById((*it)->GetId()));
+			int a = 7;
+		}
+
+		std::vector<KnownThreat>::iterator it = m_pEntity->GetKnownThreats().begin();
+		while(it != m_pEntity->GetKnownThreats().end())
+		{
+			std::vector<Entity*>::const_iterator foundIt = std::find_if(newKnownThreats.begin(), newKnownThreats.end(), Entity::FindEntityById(it->m_pEntity->GetId()));
 			if(foundIt == newKnownThreats.end())
 			{
-				if((*it)->IsAlive() && !m_pEntity->IsSuspectedThreat((*it)->GetId()))
+				if(it->m_pEntity->IsAlive() && !m_pEntity->IsSuspectedThreat(it->m_pEntity->GetId()))
 				{
 					// The previously known threat can no longer be seen -> add to suspected threats
-					m_pEntity->AddSuspectedThreat((*it)->GetId(), (*it)->GetPosition(), false);
+					m_pEntity->AddSuspectedThreat(it->m_pEntity->GetId(), it->m_pEntity->GetPosition(), false);
+				}
+
+				it = m_pEntity->GetKnownThreats().erase(it);
+			}else
+			{
+				++it;
+			}
+		}
+		/*
+		for(std::vector<KnownThreat>::iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
+		{
+			std::vector<Entity*>::const_iterator foundIt = std::find_if(newKnownThreats.begin(), newKnownThreats.end(), Entity::FindEntityById(it->m_pEntity->GetId()));
+			if(foundIt == newKnownThreats.end())
+			{
+				if(it->m_pEntity->IsAlive() && !m_pEntity->IsSuspectedThreat(it->m_pEntity->GetId()))
+				{
+					// The previously known threat can no longer be seen -> add to suspected threats
+					m_pEntity->AddSuspectedThreat(it->m_pEntity->GetId(), it->m_pEntity->GetPosition(), false);
+				}
+
+				m_pEntity->GetKnownThreats().erase(it++);
+			}
+		}
+		*/
+		// Set new known threats
+		//m_pEntity->ClearKnownThreats();
+		for(std::vector<Entity*>::iterator it = newKnownThreats.begin(); it != newKnownThreats.end(); ++it)
+		{
+			// Check if the threat was known before
+			if(!m_pEntity->IsKnownThreat((*it)->GetId()))
+			{
+				if(m_pEntity->IsSuspectedThreat((*it)->GetId()))
+				{
+					// If this known threat previously was a suspected threat (that has become visible now), remove it
+					// from the list of suspected threats and add it as known threat.
+				
+					// Carry over whether the entity was hit from the previously suspected threat.
+					m_pEntity->AddKnownThreat((*it), m_pEntity->GetSuspectedThreat((*it)->GetId())->m_hasHitEntity);
+
+					m_pEntity->RemoveSuspectedThreat((*it)->GetId());
+				
+				}else
+				{
+					m_pEntity->AddKnownThreat((*it), false);
 				}
 			}
 		}
 
-		// Set new known threats
-		m_pEntity->ClearKnownThreats();
-		for(std::vector<Entity*>::iterator it = newKnownThreats.begin(); it != newKnownThreats.end(); ++it)
-		{
-			if(m_pEntity->IsSuspectedThreat((*it)->GetId()))
-			{
-				// If this known threat previously was a suspected threat (that has become visible now), remove it
-				// from the list of suspected threats.
-				m_pEntity->RemoveSuspectedThreat((*it)->GetId());
-			}
-
-			m_pEntity->AddKnownThreat((*it));
-		}
-
 	}else
 	{
+		// There are no enemies in range at the moment.
+
 		if(!m_pEntity->GetKnownThreats().empty())
 		{
-			// Move all known threats to suspected threats
-			for(std::vector<Entity*>::const_iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
+			// Move all known threats to suspected threats.
+			for(std::vector<KnownThreat>::const_iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
 			{
-				if(!m_pEntity->IsSuspectedThreat((*it)->GetId()))
+				if(!m_pEntity->IsSuspectedThreat(it->m_pEntity->GetId()))
 				{
-					// The previously known threat can no longer be seen -> add to suspected threats
-					m_pEntity->AddSuspectedThreat((*it)->GetId(), (*it)->GetPosition(), false);
+					// The previously known threat can no longer be seen and is not yet contained in the list
+					// of suspected threats -> Add to suspected threats.
+					m_pEntity->AddSuspectedThreat(it->m_pEntity->GetId(), it->m_pEntity->GetPosition(), false);
 				}
 			}
 

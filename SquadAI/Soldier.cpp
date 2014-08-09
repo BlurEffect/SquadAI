@@ -139,7 +139,7 @@ BehaviourStatus Soldier::DetermineAttackTargetPosition(float deltaTime)
 {
 	if(GetGreatestKnownThreat())
 	{
-		SetAttackTarget(GetGreatestKnownThreat()->GetPosition());
+		SetAttackTarget(GetGreatestKnownThreat()->m_pEntity->GetPosition());
 		SetAttackTargetSet(true);
 	}else
 	{

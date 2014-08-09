@@ -81,14 +81,16 @@ public:
 	virtual BehaviourStatus ResolveSuspectedThreat(float deltaTime)					= 0;
 	
 	// Threat management
-	void AddKnownThreat(Entity* pThreat);
+	void AddKnownThreat(Entity* pThreat, bool hasHitEntity);
 	void RemoveKnownThreat(unsigned long id);
 	void ClearKnownThreats(void);
 	bool IsKnownThreat(unsigned long id);
-	void AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasPriority);
+	const KnownThreat* GetKnownThreat(unsigned long id);
+	void AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasHitEntity);
 	void RemoveSuspectedThreat(unsigned long id);
 	void ClearSuspectedThreats(void);
 	bool IsSuspectedThreat(unsigned long id);
+	const SuspectedThreat* GetSuspectedThreat(unsigned long id);
 	bool IsInvestigatingGreatestSuspectedThreat(void);
 
 	// Data access functions
@@ -96,9 +98,9 @@ public:
 	TestEnvironment*					GetTestEnvironment(void);
 	EntityTeam							GetTeam(void) const;
 	bool								IsAlive(void) const;
-	std::vector<Entity*>&				GetKnownThreats(void);
+	std::vector<KnownThreat>&			GetKnownThreats(void);
 	std::vector<SuspectedThreat>&		GetSuspectedThreats(void);
-	const Entity*						GetGreatestKnownThreat(void) const;
+	const KnownThreat*					GetGreatestKnownThreat(void) const;
 	const SuspectedThreat*				GetGreatestSuspectedThreat(void) const;
 	bool								IsReadyForAttack(void) const;
 	bool								IsAttackTargetSet(void) const;
@@ -110,7 +112,7 @@ public:
 
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 	void SetTeam(EntityTeam team);
-	void SetGreatestKnownThreat(Entity* pThreat);
+	void SetGreatestKnownThreat(KnownThreat* pThreat);
 	void SetGreatestSuspectedThreat(SuspectedThreat* pThreat);
 	void SetReadyForAttack(bool readyForAttack);
 	void SetAttackTargetSet(bool targetSet);
@@ -130,6 +132,22 @@ public:
 		bool operator()(const Entity* pEntity)
 		{
 			return pEntity->GetId() == m_id;
+		}
+	private:
+		unsigned long m_id;
+	};
+
+	//--------------------------------------------------------------------------------------
+	// Functor used to find a known threat within a container based on the id of the 
+	// associated hostile entity.
+	//--------------------------------------------------------------------------------------
+	class FindKnownThreatById
+	{
+	public:
+		FindKnownThreatById(unsigned long id) : m_id(id){}
+		bool operator()(const KnownThreat& threat)
+		{
+			return threat.m_pEntity->GetId() == m_id;
 		}
 	private:
 		unsigned long m_id;
@@ -165,9 +183,9 @@ private:
 
 	// This is pretty much used like a blackboard to communicate between different
 	// nodes of the behaviour tree
-	std::vector<Entity*>		 m_knownThreats;			 // Known Threats (enemies, whose position is definitely known)
+	std::vector<KnownThreat>	 m_knownThreats;			 // Known Threats (enemies, whose position is definitely known)
 	std::vector<SuspectedThreat> m_suspectedThreats;		 // Suspected Threats (positions, where enemies are expected and the id of the enemy that is expected to be there)
-	Entity*                      m_pGreatestKnownThreat;     // The greatest (most dangerous) known threat to the entity at the moment
+	KnownThreat*                 m_pGreatestKnownThreat;     // The greatest (most dangerous) known threat to the entity at the moment
 	SuspectedThreat*             m_pGreatestSuspectedThreat; // The greatest (most dangerous) suspected threat to the entity at the moment
 	bool						 m_readyForAttack;			 // Tells whether the entity is ready for attack
 	bool						 m_movementTargetSet;		 // Tells whether there is a movement target set or not

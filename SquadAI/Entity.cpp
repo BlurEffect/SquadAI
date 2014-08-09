@@ -158,12 +158,13 @@ void Entity::Respawn(const XMFLOAT2& respawnPosition)
 //--------------------------------------------------------------------------------------
 // Adds a new threat to the entity's list of known threats.
 // Param1: A pointer to the hostile entity that has become a known threat.
+// Param2: Tells whether the hostile enemy has successfully attacked the entity.
 //--------------------------------------------------------------------------------------
-void Entity::AddKnownThreat(Entity* pThreat)
+void Entity::AddKnownThreat(Entity* pThreat, bool hasHitEntity)
 {
 	if(pThreat)
 	{
-		m_knownThreats.push_back(pThreat);
+		m_knownThreats.push_back(KnownThreat(pThreat, hasHitEntity));
 	}
 }
 
@@ -173,7 +174,7 @@ void Entity::AddKnownThreat(Entity* pThreat)
 //--------------------------------------------------------------------------------------
 void Entity::RemoveKnownThreat(unsigned long id)
 {
-	std::vector<Entity*>::iterator foundIt = std::find_if(m_knownThreats.begin(), m_knownThreats.end(), Entity::FindEntityById(id));
+	std::vector<KnownThreat>::iterator foundIt = std::find_if(m_knownThreats.begin(), m_knownThreats.end(), Entity::FindKnownThreatById(id));
 		
 	if(foundIt != m_knownThreats.end())
 	{
@@ -197,9 +198,27 @@ void Entity::ClearKnownThreats(void)
 //--------------------------------------------------------------------------------------
 bool Entity::IsKnownThreat(unsigned long id)
 {
-	std::vector<Entity*>::iterator foundIt = std::find_if(m_knownThreats.begin(), m_knownThreats.end(), Entity::FindEntityById(id));
+	std::vector<KnownThreat>::iterator foundIt = std::find_if(m_knownThreats.begin(), m_knownThreats.end(), Entity::FindKnownThreatById(id));
 		
 	return (foundIt != m_knownThreats.end());
+}
+
+//--------------------------------------------------------------------------------------
+// Returns the known threat associated to the hostile entity with the given id.
+// Param1: The id of the entity, whose associated known threat object should be returned.
+// Returns a pointer to the known threat, null if the entity doesn't have a known
+// threat associated to the provided id.
+//--------------------------------------------------------------------------------------
+const KnownThreat* Entity::GetKnownThreat(unsigned long id)
+{
+	std::vector<KnownThreat>::iterator foundIt = std::find_if(m_knownThreats.begin(), m_knownThreats.end(), Entity::FindKnownThreatById(id));
+
+	if(foundIt != m_knownThreats.end())
+	{
+		return &(*foundIt);
+	}
+
+	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------
@@ -249,6 +268,24 @@ bool Entity::IsSuspectedThreat(unsigned long id)
 }
 
 //--------------------------------------------------------------------------------------
+// Returns the suspected threat associated to the hostile entity with the given id.
+// Param1: The id of the entity, whose associated suspected threat object should be returned.
+// Returns a pointer to the suspected threat, null if the entity doesn't have a suspected
+// threat associated to the provided id.
+//--------------------------------------------------------------------------------------
+const SuspectedThreat* Entity::GetSuspectedThreat(unsigned long id)
+{
+	std::vector<SuspectedThreat>::iterator foundIt = std::find_if(m_suspectedThreats.begin(), m_suspectedThreats.end(), Entity::FindSuspectedThreatById(id));
+
+	if(foundIt != m_suspectedThreats.end())
+	{
+		return &(*foundIt);
+	}
+
+	return nullptr;
+}
+
+//--------------------------------------------------------------------------------------
 // Tells whether the entity is currently moving towards the greatest suspected threat in
 // order to investigate it or whether there now is a greater suspected threat that the
 // entity should tend to.
@@ -290,7 +327,7 @@ void Entity::ProcessHit(float damage, unsigned long id, bool shooterAlive, const
 	if(shooterAlive)
 	{
 		// Check if the attacker is already in the list of known threats. If so, do nothing.
-		std::vector<Entity*>::iterator foundItKnown = std::find_if(GetKnownThreats().begin(), GetKnownThreats().end(), Entity::FindEntityById(id));
+		std::vector<KnownThreat>::iterator foundItKnown = std::find_if(GetKnownThreats().begin(), GetKnownThreats().end(), Entity::FindKnownThreatById(id));
 		if(foundItKnown == GetKnownThreats().end())
 		{
 			// The shooter is not an already known threat -> check the suspected threats.
@@ -309,6 +346,10 @@ void Entity::ProcessHit(float damage, unsigned long id, bool shooterAlive, const
 				foundIt->m_lastKnownPosition = position;
 				foundIt->m_hasHitEntity = true;
 			}
+		}else
+		{
+			// Mark the known threat as having successfully hit the entity.
+			foundItKnown->m_hasHitEntity = true;
 		}
 	}
 
@@ -329,7 +370,7 @@ void Entity::ProcessEnemyKilled(EntityTeam team, unsigned long id)
 {
 	// Remove the killed enemy from the threat lists
 
-	if(GetGreatestKnownThreat() && GetGreatestKnownThreat()->GetId() == id)
+	if(GetGreatestKnownThreat() && GetGreatestKnownThreat()->m_pEntity->GetId() == id)
 	{
 		SetGreatestKnownThreat(nullptr);
 	}else if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_enemyId == id)
@@ -376,7 +417,7 @@ bool Entity::IsAlive(void) const
 	return m_currentHealth > 0.0f;
 }
 
-std::vector<Entity*>& Entity::GetKnownThreats(void)
+std::vector<KnownThreat>& Entity::GetKnownThreats(void)
 {
 	return m_knownThreats;
 }
@@ -386,7 +427,7 @@ std::vector<SuspectedThreat>& Entity::GetSuspectedThreats(void)
 	return m_suspectedThreats;
 }
 
-const Entity* Entity::GetGreatestKnownThreat(void) const
+const KnownThreat* Entity::GetGreatestKnownThreat(void) const
 {
 	return m_pGreatestKnownThreat;
 }
@@ -444,7 +485,7 @@ void Entity::SetTeam(EntityTeam team)
 	m_team = team;
 }
 
-void Entity::SetGreatestKnownThreat(Entity* pThreat)
+void Entity::SetGreatestKnownThreat(KnownThreat* pThreat)
 {
 	m_pGreatestKnownThreat = pThreat;
 }

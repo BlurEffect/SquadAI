@@ -48,29 +48,44 @@ void EntityCombatManager::Reset(void)
 
 //--------------------------------------------------------------------------------------
 // Determines and sets the currently greatest known threat based on the distance of the
-// threats to the entity.
+// threats to the entity. It also takes into account whether threats have successfully 
+// attacked the entity to give special prioritisation to these threats.
 //--------------------------------------------------------------------------------------
 void EntityCombatManager::DetermineGreatestKnownThreat(void)
 {
 	if(!m_pEntity->GetKnownThreats().empty())
 	{
 		float shortestSquareDistance = std::numeric_limits<float>::max();
-		Entity* pGreatestKnownThreat = nullptr;
+		float shortestPrioritySquareDistance = std::numeric_limits<float>::max();
+		KnownThreat* pGreatestKnownThreat = nullptr;
+		KnownThreat* pPriorityKnownThreat = nullptr;
 
-		for(std::vector<Entity*>::const_iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
+		for(std::vector<KnownThreat>::iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
 		{
 			float squareDistance = 0.0f;
-			XMVECTOR vector = XMLoadFloat2(&(*it)->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition());
+			XMVECTOR vector = XMLoadFloat2(&it->m_pEntity->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition());
 			XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
 			
 			if(squareDistance < shortestSquareDistance)
 			{
-				pGreatestKnownThreat = (*it);
+				pGreatestKnownThreat = &(*it);
 				shortestSquareDistance = squareDistance;
+			}
+			if(it->m_hasHitEntity && squareDistance < shortestPrioritySquareDistance)
+			{
+				pPriorityKnownThreat = &(*it);
+				shortestPrioritySquareDistance = squareDistance;
 			}
 		}
 
-		m_pEntity->SetGreatestKnownThreat(pGreatestKnownThreat);
+		if(pPriorityKnownThreat)
+		{
+			m_pEntity->SetGreatestKnownThreat(pPriorityKnownThreat);
+		}else
+		{
+			m_pEntity->SetGreatestKnownThreat(pGreatestKnownThreat);
+		}
+
 	}else
 	{
 		m_pEntity->SetGreatestKnownThreat(nullptr);
@@ -79,7 +94,8 @@ void EntityCombatManager::DetermineGreatestKnownThreat(void)
 
 //--------------------------------------------------------------------------------------
 // Determines and sets the currently greatest suspected threat based on the distance of the
-// threats to the entity.
+// threats to the entity. It also takes into account whether threats have successfully 
+// attacked the entity to give special prioritisation to these threats.
 //--------------------------------------------------------------------------------------
 void EntityCombatManager::DetermineGreatestSuspectedThreat(void)
 {

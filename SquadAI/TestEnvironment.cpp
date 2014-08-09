@@ -102,7 +102,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		}
 	}else
 	{
-		UpdateRespawns(deltaTime);
+		if(!m_isPaused)
+		{
+			UpdateRespawns(deltaTime);
+		}
 
 		// Update soldiers
 
@@ -978,7 +981,7 @@ void TestEnvironment::UpdateRespawns(float deltaTime)
 			
 			ReadyToRespawnMessage readyToRespawnMessage(m_spawnPoints[it->second->GetTeam()][rand() % m_spawnPoints[it->second->GetTeam()].size()]);
 			it->second->ProcessMessage(&readyToRespawnMessage);
-			m_deadEntities.erase(it++);
+			it = m_deadEntities.erase(it);
 		}else
 		{
 			++it;

@@ -26,19 +26,3 @@ BehaviourStatus DetermineAttackTarget::Update(float deltaTime)
 {
 	return GetEntity()->DetermineAttackTargetPosition(deltaTime);
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void DetermineAttackTarget::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void DetermineAttackTarget::OnTerminate(BehaviourStatus status)
-{
-
-}

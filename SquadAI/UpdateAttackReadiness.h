@@ -19,9 +19,6 @@ public:
 
 private:
 	BehaviourStatus Update(float deltaTime);
-
-	void OnInitialise(void);
-	void OnTerminate(BehaviourStatus status);
 };
 
 #endif // UPDATE_ATTACK_READINESS_H

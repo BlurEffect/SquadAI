@@ -8,6 +8,10 @@
 
 // Includes
 #include "Behaviour.h"
+#include "Entity.h"
+#include "TestEnvironment.h"
+
+#define DEBUG
 
 unsigned long Behaviour::s_BehaviourId = 0;
 
@@ -42,6 +46,8 @@ Behaviour::~Behaviour(void)
 {
 }
 
+bool blard = false;
+
 //--------------------------------------------------------------------------------------
 // Updates the behaviour and ensures it is properly intialised and terminated.
 // Param1: The time in seconds passed since the last frame.
@@ -62,18 +68,24 @@ BehaviourStatus Behaviour::Tick(float deltaTime)
 		OnInitialise();
 	}
 
+#ifdef DEBUG
+	GetEntity()->GetTestEnvironment()->RecordEvent(IndividualBehaviourUpdatedEvent, GetEntity(), this);
+#endif
+
 	// Get the current state of the behaviour.
 	m_status = Update(deltaTime);
 
 	// When the behaviour is completed (fail or success), terminate
 	// it properly.
+
 	BehaviourStatus returnStatus = m_status;
+
 	if(m_status != StatusRunning)
 	{
 		OnTerminate(m_status);
 	}
 
-	return returnStatus;//m_status;
+	return returnStatus;
 }
 
 //--------------------------------------------------------------------------------------

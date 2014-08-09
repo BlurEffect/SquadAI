@@ -32,19 +32,3 @@ BehaviourStatus AttackTargetSet::Update(float deltaTime)
 		return StatusFailure;
 	}
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void AttackTargetSet::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void AttackTargetSet::OnTerminate(BehaviourStatus status)
-{
-
-}

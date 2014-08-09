@@ -34,6 +34,10 @@ Decorator::~Decorator(void)
 //--------------------------------------------------------------------------------------
 void Decorator::OnTerminate(BehaviourStatus status)
 {
+	if(status == StatusAborted)
+	{
+		m_pChild->Abort();
+	}
+
 	Behaviour::Reset();
-	//m_pChild->Reset();
 }

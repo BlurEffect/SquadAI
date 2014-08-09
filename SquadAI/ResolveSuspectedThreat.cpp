@@ -27,19 +27,3 @@ BehaviourStatus ResolveSuspectedThreat::Update(float deltaTime)
 {
 	return GetEntity()->ResolveSuspectedThreat(deltaTime);
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void ResolveSuspectedThreat::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void ResolveSuspectedThreat::OnTerminate(BehaviourStatus status)
-{
-
-}

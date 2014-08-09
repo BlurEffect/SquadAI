@@ -26,19 +26,3 @@ BehaviourStatus DetermineGreatestKnownThreat::Update(float deltaTime)
 {
 	return GetEntity()->DetermineGreatestKnownThreat(deltaTime);
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void DetermineGreatestKnownThreat::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void DetermineGreatestKnownThreat::OnTerminate(BehaviourStatus status)
-{
-
-}

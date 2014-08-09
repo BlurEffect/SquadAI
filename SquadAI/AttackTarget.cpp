@@ -28,17 +28,10 @@ BehaviourStatus AttackTarget::Update(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void AttackTarget::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
 // Terminates the behaviour.
 //--------------------------------------------------------------------------------------
 void AttackTarget::OnTerminate(BehaviourStatus status)
 {
-
+	GetEntity()->SetAttackTargetSet(false);
+	Behaviour::OnTerminate(status);
 }

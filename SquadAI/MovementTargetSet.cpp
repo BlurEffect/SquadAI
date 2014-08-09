@@ -32,19 +32,3 @@ BehaviourStatus MovementTargetSet::Update(float deltaTime)
 		return StatusFailure;
 	}
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void MovementTargetSet::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void MovementTargetSet::OnTerminate(BehaviourStatus status)
-{
-
-}

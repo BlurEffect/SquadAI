@@ -68,6 +68,7 @@ public:
 	void Update(float deltaTime);
 	void Activate(void);
 	void Reset(void);
+	void ReceiveMessage(Message* pMessage);
 
 	// Basic actions as inherited from Entity
 	BehaviourStatus MoveToTarget(float deltaTime);
@@ -85,10 +86,7 @@ public:
 	BehaviourStatus ResolveSuspectedThreat(float deltaTime);
 
 	// Events
-	void Hit(float damage, const XMFLOAT2& direction);
-
-		
-
+	//void Hit(float damage, const XMFLOAT2& direction);
 
 	// Data access functions
 	 
@@ -119,6 +117,21 @@ public:
 	void SetFireWeaponInterval(float fireWeaponInterval);
 	void SetFieldOfView(float fieldOfView);
 	void SetViewingDistance(float viewingDistance);
+
+	//--------------------------------------------------------------------------------------
+	// Functor that can be used to find a soldier with a specific ID.
+	//--------------------------------------------------------------------------------------
+	class FindSoldierById
+	{
+	public:
+		FindSoldierById(unsigned long id) : m_id(id){}
+		bool operator()(const Soldier& pSoldier)
+		{
+			return pSoldier.GetId() == m_id;
+		}
+	private:
+		unsigned long m_id;
+	};
 
 private:
 

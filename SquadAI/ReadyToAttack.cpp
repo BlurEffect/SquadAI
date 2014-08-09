@@ -31,19 +31,3 @@ BehaviourStatus ReadyToAttack::Update(float deltaTime)
 		return StatusFailure;
 	}
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void ReadyToAttack::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void ReadyToAttack::OnTerminate(BehaviourStatus status)
-{
-
-}

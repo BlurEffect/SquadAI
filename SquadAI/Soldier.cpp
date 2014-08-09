@@ -4,6 +4,8 @@
 *  Represents a fighting entity in the test environment.
 */
 
+#define DEBUG
+
 // Includes
 #include "Soldier.h"
 #include "TestEnvironment.h"
@@ -100,8 +102,6 @@ void Soldier::Update(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 {
-
-
 	if(!m_movementManager.IsPathSet())
 	{
 		// There is no path set, create a new one
@@ -115,6 +115,12 @@ BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 	if(m_movementManager.FollowPath(m_soldierProperties.m_targetReachedRadius, m_soldierProperties.m_maxSpeed))
 	{
 		// The target was reached
+		if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_lastKnownPosition.x == GetMovementTarget().x &&
+			GetGreatestSuspectedThreat()->m_lastKnownPosition.y == GetMovementTarget().y)
+		{
+			int a = 4;
+		}
+
 		return StatusSuccess;
 	}
 
@@ -197,6 +203,8 @@ BehaviourStatus Soldier::DeterminePatrolTarget(float deltaTime)
 	XMFLOAT2 patrolTarget(0.0f, 0.0f);
 	if(GetTestEnvironment()->GetRandomUnblockedTarget(patrolTarget))
 	{
+		m_movementManager.Reset();
+
 		SetMovementTarget(patrolTarget);
 		SetMovementTargetSet(true);
 	}else
@@ -219,6 +227,8 @@ BehaviourStatus Soldier::DetermineApproachThreatTarget(float deltaTime)
 
 	if(GetGreatestSuspectedThreat())
 	{
+		m_movementManager.Reset();
+
 		SetMovementTarget(GetGreatestSuspectedThreat()->m_lastKnownPosition);
 		SetMovementTargetSet(true);
 	}else
@@ -283,6 +293,50 @@ BehaviourStatus Soldier::UpdateAttackReadiness(float deltaTime)
 	return StatusSuccess;
 }
 
+
+//--------------------------------------------------------------------------------------
+// Receives and processes a given message.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void Soldier::ReceiveMessage(Message* pMessage)
+{
+	switch(pMessage->GetType())
+	{
+	case HitMessageType:
+		if(IsAlive())
+		{
+			HitMessage* pHitMessage = reinterpret_cast<HitMessage*>(pMessage);
+			m_combatManager.Hit(pHitMessage->GetDamage(), pHitMessage->GetShooterId(), pHitMessage->IsShooterAlive(), pHitMessage->GetPosition());
+
+			if(!IsAlive())
+			{
+				// The entity just died, send a message to the test environment
+				EntityKilledMessage entityKilledMessage(GetTeam(), GetId());
+				GetTestEnvironment()->ReceiveMessage(&entityKilledMessage);
+			}
+		}
+		break;
+	case EntityKilledMessageType:
+		EntityKilledMessage* pEntityKilledMessage = reinterpret_cast<EntityKilledMessage*>(pMessage);
+		if(pEntityKilledMessage->GetTeam() != GetTeam())
+		{
+			if(GetGreatestKnownThreat() && GetGreatestKnownThreat()->GetId() == pEntityKilledMessage->GetId())
+			{
+				SetGreatestKnownThreat(nullptr);
+			}else if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_enemyId == pEntityKilledMessage->GetId())
+			{
+				SetGreatestSuspectedThreat(nullptr);
+			}
+
+			RemoveKnownThreat(pEntityKilledMessage->GetId());
+			RemoveSuspectedThreat(pEntityKilledMessage->GetId());
+		}
+		break;
+	}
+}
+
+
+
 //--------------------------------------------------------------------------------------
 // Process all messages that the entity received since the last processing.
 // Param1: The time in seconds passed since the last frame.
@@ -294,6 +348,8 @@ BehaviourStatus Soldier::ProcessMessages(float deltaTime)
 	// entity was hit by several projectiles during the same frame.
 	bool notifiedDeath = false;
 
+	//Soldier* pSoldier = this;
+
 	while(!GetActiveMessages().empty())
 	{
 		switch(GetActiveMessages().front()->GetType())
@@ -301,11 +357,21 @@ BehaviourStatus Soldier::ProcessMessages(float deltaTime)
 		case HitMessageType:
 			{
 			HitMessage* pMsg = reinterpret_cast<HitMessage*>(GetActiveMessages().front());
-			m_combatManager.Hit(pMsg->GetDamage(), pMsg->GetShooterId(), pMsg->GetPosition());
+			//m_combatManager.Hit(pMsg->GetDamage(), pMsg->GetShooterId(), pMsg->GetPosition());
+
+#ifdef DEBUG
+			unsigned long shooterId = pMsg->GetShooterId();
+			GetTestEnvironment()->RecordEvent(EntityHitEvent, this, &shooterId);
+#endif
+
 			if(!IsAlive() && !notifiedDeath)
 			{
-				GetTestEnvironment()->AddDeadEntity(this);
+				//GetTestEnvironment()->AddDeadEntity(this);
 				notifiedDeath = true;
+#ifdef DEBUG
+			unsigned long shooterId = pMsg->GetShooterId();
+			GetTestEnvironment()->RecordEvent(EntityKilledEvent, this, &shooterId);
+#endif
 			}
 			break;
 			}
@@ -336,6 +402,8 @@ BehaviourStatus Soldier::ProcessMessages(float deltaTime)
 	return StatusSuccess;
 }
 
+
+
 //--------------------------------------------------------------------------------------
 // Removes the currently active suspected threat from the list of suspected threats.
 // Param1: The time in seconds passed since the last frame.
@@ -365,20 +433,6 @@ void Soldier::Activate(void)
 		//m_movementManager.SetPathTo(XMFLOAT2(-20.0f, -20.0f));
 	}
 }
-
-//--------------------------------------------------------------------------------------
-// Called when the entity is hit by a hostile projectile.
-// Param1: The target position to shoot at.
-// Param2: The velocity of the projectile that hit the entity. Used to determine the position of the threat.
-//--------------------------------------------------------------------------------------
-void Soldier::Hit(float damage, const XMFLOAT2& direction)
-{
-	// add new suspected threat somewhere -> event queue?
-	//m_combatManager.Hit(damage, direction);
-	//SetCurrentHealth(GetCurrentHealth() - damage);
-
-}
-
 
 //--------------------------------------------------------------------------------------
 // Resets the soldier entity.

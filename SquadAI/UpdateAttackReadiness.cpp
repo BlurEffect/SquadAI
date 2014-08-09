@@ -26,19 +26,3 @@ BehaviourStatus UpdateAttackReadiness::Update(float deltaTime)
 {
 	return GetEntity()->UpdateAttackReadiness(deltaTime);
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void UpdateAttackReadiness::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void UpdateAttackReadiness::OnTerminate(BehaviourStatus status)
-{
-
-}

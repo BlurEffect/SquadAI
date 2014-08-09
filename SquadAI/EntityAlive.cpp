@@ -31,19 +31,3 @@ BehaviourStatus EntityAlive::Update(float deltaTime)
 		return StatusFailure;
 	}
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void EntityAlive::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void EntityAlive::OnTerminate(BehaviourStatus status)
-{
-
-}

@@ -37,6 +37,7 @@
 #include "Obstacle.h"
 #include "MessageDataStructures.h"
 #include "Entity.h"
+#include "Logger.h"
 
 using namespace DirectX;
 
@@ -53,7 +54,6 @@ public:
 	bool AddObject(ObjectType type, const XMFLOAT2& position, float rotation);
 	bool RemoveObjects(const XMFLOAT2& position);
 
-	bool AddProjectile(unsigned long shooterId, EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target);
 
 	bool Save(std::string filename);
 	bool Load(std::string filename);
@@ -74,7 +74,10 @@ public:
 	bool CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& end);
 	void ResetNodeGraph(void);
 
-	void AddDeadEntity(Entity* pEntity);
+	
+
+	void RecordEvent(EventType type, void* pObject1, void* pObject2);
+	void ReceiveMessage(Message* pMessage);
 
 	// Data access functions
 	float		 GetGridSize(void) const;
@@ -96,10 +99,15 @@ private:
 	bool CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject);
 	void UpdateRespawns(float deltaTime);
 
+	void AddDeadEntity(unsigned long id);
+	bool AddProjectile(unsigned long shooterId, EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target);
+
 	unsigned long m_id;           // An id is assigned to each entity being created in the environment
 	bool          m_isPaused;     // Tells whether the simulation running in the environment is currently paused
 	bool          m_isInEditMode; // Tells whether the environment is in edit or simulation mode
 	
+	Logger m_logger; // The logger object that is used to record events
+
 	std::list<std::pair<float, Entity*>> m_deadEntities;  // Contains pointers to currently dead entities and the duration of their absence from the game
 
 	// Grid

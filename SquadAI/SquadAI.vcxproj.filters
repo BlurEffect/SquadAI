@@ -315,9 +315,6 @@
     <ClCompile Include="ReturnSpecificStatus.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessMessages.cpp">
-      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
-    </ClCompile>
     <ClCompile Include="EntityAlive.cpp">
       <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
     </ClCompile>
@@ -329,6 +326,12 @@
     </ClCompile>
     <ClCompile Include="ResolveSuspectedThreat.cpp">
       <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Source Files\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="InvestigatingGreatestSuspectedThreat.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -575,9 +578,6 @@
     <ClInclude Include="MessageDataStructures.h">
       <Filter>Header Files\TestEnvironment</Filter>
     </ClInclude>
-    <ClInclude Include="ProcessMessages.h">
-      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="EntityAlive.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
     </ClInclude>
@@ -589,6 +589,12 @@
     </ClInclude>
     <ClInclude Include="ResolveSuspectedThreat.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="InvestigatingGreatestSuspectedThreat.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

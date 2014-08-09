@@ -19,9 +19,6 @@ public:
 
 private:
 	BehaviourStatus Update(float deltaTime);
-
-	void OnInitialise(void);
-	void OnTerminate(BehaviourStatus status);
 };
 
 #endif // GREATEST_SUSPECTED_THREAT_SET_H

@@ -32,19 +32,3 @@ BehaviourStatus GreatestKnownThreatSet::Update(float deltaTime)
 		return StatusFailure;
 	}
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void GreatestKnownThreatSet::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void GreatestKnownThreatSet::OnTerminate(BehaviourStatus status)
-{
-
-}

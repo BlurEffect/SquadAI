@@ -42,19 +42,3 @@ BehaviourStatus GreatestSuspectedThreatSet::Update(float deltaTime)
 		return StatusFailure;
 	}
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void GreatestSuspectedThreatSet::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void GreatestSuspectedThreatSet::OnTerminate(BehaviourStatus status)
-{
-
-}

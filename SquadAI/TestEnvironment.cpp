@@ -7,6 +7,7 @@
 
 #include "TestEnvironment.h"
 
+#define DEBUG
 
 TestEnvironment::TestEnvironment(void) : m_id(0),
 										 m_isPaused(true),
@@ -202,7 +203,13 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 				if(pHitEntity->GetCategory() == CategoryEntity)
 				{
 					{
-						reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
+						// Find the soldier that shot the projectile to see if he's still alive
+						Soldier* pDeadSoldier = std::find_if(std::begin(m_soldiers), std::end(m_soldiers), Soldier::FindSoldierById((*it).GetShooterId()));
+						
+						HitMessage hitMessage(g_kProjectileDamage, it->GetShooterId(), pDeadSoldier->IsAlive(), it->GetOrigin());
+						reinterpret_cast<Entity*>(pHitEntity)->ReceiveMessage(&hitMessage);
+						//reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
+						//reinterpret_cast<Entity*>(pHitEntity)->ProcessMessages(0.0f);
 					}
 				}
 
@@ -212,9 +219,13 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 				if(pHitEntity->GetCategory() == CategoryEntity)
 				{
 					{
+						Soldier* pDeadSoldier = std::find_if(std::begin(m_soldiers), std::end(m_soldiers), Soldier::FindSoldierById((*it).GetShooterId()));
+						
+						HitMessage hitMessage(g_kProjectileDamage, it->GetShooterId(), pDeadSoldier->IsAlive(), it->GetOrigin());
+						reinterpret_cast<Entity*>(pHitEntity)->ReceiveMessage(&hitMessage);
 						// todo: change this when hit method is moved to entity from soldier
-						reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
-
+						//reinterpret_cast<Entity*>(pHitEntity)->AddMessage(new HitMessage(g_kProjectileDamage, it->GetShooterId(), it->GetOrigin()));
+						//reinterpret_cast<Entity*>(pHitEntity)->ProcessMessages(0.0f);
 						//Soldier* pSoldier = reinterpret_cast<Soldier*>(pHitEntity);
 						//pSoldier->Hit(g_kProjectileDamage, it->GetDirection());
 					}
@@ -235,6 +246,42 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 void TestEnvironment::Cleanup()
 {
 	CleanupGrid();
+
+}
+
+//--------------------------------------------------------------------------------------
+// Receives and processes a given message.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::ReceiveMessage(Message* pMessage)
+{
+	switch(pMessage->GetType())
+	{
+	case ProjectileFiredMessageType:
+		{
+		ProjectileFiredMessage* pProjectileFiredMessage = reinterpret_cast<ProjectileFiredMessage*>(pMessage);
+		AddProjectile(pProjectileFiredMessage->GetShooterId(), pProjectileFiredMessage->GetShooterTeam(), pProjectileFiredMessage->GetOrigin(), pProjectileFiredMessage->GetTarget());
+		break;
+		}
+	case EntityKilledMessageType:
+		{
+		EntityKilledMessage* pEntityKilledMessage = reinterpret_cast<EntityKilledMessage*>(pMessage);
+		
+		AddDeadEntity(pEntityKilledMessage->GetId());
+
+		// Broadcast the message to all other entities.
+		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
+		{
+			if(m_soldiers[i].GetId() != pEntityKilledMessage->GetId())
+			{
+				// Forward the message.
+				m_soldiers[i].ReceiveMessage(pMessage);
+			}
+		}
+		
+		break;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -1055,20 +1102,27 @@ void TestEnvironment::ResetNodeGraph(void)
 //--------------------------------------------------------------------------------------
 // Registers the death of an entity and broadcasts the event to all other entities. 
 // Also prepares the respawn of the entity.
-// Param1: A pointer to the entity that just died.
+// Param1: The id of the entity that died.
 //--------------------------------------------------------------------------------------
-void TestEnvironment::AddDeadEntity(Entity* pEntity)
+void TestEnvironment::AddDeadEntity(unsigned long id)
 {
-	if(pEntity)
+	// Find the soldier with the given id
+	Soldier* pDeadSoldier = std::find_if(std::begin(m_soldiers), std::end(m_soldiers), Soldier::FindSoldierById(id));
+	if (pDeadSoldier != std::end(m_soldiers))
 	{
-		m_deadEntities.push_back(std::pair<float, Entity*>(0.0f, pEntity));
-		
-		// Broadcast message to other entities
-		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
-		{
-			m_soldiers[i].AddMessage(new EntityKilledMessage(pEntity->GetTeam(), pEntity->GetId()));
-		}
+	   m_deadEntities.push_back(std::pair<float, Entity*>(0.0f, pDeadSoldier));
 	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes an event by writing it to a log file and/or updating the statistics for this
+// simulation. Simply forwards the calls to the logger object of the test environment.
+// Param1: A pointer to the first object involved in the event.
+// Param2: A pointer to the second object involved in the event.
+//--------------------------------------------------------------------------------------
+void TestEnvironment::RecordEvent(EventType type, void* pObject1, void* pObject2)
+{
+	m_logger.LogEvent(type, pObject1, pObject2);
 }
 
 //--------------------------------------------------------------------------------------
@@ -1096,6 +1150,11 @@ bool TestEnvironment::StartSimulation(void)
 	m_isInEditMode = false;
 	m_isPaused = false;
 
+#ifdef DEBUG
+	m_logger.Open("Log.txt");
+#endif
+	
+
 	return true;
 }
 
@@ -1104,6 +1163,9 @@ bool TestEnvironment::StartSimulation(void)
 //--------------------------------------------------------------------------------------
 void TestEnvironment::EndSimulation(void)
 {
+#ifdef DEBUG
+	m_logger.Close();
+#endif
 
 	// Delete all projectiles
 	m_projectiles.clear();

@@ -19,9 +19,6 @@ public:
 
 private:
 	BehaviourStatus Update(float deltaTime);
-
-	void OnInitialise(void);
-	void OnTerminate(BehaviourStatus status);
 };
 
 #endif // DETERMINE_ATTACK_TARGET_H

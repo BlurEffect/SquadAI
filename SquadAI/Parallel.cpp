@@ -37,12 +37,12 @@ BehaviourStatus Parallel::Update(float deltaTime)
 
     for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
     {
-        if(!(*it)->IsTerminated())
-        {
-            (*it)->Tick(deltaTime);
-        }
+		//if(!(*it)->IsTerminated())
+        //{
+		BehaviourStatus childStatus =   (*it)->Tick(deltaTime);
+        //}
 
-		if((*it)->GetStatus() == StatusSuccess)
+		if(childStatus == StatusSuccess)
         {
 			// The child succeeded.
             ++successCount;
@@ -52,7 +52,7 @@ BehaviourStatus Parallel::Update(float deltaTime)
             }
         }
 
-		if((*it)->GetStatus() == StatusFailure)
+		if(childStatus == StatusFailure)
         {
 			// The child failed.
             ++failureCount;
@@ -69,6 +69,11 @@ BehaviourStatus Parallel::Update(float deltaTime)
 		return StatusFailure;
     }
 
+	if(m_children[1]->GetStatus() == StatusSuccess)
+	{
+		int a = 9;
+	}
+
     if(m_successPolicy == RequireAll && successCount == m_children.size())
     {
 		// All children succeeded.
@@ -78,21 +83,4 @@ BehaviourStatus Parallel::Update(float deltaTime)
 	return StatusRunning;
 }
 
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-// Param1: The return code of the behaviour that is terminating.
-//--------------------------------------------------------------------------------------
-void Parallel::OnTerminate(BehaviourStatus status)
-{
-	Composite::OnTerminate(status);
-	/*
-	for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
-    {
-		// Abort all running child behaviours.
-		if((*it)->IsRunning())
-		{
-			(*it)->Abort();
-		}
-    }*/
-}
 

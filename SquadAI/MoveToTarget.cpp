@@ -36,22 +36,10 @@ BehaviourStatus MoveToTarget::Update(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void MoveToTarget::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
 // Terminates the behaviour.
 //--------------------------------------------------------------------------------------
 void MoveToTarget::OnTerminate(BehaviourStatus status)
 {
-	if(status == StatusSuccess || status == StatusAborted)
-	{
-		GetEntity()->SetMovementTargetSet(false);
-	}
-
-	Reset();
+	GetEntity()->SetMovementTargetSet(false);
+	Behaviour::OnTerminate(status);
 }

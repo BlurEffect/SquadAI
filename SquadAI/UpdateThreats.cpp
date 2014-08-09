@@ -27,19 +27,3 @@ BehaviourStatus UpdateThreats::Update(float deltaTime)
 	
 	return result;
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void UpdateThreats::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void UpdateThreats::OnTerminate(BehaviourStatus status)
-{
-
-}

@@ -45,7 +45,6 @@ public:
 
 protected:
 	virtual BehaviourStatus Update(float deltaTime);
-	virtual void OnTerminate(BehaviourStatus status);
 
 	ParallelPolicy m_successPolicy; // The policy determining when the parallel behaviour succeeds
 	ParallelPolicy m_failurePolicy; // The policy determining when the parallel behaviour fails

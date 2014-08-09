@@ -69,23 +69,13 @@ void Composite::ClearChildren(void)
 //--------------------------------------------------------------------------------------
 void Composite::OnTerminate(BehaviourStatus status)
 {
-	ResetChildren();
-
-	Behaviour::Reset();
 	if(status == StatusAborted)
 	{
-		const char* name = GetName();
-		if(name == "ApproachThreatSequence")
-		{
-			int a = 4;
-		}
 		AbortChildren();
-		Behaviour::Reset();
-	}//else
-	//{
-	//	Behaviour::Reset();
-	//}
-	//ResetChildren();
+	}
+
+	ResetChildren();
+	Behaviour::Reset();
 }
 
 //--------------------------------------------------------------------------------------

@@ -66,6 +66,7 @@ void EntityCombatManager::DetermineGreatestKnownThreat(void)
 			if(squareDistance < shortestSquareDistance)
 			{
 				pGreatestKnownThreat = (*it);
+				shortestSquareDistance = squareDistance;
 			}
 		}
 
@@ -85,7 +86,9 @@ void EntityCombatManager::DetermineGreatestSuspectedThreat(void)
 	if(!m_pEntity->GetSuspectedThreats().empty())
 	{
 		float shortestSquareDistance = std::numeric_limits<float>::max();
+		float shortestPrioritySquareDistance = std::numeric_limits<float>::max();
 		SuspectedThreat* pGreatestSuspectedThreat = nullptr;
+		SuspectedThreat* pPrioritySuspectedThreat = nullptr;
 
 		for(std::vector<SuspectedThreat>::iterator it = m_pEntity->GetSuspectedThreats().begin(); it != m_pEntity->GetSuspectedThreats().end(); ++it)
 		{
@@ -96,10 +99,23 @@ void EntityCombatManager::DetermineGreatestSuspectedThreat(void)
 			if(squareDistance < shortestSquareDistance)
 			{
 				pGreatestSuspectedThreat = &(*it);
+				shortestSquareDistance = squareDistance;
+			}
+
+			if(it->m_hasPriority && squareDistance < shortestPrioritySquareDistance)
+			{
+				pPrioritySuspectedThreat = &(*it);
+				shortestPrioritySquareDistance = squareDistance;
 			}
 		}
 
-		m_pEntity->SetGreatestSuspectedThreat(pGreatestSuspectedThreat);
+		if(pPrioritySuspectedThreat)
+		{
+			m_pEntity->SetGreatestSuspectedThreat(pPrioritySuspectedThreat);
+		}else
+		{
+			m_pEntity->SetGreatestSuspectedThreat(pGreatestSuspectedThreat);
+		}
 	}else
 	{
 		m_pEntity->SetGreatestSuspectedThreat(nullptr);
@@ -112,37 +128,43 @@ void EntityCombatManager::DetermineGreatestSuspectedThreat(void)
 //--------------------------------------------------------------------------------------
 void EntityCombatManager::ShootAt(const XMFLOAT2& target)
 {
-
-	m_pEnvironment->AddProjectile(m_pEntity->GetId(), m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
+	ProjectileFiredMessage projectileFiredMessage(m_pEntity->GetId(), m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
+	m_pEnvironment->ReceiveMessage(&projectileFiredMessage);
+	//m_pEnvironment->AddProjectile(m_pEntity->GetId(), m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
 }
 
 //--------------------------------------------------------------------------------------
 // Called when the entity is hit by a hostile projectile.
 // Param1: The damage that will be suffered through the projectile.
 // Param2: The id of the entity that shot the projectile.
-// Param2: The position of the entity that shot the projectile.
+// Param3: Tells whether the entity that fired the projectile is still alive.
+// Param4: The position of the entity that shot the projectile.
 //--------------------------------------------------------------------------------------
-void EntityCombatManager::Hit(float damage, unsigned long id, const XMFLOAT2& position)
+void EntityCombatManager::Hit(float damage, unsigned long id, bool shooterAlive, const XMFLOAT2& position)
 {
 	m_pEntity->SetCurrentHealth(m_pEntity->GetCurrentHealth() - damage);
 
-	// check if already in list of known threats -> do nothing
-
-	std::vector<Entity*>::iterator foundItKnown = std::find_if(m_pEntity->GetKnownThreats().begin(), m_pEntity->GetKnownThreats().end(), Entity::FindEntityById(id));
-	if(foundItKnown == m_pEntity->GetKnownThreats().end())
+	// Only update threat state if the attacker is still alive
+	if(shooterAlive)
 	{
-		// The shooter is not an already known threat -> check the suspected threats
+		// check if already in list of known threats -> do nothing
+		std::vector<Entity*>::iterator foundItKnown = std::find_if(m_pEntity->GetKnownThreats().begin(), m_pEntity->GetKnownThreats().end(), Entity::FindEntityById(id));
+		if(foundItKnown == m_pEntity->GetKnownThreats().end())
+		{
+			// The shooter is not an already known threat -> check the suspected threats
 
-		// Check if the shooter is already in the list of suspected threats
-		std::vector<SuspectedThreat>::iterator foundIt = std::find_if(m_pEntity->GetSuspectedThreats().begin(), m_pEntity->GetSuspectedThreats().end(), Entity::FindSuspectedThreatById(id));
-		if(foundIt == m_pEntity->GetSuspectedThreats().end())
-		{
-			// This is a new suspected threat -> add it to the list
-			m_pEntity->AddSuspectedThreat(id, position);
-		}else
-		{
-			// The shooter is already a suspected threat, update the last known position
-			foundIt->m_lastKnownPosition = position;
+			// Check if the shooter is already in the list of suspected threats
+			std::vector<SuspectedThreat>::iterator foundIt = std::find_if(m_pEntity->GetSuspectedThreats().begin(), m_pEntity->GetSuspectedThreats().end(), Entity::FindSuspectedThreatById(id));
+			if(foundIt == m_pEntity->GetSuspectedThreats().end())
+			{
+				// This is a new suspected threat -> add it to the list
+				m_pEntity->AddSuspectedThreat(id, position, true);
+			}else
+			{
+				// The shooter is already a suspected threat, update the last known position
+				foundIt->m_lastKnownPosition = position;
+				foundIt->m_hasPriority = true;
+			}
 		}
 	}
 

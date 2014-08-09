@@ -19,9 +19,6 @@ public:
 
 private:
 	BehaviourStatus Update(float deltaTime);
-
-	void OnInitialise(void);
-	void OnTerminate(BehaviourStatus status);
 };
 
 #endif // DETERMINE_GREATEST_KNOWN_THREAT_H

@@ -31,7 +31,7 @@ public:
 
 	void ShootAt(const XMFLOAT2& target);
 
-	void Hit(float damage, unsigned long id, const XMFLOAT2& position);
+	void Hit(float damage, unsigned long id, bool shooterAlive, const XMFLOAT2& position);
 
 private:
 	Entity*          m_pEntity;      // The entity that this combat manager is associated to

@@ -27,18 +27,3 @@ BehaviourStatus DeterminePatrolTarget::Update(float deltaTime)
 	return GetEntity()->DeterminePatrolTarget(deltaTime);
 }
 
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void DeterminePatrolTarget::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void DeterminePatrolTarget::OnTerminate(BehaviourStatus status)
-{
-
-}

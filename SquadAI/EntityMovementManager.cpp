@@ -243,6 +243,10 @@ bool EntityMovementManager::FollowPath(float nodeReachedRadius, float speed)
 				m_velocity = XMFLOAT2(0.0f, 0.0f);
 			
 				return true;
+			}else
+			{
+				Seek(m_path[m_currentNode], nodeReachedRadius, speed);
+				return false;
 			}
 		}else
 		{

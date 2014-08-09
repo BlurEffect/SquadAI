@@ -26,13 +26,15 @@ class Message;
 //--------------------------------------------------------------------------------------
 struct SuspectedThreat
 {
-	SuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition)
+	SuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasPriority)
 		: m_enemyId(id),
-		  m_lastKnownPosition(lastKnownPosition)
+		  m_lastKnownPosition(lastKnownPosition),
+		  m_hasPriority(hasPriority)
 	{}
 
 	unsigned long m_enemyId;			// The id of the hostile entity that has now become a suspected threat
 	XMFLOAT2      m_lastKnownPosition;  // The position, where the enemy was last seen when it changed from a known to a suspected threat
+	bool          m_hasPriority;        // Can be used to give priority to some suspected threats despite them being less threatening when only considering the usual factors
 };
 
 using namespace DirectX;
@@ -48,7 +50,8 @@ public:
 	virtual void Activate(void) = 0;
 	virtual void Reset(void);
 	virtual void Respawn(const XMFLOAT2& respawnPosition);
-	
+	virtual void ReceiveMessage(Message* pMessage) = 0;
+
 	// Basic actions
 	virtual BehaviourStatus MoveToTarget(float deltaTime)						    = 0;
 	virtual BehaviourStatus Attack(float deltaTime)									= 0;
@@ -72,10 +75,12 @@ public:
 	void RemoveKnownThreat(unsigned long id);
 	void ClearKnownThreats(void);
 	bool IsKnownThreat(unsigned long id);
-	void AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition);
+	void AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasPriority);
 	void RemoveSuspectedThreat(unsigned long id);
 	void ClearSuspectedThreats(void);
 	bool IsSuspectedThreat(unsigned long id);
+
+	bool IsInvestigatingGreatestSuspectedThreat(void);
 
 	// Data access functions
 	Behaviour*						    GetBehaviour(void);

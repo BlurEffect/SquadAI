@@ -57,7 +57,7 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
-	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree2, this);
+	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree, this);
 	if(!m_pBehaviour)
 	{
 		return false;
@@ -103,6 +103,10 @@ void Entity::Reset(void)
 	m_currentHealth = m_maximalHealth;
 }
 
+//--------------------------------------------------------------------------------------
+// Respawns the entity at a given position.
+// Param1: The position of the respawn point, where the entity will reenter the game.
+//--------------------------------------------------------------------------------------
 void Entity::Respawn(const XMFLOAT2& respawnPosition)
 {
 	Reset();
@@ -110,6 +114,7 @@ void Entity::Respawn(const XMFLOAT2& respawnPosition)
 	UpdateColliderPosition(respawnPosition);
 	SetRotation(static_cast<float>(rand() % 360));
 }
+
 
 //--------------------------------------------------------------------------------------
 // Adds a new message to this entity's queue of active messages.
@@ -174,10 +179,11 @@ bool Entity::IsKnownThreat(unsigned long id)
 // Adds a new threat to the entity's list of known threats.
 // Param1: The id of the entity that is no longer a known threat to this entity.
 // Param2: The last known position of the threat.
+// Param3: Tells whether this suspected threat has special priority.
 //--------------------------------------------------------------------------------------
-void Entity::AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition)
+void Entity::AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasPriority)
 {
-	m_suspectedThreats.push_back(SuspectedThreat(id, lastKnownPosition));
+	m_suspectedThreats.push_back(SuspectedThreat(id, lastKnownPosition, hasPriority));
 }
 
 //--------------------------------------------------------------------------------------
@@ -213,6 +219,29 @@ bool Entity::IsSuspectedThreat(unsigned long id)
 	std::vector<SuspectedThreat>::iterator foundIt = std::find_if(m_suspectedThreats.begin(), m_suspectedThreats.end(), Entity::FindSuspectedThreatById(id));
 		
 	return (foundIt != m_suspectedThreats.end());
+}
+
+//--------------------------------------------------------------------------------------
+// Tells whether the entity is currently moving towards the greatest suspected threat in
+// order to investigate it or whether there now is a greater suspected threat that the
+// entity should tend to.
+// Returns true if the suspected threat being investigated is still the greatest suspected threat,
+// false otherwise and also if there is no suspected threat at all.
+//--------------------------------------------------------------------------------------
+bool Entity::IsInvestigatingGreatestSuspectedThreat(void)
+{
+	if(!GetGreatestSuspectedThreat())
+	{
+		return false;
+	}
+
+	if(GetGreatestSuspectedThreat()->m_lastKnownPosition.x == GetMovementTarget().x &&
+	   GetGreatestSuspectedThreat()->m_lastKnownPosition.y == GetMovementTarget().y)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 // Data access functions

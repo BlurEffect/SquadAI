@@ -25,19 +25,3 @@ BehaviourStatus AimAtTarget::Update(float deltaTime)
 {
 	return GetEntity()->AimAt(deltaTime);
 }
-
-//--------------------------------------------------------------------------------------
-// Initialises the behaviour.
-//--------------------------------------------------------------------------------------
-void AimAtTarget::OnInitialise(void)
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-// Terminates the behaviour.
-//--------------------------------------------------------------------------------------
-void AimAtTarget::OnTerminate(BehaviourStatus status)
-{
-
-}

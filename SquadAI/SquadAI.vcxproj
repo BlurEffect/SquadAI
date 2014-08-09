@@ -112,6 +112,7 @@
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="EntityMovementManager.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GreatestKnownThreatSet.cpp" />
     <ClCompile Include="GreatestSuspectedThreatSet.cpp" />
     <ClCompile Include="Idle.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
     <ClInclude Include="EntityMovementManager.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="GreatestKnownThreatSet.h" />
     <ClInclude Include="GreatestSuspectedThreatSet.h" />
     <ClInclude Include="Idle.h" />

@@ -38,6 +38,7 @@
 #include "MessageDataStructures.h"
 #include "Entity.h"
 #include "Logger.h"
+#include "GameState.h"
 
 using namespace DirectX;
 
@@ -107,6 +108,7 @@ private:
 	bool          m_isInEditMode; // Tells whether the environment is in edit or simulation mode
 	
 	Logger m_logger; // The logger object that is used to record events
+	GameState m_gameState; // The current gamestate
 
 	std::list<std::pair<float, Entity*>> m_deadEntities;  // Contains pointers to currently dead entities and the duration of their absence from the game
 
@@ -115,7 +117,6 @@ private:
 	unsigned int        m_numberOfGridPartitions; // The number of grid fields along x and y axis
 	float               m_gridSpacing;			  // The size of a grid field along x and y axis
 	Node**              m_pNodes;                 // The graph made up of nodes representing the test environment when in simulation mode
-
 
 	// Objects
 	std::vector<EditModeObject> m_staticObjects;									// The static test environment objects, as set up by the user in edit mode

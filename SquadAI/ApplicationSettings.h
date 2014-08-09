@@ -38,13 +38,16 @@ const XMFLOAT4 g_kGridColour(1.0f, 1.0f, 1.0f, 1.0f);			  // The colour of the g
 const unsigned int g_kSoldiersPerTeam = 8; // The number of soldiers forming a team during the matches
 
 // Game settings
-const float g_kPickupFlagRadiusRelative = 0.25f; // An entity has to approach a flag this close (in relation to the grid spacing) in order to pick it up or return it
-const float g_kFlagResetTimer		    = 10.0f; // A flag will be reset to its start position after it was dropped for this long
-const float g_kRespawnTimer				= 5.0f;  // Killed entities have to wait this long before being able to respawn 
+const float g_kPickupFlagRadiusRelative = 0.25f;  // An entity has to approach a flag this close (in relation to the grid spacing) in order to pick it up or return it
+const float g_kFlagResetTimer		    = 10.0f;  // A flag will be reset to its start position after it was dropped for this long
+const float g_kRespawnTimer				= 5.0f;   // Killed entities have to wait this long before being able to respawn 
+const float g_kGameRoundTimeLimit       = 120.0f; // The time a game round lasts in seconds
+const unsigned int g_kWinScore          = 3;      // The score required by a team to win the game
 
 // Projectile settings
 const float g_kProjectileSpeed(30.0f);   // Determines how fast projectiles can move within the test environment
 const float g_kProjectileDamage(20.0f);  // The damage that an entity suffers when hit by a hostile projectile.
+
 
 
 #endif // APPLICATION_SETTINGS_H

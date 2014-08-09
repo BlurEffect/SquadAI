@@ -77,6 +77,8 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 	// initialise the random number generator
 	srand(static_cast<unsigned int>(time(NULL)));
 
+	m_gameState.Initialise(g_kGameRoundTimeLimit, g_kWinScore);
+
 	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
 
@@ -105,13 +107,14 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		if(!m_isPaused)
 		{
 			UpdateRespawns(deltaTime);
+			m_gameState.UpdateTimer(deltaTime);
 		}
 
 		// Update soldiers
 
 		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 		{
-			if(!m_isPaused && m_soldiers[i].IsAlive())
+			if(!m_gameState.IsTerminated() && !m_isPaused && m_soldiers[i].IsAlive())
 			{
 				m_soldiers[i].Update(deltaTime);
 			}
@@ -147,7 +150,10 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		// Update flags
 		for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 		{
-			m_flags[i].Update(deltaTime);
+			if(!m_gameState.IsTerminated() && !m_isPaused)
+			{
+				m_flags[i].Update(deltaTime);
+			}
 
 			XMMATRIX translationMatrix = XMMatrixTranslation(m_flags[i].GetPosition().x, m_flags[i].GetPosition().y, 0.0f);
 			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - m_flags[i].GetRotation()));
@@ -183,7 +189,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		{
 			XMFLOAT2 oldPos = it->GetPosition();
 
-			if(!m_isPaused)
+			if(!m_gameState.IsTerminated() && !m_isPaused)
 			{
 				it->Update(deltaTime);
 			}
@@ -263,6 +269,7 @@ void TestEnvironment::ProcessMessage(Message* pMessage)
 	case ProjectileFiredMessageType:
 		{
 		ProjectileFiredMessage* pProjectileFiredMessage = reinterpret_cast<ProjectileFiredMessage*>(pMessage);
+		m_gameState.AddShotFired(pProjectileFiredMessage->GetShooterTeam(), 1);
 		AddProjectile(pProjectileFiredMessage->GetShooterId(), pProjectileFiredMessage->GetShooterTeam(), pProjectileFiredMessage->GetOrigin(), pProjectileFiredMessage->GetTarget());
 		break;
 		}
@@ -270,6 +277,14 @@ void TestEnvironment::ProcessMessage(Message* pMessage)
 		{
 		EntityKilledMessage* pEntityKilledMessage = reinterpret_cast<EntityKilledMessage*>(pMessage);
 		
+		if(pEntityKilledMessage->GetTeam() == TeamRed)
+		{
+			m_gameState.AddKills(TeamBlue, 1);
+		}else
+		{
+			m_gameState.AddKills(TeamRed, 1);
+		}
+
 		AddDeadEntity(pEntityKilledMessage->GetId());
 
 		// Broadcast the message to all other entities.
@@ -1214,6 +1229,8 @@ void TestEnvironment::EndSimulation(void)
 
 	m_isInEditMode = true;
 	m_isPaused = true;
+
+	m_gameState.Reset();
 }
 
 //--------------------------------------------------------------------------------------

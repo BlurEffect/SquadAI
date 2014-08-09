@@ -333,6 +333,9 @@
     <ClCompile Include="InvestigatingGreatestSuspectedThreat.cpp">
       <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="GameState.cpp">
+      <Filter>Source Files\TestEnvironment</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -595,6 +598,9 @@
     </ClInclude>
     <ClInclude Include="InvestigatingGreatestSuspectedThreat.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>Header Files\TestEnvironment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

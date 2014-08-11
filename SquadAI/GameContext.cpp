@@ -1,16 +1,19 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  GameState.cpp
-*  This class bundles the current state of a Multiflag CTF game.
+*  GameContext.cpp
+*  Abstract base class for all game contexts. Game context objects keep track
+*  of the state of the game and control the game mode specific parts of the 
+*  game in collaboration with the test environment.
 */
 
 // Includes
-#include "GameState.h"
+#include "GameContext.h"
 
-GameState::GameState(void) : m_terminated(false),
-							 m_maxTime(0.0f),
-							 m_time(0.0f),
-							 m_maxScore(0.0f)
+GameContext::GameContext(GameMode mode, float maxTime, unsigned int winScore) : m_gameMode(mode),
+																			    m_terminated(false),
+																			    m_maxTime(maxTime),
+																			    m_time(0.0f),
+																			    m_maxScore(winScore)
 {
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
@@ -20,19 +23,8 @@ GameState::GameState(void) : m_terminated(false),
 	}
 }
 
-GameState::~GameState(void)
+GameContext::~GameContext(void)
 {
-}
-
-//--------------------------------------------------------------------------------------
-// Adds a certain score to the total score of a specified team.
-// Param1: The time a round of the game lasts.
-// Param2: The score required by a team to win the game.
-//--------------------------------------------------------------------------------------
-void GameState::Initialise(float maxTime, unsigned int winScore)
-{
-	m_maxTime  = maxTime;
-	m_maxScore = winScore;
 }
 
 //--------------------------------------------------------------------------------------
@@ -40,7 +32,7 @@ void GameState::Initialise(float maxTime, unsigned int winScore)
 // Param1: The team, for which to increase the score.
 // Param2: The score to add to the total score of the specified team.
 //--------------------------------------------------------------------------------------
-void GameState::AddScore(EntityTeam team, unsigned int score)
+void GameContext::AddScore(EntityTeam team, unsigned int score)
 {
 	if(!m_terminated)
 	{
@@ -53,7 +45,7 @@ void GameState::AddScore(EntityTeam team, unsigned int score)
 // Param1: The team, for which to increase the killcount.
 // Param2: The number of kills add to the total killcount of the specified team.
 //--------------------------------------------------------------------------------------
-void GameState::AddKills(EntityTeam team, unsigned int kills)
+void GameContext::AddKills(EntityTeam team, unsigned int kills)
 {
 	if(!m_terminated)
 	{
@@ -66,7 +58,7 @@ void GameState::AddKills(EntityTeam team, unsigned int kills)
 // Param1: The team, for which to increase the shot count.
 // Param2: The number of shots fired to add to the total shot count of the specified team.
 //--------------------------------------------------------------------------------------
-void GameState::AddShotFired(EntityTeam team, unsigned int shotsFired)
+void GameContext::AddShotFired(EntityTeam team, unsigned int shotsFired)
 {
 	if(!m_terminated)
 	{
@@ -78,7 +70,7 @@ void GameState::AddShotFired(EntityTeam team, unsigned int shotsFired)
 // Updates the game timer.
 // Param1: The time to add to the timer. Usually the time passed since the last game update.
 //--------------------------------------------------------------------------------------
-void GameState::UpdateTimer(float deltaTime)
+void GameContext::Update(float deltaTime)
 {
 	m_time += deltaTime;
 	
@@ -91,7 +83,7 @@ void GameState::UpdateTimer(float deltaTime)
 //--------------------------------------------------------------------------------------
 // Resets the game state.
 //--------------------------------------------------------------------------------------
-void GameState::Reset(void)
+void GameContext::Reset(void)
 {
 	m_terminated = false;
 	m_time       = 0.0f;
@@ -106,52 +98,57 @@ void GameState::Reset(void)
 
 // Data access functions
 
-bool GameState::IsTerminated(void) const
+GameMode GameContext::GetGameMode(void) const
+{
+	return m_gameMode;
+}
+
+bool GameContext::IsTerminated(void) const
 {
 	return m_terminated;
 }
 
-float GameState::GetMaxTime(void) const
+float GameContext::GetMaxTime(void) const
 {
 	return m_maxTime;
 }
 
-float GameState::GetTime(void) const
+float GameContext::GetTime(void) const
 {
 	return m_time;
 }
 
-float GameState::GetTimeLeft(void) const
+float GameContext::GetTimeLeft(void) const
 {
 	return (m_maxTime - m_time);
 }
 
-unsigned int GameState::GetMaxScore(void) const
+unsigned int GameContext::GetMaxScore(void) const
 {
 	return m_maxScore;
 }
 
-unsigned int GameState::GetScore(EntityTeam team) const
+unsigned int GameContext::GetScore(EntityTeam team) const
 {
 	return m_score[team];
 }
 
-unsigned int GameState::GetKills(EntityTeam team) const
+unsigned int GameContext::GetKills(EntityTeam team) const
 {
 	return m_kills[team];
 }
 
-unsigned int GameState::GetShotsFired(EntityTeam team) const
+unsigned int GameContext::GetShotsFired(EntityTeam team) const
 {
 	return m_shotsFired[team];
 }
 
-void GameState::SetMaxTime(float time)
+void GameContext::SetMaxTime(float time)
 {
 	m_maxTime = time;
 }
 
-void GameState::SetMaxScore(float score)
+void GameContext::SetMaxScore(float score)
 {
 	m_maxScore = score;
 }

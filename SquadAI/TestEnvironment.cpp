@@ -77,7 +77,11 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 	// initialise the random number generator
 	srand(static_cast<unsigned int>(time(NULL)));
 
-	m_gameState.Initialise(g_kGameRoundTimeLimit, g_kWinScore);
+	m_pGameContext = new MultiflagCTFGameContext(g_kGameRoundTimeLimit, g_kWinScore, g_kFlagResetTimer);
+	if(!m_pGameContext)
+	{
+		return false;
+	}
 
 	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
@@ -104,17 +108,19 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		}
 	}else
 	{
-		if(!m_isPaused)
+		if(!m_isPaused && !m_pGameContext->IsTerminated())
 		{
 			UpdateRespawns(deltaTime);
-			m_gameState.UpdateTimer(deltaTime);
 		}
 
 		// Update soldiers
 
 		for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 		{
-			if(!m_gameState.IsTerminated() && !m_isPaused && m_soldiers[i].IsAlive())
+			
+			XMFLOAT2 oldPos = m_soldiers[i].GetPosition();
+
+			if(!m_pGameContext->IsTerminated() && !m_isPaused && m_soldiers[i].IsAlive())
 			{
 				m_soldiers[i].Update(deltaTime);
 			}
@@ -145,8 +151,51 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 					pRenderContext.AddInstance(DeadBlueSoldierType, transform);
 				}
 			}
+
+			// The objective possibly reached by the soldier
+			CollidableObject* pHitEntity = nullptr;
+
+			if(!m_pGameContext->IsTerminated() && !m_isPaused && m_soldiers[i].IsAlive())
+			{
+				// Check for collisions of the soldiers with any objectives
+				if(CheckCollision(&m_soldiers[i], oldPos, GroupObjectivesTeamRed, pHitEntity))
+				{
+					EntityReachedObjectiveMessage message(&m_soldiers[i], reinterpret_cast<Objective*>(pHitEntity));
+					m_pGameContext->ProcessMessage(&message);
+				}
+				if(CheckCollision(&m_soldiers[i], oldPos, GroupObjectivesTeamBlue, pHitEntity))
+				{
+					EntityReachedObjectiveMessage message(&m_soldiers[i], reinterpret_cast<Objective*>(pHitEntity));
+					m_pGameContext->ProcessMessage(&message);
+				}
+			}
 		}
 
+		// Update flags
+		for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+		{
+			if(!m_pGameContext->IsTerminated() && !m_isPaused)
+			{
+				//m_flags[i].Update(deltaTime);
+			}
+
+			XMMATRIX translationMatrix = XMMatrixTranslation(m_objectives[i].GetPosition().x, m_objectives[i].GetPosition().y, 0.0f);
+			XMMATRIX rotationMatrix    = XMMatrixRotationZ(XMConvertToRadians(360.0f - m_objectives[i].GetRotation()));
+			XMMATRIX scalingMatrix     = XMMatrixScaling(m_objectives[i].GetUniformScale(), m_objectives[i].GetUniformScale(), 1.0f);
+
+			XMFLOAT4X4 transform;
+			XMStoreFloat4x4(&transform, scalingMatrix * rotationMatrix * translationMatrix);
+
+			switch(EntityTeam(i))
+			{
+			case TeamRed:
+				pRenderContext.AddInstance(RedFlagType, transform);
+			case TeamBlue:
+				pRenderContext.AddInstance(BlueFlagType, transform);
+			}
+		}
+
+		/*
 		// Update flags
 		for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 		{
@@ -170,7 +219,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 				pRenderContext.AddInstance(BlueFlagType, transform);
 			}
 		}
-
+		*/
 		// Update obstacles
 		for(std::list<Obstacle>::iterator it = m_obstacles.begin(); it != m_obstacles.end(); ++it)
 		{
@@ -189,7 +238,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		{
 			XMFLOAT2 oldPos = it->GetPosition();
 
-			if(!m_gameState.IsTerminated() && !m_isPaused)
+			if(!m_pGameContext->IsTerminated() && !m_isPaused)
 			{
 				it->Update(deltaTime);
 			}
@@ -246,6 +295,12 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 				++it;
 			}
 		}
+
+		if(!m_isPaused && !m_pGameContext->IsTerminated())
+		{
+			m_pGameContext->Update(deltaTime);
+		}
+
 	}
 }
 
@@ -255,7 +310,11 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 void TestEnvironment::Cleanup()
 {
 	CleanupGrid();
-
+	if(m_pGameContext)
+	{
+		delete m_pGameContext;
+		m_pGameContext = nullptr;
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -269,7 +328,7 @@ void TestEnvironment::ProcessMessage(Message* pMessage)
 	case ProjectileFiredMessageType:
 		{
 		ProjectileFiredMessage* pProjectileFiredMessage = reinterpret_cast<ProjectileFiredMessage*>(pMessage);
-		m_gameState.AddShotFired(pProjectileFiredMessage->GetShooterTeam(), 1);
+		m_pGameContext->AddShotFired(pProjectileFiredMessage->GetShooterTeam(), 1);
 		AddProjectile(pProjectileFiredMessage->GetShooterId(), pProjectileFiredMessage->GetShooterTeam(), pProjectileFiredMessage->GetOrigin(), pProjectileFiredMessage->GetTarget());
 		break;
 		}
@@ -279,10 +338,10 @@ void TestEnvironment::ProcessMessage(Message* pMessage)
 		
 		if(pEntityKilledMessage->GetTeam() == TeamRed)
 		{
-			m_gameState.AddKills(TeamBlue, 1);
+			m_pGameContext->AddKills(TeamBlue, 1);
 		}else
 		{
-			m_gameState.AddKills(TeamRed, 1);
+			m_pGameContext->AddKills(TeamRed, 1);
 		}
 
 		AddDeadEntity(pEntityKilledMessage->GetId());
@@ -387,19 +446,23 @@ bool TestEnvironment::PrepareSimulation(void)
 		case RedFlagType:
 			{
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
-			if(!m_flags[TeamRed].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamRed, g_kFlagResetTimer))
+			if(!m_objectives[TeamRed].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamRed))
 			{
 				return false;
 			}
+			AddObjectiveMessage message(&m_objectives[TeamRed]);
+			m_pGameContext->ProcessMessage(&message);
 			break;
 			}
 		case BlueFlagType:
 			{
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * g_kPickupFlagRadiusRelative);
-			if(!m_flags[TeamBlue].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamBlue, g_kFlagResetTimer))
+			if(!m_objectives[TeamBlue].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryObjective, CircleColliderType, &colliderData, TeamBlue))
 			{
 				return false;
 			}
+			AddObjectiveMessage message(&m_objectives[TeamBlue]);
+			m_pGameContext->ProcessMessage(&message);
 			break;
 			}
 		case RedSpawnPointType:
@@ -883,7 +946,7 @@ bool TestEnvironment::GetRandomUnblockedTarget(XMFLOAT2& outPosition) const
 
 
 //--------------------------------------------------------------------------------------
-// Checks for collisions between an entity and a specified group of other entities. Collision
+// Checks for collisions between a moving entity and a specified group of other entities. Collision
 // of an object with itself is excluded, as are collisions with dead entities.
 // Param1: A pointer to the collider that should be checked for collision with other entities.
 // Param2: The previous position of the entity (during the last frame).
@@ -930,7 +993,6 @@ bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject, 
 		}
 	}
 
-
 	if(entityGroup == GroupObstacles || entityGroup == GroupTeamRedAndObstacles || entityGroup == GroupTeamBlueAndObstacles || entityGroup == GroupAllSoldiersAndObstacles)
 	{
 		float distance = 0.0f;
@@ -968,6 +1030,41 @@ bool TestEnvironment::CheckCollision(const CollidableObject* pCollidableObject, 
 							outCollisionObject = m_pNodes[i][k].GetObstacle();
 						}
 					}
+				}
+			}
+		}
+	}
+
+	if(entityGroup == GroupObjectivesTeamRed)
+	{
+		if(m_objectives[TeamRed].GetCollider()->CheckLineCollision(start, end))
+		{
+			outCollisionObject = &(m_objectives[TeamRed]);
+		}
+	}
+
+	if(entityGroup == GroupObjectivesTeamBlue)
+	{
+		if(m_objectives[TeamBlue].GetCollider()->CheckLineCollision(start, end))
+		{
+			outCollisionObject = &(m_objectives[TeamBlue]);
+		}
+	}
+
+	if(entityGroup == GroupAllObjectives)
+	{
+		for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+		{
+			if(m_objectives[i].GetCollider()->CheckLineCollision(start, end))
+			{
+				float squareDistance = 0.0f;
+				XMVECTOR vector = XMLoadFloat2(&m_soldiers[i].GetPosition()) - XMLoadFloat2(&pCollidableObject->GetPosition());
+				XMStoreFloat(&squareDistance, XMVector2Dot(vector, vector));
+
+				if(squareDistance < shortestSquareDistance)
+				{
+					shortestSquareDistance = squareDistance;
+					outCollisionObject = &(m_soldiers[i]);
 				}
 			}
 		}
@@ -1091,22 +1188,22 @@ bool TestEnvironment::CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& en
 
 	if(line.x >= 0.0f)
 	{
-		startX = gridPos.x;
+		startX = static_cast<unsigned int>(gridPos.x);
 		endX = (gridPos.x + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.x) + maxGridDistance) : (m_numberOfGridPartitions - 1);
 	}else
 	{
 		startX = (gridPos.x > maxGridDistance) ? (static_cast<int>(gridPos.x) - maxGridDistance) : 0;
-		endX = gridPos.x;
+		endX = static_cast<unsigned int>(gridPos.x);
 	}
 
 	if(line.y >= 0.0f)
 	{
-		startY = gridPos.y;
+		startY = static_cast<unsigned int>(gridPos.y);
 		endY = (gridPos.y + maxGridDistance < m_numberOfGridPartitions) ? (static_cast<int>(gridPos.y) + maxGridDistance) : (m_numberOfGridPartitions - 1);
 	}else
 	{
 		startY = (gridPos.y > maxGridDistance) ? (static_cast<int>(gridPos.y) - maxGridDistance) : 0;
-		endY = gridPos.y;
+		endY = static_cast<unsigned int>(gridPos.y);
 	}
 
 	// Check the grid within that distance for colliding obstacles
@@ -1214,6 +1311,8 @@ void TestEnvironment::EndSimulation(void)
 	m_obstacles.clear();
 	m_deadEntities.clear();
 
+	// Reset game context
+
 	for(unsigned int i = 0; i < g_kSoldiersPerTeam * (NumberOfTeams-1); ++i)
 	{
 		m_soldiers[i].Reset();
@@ -1221,7 +1320,7 @@ void TestEnvironment::EndSimulation(void)
 
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
-		m_flags[i].OnReset();
+		//m_flags[i].OnReset();
 		m_spawnPoints[i].clear();
 	}
 
@@ -1230,7 +1329,7 @@ void TestEnvironment::EndSimulation(void)
 	m_isInEditMode = true;
 	m_isPaused = true;
 
-	m_gameState.Reset();
+	m_pGameContext->Reset();
 }
 
 //--------------------------------------------------------------------------------------
@@ -1508,6 +1607,11 @@ void TestEnvironment::UpdateBaseEntrances(void)
 bool TestEnvironment::IsPaused(void) const
 {
 	return m_isPaused;
+}
+
+const GameContext* TestEnvironment::GetGameContext(void) const
+{
+	return m_pGameContext;
 }
 
 float TestEnvironment::GetGridSize(void) const

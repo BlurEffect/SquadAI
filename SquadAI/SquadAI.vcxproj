@@ -108,11 +108,11 @@
     <ClCompile Include="EntityAlive.cpp" />
     <ClCompile Include="EntityCombatManager.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
-    <ClCompile Include="Flag.cpp" />
+    <ClCompile Include="Objective.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
     <ClCompile Include="EntityMovementManager.cpp" />
-    <ClCompile Include="GameState.cpp" />
+    <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="GreatestKnownThreatSet.cpp" />
     <ClCompile Include="GreatestSuspectedThreatSet.cpp" />
     <ClCompile Include="Idle.cpp" />
@@ -121,6 +121,7 @@
     <ClCompile Include="Monitor.cpp" />
     <ClCompile Include="MovementTargetSet.cpp" />
     <ClCompile Include="MoveToTarget.cpp" />
+    <ClCompile Include="MultiflagCTFGameContext.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Obstacle.cpp" />
@@ -189,11 +190,11 @@
     <ClInclude Include="EntityAlive.h" />
     <ClInclude Include="EntityCombatManager.h" />
     <ClInclude Include="EntitySensors.h" />
-    <ClInclude Include="Flag.h" />
+    <ClInclude Include="Objective.h" />
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
     <ClInclude Include="EntityMovementManager.h" />
-    <ClInclude Include="GameState.h" />
+    <ClInclude Include="GameContext.h" />
     <ClInclude Include="GreatestKnownThreatSet.h" />
     <ClInclude Include="GreatestSuspectedThreatSet.h" />
     <ClInclude Include="Idle.h" />
@@ -203,6 +204,7 @@
     <ClInclude Include="Monitor.h" />
     <ClInclude Include="MovementTargetSet.h" />
     <ClInclude Include="MoveToTarget.h" />
+    <ClInclude Include="MultiflagCTFGameContext.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Obstacle.h" />

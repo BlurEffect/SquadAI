@@ -13,6 +13,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <vector>
+#include <stdio.h>
 
 #include "Drawable.h"
 #include "TriangleDrawable.h"
@@ -31,13 +32,16 @@
 
 using namespace DirectX;
 
+// Includes
+#include "GameContext.h"
+
 class Renderer
 {
 public:
 	Renderer(void);
 	~Renderer(void);
 	bool Initialise(HWND hWnd, UINT windowWidth, UINT windowHeight, const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
-	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData);
+	void RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData, const GameContext* pGameContext);
 	void Cleanup(void);
 	
 	bool SetupGrid(float gridSize, unsigned int numberOfGridPartitions);
@@ -56,8 +60,8 @@ private:
 	bool        InitialiseSentences(void);
 
 	void        RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix);
-	void        RenderText(const AppData& appData);
-	void        UpdateSentences(const AppData& appData);
+	void        RenderText(const AppData& appData, const GameContext* pGameContext);
+	void        UpdateSentences(const AppData& appData, const GameContext* pGameContext);
 
 	void	    PrepareDefaultGeometryRendering(void);
 	void	    PrepareTextRendering(void);

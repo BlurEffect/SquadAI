@@ -33,12 +33,13 @@
 #include "AxisAlignedRectangleCollider.h"
 #include "EditModeObject.h"
 #include "ApplicationSettings.h"
-#include "Flag.h"
+#include "Objective.h"
 #include "Obstacle.h"
 #include "MessageDataStructures.h"
 #include "Entity.h"
 #include "Logger.h"
-#include "GameState.h"
+#include "GameContext.h"
+#include "MultiflagCTFGameContext.h"
 
 using namespace DirectX;
 
@@ -74,8 +75,8 @@ public:
 	bool CheckLineOfSightGrid(int startGridX, int startGridY, int endGridX, int endGridY);
 	bool CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& end);
 	void ResetNodeGraph(void);
-
 	
+	bool CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject);
 
 	void RecordEvent(EventType type, void* pObject1, void* pObject2);
 	void ProcessMessage(Message* pMessage);
@@ -85,6 +86,7 @@ public:
 	unsigned int GetNumberOfGridPartitions(void) const;
 	float	     GetGridSpacing(void) const;
 	bool         IsPaused(void) const;
+	const GameContext* GetGameContext(void) const;
 
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);
@@ -97,7 +99,6 @@ private:
 	void UpdateCoverSpots(CollidableObject* obstacle);
 	void UpdateBaseEntrances(void);
 	void UpdateNodeGraph(void);
-	bool CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject);
 	void UpdateRespawns(float deltaTime);
 
 	void AddDeadEntity(unsigned long id);
@@ -108,7 +109,7 @@ private:
 	bool          m_isInEditMode; // Tells whether the environment is in edit or simulation mode
 	
 	Logger m_logger; // The logger object that is used to record events
-	GameState m_gameState; // The current gamestate
+	GameContext* m_pGameContext; // The current gamestate
 
 	std::list<std::pair<float, Entity*>> m_deadEntities;  // Contains pointers to currently dead entities and the duration of their absence from the game
 
@@ -121,7 +122,7 @@ private:
 	// Objects
 	std::vector<EditModeObject> m_staticObjects;									// The static test environment objects, as set up by the user in edit mode
 	Soldier				        m_soldiers[g_kSoldiersPerTeam * (NumberOfTeams-1)]; // The soldier objects of all teams
-	Flag                        m_flags[NumberOfTeams-1];						    // The flags of all teams
+	Objective                        m_objectives[NumberOfTeams-1];						    // The flags of all teams
 	std::list<Obstacle>         m_obstacles;										// The obstacles within the environment 
 	std::list<Projectile>       m_projectiles;										// Holds the currently active projectiles
 	std::vector<XMFLOAT2>       m_spawnPoints[NumberOfTeams-1];					    // Holds the spawn points of all teams

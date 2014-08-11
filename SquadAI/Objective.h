@@ -1,9 +1,36 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  Flag.h
-*  Encapsulates a flag object.
+*  Objective.h
+*  Encapsulates an objective object such as flags in a CTF game.
 */
 
+#ifndef OBJECTIVE_H
+#define OBJECTIVE_H
+
+// Includes
+#include "CollidableObject.h"
+#include "ObjectTypes.h"
+
+class Objective : public CollidableObject
+{
+public:
+	Objective(void);
+	~Objective(void);
+
+	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team);
+	
+	// Data access functions
+	EntityTeam      GetTeam(void) const;
+	void SetTeam(EntityTeam team);
+
+private:
+
+	EntityTeam m_team; // The team that the objective belongs to
+};
+
+#endif // OBJECTIVE_H
+
+/*
 #ifndef FLAG_H
 #define FLAG_H
 
@@ -31,7 +58,7 @@ public:
 	Flag(void);
 	~Flag(void);
 
-	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team, float resetInterval);
+	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team);
 
 	bool OnPickUp(Entity* pEntity);
 	void Update(float deltaTime);
@@ -62,3 +89,4 @@ private:
 };
 
 #endif // FLAG_H
+*/

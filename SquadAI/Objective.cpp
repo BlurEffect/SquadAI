@@ -1,9 +1,57 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  Flag.cpp
+*  Objective.cpp
 *  Encapsulates a flag object.
 */
 
+// Includes
+#include "Objective.h"
+
+Objective::Objective(void) : CollidableObject()
+{
+}
+
+Objective::~Objective(void)
+{
+}
+
+//--------------------------------------------------------------------------------------
+// Initialise the objective object.
+// Param1: A unique identifier for the object.
+// Param2: The initial position of the objective in world space.
+// Param3: The rotation of the objective.
+// Param4: The scale of the objective.
+// Param5: The category the object belongs to.
+// Param6: The type of the collider that should be created.
+// Param7: A pointer to the initialisation data for the collider.
+// Param8: The team that the objective belongs to.
+// Returns true if the flag was initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool Objective::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, EntityTeam team)
+{
+	if(!CollidableObject::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData))
+	{
+		return false;
+	}
+
+	m_team = team;
+
+	return true;
+}
+
+// Data access functions
+
+EntityTeam Objective::GetTeam(void) const
+{
+	return m_team;
+}
+
+void Objective::SetTeam(EntityTeam team)
+{
+	m_team = team;
+}
+
+/*
 // Includes
 #include "Flag.h"
 
@@ -167,3 +215,5 @@ void Flag::SetCarrier(Entity* pCarrier)
 {
 	m_pCarrier = pCarrier;
 }
+
+*/

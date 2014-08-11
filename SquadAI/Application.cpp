@@ -46,7 +46,7 @@ void Application::Update()
 	ProcessInput();
 	m_camera.Update(m_inputManager.GetCameraMovement());
 	m_testEnvironment.Update(m_renderer.GetRenderContext(), m_performanceTimer.GetDeltaTime());
-	m_renderer.RenderScene(m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix(), m_appData);
+	m_renderer.RenderScene(m_camera.GetViewMatrix(), m_camera.GetProjectionMatrix(), m_appData, m_testEnvironment.GetGameContext());
 }
 
 //--------------------------------------------------------------------------------------

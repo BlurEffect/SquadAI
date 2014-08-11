@@ -561,6 +561,82 @@ bool Renderer::InitialiseSentences(void)
 		return false;
 	}
 
+	m_pPermanentSentences[LabelTimeLeft] = new SentenceDrawable(6, &m_font, "Time: ", right - 250, top -140, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelTimeLeft])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtTimeLeft] = new SentenceDrawable(5, &m_font, "15:00", right - 150, top -140, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtTimeLeft])
+	{
+		return false;
+	}
+
+	m_pPermanentSentences[LabelScore] = new SentenceDrawable(7, &m_font, "Score: ", right - 250, top -160, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelScore])
+	{
+		return false;
+	}
+	m_pPermanentSentences[LabelScoreSeparators] = new SentenceDrawable(27, &m_font, "        |       ", right - 150, top -160, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelScoreSeparators])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtScoreRed] = new SentenceDrawable(4, &m_font, "1000", right - 150, top -160, XMFLOAT3(1.0f, 0.0f, 0.0f));
+	if(!m_pPermanentSentences[TxtScoreRed])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtScoreBlue] = new SentenceDrawable(4, &m_font, "1000", right - 90, top -160, XMFLOAT3(0.0f, 0.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtScoreBlue])
+	{
+		return false;
+	}
+	
+	m_pPermanentSentences[LabelKills] = new SentenceDrawable(7, &m_font, "Kills: ", right - 250, top -180, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelKills])
+	{
+		return false;
+	}
+	m_pPermanentSentences[LabelKillsSeparators] = new SentenceDrawable(27, &m_font, "        |       ", right - 150, top -180, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelKillsSeparators])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtKillsRed] = new SentenceDrawable(4, &m_font, "1000", right - 150, top -180, XMFLOAT3(1.0f, 0.0f, 0.0f));
+	if(!m_pPermanentSentences[TxtKillsRed])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtKillsBlue] = new SentenceDrawable(4, &m_font, "1000", right - 90, top -180, XMFLOAT3(0.0f, 0.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtKillsBlue])
+	{
+		return false;
+	}
+
+
+	m_pPermanentSentences[LabelShotsFired] = new SentenceDrawable(13, &m_font, "Shots fired: ", right - 250, top -200, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelShotsFired])
+	{
+		return false;
+	}
+	m_pPermanentSentences[LabelShotsFiredSeparators] = new SentenceDrawable(27, &m_font, "        |       ", right - 150, top -200, XMFLOAT3(1.0f, 1.0f, 1.0f));
+	if(!m_pPermanentSentences[LabelShotsFiredSeparators])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtShotsFiredRed] = new SentenceDrawable(4, &m_font, "1000", right - 150, top -200, XMFLOAT3(1.0f, 0.0f, 0.0f));
+	if(!m_pPermanentSentences[TxtShotsFiredRed])
+	{
+		return false;
+	}
+	m_pPermanentSentences[TxtShotsFiredBlue] = new SentenceDrawable(4, &m_font, "1000", right - 90, top -200, XMFLOAT3(0.0f, 0.0f, 1.0f));
+	if(!m_pPermanentSentences[TxtShotsFiredBlue])
+	{
+		return false;
+	}
+
+
 	// Initialise the sentences
 
 	for(int i = 0; i < NumberOfSentences; ++i)
@@ -631,8 +707,9 @@ void Renderer::Cleanup( void )
 // Param1: The view matrix of the camera for which to render the frame.
 // Param2: The projection matrix of the camera for which to render the frame.
 // Param3: The current application data, required for text rendering to provide information to the user.
+// Param4: The current game context, required for text rendering.
 //--------------------------------------------------------------------------------------
-void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData)
+void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& projectionMatrix, const AppData& appData, const GameContext* pGameContext)
 {
 	// Clear the backbuffer
 	m_pD3d11DeviceContext->ClearRenderTargetView(m_pRenderTargetView, g_kBackgroundColour);
@@ -644,7 +721,7 @@ void Renderer::RenderScene(const XMFLOAT4X4& viewMatrix, const XMFLOAT4X4& proje
 	RenderTestEnvironment(viewMatrix, projectionMatrix);
 
 	// Render the text (GUI)
-	RenderText(appData);
+	RenderText(appData, pGameContext);
 
 	// Present the backbuffer to the screen
 	m_pSwapChain->Present(0, 0);
@@ -699,11 +776,12 @@ void Renderer::RenderTestEnvironment(const XMFLOAT4X4& viewMatrix, const XMFLOAT
 //--------------------------------------------------------------------------------------
 // Renders all the text.
 // Param1: The current application data.
+// Param2: The context of the current game.
 //--------------------------------------------------------------------------------------
-void Renderer::RenderText(const AppData& appData)
+void Renderer::RenderText(const AppData& appData, const GameContext* pGameContext)
 {
 	// Update the sentences
-	UpdateSentences(appData);
+	UpdateSentences(appData, pGameContext);
 
 	PrepareTextRendering();
 
@@ -729,8 +807,9 @@ void Renderer::RenderText(const AppData& appData)
 //--------------------------------------------------------------------------------------
 // Update the text on the screen.
 // Param1: The current application data.
+// Param2: The current game context.
 //--------------------------------------------------------------------------------------
-void Renderer::UpdateSentences(const AppData& appData)
+void Renderer::UpdateSentences(const AppData& appData, const GameContext* pGameContext)
 {
 	// Note: Only update sentences when their content changed.
 
@@ -782,6 +861,86 @@ void Renderer::UpdateSentences(const AppData& appData)
 	{
 		m_pPermanentSentences[TxtFramerate]->SetText("9999");
 	}
+
+	char bufferTime[6];
+	if(pGameContext->GetTimeLeft() <= 3600)
+	{
+		if(pGameContext->GetTimeLeft() > 0.0f)
+		{
+			unsigned int minutes = static_cast<unsigned int>(pGameContext->GetTimeLeft()) / 60;
+			unsigned int seconds = static_cast<unsigned int>(pGameContext->GetTimeLeft()) % 60;
+
+			_snprintf_s(bufferTime, 6, 6, "%02d:%02d", minutes, seconds);
+			m_pPermanentSentences[TxtTimeLeft]->SetText(bufferTime);
+		}else
+		{
+			m_pPermanentSentences[TxtTimeLeft]->SetText("00:00");
+		}
+	}else
+	{
+		m_pPermanentSentences[TxtTimeLeft]->SetText("60:00");
+	}
+
+	char bufferScoreRed[5];
+	if(pGameContext->GetScore(TeamRed) <= 9999)
+	{
+		_itoa_s(pGameContext->GetScore(TeamRed), bufferScoreRed, 5, 10);
+		m_pPermanentSentences[TxtScoreRed]->SetText(bufferScoreRed);
+	}else
+	{
+		m_pPermanentSentences[TxtScoreRed]->SetText("9999");
+	}
+
+	char bufferScoreBlue[5];
+	if(pGameContext->GetScore(TeamBlue) <= 9999)
+	{
+		_itoa_s(pGameContext->GetScore(TeamBlue), bufferScoreBlue, 5, 10);
+		m_pPermanentSentences[TxtScoreBlue]->SetText(bufferScoreBlue);
+	}else
+	{
+		m_pPermanentSentences[TxtScoreBlue]->SetText("9999");
+	}
+
+	char bufferKillsRed[5];
+	if(pGameContext->GetKills(TeamRed) <= 9999)
+	{
+		_itoa_s(pGameContext->GetKills(TeamRed), bufferKillsRed, 5, 10);
+		m_pPermanentSentences[TxtKillsRed]->SetText(bufferKillsRed);
+	}else
+	{
+		m_pPermanentSentences[TxtKillsRed]->SetText("9999");
+	}
+
+	char bufferKillsBlue[5];
+	if(pGameContext->GetKills(TeamBlue) <= 9999)
+	{
+		_itoa_s(pGameContext->GetKills(TeamBlue), bufferKillsBlue, 5, 10);
+		m_pPermanentSentences[TxtKillsBlue]->SetText(bufferKillsBlue);
+	}else
+	{
+		m_pPermanentSentences[TxtKillsBlue]->SetText("9999");
+	}
+
+	char bufferShotsFiredRed[5];
+	if(pGameContext->GetShotsFired(TeamRed) <= 9999)
+	{
+		_itoa_s(pGameContext->GetShotsFired(TeamRed), bufferShotsFiredRed, 5, 10);
+		m_pPermanentSentences[TxtShotsFiredRed]->SetText(bufferShotsFiredRed);
+	}else
+	{
+		m_pPermanentSentences[TxtShotsFiredRed]->SetText("9999");
+	}
+
+	char bufferShotsFiredBlue[5];
+	if(pGameContext->GetShotsFired(TeamBlue) <= 9999)
+	{
+		_itoa_s(pGameContext->GetShotsFired(TeamBlue), bufferShotsFiredBlue, 5, 10);
+		m_pPermanentSentences[TxtShotsFiredBlue]->SetText(bufferShotsFiredBlue);
+	}else
+	{
+		m_pPermanentSentences[TxtShotsFiredBlue]->SetText("9999");
+	}
+
 }
 
 //--------------------------------------------------------------------------------------

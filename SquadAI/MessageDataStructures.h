@@ -2,7 +2,7 @@
 *  Kevin Meergans, SquadAI, 2014
 *  MessageDataStructures.h
 *  This file contains data structures required for the message passing between entities and the
-*  test environment.
+*  test environment as well as other components of the application.
 */
 
 #ifndef MESSAGE_DATA_STRUCTURES_H
@@ -11,6 +11,8 @@
 // Includes
 #include <DirectXMath.h>
 #include "ObjectTypes.h"
+#include "Entity.h"
+#include "Objective.h"
 
 using namespace DirectX;
 
@@ -19,10 +21,12 @@ using namespace DirectX;
 //--------------------------------------------------------------------------------------
 enum MessageType
 {
-	ProjectileFiredMessageType, // A projectile was fired by an entity
-	HitMessageType,			    // The entity receiving this message was hit by a projectile
-	EntityKilledMessageType,    // An entity was killed and other entities are notified of this event
-	ReadyToRespawnMessageType   // Tells an entity that it is ready to respawn
+	ProjectileFiredMessageType,			// A projectile was fired by an entity
+	HitMessageType,						// The entity receiving this message was hit by a projectile
+	EntityKilledMessageType,			// An entity was killed and other entities are notified of this event
+	ReadyToRespawnMessageType,			// Tells an entity that it is ready to respawn
+	AddObjectiveMessageType,			// Puts an objective object under the control of a specific game context
+	EntityReachedObjectiveMessageType	// An entity collided with an objective object.
 };
 
 //--------------------------------------------------------------------------------------
@@ -126,6 +130,43 @@ public:
 
 private:
 	XMFLOAT2 m_respawnPosition; // The position, where the entity will reenter the game
+};
+
+//--------------------------------------------------------------------------------------
+// Contains data required for a message sent when an objective should be put under the 
+// control of a specific game context.
+//--------------------------------------------------------------------------------------
+class AddObjectiveMessage : public Message
+{
+public:
+	AddObjectiveMessage(Objective* pObjective) : Message(AddObjectiveMessageType),
+														m_pObjective(pObjective)
+	{}
+
+	Objective* GetObjective(void) { return m_pObjective; }
+
+private:
+	Objective* m_pObjective; // The objective that should be added to the game context
+};
+
+//--------------------------------------------------------------------------------------
+// Contains data required for a message sent when an entity has reached an objective,
+// that is collided with it.
+//--------------------------------------------------------------------------------------
+class EntityReachedObjectiveMessage : public Message
+{
+public:
+	EntityReachedObjectiveMessage(Entity* pEntity, Objective* pObjective) : Message(EntityReachedObjectiveMessageType),
+																			m_pEntity(pEntity),
+																			m_pObjective(pObjective)
+	{}
+
+	Entity*			  GetEntity(void)    { return m_pEntity; }
+	Objective* GetObjective(void) { return m_pObjective; }
+
+private:
+	Entity*			  m_pEntity;  // The entity that reached the objective
+	Objective* m_pObjective; // The objective that was reached by the entity
 };
 
 

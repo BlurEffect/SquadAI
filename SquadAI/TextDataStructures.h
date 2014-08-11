@@ -62,6 +62,20 @@ enum SentenceIdentifiers
 	TxtObjectType,
 	LabelFramerate,
 	TxtFramerate,
+	LabelTimeLeft,
+	TxtTimeLeft,
+	LabelScore,
+	LabelScoreSeparators,
+	TxtScoreRed,
+	TxtScoreBlue,
+	LabelKills,
+	LabelKillsSeparators,
+	TxtKillsRed,
+	TxtKillsBlue,
+	LabelShotsFired,
+	LabelShotsFiredSeparators,
+	TxtShotsFiredRed,
+	TxtShotsFiredBlue,
 	NumberOfSentences
 };
 

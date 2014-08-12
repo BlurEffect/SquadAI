@@ -108,6 +108,7 @@
     <ClCompile Include="EntityAlive.cpp" />
     <ClCompile Include="EntityCombatManager.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
+    <ClCompile Include="MultiflagCTFTeamAI.cpp" />
     <ClCompile Include="Objective.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="Soldier.cpp" />
     <ClCompile Include="SquareDrawable.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="TeamAI.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
     <ClCompile Include="TriangleDrawable.cpp" />
     <ClCompile Include="UpdateAttackReadiness.cpp" />
@@ -190,6 +192,11 @@
     <ClInclude Include="EntityAlive.h" />
     <ClInclude Include="EntityCombatManager.h" />
     <ClInclude Include="EntitySensors.h" />
+    <ClInclude Include="GameContextToTeamAIMessages.h" />
+    <ClInclude Include="TestEnvironmentMessages.h" />
+    <ClInclude Include="EntityToTeamAIMessages.h" />
+    <ClInclude Include="Message.h" />
+    <ClInclude Include="MultiflagCTFTeamAI.h" />
     <ClInclude Include="Objective.h" />
     <ClInclude Include="FontPixelShader.h" />
     <ClInclude Include="FontVertexShader.h" />
@@ -200,7 +207,6 @@
     <ClInclude Include="Idle.h" />
     <ClInclude Include="InvestigatingGreatestSuspectedThreat.h" />
     <ClInclude Include="Logger.h" />
-    <ClInclude Include="MessageDataStructures.h" />
     <ClInclude Include="Monitor.h" />
     <ClInclude Include="MovementTargetSet.h" />
     <ClInclude Include="MoveToTarget.h" />
@@ -246,6 +252,7 @@
     <ClInclude Include="SoldierProperties.h" />
     <ClInclude Include="SquareDrawable.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="TeamAI.h" />
     <ClInclude Include="TestEnvironment.h" />
     <ClInclude Include="TestEnvironmentData.h" />
     <ClInclude Include="TextDataStructures.h">

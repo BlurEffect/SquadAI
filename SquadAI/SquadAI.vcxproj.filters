@@ -121,6 +121,15 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{76d9ea47-57ce-4428-a4e9-e239f836d97e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\TeamAI">
+      <UniqueIdentifier>{cdfd50cf-33ad-4342-bd4a-47810ac420cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TeamAI">
+      <UniqueIdentifier>{80bc8eec-0653-423e-a8c1-a0b20ccf9104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Messages">
+      <UniqueIdentifier>{204d5a03-68bb-4981-98a9-feb16a876bc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SimplePixelShader.cpp">
@@ -344,6 +353,12 @@
     </ClCompile>
     <ClCompile Include="MultiflagCTFGameContext.cpp">
       <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamAI.cpp">
+      <Filter>Source Files\TeamAI</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiflagCTFTeamAI.cpp">
+      <Filter>Source Files\TeamAI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -584,9 +599,6 @@
     <ClInclude Include="ReturnSpecificStatus.h">
       <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
-    <ClInclude Include="MessageDataStructures.h">
-      <Filter>Header Files\TestEnvironment</Filter>
-    </ClInclude>
     <ClInclude Include="EntityAlive.h">
       <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Conditions</Filter>
     </ClInclude>
@@ -613,6 +625,24 @@
     </ClInclude>
     <ClInclude Include="MultiflagCTFGameContext.h">
       <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamAI.h">
+      <Filter>Header Files\TeamAI</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiflagCTFTeamAI.h">
+      <Filter>Header Files\TeamAI</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityToTeamAIMessages.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="TestEnvironmentMessages.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="GameContextToTeamAIMessages.h">
+      <Filter>Header Files\Messages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

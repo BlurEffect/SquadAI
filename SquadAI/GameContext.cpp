@@ -148,7 +148,7 @@ void GameContext::SetMaxTime(float time)
 	m_maxTime = time;
 }
 
-void GameContext::SetMaxScore(float score)
+void GameContext::SetMaxScore(unsigned int score)
 {
 	m_maxScore = score;
 }

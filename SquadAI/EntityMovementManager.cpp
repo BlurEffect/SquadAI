@@ -391,7 +391,7 @@ void EntityMovementManager::Separate(float separationRadius, float maximalForce)
 				// stronger than that from objects that are farther away.
 
 				// Avoid possible division by zero
-				float proximity = (it->first != 0) ? it->first : 0.01;
+				float proximity = (it->first != 0) ? it->first : 0.01f;
 
 				separationVector += (XMLoadFloat2(&m_pEntity->GetPosition()) - XMLoadFloat2(&it->second->GetPosition())) / proximity;
 			}

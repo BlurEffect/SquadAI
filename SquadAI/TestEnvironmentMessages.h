@@ -1,50 +1,21 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
 *  MessageDataStructures.h
-*  This file contains data structures required for the message passing between entities and the
-*  test environment as well as other components of the application.
+*  This file contains all messages that are exchanged between the test environment and
+*  and other components such as entities, game contexts.
 */
 
-#ifndef MESSAGE_DATA_STRUCTURES_H
-#define MESSAGE_DATA_STRUCTURES_H
+#ifndef TEST_ENVIRONMENT_MESSAGES_H
+#define TEST_ENVIRONMENT_MESSAGES_H
 
 // Includes
 #include <DirectXMath.h>
+#include "Message.h"
 #include "ObjectTypes.h"
-#include "Entity.h"
 #include "Objective.h"
+#include "Entity.h"
 
 using namespace DirectX;
-
-//--------------------------------------------------------------------------------------
-// Identifies the type of a message.
-//--------------------------------------------------------------------------------------
-enum MessageType
-{
-	ProjectileFiredMessageType,			// A projectile was fired by an entity
-	HitMessageType,						// The entity receiving this message was hit by a projectile
-	EntityKilledMessageType,			// An entity was killed and other entities are notified of this event
-	ReadyToRespawnMessageType,			// Tells an entity that it is ready to respawn
-	AddObjectiveMessageType,			// Puts an objective object under the control of a specific game context
-	EntityReachedObjectiveMessageType	// An entity collided with an objective object.
-};
-
-//--------------------------------------------------------------------------------------
-// Class representing a message.
-//--------------------------------------------------------------------------------------
-class Message
-{
-public:
-	Message(MessageType messageType) : m_messageType(messageType){}
-
-	MessageType GetType(void) const { return m_messageType; }
-
-private:
-	MessageType m_messageType;	// The type of the message
-};		
-
-// The following classes define the specific data contained in the messages
-// of the different types
 
 //--------------------------------------------------------------------------------------
 // Contains data required for a message sent when an entity fires a projectile.
@@ -169,5 +140,4 @@ private:
 	Objective* m_pObjective; // The objective that was reached by the entity
 };
 
-
-#endif // MESSAGE_DATA_STRUCTURES_H
+#endif // TEST_ENVIRONMENT_MESSAGES_H

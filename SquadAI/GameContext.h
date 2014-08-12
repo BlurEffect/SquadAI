@@ -11,7 +11,8 @@
 
 // Includes
 #include "ObjectTypes.h"
-#include "MessageDataStructures.h"
+#include "Message.h"
+#include "TestEnvironmentMessages.h"
 
 //--------------------------------------------------------------------------------------
 // Identifies the specific type of game context that is the game mode it is associated to.
@@ -49,7 +50,7 @@ public:
 	unsigned int GetShotsFired(EntityTeam team) const;
 
 	void SetMaxTime(float time);
-	void SetMaxScore(float score);
+	void SetMaxScore(unsigned int score);
 
 private:
 

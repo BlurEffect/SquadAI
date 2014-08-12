@@ -9,7 +9,8 @@
 // Includes
 #include "Soldier.h"
 #include "TestEnvironment.h"
-#include "MessageDataStructures.h"
+#include "Message.h"
+#include "TestEnvironmentMessages.h"
 
 Soldier::Soldier(void) : Entity(),
 						 m_fireWeaponTimer(0.0f)

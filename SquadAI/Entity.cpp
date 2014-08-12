@@ -8,7 +8,8 @@
 // Includes
 #include "Entity.h"
 #include "TestEnvironment.h"
-#include "MessageDataStructures.h"
+#include "Message.h"
+#include "TestEnvironmentMessages.h"
 
 Entity::Entity(void) : CollidableObject(),
 					   m_pBehaviour(nullptr),

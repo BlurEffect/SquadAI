@@ -46,10 +46,10 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetFlagOwner()].m_carrierId = 0;
 		break;
 		}
+	default:
+		// Forward other messages to the base class implementation of the function
+		TeamAI::ProcessMessage(pMessage);
 	}
-
-	// Forward other messages to the base class implementation of the function
-	TeamAI::ProcessMessage(pMessage);
 }
 
 //--------------------------------------------------------------------------------------

@@ -49,21 +49,6 @@ bool Soldier::Initialise(unsigned long id, const XMFLOAT2& position, float rotat
 }
 
 //--------------------------------------------------------------------------------------
-// Updates the soldier entity.
-// Param1: The time in seconds passed since the last frame.
-//--------------------------------------------------------------------------------------
-void Soldier::Update(float deltaTime)
-{
-	if(deltaTime == 0.0f)
-	{
-		// No need to traverse the tree.
-		return;
-	}
-
-	GetBehaviour()->Tick(deltaTime);
-}
-
-//--------------------------------------------------------------------------------------
 // Moves the soldier entity towards a given target.
 // Param1: The time in seconds passed since the last frame.
 // Returns the current state of the action.

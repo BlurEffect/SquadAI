@@ -8,9 +8,9 @@
 #include "Entity.h"
 #include "TestEnvironment.h"
 
-TeamAI::TeamAI(EntityTeam team, TestEnvironment* pEnvironment) : m_team(team),
-																 m_pTestEnvironment(pEnvironment),
-																 m_timeLeft(1.0f)
+TeamAI::TeamAI(void) : m_team(None),
+					   m_pTestEnvironment(nullptr),
+					   m_timeLeft(1.0f)
 {
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
@@ -20,6 +20,35 @@ TeamAI::TeamAI(EntityTeam team, TestEnvironment* pEnvironment) : m_team(team),
 
 TeamAI::~TeamAI(void)
 {
+}
+
+
+bool TeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment)
+{
+	if(!pEnvironment)
+	{
+		return false;
+	}
+	
+	m_team = team;
+	m_pTestEnvironment = pEnvironment;
+	
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the team AI.
+// Param1: The time in seconds passed since the last frame.
+//--------------------------------------------------------------------------------------
+void TeamAI::Update(float deltaTime)
+{
+	if(deltaTime == 0.0f)
+	{
+		// No need to traverse the tree.
+		return;
+	}
+
+	m_pBehaviour->Tick(deltaTime);
 }
 
 //--------------------------------------------------------------------------------------

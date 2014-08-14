@@ -65,7 +65,6 @@ public:
 	~Soldier(void);
 
 	bool Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, EntityTeam team, const SoldierProperties& soldierProperties);
-	void Update(float deltaTime);
 	void Reset(void);
 
 	// Basic actions as inherited from Entity

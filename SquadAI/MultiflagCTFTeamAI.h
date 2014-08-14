@@ -40,8 +40,10 @@ class MultiflagCTFTeamAI : public TeamAI
 {
 public:
 
-	MultiflagCTFTeamAI(EntityTeam team, TestEnvironment* pEnvironment);
+	MultiflagCTFTeamAI(void);
 	~MultiflagCTFTeamAI(void);
+
+	bool Initialise(EntityTeam team, TestEnvironment* pEnvironment);
 
 	//void ProcessMessage(Message* pMessage);
 	void Reset(void);

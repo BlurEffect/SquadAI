@@ -63,7 +63,7 @@ public:
 	bool         Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team);
 	//void         ProcessMessage(Message* pMessage);
 
-	virtual void Update(float deltaTime) = 0;
+	virtual void Update(float deltaTime);
 	virtual void Activate(void);
 	virtual void Reset(void);
 

@@ -77,7 +77,13 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 //--------------------------------------------------------------------------------------
 void Entity::Update(float deltaTime)
 {
-	// Do nothing
+	if(deltaTime == 0.0f)
+	{
+		// No need to traverse the tree.
+		return;
+	}
+
+	m_pBehaviour->Tick(deltaTime);
 }
 	
 //--------------------------------------------------------------------------------------

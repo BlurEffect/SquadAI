@@ -8,6 +8,7 @@
 // Includes
 #include "BehaviourFactory.h"
 #include "Entity.h"
+#include "TeamAI.h"
 
 //--------------------------------------------------------------------------------------
 // Creates a behaviour tree for the provided entity.

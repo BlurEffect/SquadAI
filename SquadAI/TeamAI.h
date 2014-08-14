@@ -19,6 +19,7 @@
 #include "EntityToTeamAIMessages.h"
 #include "GameContextToTeamAIMessages.h"
 #include "Communicator.h"
+#include "Behaviour.h"
 
 using namespace DirectX;
 
@@ -46,13 +47,16 @@ class TeamAI : public Communicator
 {
 public:
 
-	TeamAI(EntityTeam team, TestEnvironment* pEnvironment);
+	TeamAI(void);
 	virtual ~TeamAI(void) = 0;
+
+	virtual bool Initialise(EntityTeam team, TestEnvironment* pEnvironment);
 
 	//virtual void ProcessMessage(Message* pMessage);
 	void AddTeamMember(Entity* pEntity);
 	void RemoveTeamMember(unsigned long id);
 
+	virtual void Update(float deltaTime);
 	virtual void Reset(void);
 
 	// Data access functions
@@ -64,11 +68,13 @@ public:
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 
 	virtual void ProcessEvent(EventType type, void* pEventData);
+
 protected:
 	virtual void ProcessMessage(Message* pMessage);
 	
 
 private:
+	Behaviour*                           m_pBehaviour;              // The behaviour tree controlling the decisions of the team AI
 	EntityTeam						     m_team;					// The team that the AI is controlling
 	std::vector<Entity*>                 m_teamMembers;				// The entities being controlled by this team AI
 	std::map<unsigned long, EnemyRecord> m_enemyRecords;			// The team AI creates and obtains a record for every enemy spotted in the environment

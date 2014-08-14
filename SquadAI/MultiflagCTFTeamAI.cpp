@@ -7,12 +7,27 @@
 #include "MultiflagCTFTeamAI.h"
 #include "TestEnvironment.h"
 
-MultiflagCTFTeamAI::MultiflagCTFTeamAI(EntityTeam team, TestEnvironment* pEnvironment) : TeamAI(team, pEnvironment)
+MultiflagCTFTeamAI::MultiflagCTFTeamAI(void) : TeamAI()
 {
 }
 
 MultiflagCTFTeamAI::~MultiflagCTFTeamAI(void)
 {
+}
+
+bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment)
+{
+	if(TeamAI::Initialise(team, pEnvironment))
+	{
+		/*
+		m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree, this);
+		if(!m_pBehaviour)
+		{
+			return false;
+		}*/
+	}
+
+	return false;
 }
 
 //--------------------------------------------------------------------------------------
@@ -100,6 +115,10 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 	}
 }
 */
+
+
+
+
 //--------------------------------------------------------------------------------------
 // Resets the team AI after a completed match.
 //--------------------------------------------------------------------------------------

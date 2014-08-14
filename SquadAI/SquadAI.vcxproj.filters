@@ -127,8 +127,17 @@
     <Filter Include="Source Files\TeamAI">
       <UniqueIdentifier>{80bc8eec-0653-423e-a8c1-a0b20ccf9104}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Messages">
+    <Filter Include="Header Files\Messages/Events">
       <UniqueIdentifier>{204d5a03-68bb-4981-98a9-feb16a876bc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Messages/Events\Messages">
+      <UniqueIdentifier>{fdc621e7-2057-47b9-8bdc-259ab7c7fef3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Messages/Events\Events">
+      <UniqueIdentifier>{a03e2b4d-9cd3-4991-a196-37fc66c1a4d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Messages/Events">
+      <UniqueIdentifier>{804c7a98-6bac-464b-a7b8-cf9296f2f3e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -359,6 +368,12 @@
     </ClCompile>
     <ClCompile Include="MultiflagCTFTeamAI.cpp">
       <Filter>Source Files\TeamAI</Filter>
+    </ClCompile>
+    <ClCompile Include="Communicator.cpp">
+      <Filter>Source Files\Messages/Events</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessMessages.cpp">
+      <Filter>Source Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -632,17 +647,29 @@
     <ClInclude Include="MultiflagCTFTeamAI.h">
       <Filter>Header Files\TeamAI</Filter>
     </ClInclude>
+    <ClInclude Include="GameContextToTeamAIMessages.h">
+      <Filter>Header Files\Messages/Events\Messages</Filter>
+    </ClInclude>
     <ClInclude Include="Message.h">
-      <Filter>Header Files\Messages</Filter>
+      <Filter>Header Files\Messages/Events\Messages</Filter>
     </ClInclude>
     <ClInclude Include="EntityToTeamAIMessages.h">
-      <Filter>Header Files\Messages</Filter>
+      <Filter>Header Files\Messages/Events\Messages</Filter>
     </ClInclude>
-    <ClInclude Include="TestEnvironmentMessages.h">
-      <Filter>Header Files\Messages</Filter>
+    <ClInclude Include="TestEnvironmentToEntityMessages.h">
+      <Filter>Header Files\Messages/Events\Messages</Filter>
     </ClInclude>
-    <ClInclude Include="GameContextToTeamAIMessages.h">
-      <Filter>Header Files\Messages</Filter>
+    <ClInclude Include="Communicator.h">
+      <Filter>Header Files\Messages/Events</Filter>
+    </ClInclude>
+    <ClInclude Include="EventTypes.h">
+      <Filter>Header Files\Messages/Events\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDataStructures.h">
+      <Filter>Header Files\Messages/Events\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessMessages.h">
+      <Filter>Header Files\BehaviourTree\PrimitiveBehaviours\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

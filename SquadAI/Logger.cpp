@@ -56,20 +56,20 @@ bool Logger::Open(const char* filename)
 // Param1: A pointer to the first object involved in the event.
 // Param2: A pointer to the second object involved in the event.
 //--------------------------------------------------------------------------------------
-void Logger::LogEvent(EventType type, void* pObject1, void* pObject2)
+void Logger::LogEvent(LogEventType type, void* pObject1, void* pObject2)
 {
 	switch(type)
 	{
-	case IndividualBehaviourUpdatedEvent:
+	case IndividualBehaviourUpdatedLogEvent:
 		LogIndividualBehaviourUpdated(reinterpret_cast<Entity*>(pObject1), reinterpret_cast<Behaviour*>(pObject2));
 		break;
-	case EnemySpottedEvent:
+	case EnemySpottedLogEvent:
 		LogEnemySpotted(reinterpret_cast<Entity*>(pObject1), reinterpret_cast<Entity*>(pObject2));
 		break;
-	case EntityHitEvent:
+	case EntityHitLogEvent:
 		LogEntityHit(reinterpret_cast<Entity*>(pObject1), reinterpret_cast<unsigned long*>(pObject2));
 		break;
-	case EntityKilledEvent:
+	case EntityKilledLogEvent:
 		LogEntityKilled(reinterpret_cast<Entity*>(pObject1), reinterpret_cast<unsigned long*>(pObject2));
 		break;
 	}

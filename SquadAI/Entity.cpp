@@ -9,7 +9,6 @@
 #include "Entity.h"
 #include "TestEnvironment.h"
 #include "Message.h"
-#include "TestEnvironmentMessages.h"
 
 Entity::Entity(void) : CollidableObject(),
 					   m_pBehaviour(nullptr),
@@ -102,8 +101,10 @@ void Entity::Reset(void)
 	m_movementTargetSet		   = false;
 	m_movementTarget		   = XMFLOAT2(0.0f, 0.0f);
 	m_currentHealth			   = m_maximalHealth;
-}
 
+	ResetCommunication();
+}
+/*
 //--------------------------------------------------------------------------------------
 // Receives and processes a given message sent by the test environment.
 // Param1: A pointer to the message to process.
@@ -141,7 +142,7 @@ void Entity::ProcessMessage(Message* pMessage)
 		}
 	}
 }
-
+*/
 /*
 //--------------------------------------------------------------------------------------
 // Respawns the entity at a given position.
@@ -309,6 +310,62 @@ bool Entity::IsInvestigatingGreatestSuspectedThreat(void)
 	return false;
 }
 
+//--------------------------------------------------------------------------------------
+// Process a given event. Default implementation.
+// Param1: The type of event.
+// Param2: A pointer to the event data.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessEvent(EventType type, void* pEventData)
+{
+	switch(type)
+	{
+	case EntityHitEventType:
+		{
+		// Make sure the entity is actually alive (cannot be hit when dead but in the rare case that the
+		// entity is hit by two projectiles during the same frame this if-statement will prevent all hits
+		// after the fatal one to be processed)
+		if(IsAlive())
+		{
+			EntityHitEventData* pHitData = reinterpret_cast<EntityHitEventData*>(pEventData);
+			ProcessHit(pHitData->m_damage, pHitData->m_id, pHitData->m_shooterAlive, pHitData->m_position);
+		}
+		break;
+		}
+	
+	case RespawnEventType:
+		{
+		RespawnEventData* pRespawnData = reinterpret_cast<RespawnEventData*>(pEventData);
+		ProcessRespawn(pRespawnData->m_respawnPosition);
+		break;
+		}
+	default:
+		Communicator::ProcessEvent(type, pEventData);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a given message.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessMessage(Message* pMessage)
+{
+	switch(pMessage->GetType())
+	{
+	case EntityKilledMessageType:
+		{
+		EntityKilledMessage* pEntityKilledMessage = reinterpret_cast<EntityKilledMessage*>(pMessage);
+		if(pEntityKilledMessage->GetData().m_team != GetTeam())
+		{
+			ProcessEnemyKilled(pEntityKilledMessage->GetData().m_team, pEntityKilledMessage->GetData().m_id);
+		}
+		break;
+		}
+	default:
+		Communicator::ProcessMessage(pMessage);
+	}
+}
+
+
 // The following functions provide default implementations for the different events and
 // messages that the entity can receive from the test environment.
 
@@ -357,8 +414,10 @@ void Entity::ProcessHit(float damage, unsigned long id, bool shooterAlive, const
 	if(!IsAlive())
 	{
 		// The entity just died, send a message to the test environment
-		EntityKilledMessage entityKilledMessage(GetTeam(), GetId());
-		GetTestEnvironment()->ProcessMessage(&entityKilledMessage);
+		//EntityKilledMessage entityKilledMessage(GetTeam(), GetId());
+
+		EntityDiedEventData data(GetTeam(), GetId());
+		SendEvent(GetTestEnvironment(),EntityDiedEventType, &data);
 	}
 }
 

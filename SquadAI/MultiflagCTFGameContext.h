@@ -38,7 +38,7 @@ public:
 	void Update(float deltaTime);
 	void Reset(void);
 
-	virtual void ProcessMessage(Message* pMessage);
+	//void ProcessMessage(Message* pMessage);
 
 	void FlagPickedUp(EntityTeam flagOwner, Entity* pCarrier);
 	void FlagDropped(EntityTeam flagOwner);
@@ -57,6 +57,11 @@ public:
 	void SetFlagResetTimeLimit(float timeLimit);
 	void SetFlagBasePosition(EntityTeam team, const XMFLOAT2& basePosition);
 	void SetFlag(EntityTeam flagOwner, Objective* pCollidableObject);
+
+	void ProcessEvent(EventType type, void* pEventData);
+protected:
+	void ProcessMessage(Message* pMessage);
+	
 
 private:
 

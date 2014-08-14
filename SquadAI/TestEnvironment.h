@@ -36,7 +36,6 @@
 #include "Objective.h"
 #include "Obstacle.h"
 #include "Message.h"
-#include "TestEnvironmentMessages.h"
 #include "Entity.h"
 #include "Logger.h"
 #include "GameContext.h"
@@ -44,7 +43,7 @@
 
 using namespace DirectX;
 
-class TestEnvironment
+class TestEnvironment : public Communicator
 {
 public:
 	TestEnvironment(void);
@@ -79,8 +78,9 @@ public:
 	
 	bool CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject);
 
-	void RecordEvent(EventType type, void* pObject1, void* pObject2);
-	void ProcessMessage(Message* pMessage);
+	void RecordEvent(LogEventType type, void* pObject1, void* pObject2);
+	
+	//void ProcessMessage(Message* pMessage);
 
 	// Data access functions
 	float		 GetGridSize(void) const;
@@ -91,6 +91,12 @@ public:
 
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);
+
+	void ProcessEvent(EventType type, void* pEventData);
+
+protected:
+	void ProcessMessage(Message* pMessage);
+	
 
 private:
 

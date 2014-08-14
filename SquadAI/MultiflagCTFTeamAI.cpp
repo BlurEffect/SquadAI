@@ -16,6 +16,54 @@ MultiflagCTFTeamAI::~MultiflagCTFTeamAI(void)
 }
 
 //--------------------------------------------------------------------------------------
+// Processes all inbox messages that the team AI received.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
+{
+	switch(pMessage->GetType())
+	{
+	case FlagPickedUpMessageType:
+		{
+		FlagPickedUpMessage* pMsg = reinterpret_cast<FlagPickedUpMessage*>(pMessage);
+		m_flagData[pMsg->GetData().m_flagOwner].m_state     = Stolen;
+		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = pMsg->GetData().m_carrierId;
+		break;
+		}
+	case FlagDroppedMessageType:
+		{
+		FlagDroppedMessage* pMsg = reinterpret_cast<FlagDroppedMessage*>(pMessage);
+		m_flagData[pMsg->GetData().m_flagOwner].m_state     = Dropped;
+		m_flagData[pMsg->GetData().m_flagOwner].m_position  = pMsg->GetData().m_dropPosition;
+		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
+		break;
+		}
+	case FlagReturnedMessageType:
+		{
+		FlagReturnedMessage* pMsg = reinterpret_cast<FlagReturnedMessage*>(pMessage);
+		m_flagData[pMsg->GetData().m_flagOwner].m_state     = InBase;
+		m_flagData[pMsg->GetData().m_flagOwner].m_position  = m_flagData[pMsg->GetData().m_flagOwner].m_basePosition;
+		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
+		break;
+		}
+	default:
+		// Forward other messages to the base class implementation of the function
+		TeamAI::ProcessMessage(pMessage);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Process a given event. Default implementation.
+// Param1: The type of event.
+// Param2: A pointer to the event data.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFTeamAI::ProcessEvent(EventType type, void* pEventData)
+{
+	// Not expecting any events, forward to the base class
+	TeamAI::ProcessEvent(type, pEventData);
+}
+/*
+//--------------------------------------------------------------------------------------
 // Processes a message sent to the team AI.
 // Param1: A pointer to the message to process.
 //--------------------------------------------------------------------------------------
@@ -51,7 +99,7 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		TeamAI::ProcessMessage(pMessage);
 	}
 }
-
+*/
 //--------------------------------------------------------------------------------------
 // Resets the team AI after a completed match.
 //--------------------------------------------------------------------------------------

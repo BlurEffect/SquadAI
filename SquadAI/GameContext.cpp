@@ -78,6 +78,8 @@ void GameContext::Update(float deltaTime)
 	{
 		m_terminated = true;
 	}
+
+	SortOutProcessedMessages();
 }
 
 //--------------------------------------------------------------------------------------
@@ -94,6 +96,29 @@ void GameContext::Reset(void)
 		m_kills[i]		= 0;
 		m_shotsFired[i] = 0;
 	}
+
+	ResetCommunication();
+}
+
+//--------------------------------------------------------------------------------------
+// Process a given event. Default implementation.
+// Param1: The type of event.
+// Param2: A pointer to the event data.
+//--------------------------------------------------------------------------------------
+void GameContext::ProcessEvent(EventType type, void* pEventData)
+{
+	// No events expected, forward call to default implementation
+	Communicator::ProcessEvent(type, pEventData);
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a given message.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void GameContext::ProcessMessage(Message* pMessage)
+{
+	// No messages expected, forward call to default implementation
+	Communicator::ProcessMessage(pMessage);
 }
 
 // Data access functions

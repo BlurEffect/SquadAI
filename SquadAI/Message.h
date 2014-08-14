@@ -1,8 +1,11 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  MessageDataStructures.h
+*  Message.h
 *  This file contains an enumeration of available message types and the abstract base
-*  class, from which as specific messages have to inherit.
+*  class, from which all specific messages have to inherit. Messages contain information
+*  that either entities and team AI exchange to simulate human communication within a team 
+*  or information that is shared by the game itself, such as notifications of entities that
+*  were killed or objectives that were reached.
 */
 
 // Note: Messages are defined in their header files and certain types of messages are 
@@ -19,16 +22,16 @@
 enum MessageType
 {
 	// Messages sent from entities to the test environment
-	ProjectileFiredMessageType,			// A projectile was fired by an entity
+	//ProjectileFiredMessageType,			// A projectile was fired by an entity
 	
 	// Messages sent from the test environment to the entities
-	HitMessageType,						// The entity receiving this message was hit by a projectile
+	//HitMessageType,						// The entity receiving this message was hit by a projectile
 	EntityKilledMessageType,			// An entity was killed and other entities are notified of this event (also sent from entities to the test environment)
-	ReadyToRespawnMessageType,			// Tells an entity that it is ready to respawn
+	//ReadyToRespawnMessageType,			// Tells an entity that it is ready to respawn
 	
 	// Messages sent from the test environment to the game context
-	AddObjectiveMessageType,			// Puts an objective object under the control of a specific game context
-	EntityReachedObjectiveMessageType,	// An entity collided with an objective object.
+	//AddObjectiveMessageType,			// Puts an objective object under the control of a specific game context
+	//EntityReachedObjectiveMessageType,	// An entity collided with an objective object.
 
 	// Messages sent from entities to the team AI
 	EnemySpottedMessageType,			// An enemy was spotted by an entity
@@ -52,13 +55,19 @@ enum MessageType
 class Message
 {
 public:
-	Message(MessageType messageType) : m_messageType(messageType){}
+	Message(MessageType messageType) : m_messageType(messageType),
+									   m_isProcessed(false)
+	{}
 	virtual ~Message(void) = 0{}
 
 	MessageType GetType(void) const { return m_messageType; }
+	bool        IsProcessed(void) const { return m_isProcessed; }
+
+	void SetProcessed(bool isProcessed) { m_isProcessed = isProcessed; }
 
 private:
 	MessageType m_messageType;	// The type of the message
+	bool        m_isProcessed;  // Tells whether the message was processed by its recipient or not
 };		
 
 #endif // MESSAGE_H

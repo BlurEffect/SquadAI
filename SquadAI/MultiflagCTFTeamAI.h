@@ -43,9 +43,13 @@ public:
 	MultiflagCTFTeamAI(EntityTeam team, TestEnvironment* pEnvironment);
 	~MultiflagCTFTeamAI(void);
 
-	void ProcessMessage(Message* pMessage);
-
+	//void ProcessMessage(Message* pMessage);
 	void Reset(void);
+
+	void ProcessEvent(EventType type, void* pEventData);
+protected:
+	void ProcessMessage(Message* pMessage);
+	
 
 private:
 

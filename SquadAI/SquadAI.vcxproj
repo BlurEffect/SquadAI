@@ -85,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
+    <ClCompile Include="Communicator.cpp" />
     <ClCompile Include="DetermineGreatestKnownThreat.cpp" />
     <ClCompile Include="AimAtTarget.cpp" />
     <ClCompile Include="Application.cpp" />
@@ -139,6 +140,7 @@
     <ClCompile Include="Pathfinder.cpp" />
     <ClCompile Include="PerformanceTimer.cpp" />
     <ClCompile Include="PixelShader.cpp" />
+    <ClCompile Include="ProcessMessages.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ReadyToAttack.cpp" />
     <ClCompile Include="RenderContext.cpp" />
@@ -192,8 +194,12 @@
     <ClInclude Include="EntityAlive.h" />
     <ClInclude Include="EntityCombatManager.h" />
     <ClInclude Include="EntitySensors.h" />
+    <ClInclude Include="EventDataStructures.h" />
+    <ClInclude Include="EventTypes.h" />
     <ClInclude Include="GameContextToTeamAIMessages.h" />
-    <ClInclude Include="TestEnvironmentMessages.h" />
+    <ClInclude Include="Communicator.h" />
+    <ClInclude Include="ProcessMessages.h" />
+    <ClInclude Include="TestEnvironmentToEntityMessages.h" />
     <ClInclude Include="EntityToTeamAIMessages.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="MultiflagCTFTeamAI.h" />

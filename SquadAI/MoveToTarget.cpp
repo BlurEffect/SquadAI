@@ -24,14 +24,6 @@ MoveToTarget::~MoveToTarget(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus MoveToTarget::Update(float deltaTime)
 {
-	if(GetEntity()->GetTeam() == TeamRed)
-	{
-		int a  = 2;
-	}else
-	{
-		int b = 3;
-	}
-
 	return GetEntity()->MoveToTarget(deltaTime);
 }
 

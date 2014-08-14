@@ -67,8 +67,6 @@ void MultiflagCTFGameContext::Update(float deltaTime)
 //--------------------------------------------------------------------------------------
 void MultiflagCTFGameContext::Reset(void)
 {
-	GameContext::Reset();
-
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
 		m_flagResetTimers[i] = m_flagResetTimeLimit;
@@ -78,8 +76,83 @@ void MultiflagCTFGameContext::Reset(void)
 	    m_flags[i]->SetPosition(m_flagPositions[i]);
 		m_flags[i]->UpdateColliderPosition(m_flagPositions[i]);
 	}
+
+	GameContext::Reset();
 }
 
+
+//--------------------------------------------------------------------------------------
+// Processes a given message. Default implementation.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFGameContext::ProcessMessage(Message* pMessage)
+{
+	// Not expecting any messages, call the default implementation that simply marks all
+	// messages as processed.
+	GameContext::ProcessMessage(pMessage);
+}
+
+//--------------------------------------------------------------------------------------
+// Process a given event.
+// Param1: The type of event.
+// Param2: A pointer to the event data.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFGameContext::ProcessEvent(EventType type, void* pEventData)
+{
+	switch(type)
+	{
+	case ObjectiveAddedEventType:
+		{
+		ObjectiveAddedEventData* pAddObjectiveData = reinterpret_cast<ObjectiveAddedEventData*>(pEventData);
+		SetFlag(pAddObjectiveData->m_pObjective->GetTeam(), pAddObjectiveData->m_pObjective);
+		m_flagBasePositions[pAddObjectiveData->m_pObjective->GetTeam()] = pAddObjectiveData->m_pObjective->GetPosition();
+		break;
+		}
+	case EntityReachedObjectiveEventType:
+		{
+		EntityReachedObjectiveEventData* pEntityReachedObjectiveData = reinterpret_cast<EntityReachedObjectiveEventData*>(pEventData);
+		switch(m_flagStates[pEntityReachedObjectiveData->m_pObjective->GetTeam()])
+		{
+		case InBase:
+			if(pEntityReachedObjectiveData->m_pEntity->GetTeam() != pEntityReachedObjectiveData->m_pEntity->GetTeam())
+			{
+				// An entity of a hostile team reached the flag, make the entity the new flag carrier
+				FlagPickedUp(pEntityReachedObjectiveData->m_pObjective->GetTeam(), pEntityReachedObjectiveData->m_pEntity);
+			}else
+			{
+				for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+				{
+					// Check if there is a homecoming flag carrier
+					// (flag can only be returned when the own flag is at home, this collision with the own flag
+					// in base is used as an indicator whether the flag was successfully captured)
+					if(m_flagCarriers[i] && (pEntityReachedObjectiveData->m_pEntity->GetId() == m_flagCarriers[i]->GetId()))
+					{
+						// The flag carrier reached the base position of his own flag -> captured
+						FlagCaptured(pEntityReachedObjectiveData->m_pObjective->GetTeam());
+					}
+				}
+			}
+			break;
+		case Dropped:
+			if(pEntityReachedObjectiveData->m_pEntity->GetTeam() != pEntityReachedObjectiveData->m_pObjective->GetTeam())
+			{
+				// An entity of a hostile team reached the flag, make the entity the new flag carrier
+				FlagPickedUp(pEntityReachedObjectiveData->m_pObjective->GetTeam(), pEntityReachedObjectiveData->m_pEntity);
+			}else
+			{
+				// An entity of the team the flag belongs to has reached the flag -> return it
+				FlagReturned(pEntityReachedObjectiveData->m_pObjective->GetTeam());
+			}
+			break;
+		}
+		break;
+		}
+	default:
+		// Forward all other events to the base class
+		GameContext::ProcessEvent(type, pEventData);
+	}
+}
+/*
 //--------------------------------------------------------------------------------------
 // Receives and processes a given message.
 // Param1: A pointer to the message to process.
@@ -138,7 +211,7 @@ void MultiflagCTFGameContext::ProcessMessage(Message* pMessage)
 		}
 	}
 }
-
+*/
 //--------------------------------------------------------------------------------------
 // Called when a flag is picked up.
 // Param1: The team, whose flag was picked up, that is stolen.

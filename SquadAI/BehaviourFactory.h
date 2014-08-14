@@ -39,6 +39,7 @@
 #include "Idle.h"
 #include "MoveToTarget.h"
 #include "ResolveSuspectedThreat.h"
+#include "ProcessMessages.h"
 
 // Forward declarations
 class Entity;
@@ -75,7 +76,8 @@ enum BehaviourType
 	UpdateAttackReadinessType,
 	IdleType,
 	MoveToTargetType,
-	ResolveSuspectedThreatType
+	ResolveSuspectedThreatType,
+	ProcessMessagesType
 };
 
 //--------------------------------------------------------------------------------------

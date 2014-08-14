@@ -90,14 +90,16 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 			ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
 			Behaviour* pAlwaysFailDecorator = CreateBehaviour(ReturnSpecificStatusType, pEntity, "AlwaysFailDecorator", &data);
 
+			Behaviour* pProcessMessagesAction		    = CreateBehaviour(ProcessMessagesType, pEntity, "ProcessMessagesAction", nullptr);
 			Behaviour* pEntityAliveCondition		    = CreateBehaviour(EntityAliveType, pEntity, "EntityAliveCondition", nullptr);
 			Behaviour* pUpdateThreatsAction				= CreateBehaviour(UpdateThreatsType, pEntity, "UpdateThreatsAction", nullptr);
 			Behaviour* pUpdateAttackReadinessAction		= CreateBehaviour(UpdateAttackReadinessType, pEntity, "UpdateAttackReadinessAction", nullptr);
 
-			if(pAlwaysFailDecorator && pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
+			if(pProcessMessagesAction && pAlwaysFailDecorator && pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
 			{
 				reinterpret_cast<Composite*>(pRoot)->AddChild(pAlwaysFailDecorator);
 
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pProcessMessagesAction);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pEntityAliveCondition);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateThreatsAction);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateAttackReadinessAction);
@@ -297,6 +299,8 @@ Behaviour* BehaviourFactory::CreateBehaviour(BehaviourType behaviourType, Entity
 		break;
 	case ResolveSuspectedThreatType:
 		return new ResolveSuspectedThreat(pEntity, name);
+	case ProcessMessagesType:
+		return new ProcessMessages(pEntity, name);
 	default:
 		return nullptr;
 	}

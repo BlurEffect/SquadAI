@@ -10,7 +10,6 @@
 #include "Soldier.h"
 #include "TestEnvironment.h"
 #include "Message.h"
-#include "TestEnvironmentMessages.h"
 
 Soldier::Soldier(void) : Entity(),
 						 m_fireWeaponTimer(0.0f)
@@ -286,6 +285,28 @@ void Soldier::Reset(void)
 
 	Entity::Reset();
 }
+
+//--------------------------------------------------------------------------------------
+// Process a given event. Default implementation.
+// Param1: The type of event.
+// Param2: A pointer to the event data.
+//--------------------------------------------------------------------------------------
+void Soldier::ProcessEvent(EventType type, void* pEventData)
+{
+	// Forward all calls to the base class
+	Entity::ProcessEvent(type, pEventData);
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a given message. Default implementation.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void Soldier::ProcessMessage(Message* pMessage)
+{
+	// Forward all calls to the base class
+	Entity::ProcessMessage(pMessage);
+}
+
 
 // Data access functions
 

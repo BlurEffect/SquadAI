@@ -18,6 +18,7 @@
 #include "Message.h"
 #include "EntityToTeamAIMessages.h"
 #include "GameContextToTeamAIMessages.h"
+#include "Communicator.h"
 
 using namespace DirectX;
 
@@ -41,15 +42,14 @@ struct EnemyRecord
 };
 
 
-class TeamAI
+class TeamAI : public Communicator
 {
 public:
 
 	TeamAI(EntityTeam team, TestEnvironment* pEnvironment);
 	virtual ~TeamAI(void) = 0;
 
-	virtual void ProcessMessage(Message* pMessage);
-
+	//virtual void ProcessMessage(Message* pMessage);
 	void AddTeamMember(Entity* pEntity);
 	void RemoveTeamMember(unsigned long id);
 
@@ -62,6 +62,11 @@ public:
 
 	void SetTeam(EntityTeam team);
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
+
+	virtual void ProcessEvent(EventType type, void* pEventData);
+protected:
+	virtual void ProcessMessage(Message* pMessage);
+	
 
 private:
 	EntityTeam						     m_team;					// The team that the AI is controlling

@@ -69,7 +69,7 @@ BehaviourStatus Behaviour::Tick(float deltaTime)
 	}
 
 #ifdef DEBUG
-	GetEntity()->GetTestEnvironment()->RecordEvent(IndividualBehaviourUpdatedEvent, GetEntity(), this);
+	GetEntity()->GetTestEnvironment()->RecordEvent(IndividualBehaviourUpdatedLogEvent, GetEntity(), this);
 #endif
 
 	// Get the current state of the behaviour.

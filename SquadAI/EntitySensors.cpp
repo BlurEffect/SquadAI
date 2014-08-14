@@ -98,7 +98,7 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 						// Remember this enemy as a known threat
 						newKnownThreats.push_back(reinterpret_cast<Entity*>(it->second));
 #ifdef DEBUG
-						m_pEntity->GetTestEnvironment()->RecordEvent(EnemySpottedEvent, m_pEntity, it->second);
+						m_pEntity->GetTestEnvironment()->RecordEvent(EnemySpottedLogEvent, m_pEntity, it->second);
 #endif
 					}
 				}	

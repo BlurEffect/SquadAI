@@ -22,12 +22,12 @@ class Projectile;
 //--------------------------------------------------------------------------------------
 // Lists all types of events that can be recorded.
 //--------------------------------------------------------------------------------------
-enum EventType
+enum LogEventType
 {
-	IndividualBehaviourUpdatedEvent, // Called when an individual behaviour of an entity is updated
-	EnemySpottedEvent,               // Called when an entity spots an enemy
-	EntityHitEvent,					 // Called when an entity is hit by a projectile
-	EntityKilledEvent				 // Called when an entity was killed
+	IndividualBehaviourUpdatedLogEvent, // Called when an individual behaviour of an entity is updated
+	EnemySpottedLogEvent,               // Called when an entity spots an enemy
+	EntityHitLogEvent,					 // Called when an entity is hit by a projectile
+	EntityKilledLogEvent				 // Called when an entity was killed
 };
 
 //--------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public:
 	~Logger(void);
 
 	bool Open(const char* filename);
-	void LogEvent(EventType type, void* pObject1, void* pObject2);
+	void LogEvent(LogEventType type, void* pObject1, void* pObject2);
 	void Close(void);
 
 private:

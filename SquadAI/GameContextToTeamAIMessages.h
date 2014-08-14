@@ -15,45 +15,68 @@
 // Contains data required for a message sent by the game context to update the team AI's
 // knowledge of the scores for the competing teams.
 //--------------------------------------------------------------------------------------
-class ScoreUpdateMessage : public Message
+struct ScoreUpdateMessageData
 {
-public:
-	ScoreUpdateMessage(EntityTeam team, unsigned int score, unsigned int maxScore) : Message(ScoreUpdateMessageType),
-																					 m_team(team),
-																					 m_score(score),
-																					 m_maxScore(maxScore)
+	ScoreUpdateMessageData(EntityTeam team, unsigned int score, unsigned int maxScore) : m_team(team),
+																						 m_score(score),
+																						 m_maxScore(maxScore)
 	{}
-	
-	EntityTeam	 GetTeam(void) const { return m_team; }
-	unsigned int GetScore(void) const { return m_score; }
-	unsigned int GetMaxScore(void) const { return m_maxScore; }
 
-private:
 	EntityTeam   m_team;	 // The team, whose score is being updated
 	unsigned int m_score;	 // The new score of the team
 	unsigned int m_maxScore; // The score required by a team for victory
 };
 
 //--------------------------------------------------------------------------------------
+// Message sent by the game context to update the team AI's
+// knowledge of the scores for the competing teams.
+//--------------------------------------------------------------------------------------
+class ScoreUpdateMessage : public Message
+{
+public:
+	ScoreUpdateMessage(const ScoreUpdateMessageData& data) : Message(ScoreUpdateMessageType),
+															 m_data(data)
+	{}
+
+	const ScoreUpdateMessageData& GetData(void) const { return m_data; }
+
+private:
+	ScoreUpdateMessageData m_data; // The contents of the message
+};
+
+
+//--------------------------------------------------------------------------------------
 // Contains data required for a message by the game context to the team AI at regular
+// intervals to inform it about the time left for the current match.
+//--------------------------------------------------------------------------------------
+struct TimeUpdateMessageData
+{
+	TimeUpdateMessageData(float timeLeft, float maxTime) : m_timeLeft(timeLeft),
+														   m_maxTime(maxTime)
+	{}
+	
+	float m_timeLeft; // The time left for the current round
+	float m_maxTime;  // The time a round lasts in total
+
+};
+
+//--------------------------------------------------------------------------------------
+// Message by the game context to the team AI at regular
 // intervals to inform it about the time left for the current match.
 //--------------------------------------------------------------------------------------
 class TimeUpdateMessage : public Message
 {
 public:
-	TimeUpdateMessage(float timeLeft, float maxTime) : Message(TimeUpdateMessageType),
-													   m_timeLeft(timeLeft),
-													   m_maxTime(maxTime)
+	TimeUpdateMessage(const TimeUpdateMessageData& data) : Message(TimeUpdateMessageType),
+														   m_data(data)
 	{}
-	
-	float GetTimeLeft(void) const { return m_timeLeft; }
-	float GetMaxTime(void) const { return m_maxTime; }
+
+	const TimeUpdateMessageData& GetData(void) const { return m_data; }
 
 private:
-	float m_timeLeft; // The time left for the current round
-	float m_maxTime;  // The time a round lasts in total
-
+	TimeUpdateMessageData m_data; // The contents of the message
 };
+
 
 // Messages specific to Multiflag CTF matches
 
@@ -61,59 +84,95 @@ private:
 // Contains data required for a message by the game context to the team AI to notify it
 // of a flag having been picked up, that is stolen by a member of a hostile team.
 //--------------------------------------------------------------------------------------
-class FlagPickedUpMessage : public Message
+struct FlagPickedUpMessageData
 {
 public:
-	FlagPickedUpMessage(EntityTeam flagOwner, unsigned long carrierId) : Message(FlagPickedUpMessageType),
-																		 m_flagOwner(flagOwner),
-																		 m_carrierId(carrierId)
+	FlagPickedUpMessageData(EntityTeam flagOwner, unsigned long carrierId) : m_flagOwner(flagOwner),
+																			 m_carrierId(carrierId)
 	{}
 	
-	EntityTeam    GetFlagOwner(void) const { return m_flagOwner; }
-	unsigned long GetCarrierId(void) const { return m_carrierId; }
-
-private:
 	EntityTeam	  m_flagOwner; // The team, whose flag has been stolen
 	unsigned long m_carrierId; // The id of the entity that stole the flag
 
 };
 
 //--------------------------------------------------------------------------------------
+// Message by the game context to the team AI to notify it
+// of a flag having been picked up, that is stolen by a member of a hostile team.
+//--------------------------------------------------------------------------------------
+class FlagPickedUpMessage : public Message
+{
+public:
+	FlagPickedUpMessage(const FlagPickedUpMessageData& data) : Message(FlagPickedUpMessageType),
+														       m_data(data)
+	{}
+
+	const FlagPickedUpMessageData& GetData(void) const { return m_data; }
+
+private:
+	FlagPickedUpMessageData m_data; // The contents of the message
+};
+
+
+//--------------------------------------------------------------------------------------
 // Contains data required for a message by the game context to the team AI to notify it
+// of a flag having been dropped.
+//--------------------------------------------------------------------------------------
+struct FlagDroppedMessageData
+{
+	FlagDroppedMessageData(EntityTeam flagOwner, const XMFLOAT2& dropPosition) : m_flagOwner(flagOwner),
+																				 m_dropPosition(dropPosition)
+	{}
+
+	EntityTeam m_flagOwner;    // The team, whose flag has been dropped
+	XMFLOAT2   m_dropPosition; // The position, at which the flag was dropped
+};
+
+//--------------------------------------------------------------------------------------
+// Message by the game context to the team AI to notify it
 // of a flag having been dropped.
 //--------------------------------------------------------------------------------------
 class FlagDroppedMessage : public Message
 {
 public:
-	FlagDroppedMessage(EntityTeam flagOwner, const XMFLOAT2& dropPosition) : Message(FlagDroppedMessageType),
-																			 m_flagOwner(flagOwner),
-																			 m_dropPosition(dropPosition)
+	FlagDroppedMessage(const FlagDroppedMessageData& data) : Message(FlagDroppedMessageType),
+														       m_data(data)
 	{}
-	
-	EntityTeam      GetFlagOwner(void) const { return m_flagOwner; }
-	const XMFLOAT2& GetDropPosition(void) const { return m_dropPosition; }
+
+	const FlagDroppedMessageData& GetData(void) const { return m_data; }
 
 private:
-	EntityTeam m_flagOwner;    // The team, whose flag has been dropped
-	XMFLOAT2   m_dropPosition; // The position, at which the flag was dropped
+	FlagDroppedMessageData m_data; // The contents of the message
 };
 
 //--------------------------------------------------------------------------------------
 // Contains data required for a message by the game context to the team AI to notify it
 // of a flag having been returned to its base.
 //--------------------------------------------------------------------------------------
-class FlagReturnedMessage : public Message
+struct FlagReturnedMessageData 
 {
 public:
-	FlagReturnedMessage(EntityTeam flagOwner) : Message(FlagReturnedMessageType),
-												m_flagOwner(flagOwner)
+	FlagReturnedMessageData(EntityTeam flagOwner) : m_flagOwner(flagOwner)
 	{}
-	
-	EntityTeam GetFlagOwner(void) const { return m_flagOwner; }
 
-private:
 	EntityTeam m_flagOwner; // The team, whose flag has been returned
 };
 
+//--------------------------------------------------------------------------------------
+// Message by the game context to the team AI to notify it
+// of a flag having been returned to its base.
+//--------------------------------------------------------------------------------------
+class FlagReturnedMessage : public Message
+{
+public:
+	FlagReturnedMessage(const FlagReturnedMessageData& data) : Message(FlagReturnedMessageType),
+														       m_data(data)
+	{}
+
+	const FlagReturnedMessageData& GetData(void) const { return m_data; }
+
+private:
+	FlagReturnedMessageData m_data; // The contents of the message
+};
 
 #endif // GAME_CONTEXT_TO_TEAM_AI_MESSAGES_H

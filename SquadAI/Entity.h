@@ -16,6 +16,7 @@
 #include "ObjectTypes.h"
 #include "Behaviour.h"
 #include "BehaviourFactory.h"
+#include "Communicator.h"
 
 // Forward declarations
 class TestEnvironment;
@@ -53,14 +54,14 @@ struct SuspectedThreat
 
 using namespace DirectX;
 
-class Entity : public CollidableObject
+class Entity : public CollidableObject, public Communicator
 {
 public:
 	Entity(void);
 	virtual ~Entity(void) = 0;
 
 	bool         Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team);
-	void         ProcessMessage(Message* pMessage);
+	//void         ProcessMessage(Message* pMessage);
 
 	virtual void Update(float deltaTime) = 0;
 	virtual void Activate(void);
@@ -168,7 +169,12 @@ public:
 		unsigned long m_id;
 	};
 
+	virtual void ProcessEvent(EventType type, void* pEventData);
+
 protected:
+
+	
+	virtual void ProcessMessage(Message* pMessage);
 
 	// Called to process events
 	virtual void ProcessHit(float damage, unsigned long id, bool shooterAlive, const XMFLOAT2& position);

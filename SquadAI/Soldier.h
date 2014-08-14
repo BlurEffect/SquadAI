@@ -82,6 +82,8 @@ public:
 	BehaviourStatus UpdateAttackReadiness(float deltaTime);
 	BehaviourStatus ResolveSuspectedThreat(float deltaTime);
 
+	void ProcessEvent(EventType type, void* pEventData);
+
 	// Data access functions
 	 
 	const XMFLOAT2& GetVelocity(void) const;
@@ -126,6 +128,9 @@ public:
 	private:
 		unsigned long m_id;
 	};
+
+protected:
+	void ProcessMessage(Message* pMessage);
 
 private:
 

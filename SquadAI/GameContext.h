@@ -12,7 +12,7 @@
 // Includes
 #include "ObjectTypes.h"
 #include "Message.h"
-#include "TestEnvironmentMessages.h"
+#include "Communicator.h"
 
 //--------------------------------------------------------------------------------------
 // Identifies the specific type of game context that is the game mode it is associated to.
@@ -22,7 +22,7 @@ enum GameMode
 	MultiflagCTF  // Identifier for Capture-The-Flag matches, in which each team has a flag to protect
 };
 
-class GameContext
+class GameContext : public Communicator
 {
 public:
 	GameContext(GameMode mode, float maxTime, unsigned int winScore);
@@ -34,8 +34,6 @@ public:
 	void AddScore(EntityTeam team, unsigned int score);
 	void AddKills(EntityTeam team, unsigned int kills);
 	void AddShotFired(EntityTeam team, unsigned int shotsFired);
-
-	virtual void ProcessMessage(Message* pMessage) = 0;
 
 	// Data access functions
 
@@ -51,6 +49,11 @@ public:
 
 	void SetMaxTime(float time);
 	void SetMaxScore(unsigned int score);
+
+	virtual void ProcessEvent(EventType type, void* pEventData);
+protected:
+	
+	virtual void ProcessMessage(Message* pMessage);
 
 private:
 

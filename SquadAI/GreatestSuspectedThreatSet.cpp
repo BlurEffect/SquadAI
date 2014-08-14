@@ -9,7 +9,7 @@
 #include "GreatestSuspectedThreatSet.h"
 #include "Entity.h"
 
-GreatestSuspectedThreatSet::GreatestSuspectedThreatSet(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+GreatestSuspectedThreatSet::GreatestSuspectedThreatSet(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

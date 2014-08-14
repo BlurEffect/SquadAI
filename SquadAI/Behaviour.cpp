@@ -8,17 +8,13 @@
 
 // Includes
 #include "Behaviour.h"
-#include "Entity.h"
-#include "TestEnvironment.h"
 
-#define DEBUG
 
 unsigned long Behaviour::s_BehaviourId = 0;
 
-Behaviour::Behaviour(Entity* pEntity, const char* name) : m_pEntity(pEntity),
-														  m_id(++s_BehaviourId),
-														  m_name(name),
-														  m_status(StatusInvalid)
+Behaviour::Behaviour(const char* name) : m_id(++s_BehaviourId),
+										 m_name(name),
+										 m_status(StatusInvalid)
 {
 }
 
@@ -46,8 +42,6 @@ Behaviour::~Behaviour(void)
 {
 }
 
-bool blard = false;
-
 //--------------------------------------------------------------------------------------
 // Updates the behaviour and ensures it is properly intialised and terminated.
 // Param1: The time in seconds passed since the last frame.
@@ -56,21 +50,12 @@ bool blard = false;
 BehaviourStatus Behaviour::Tick(float deltaTime)
 {
 
-	if(!m_pEntity)
-	{
-		return StatusInvalid;
-	}
-
 	// When the behaviour is ticked the first time, make sure it is
 	// initialised properly.
 	if(m_status == StatusInvalid)
 	{
 		OnInitialise();
 	}
-
-#ifdef DEBUG
-	GetEntity()->GetTestEnvironment()->RecordEvent(IndividualBehaviourUpdatedLogEvent, GetEntity(), this);
-#endif
 
 	// Get the current state of the behaviour.
 	m_status = Update(deltaTime);
@@ -128,11 +113,6 @@ void Behaviour::OnInitialise(void)
 void Behaviour::OnTerminate(BehaviourStatus status)
 {
 	Reset();
-}
-
-Entity* Behaviour::GetEntity(void)
-{
-	return m_pEntity;
 }
 
 unsigned long Behaviour::GetId(void) const

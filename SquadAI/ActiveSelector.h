@@ -16,7 +16,7 @@
 class ActiveSelector : public Selector
 {
 public:
-	ActiveSelector(Entity* pEntity, const char* name);
+	ActiveSelector(const char* name);
 	virtual ~ActiveSelector(void);
 
 protected:

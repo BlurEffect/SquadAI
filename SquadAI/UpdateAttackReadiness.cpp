@@ -9,7 +9,7 @@
 #include "UpdateAttackReadiness.h"
 #include "Entity.h"
 
-UpdateAttackReadiness::UpdateAttackReadiness(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+UpdateAttackReadiness::UpdateAttackReadiness(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

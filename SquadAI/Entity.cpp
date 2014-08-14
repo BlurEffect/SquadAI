@@ -57,7 +57,7 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
-	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree, this);
+	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleIndividualCombatTree, this);
 	if(!m_pBehaviour)
 	{
 		return false;

@@ -9,7 +9,7 @@
 #include "MoveToTarget.h"
 #include "Entity.h"
 
-MoveToTarget::MoveToTarget(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+MoveToTarget::MoveToTarget(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

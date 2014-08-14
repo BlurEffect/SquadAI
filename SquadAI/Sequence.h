@@ -18,7 +18,7 @@
 class Sequence : public Composite
 {
 public:
-	Sequence(Entity* pEntity, const char* name);
+	Sequence(const char* name);
 	virtual ~Sequence(void);
 
 protected:

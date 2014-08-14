@@ -8,12 +8,12 @@
 #define IDLE_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class Idle : public Behaviour
+class Idle : public UniversalIndividualBehaviour
 {
 public:
-	Idle(Entity* pEntity, const char* name);
+	Idle(const char* name, Entity* pEntity);
 	~Idle(void);
 
 private:

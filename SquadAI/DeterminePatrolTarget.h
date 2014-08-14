@@ -9,12 +9,12 @@
 #define DETERMINE_PATROL_TARGET_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class DeterminePatrolTarget : public Behaviour
+class DeterminePatrolTarget : public UniversalIndividualBehaviour
 {
 public:
-	DeterminePatrolTarget(Entity* pEntity, const char* name);
+	DeterminePatrolTarget(const char* name, Entity* pEntity);
 	~DeterminePatrolTarget(void);
 
 private:

@@ -9,24 +9,35 @@
 #include "BehaviourFactory.h"
 #include "Entity.h"
 #include "TeamAI.h"
+#include "MultiflagCTFTeamAI.h"
+
+
 
 //--------------------------------------------------------------------------------------
 // Creates a behaviour tree for the provided entity.
 // Param1: Determines the type of the entity and thus, which behaviour tree will be created.
-// Param2: A pointer to the entity that the behaviour tree should be created for.
+// Param2: A pointer to the object the behaviour of which should be controlled by the behaviour tree.
 // Returns a pointer to the root behaviour of the created tree. The pointer is null if 
 // something failed during creation or if the factory does not support the given entity
 // type.
 //--------------------------------------------------------------------------------------
-Behaviour* BehaviourFactory::CreateBehaviourTree(BehaviourTreeType behaviourTreeType, Entity* pEntity)
+Behaviour* BehaviourFactory::CreateBehaviourTree(BehaviourTreeType treeType, void* pTreeOwner)
 {
-	switch(behaviourTreeType)
+	if(!pTreeOwner)
 	{
-	case SimpleMovementTree:
-		return CreateSimpleMovementTree(pEntity);
+		return nullptr;
+	}
+
+	switch(treeType)
+	{
+	case SimpleIndividualMovementTree:
+		return CreateSimpleMovementTree(reinterpret_cast<Entity*>(pTreeOwner));
 		break;
-	case SimpleCombatTree:
-		return CreateSimpleCombatTree(pEntity);
+	case SimpleIndividualCombatTree:
+		return CreateSimpleCombatTree(reinterpret_cast<Entity*>(pTreeOwner));
+		break;
+	case SimpleTeamMultiflagCTFTree:
+		return CreateSimpleTeamMultiflagCTFTree(reinterpret_cast<MultiflagCTFTeamAI*>(pTreeOwner));
 		break;
 	default:
 		return nullptr;
@@ -41,21 +52,21 @@ Behaviour* BehaviourFactory::CreateBehaviourTree(BehaviourTreeType behaviourTree
 //--------------------------------------------------------------------------------------
 Behaviour* BehaviourFactory::CreateSimpleMovementTree(Entity* pEntity)
 {
-	Behaviour* pRoot = CreateBehaviour(SelectorType, pEntity, "Root", nullptr);
+	Behaviour* pRoot = CreateUniversalBehaviour(SelectorType, "Root", nullptr);
 
 	if(pRoot)
 	{
-		Behaviour* pPatrolSequence = CreateBehaviour(SequenceType, pEntity, "PatrolSequence", nullptr);
-		Behaviour* pIdleAction     = CreateBehaviour(IdleType, pEntity, "IdleAction", nullptr);
+		Behaviour* pPatrolSequence = CreateUniversalBehaviour(SequenceType, "PatrolSequence", nullptr);
+		Behaviour* pIdleAction     = CreateUniversalIndividualBehaviour(IdleType, pEntity, "IdleAction", nullptr);
 		
 		if(pPatrolSequence && pIdleAction)
 		{
 			reinterpret_cast<Composite*>(pRoot)->AddChild(pPatrolSequence);
 			reinterpret_cast<Composite*>(pRoot)->AddChild(pIdleAction);
 
-			Behaviour* pDeterminePatrolTargetAction = CreateBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
-			Behaviour* pMovementTargetSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetSetCondition", nullptr);
-			Behaviour* pMoveToTargetAction = CreateBehaviour(MoveToTargetType, pEntity, "MoveToTargetAction", nullptr);
+			Behaviour* pDeterminePatrolTargetAction = CreateUniversalIndividualBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
+			Behaviour* pMovementTargetSetCondition = CreateUniversalIndividualBehaviour(MovementTargetSetType, pEntity, "MovementTargetSetCondition", nullptr);
+			Behaviour* pMoveToTargetAction = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToTargetAction", nullptr);
 		
 			if(pDeterminePatrolTargetAction && pMovementTargetSetCondition && pMoveToTargetAction)
 			{
@@ -80,21 +91,21 @@ Behaviour* BehaviourFactory::CreateSimpleMovementTree(Entity* pEntity)
 //--------------------------------------------------------------------------------------
 Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 {
-	Behaviour* pRoot = CreateBehaviour(ActiveSelectorType, pEntity, "Root", nullptr);
+	Behaviour* pRoot = CreateUniversalBehaviour(ActiveSelectorType, "Root", nullptr);
 
 	if(pRoot)
 	{
-		Behaviour* pUpdateEntitySequence = CreateBehaviour(SequenceType, pEntity, "UpdateEntitySequence", nullptr);
+		Behaviour* pUpdateEntitySequence = CreateUniversalBehaviour(SequenceType, "UpdateEntitySequence", nullptr);
 		
 		if(pUpdateEntitySequence)
 		{
 			ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
-			Behaviour* pAlwaysFailDecorator = CreateBehaviour(ReturnSpecificStatusType, pEntity, "AlwaysFailDecorator", &data);
+			Behaviour* pAlwaysFailDecorator = CreateUniversalBehaviour(ReturnSpecificStatusType, "AlwaysFailDecorator", &data);
 
-			Behaviour* pProcessMessagesAction		    = CreateBehaviour(ProcessMessagesType, pEntity, "ProcessMessagesAction", nullptr);
-			Behaviour* pEntityAliveCondition		    = CreateBehaviour(EntityAliveType, pEntity, "EntityAliveCondition", nullptr);
-			Behaviour* pUpdateThreatsAction				= CreateBehaviour(UpdateThreatsType, pEntity, "UpdateThreatsAction", nullptr);
-			Behaviour* pUpdateAttackReadinessAction		= CreateBehaviour(UpdateAttackReadinessType, pEntity, "UpdateAttackReadinessAction", nullptr);
+			Behaviour* pProcessMessagesAction		    = CreateUniversalIndividualBehaviour(ProcessMessagesType, pEntity, "ProcessMessagesAction", nullptr);
+			Behaviour* pEntityAliveCondition		    = CreateUniversalIndividualBehaviour(EntityAliveType, pEntity, "EntityAliveCondition", nullptr);
+			Behaviour* pUpdateThreatsAction				= CreateUniversalIndividualBehaviour(UpdateThreatsType, pEntity, "UpdateThreatsAction", nullptr);
+			Behaviour* pUpdateAttackReadinessAction		= CreateUniversalIndividualBehaviour(UpdateAttackReadinessType, pEntity, "UpdateAttackReadinessAction", nullptr);
 
 			if(pProcessMessagesAction && pAlwaysFailDecorator && pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
 			{
@@ -105,10 +116,10 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateThreatsAction);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateAttackReadinessAction);
 
-				Behaviour* pFightSequence		   = CreateBehaviour(SequenceType, pEntity, "FightSequence", nullptr);
-				Behaviour* pApproachThreatSequence = CreateBehaviour(SequenceType, pEntity, "ApproachThreatSequence", nullptr);
-				Behaviour* pPatrolSequence		   = CreateBehaviour(SequenceType, pEntity, "PatrolSequence", nullptr);
-				Behaviour* pIdleAction			   = CreateBehaviour(IdleType, pEntity, "IdleAction", nullptr);
+				Behaviour* pFightSequence		   = CreateUniversalBehaviour(SequenceType, "FightSequence", nullptr);
+				Behaviour* pApproachThreatSequence = CreateUniversalBehaviour(SequenceType, "ApproachThreatSequence", nullptr);
+				Behaviour* pPatrolSequence		   = CreateUniversalBehaviour(SequenceType, "PatrolSequence", nullptr);
+				Behaviour* pIdleAction			   = CreateUniversalIndividualBehaviour(IdleType, pEntity, "IdleAction", nullptr);
 
 				if(pFightSequence && pApproachThreatSequence && pPatrolSequence && pIdleAction)
 				{
@@ -117,27 +128,27 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 					reinterpret_cast<Composite*>(pRoot)->AddChild(pPatrolSequence);
 					reinterpret_cast<Composite*>(pRoot)->AddChild(pIdleAction);
 
-					Behaviour* pDetermineGreatestKnownThreatAction = CreateBehaviour(DetermineGreatestKnownThreatType, pEntity, "DetermineGreatestKnownThreatAction", nullptr);
-					Behaviour* pGreatestKnownThreatSetCondition    = CreateBehaviour(GreatestKnownThreatSetType, pEntity, "GreatestKnownThreatSetCondition", nullptr);
-					Behaviour* pAttackSelector		               = CreateBehaviour(SelectorType, pEntity, "AttackSelector", nullptr);
+					Behaviour* pDetermineGreatestKnownThreatAction = CreateUniversalIndividualBehaviour(DetermineGreatestKnownThreatType, pEntity, "DetermineGreatestKnownThreatAction", nullptr);
+					Behaviour* pGreatestKnownThreatSetCondition    = CreateUniversalIndividualBehaviour(GreatestKnownThreatSetType, pEntity, "GreatestKnownThreatSetCondition", nullptr);
+					Behaviour* pAttackSelector		               = CreateUniversalBehaviour(SelectorType, "AttackSelector", nullptr);
 						
-					Behaviour* pDetermineGreatestSuspectedThreatAction   = CreateBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatAction", nullptr);
-					Behaviour* pGreatestSuspectedThreatSetCondition	     = CreateBehaviour(GreatestSuspectedThreatSetType, pEntity, "GreatestSuspectedThreatSetCondition", nullptr);
-					Behaviour* pDetermineApproachThreatPositionAction    = CreateBehaviour(DetermineApproachThreatPositionType, pEntity, "DetermineApproachThreatPositionAction", nullptr);
-					Behaviour* pMovementTargetApproachThreatSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetApproachThreatSetCondition", nullptr);
+					Behaviour* pDetermineGreatestSuspectedThreatAction   = CreateUniversalIndividualBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatAction", nullptr);
+					Behaviour* pGreatestSuspectedThreatSetCondition	     = CreateUniversalIndividualBehaviour(GreatestSuspectedThreatSetType, pEntity, "GreatestSuspectedThreatSetCondition", nullptr);
+					Behaviour* pDetermineApproachThreatPositionAction    = CreateUniversalIndividualBehaviour(DetermineApproachThreatPositionType, pEntity, "DetermineApproachThreatPositionAction", nullptr);
+					Behaviour* pMovementTargetApproachThreatSetCondition = CreateUniversalIndividualBehaviour(MovementTargetSetType, pEntity, "MovementTargetApproachThreatSetCondition", nullptr);
 					
 					ParallelInitData parallelInitData(ParallelPolicy::RequireAll, ParallelPolicy::RequireOne);
-					Behaviour* pCheckInvestigatedThreatMonitor               = CreateBehaviour(MonitorType, pEntity, "CheckInvestigatedThreatMonitor", &parallelInitData);   
-					Behaviour* pCheckInvestigatedTargetSequence              = CreateBehaviour(SequenceType, pEntity, "CheckInvestigatedTargetSequence", nullptr);
-					Behaviour* pDetermineGreatestSuspectedThreatUpdateAction = CreateBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatUpdateAction", nullptr);
-					Behaviour* pStillInvestigatingGreatestThreatCondition    = CreateBehaviour(InvestigatingGreatestSuspectedThreatType, pEntity, "StillInvestigatingGreatestThreatCondition", nullptr);
+					Behaviour* pCheckInvestigatedThreatMonitor               = CreateUniversalBehaviour(MonitorType, "CheckInvestigatedThreatMonitor", &parallelInitData);   
+					Behaviour* pCheckInvestigatedTargetSequence              = CreateUniversalBehaviour(SequenceType, "CheckInvestigatedTargetSequence", nullptr);
+					Behaviour* pDetermineGreatestSuspectedThreatUpdateAction = CreateUniversalIndividualBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatUpdateAction", nullptr);
+					Behaviour* pStillInvestigatingGreatestThreatCondition    = CreateUniversalIndividualBehaviour(InvestigatingGreatestSuspectedThreatType, pEntity, "StillInvestigatingGreatestThreatCondition", nullptr);
 
-					Behaviour* pMoveToApproachThreatTargetAction	 = CreateBehaviour(MoveToTargetType, pEntity, "MoveToApproachThreatTargetAction", nullptr);
-					Behaviour* pResolveSuspectedThreatAction		 = CreateBehaviour(ResolveSuspectedThreatType, pEntity, "ResolveSuspectedThreatAction", nullptr);
+					Behaviour* pMoveToApproachThreatTargetAction	 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToApproachThreatTargetAction", nullptr);
+					Behaviour* pResolveSuspectedThreatAction		 = CreateUniversalIndividualBehaviour(ResolveSuspectedThreatType, pEntity, "ResolveSuspectedThreatAction", nullptr);
 
-					Behaviour* pDeterminePatrolTargetAction      = CreateBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
-					Behaviour* pMovementTargetPatrolSetCondition = CreateBehaviour(MovementTargetSetType, pEntity, "MovementTargetPatrolSetCondition", nullptr);
-					Behaviour* pMoveToPatrolTargetAction		 = CreateBehaviour(MoveToTargetType, pEntity, "MoveToPatrolTargetAction", nullptr);
+					Behaviour* pDeterminePatrolTargetAction      = CreateUniversalIndividualBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
+					Behaviour* pMovementTargetPatrolSetCondition = CreateUniversalIndividualBehaviour(MovementTargetSetType, pEntity, "MovementTargetPatrolSetCondition", nullptr);
+					Behaviour* pMoveToPatrolTargetAction		 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToPatrolTargetAction", nullptr);
 		
 					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
 					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pCheckInvestigatedThreatMonitor && pCheckInvestigatedTargetSequence && pDetermineGreatestSuspectedThreatUpdateAction && 
@@ -166,19 +177,19 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMovementTargetPatrolSetCondition);
 						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMoveToPatrolTargetAction);
 
-						Behaviour* pAttackSequence = CreateBehaviour(SequenceType, pEntity, "AttackSequence", nullptr);
-						Behaviour* pWaitForAttackReadinessIdleAction = CreateBehaviour(IdleType, pEntity, "WaitForAttackReadinessIdleAction", nullptr);
+						Behaviour* pAttackSequence = CreateUniversalBehaviour(SequenceType, "AttackSequence", nullptr);
+						Behaviour* pWaitForAttackReadinessIdleAction = CreateUniversalIndividualBehaviour(IdleType, pEntity, "WaitForAttackReadinessIdleAction", nullptr);
 
 						if(pAttackSequence && pWaitForAttackReadinessIdleAction)
 						{
 							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pAttackSequence);
 							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pWaitForAttackReadinessIdleAction);
 
-							Behaviour* pReadyToAttackCondition		    = CreateBehaviour(ReadyToAttackType, pEntity, "ReadyToAttackCondition", nullptr);
-							Behaviour* pDetermineAttackTargetAction		= CreateBehaviour(DetermineAttackTargetType, pEntity, "DetermineAttackTargetAction", nullptr);
-							Behaviour* pAttackTargetSetCondition		= CreateBehaviour(AttackTargetSetType, pEntity, "AttackTargetSetCondition", nullptr);
-							Behaviour* pAimAtTargetAction				= CreateBehaviour(AimAtTargetType, pEntity, "AimAtTargetAction", nullptr);
-							Behaviour* pAttackTargetAction				= CreateBehaviour(AttackTargetType, pEntity, "AttackTargetAction", nullptr);
+							Behaviour* pReadyToAttackCondition		    = CreateUniversalIndividualBehaviour(ReadyToAttackType, pEntity, "ReadyToAttackCondition", nullptr);
+							Behaviour* pDetermineAttackTargetAction		= CreateUniversalIndividualBehaviour(DetermineAttackTargetType, pEntity, "DetermineAttackTargetAction", nullptr);
+							Behaviour* pAttackTargetSetCondition		= CreateUniversalIndividualBehaviour(AttackTargetSetType, pEntity, "AttackTargetSetCondition", nullptr);
+							Behaviour* pAimAtTargetAction				= CreateUniversalIndividualBehaviour(AimAtTargetType, pEntity, "AimAtTargetAction", nullptr);
+							Behaviour* pAttackTargetAction				= CreateUniversalIndividualBehaviour(AttackTargetType, pEntity, "AttackTargetAction", nullptr);
 	
 							if(pReadyToAttackCondition && pDetermineAttackTargetAction && pAttackTargetSetCondition && 
 							   pAimAtTargetAction && pAttackTargetAction)
@@ -202,7 +213,66 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 }
 
 //--------------------------------------------------------------------------------------
-// Creates a certain behaviour for the provided entity.
+// Creates a simple behaviour tree for a team AI controlling entities into playing
+// multiflag CTF matches.
+// Param1: A pointer to the multiflag CTF team AI that the behaviour tree should be created for.
+// Returns a pointer to the root behaviour of the created tree. The pointer is null if 
+// something failed during creation.
+//--------------------------------------------------------------------------------------
+Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI*)
+{
+	return nullptr;
+}
+
+//--------------------------------------------------------------------------------------
+// Creates a certain universal behaviour.
+// Param1: Determines which behaviour will be created from a range of available types.
+// Param2: The name that will be associated to the newly created behaviour.
+// Param3: A pointer to a data structure holding the initialisation data for some behaviours.
+// Returns a pointer to the newly created behaviour. The pointer is null if something failed 
+// during creation or if the factory does not support the given behaviour type.
+//--------------------------------------------------------------------------------------
+Behaviour* BehaviourFactory::CreateUniversalBehaviour(UniversalBehaviourType behaviourType, const char* name, void* pInitData)
+{
+	switch(behaviourType)
+	{
+	case SelectorType:
+		return new Selector(name);
+		break;
+	case ActiveSelectorType:
+		return new ActiveSelector(name);
+		break;
+	case SequenceType:
+		return new Sequence(name);
+		break;
+	case ParallelType:
+		{
+		ParallelInitData* pData = reinterpret_cast<ParallelInitData*>(pInitData);
+		return new Parallel(name, pData->m_successPolicy, pData->m_failurePolicy);
+		break;
+		}
+	case MonitorType:
+		return new Monitor(name);
+		break;
+	case RepeatType:
+		{
+		RepeatInitData* pData = reinterpret_cast<RepeatInitData*>(pInitData);
+		return new Repeat(name, pData->m_pChild, pData->m_numberOfRepeats);
+		break;
+		}
+	case ReturnSpecificStatusType:
+		{
+		ReturnSpecificStatusInitData* pData = reinterpret_cast<ReturnSpecificStatusInitData*>(pInitData);
+		return new ReturnSpecificStatus(name, pData->m_pChild, pData->m_returnStatus);
+		break;
+		}
+	default:
+		return nullptr;
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Creates a certain universal individual behaviour for the provided entity.
 // Param1: Determines which behaviour will be created from a range of available types.
 // Param2: A pointer to the entity that the behaviour tree should be created for.
 // Param3: The name that will be associated to the newly created behaviour.
@@ -210,101 +280,97 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 // Returns a pointer to the newly created behaviour. The pointer is null if something failed 
 // during creation or if the factory does not support the given behaviour type.
 //--------------------------------------------------------------------------------------
-Behaviour* BehaviourFactory::CreateBehaviour(BehaviourType behaviourType, Entity* pEntity, const char* name, void* pInitData)
+Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndividualBehaviourType behaviourType, Entity* pEntity, const char* name, void* pInitData)
 {
 	switch(behaviourType)
 	{
-	case SelectorType:
-		return new Selector(pEntity, name);
-		break;
-	case ActiveSelectorType:
-		return new ActiveSelector(pEntity, name);
-		break;
-	case SequenceType:
-		return new Sequence(pEntity, name);
-		break;
-	case ParallelType:
-		{
-		ParallelInitData* pData = reinterpret_cast<ParallelInitData*>(pInitData);
-		return new Parallel(pEntity, name, pData->m_successPolicy, pData->m_failurePolicy);
-		break;
-		}
-	case MonitorType:
-		return new Monitor(pEntity, name);
-		break;
-	case RepeatType:
-		{
-		RepeatInitData* pData = reinterpret_cast<RepeatInitData*>(pInitData);
-		return new Repeat(pEntity, name, pData->m_pChild, pData->m_numberOfRepeats);
-		break;
-		}
-	case ReturnSpecificStatusType:
-		{
-		ReturnSpecificStatusInitData* pData = reinterpret_cast<ReturnSpecificStatusInitData*>(pInitData);
-		return new ReturnSpecificStatus(pEntity, name, pData->m_pChild, pData->m_returnStatus);
-		break;
-		}
 	case MovementTargetSetType:
-		return new MovementTargetSet(pEntity, name);
+		return new MovementTargetSet(name, pEntity);
 		break;
 	case ReadyToAttackType:
-		return new ReadyToAttack(pEntity, name);
+		return new ReadyToAttack(name, pEntity);
 		break;
 	case AttackTargetSetType:
-		return new AttackTargetSet(pEntity, name);
+		return new AttackTargetSet(name, pEntity);
 		break;
 	case GreatestKnownThreatSetType:
-		return new GreatestKnownThreatSet(pEntity, name);
+		return new GreatestKnownThreatSet(name, pEntity);
 		break;
 	case GreatestSuspectedThreatSetType:
-		return new GreatestSuspectedThreatSet(pEntity, name);
+		return new GreatestSuspectedThreatSet(name, pEntity);
 		break;
 	case EntityAliveType:
-		return new EntityAlive(pEntity, name);
+		return new EntityAlive(name, pEntity);
 		break;
 	case InvestigatingGreatestSuspectedThreatType:
-		return new InvestigatingGreatestSuspectedThreat(pEntity, name);
+		return new InvestigatingGreatestSuspectedThreat(name, pEntity);
 		break;
 	case DeterminePatrolTargetType:
-		return new DeterminePatrolTarget(pEntity, name);
+		return new DeterminePatrolTarget(name, pEntity);
 		break;
 	case DetermineApproachThreatPositionType:
-		return new DetermineApproachThreatPosition(pEntity, name);
+		return new DetermineApproachThreatPosition(name, pEntity);
 		break;
 	case DetermineAttackTargetType:
-		return new DetermineAttackTarget(pEntity, name);
+		return new DetermineAttackTarget(name, pEntity);
 		break;
 	case DetermineGreatestKnownThreatType:
-		return new DetermineGreatestKnownThreat(pEntity, name);
+		return new DetermineGreatestKnownThreat(name, pEntity);
 		break;
 	case DetermineGreatestSuspectedThreatType:
-		return new DetermineGreatestSuspectedThreat(pEntity, name);
+		return new DetermineGreatestSuspectedThreat(name, pEntity);
 		break;
 	case AttackTargetType:
-		return new AttackTarget(pEntity, name);
+		return new AttackTarget(name, pEntity);
 		break;
 	case AimAtTargetType:
-		return new AimAtTarget(pEntity, name);
+		return new AimAtTarget(name, pEntity);
 		break;
 	case UpdateThreatsType:
-		return new UpdateThreats(pEntity, name);
+		return new UpdateThreats(name, pEntity);
 		break;
 	case UpdateAttackReadinessType:
-		return new UpdateAttackReadiness(pEntity, name);
+		return new UpdateAttackReadiness(name, pEntity);
 		break;
 	case IdleType:
-		return new Idle(pEntity, name);
+		return new Idle(name, pEntity);
 		break;
 	case MoveToTargetType:
-		return new MoveToTarget(pEntity, name);
+		return new MoveToTarget(name, pEntity);
 		break;
 	case ResolveSuspectedThreatType:
-		return new ResolveSuspectedThreat(pEntity, name);
+		return new ResolveSuspectedThreat(name, pEntity);
 	case ProcessMessagesType:
-		return new ProcessMessages(pEntity, name);
+		return new ProcessMessages(name, pEntity);
 	default:
 		return nullptr;
 	}
 }
 
+//--------------------------------------------------------------------------------------
+// Creates a certain universal team behaviour for the provided team AI.
+// Param1: Determines which behaviour will be created from a range of available types.
+// Param2: A pointer to the team AI that the behaviour tree should be created for.
+// Param3: The name that will be associated to the newly created behaviour.
+// Param4: A pointer to a data structure holding the initialisation data for some behaviours.
+// Returns a pointer to the newly created behaviour. The pointer is null if something failed 
+// during creation or if the factory does not support the given behaviour type.
+//--------------------------------------------------------------------------------------
+Behaviour* BehaviourFactory::CreateUniversalTeamBehaviour(UniversalTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, void* pInitData)
+{
+	return nullptr;
+}
 
+//--------------------------------------------------------------------------------------
+// Creates a certain multiflag CTF team behaviour for the provided multiflag CTF team AI.
+// Param1: Determines which behaviour will be created from a range of available types.
+// Param2: A pointer to the multiflag CTF team AI that the behaviour tree should be created for.
+// Param3: The name that will be associated to the newly created behaviour.
+// Param4: A pointer to a data structure holding the initialisation data for some behaviours.
+// Returns a pointer to the newly created behaviour. The pointer is null if something failed 
+// during creation or if the factory does not support the given behaviour type.
+//--------------------------------------------------------------------------------------
+Behaviour* BehaviourFactory::CreateMultiflagCTFTeamBehaviour(MultiflagCTFTeamBehaviourType behaviourType, MultiflagCTFTeamAI* pMultiflagCTFTeamAI, const char* name, void* pInitData)
+{
+	return nullptr;
+}

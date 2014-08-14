@@ -27,7 +27,7 @@ struct ReturnSpecificStatusInitData
 class ReturnSpecificStatus : public Decorator
 {
 public:
-	ReturnSpecificStatus(Entity* pEntity, const char* name, Behaviour* pChild, BehaviourStatus returnStatus);
+	ReturnSpecificStatus(const char* name, Behaviour* pChild, BehaviourStatus returnStatus);
 	~ReturnSpecificStatus(void);
 
 	void SetReturnStatus(BehaviourStatus returnStatus);

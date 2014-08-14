@@ -9,7 +9,7 @@
 #include "GreatestKnownThreatSet.h"
 #include "Entity.h"
 
-GreatestKnownThreatSet::GreatestKnownThreatSet(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+GreatestKnownThreatSet::GreatestKnownThreatSet(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

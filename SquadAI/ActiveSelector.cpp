@@ -10,7 +10,7 @@
 // Includes
 #include "ActiveSelector.h"
 
-ActiveSelector::ActiveSelector(Entity* pEntity, const char* name) : Selector(pEntity, name)
+ActiveSelector::ActiveSelector(const char* name) : Selector(name)
 {
 
 }

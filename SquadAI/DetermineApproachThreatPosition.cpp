@@ -9,7 +9,7 @@
 #include "DetermineApproachThreatPosition.h"
 #include "Entity.h"
 
-DetermineApproachThreatPosition::DetermineApproachThreatPosition(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+DetermineApproachThreatPosition::DetermineApproachThreatPosition(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

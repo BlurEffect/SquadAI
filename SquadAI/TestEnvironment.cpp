@@ -15,7 +15,7 @@ TestEnvironment::TestEnvironment(void) : m_id(0),
 										 m_gridSize(0.0f),
 										 m_numberOfGridPartitions(0),
 										 m_gridSpacing(0.0f),
-										 m_pNodes(nullptr)				 
+										 m_pNodes(nullptr)
 {
 	for(unsigned int i = 0; i < NumberOfObjectTypes; ++i)
 	{
@@ -27,6 +27,7 @@ TestEnvironment::TestEnvironment(void) : m_id(0),
 		m_soldierCount[i]    = 0;
 		m_flagSet[i]         = false;
 		m_spawnPointCount[i] = 0;
+		m_pTeamAI[i]         = nullptr;
 	}
 }
 
@@ -72,6 +73,11 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 		m_soldierCount[i] = 0;
 		m_flagSet[i]      = false;
 		m_spawnPointCount[i] = 0;
+		m_pTeamAI[i] = new MultiflagCTFTeamAI();
+		if(!m_pTeamAI || !m_pTeamAI[i]->Initialise(EntityTeam(i), this))
+		{
+			return false;
+		}
 	}
 
 	// initialise the random number generator
@@ -82,6 +88,8 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 	{
 		return false;
 	}
+
+	
 
 	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
@@ -331,6 +339,18 @@ void TestEnvironment::Cleanup()
 		delete m_pGameContext;
 		m_pGameContext = nullptr;
 	}
+
+	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+	{
+		if(m_pTeamAI[i]  )
+		{
+			delete m_pTeamAI[i];
+			m_pTeamAI[i] = nullptr;
+		}
+	}
+
+	
+	
 }
 
 //--------------------------------------------------------------------------------------

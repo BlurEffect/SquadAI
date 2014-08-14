@@ -11,7 +11,7 @@
 #include "Monitor.h"
 
 
-Monitor::Monitor(Entity* pEntity, const char* name) : Parallel(pEntity, name, RequireAll, RequireOne)
+Monitor::Monitor(const char* name) : Parallel(name, RequireAll, RequireOne)
 {
 }
 

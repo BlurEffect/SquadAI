@@ -8,7 +8,7 @@
 #include "AimAtTarget.h"
 #include "Entity.h"
 
-AimAtTarget::AimAtTarget(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+AimAtTarget::AimAtTarget(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

@@ -8,12 +8,12 @@
 #define UPDATE_THREATS_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class UpdateThreats : public Behaviour
+class UpdateThreats : public UniversalIndividualBehaviour
 {
 public:
-	UpdateThreats(Entity* pEntity, const char* name);
+	UpdateThreats(const char* name, Entity* pEntity);
 	~UpdateThreats(void);
 
 private:

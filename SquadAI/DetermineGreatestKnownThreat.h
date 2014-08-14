@@ -9,12 +9,12 @@
 #define DETERMINE_GREATEST_KNOWN_THREAT_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class DetermineGreatestKnownThreat : public Behaviour
+class DetermineGreatestKnownThreat : public UniversalIndividualBehaviour
 {
 public:
-	DetermineGreatestKnownThreat(Entity* pEntity, const char* name);
+	DetermineGreatestKnownThreat(const char* name, Entity* pEntity);
 	~DetermineGreatestKnownThreat(void);
 
 private:

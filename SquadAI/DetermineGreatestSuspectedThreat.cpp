@@ -9,7 +9,7 @@
 #include "DetermineGreatestSuspectedThreat.h"
 #include "Entity.h"
 
-DetermineGreatestSuspectedThreat::DetermineGreatestSuspectedThreat(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+DetermineGreatestSuspectedThreat::DetermineGreatestSuspectedThreat(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

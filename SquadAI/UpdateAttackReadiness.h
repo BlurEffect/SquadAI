@@ -9,12 +9,12 @@
 #define UPDATE_ATTACK_READINESS_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class UpdateAttackReadiness : public Behaviour
+class UpdateAttackReadiness : public UniversalIndividualBehaviour
 {
 public:
-	UpdateAttackReadiness(Entity* pEntity, const char* name);
+	UpdateAttackReadiness(const char* name, Entity* pEntity);
 	~UpdateAttackReadiness(void);
 
 private:

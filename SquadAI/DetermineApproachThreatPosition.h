@@ -9,12 +9,12 @@
 #define DETERMINE_APPROACH_THREAT_POSITION_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class DetermineApproachThreatPosition : public Behaviour
+class DetermineApproachThreatPosition : public UniversalIndividualBehaviour
 {
 public:
-	DetermineApproachThreatPosition(Entity* pEntity, const char* name);
+	DetermineApproachThreatPosition(const char* name, Entity* pEntity);
 	~DetermineApproachThreatPosition(void);
 
 private:

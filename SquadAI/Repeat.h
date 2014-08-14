@@ -28,7 +28,7 @@ struct RepeatInitData
 class Repeat : public Decorator
 {
 public:
-	Repeat(Entity* pEntity, const char* name, Behaviour* pChild, unsigned int numberOfRepeats);
+	Repeat(const char* name, Behaviour* pChild, unsigned int numberOfRepeats);
 	~Repeat(void);
 
 	void SetNumberOfRepeats(unsigned int count);

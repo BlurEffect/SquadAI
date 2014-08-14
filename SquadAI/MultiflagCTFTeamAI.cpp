@@ -15,16 +15,20 @@ MultiflagCTFTeamAI::~MultiflagCTFTeamAI(void)
 {
 }
 
+//--------------------------------------------------------------------------------------
+// Initialises the multiflag CTF AI.
+// Param1: The team that this Ai will control.
+// Param2: A pointer to the test environment, in which the matches take place.
+//--------------------------------------------------------------------------------------
 bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment)
 {
 	if(TeamAI::Initialise(team, pEnvironment))
 	{
-		/*
-		m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleCombatTree, this);
+		m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleTeamMultiflagCTFTree, this);
 		if(!m_pBehaviour)
 		{
 			return false;
-		}*/
+		}
 	}
 
 	return false;

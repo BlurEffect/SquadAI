@@ -8,7 +8,7 @@
 #include "Idle.h"
 #include "Entity.h"
 
-Idle::Idle(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+Idle::Idle(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

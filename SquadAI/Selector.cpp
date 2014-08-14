@@ -13,7 +13,7 @@
 // Includes
 #include "Selector.h"
 
-Selector::Selector(Entity* pEntity, const char* name) : Composite(pEntity, name)
+Selector::Selector(const char* name) : Composite(name)
 {
 }
 

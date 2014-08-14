@@ -13,8 +13,8 @@
 #include "Decorator.h"
 
 
-Decorator::Decorator(Entity* pEntity, const char* name, Behaviour* pChild) : Behaviour(pEntity, name),
-																		     m_pChild(pChild)
+Decorator::Decorator(const char* name, Behaviour* pChild) : Behaviour(name),
+															m_pChild(pChild)
 {
 
 }

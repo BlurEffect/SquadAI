@@ -9,12 +9,12 @@
 #define MOVEMENT_TARGET_SET_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class MovementTargetSet : public Behaviour
+class MovementTargetSet : public UniversalIndividualBehaviour
 {
 public:
-	MovementTargetSet(Entity* pEntity, const char* name);
+	MovementTargetSet(const char* name, Entity* pEntity);
 	~MovementTargetSet(void);
 
 private:

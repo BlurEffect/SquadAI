@@ -110,6 +110,7 @@
     <ClCompile Include="EntityCombatManager.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
     <ClCompile Include="MultiflagCTFTeamAI.cpp" />
+    <ClCompile Include="MultiflagCTFTeamBehaviour.cpp" />
     <ClCompile Include="Objective.cpp" />
     <ClCompile Include="FontPixelShader.cpp" />
     <ClCompile Include="FontVertexShader.cpp" />
@@ -163,6 +164,8 @@
     <ClCompile Include="TeamAI.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
     <ClCompile Include="TriangleDrawable.cpp" />
+    <ClCompile Include="UniversalIndividualBehaviour.cpp" />
+    <ClCompile Include="UniversalTeamBehaviour.cpp" />
     <ClCompile Include="UpdateAttackReadiness.cpp" />
     <ClCompile Include="UpdateThreats.cpp" />
     <ClCompile Include="VertexShader.cpp" />
@@ -198,7 +201,10 @@
     <ClInclude Include="EventTypes.h" />
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
+    <ClInclude Include="UniversalIndividualBehaviour.h" />
+    <ClInclude Include="MultiflagCTFTeamBehaviour.h" />
     <ClInclude Include="ProcessMessages.h" />
+    <ClInclude Include="UniversalTeamBehaviour.h" />
     <ClInclude Include="TestEnvironmentToEntityMessages.h" />
     <ClInclude Include="EntityToTeamAIMessages.h" />
     <ClInclude Include="Message.h" />

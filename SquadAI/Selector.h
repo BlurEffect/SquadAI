@@ -19,7 +19,7 @@
 class Selector : public Composite
 {
 public:
-	Selector(Entity* pEntity, const char* name);
+	Selector(const char* name);
 	virtual ~Selector(void);
 
 protected:

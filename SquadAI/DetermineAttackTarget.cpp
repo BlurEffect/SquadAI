@@ -9,7 +9,7 @@
 #include "DetermineAttackTarget.h"
 #include "Entity.h"
 
-DetermineAttackTarget::DetermineAttackTarget(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+DetermineAttackTarget::DetermineAttackTarget(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

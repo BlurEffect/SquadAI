@@ -8,12 +8,12 @@
 #define AIM_AT_TARGET_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class AimAtTarget : public Behaviour
+class AimAtTarget : public UniversalIndividualBehaviour
 {
 public:
-	AimAtTarget(Entity* pEntity, const char* name);
+	AimAtTarget(const char* name, Entity* pEntity);
 	~AimAtTarget(void);
 
 private:

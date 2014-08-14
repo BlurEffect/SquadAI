@@ -9,12 +9,12 @@
 #define DETERMINE_ATTACK_TARGET_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class DetermineAttackTarget : public Behaviour
+class DetermineAttackTarget : public UniversalIndividualBehaviour
 {
 public:
-	DetermineAttackTarget(Entity* pEntity, const char* name);
+	DetermineAttackTarget(const char* name, Entity* pEntity);
 	~DetermineAttackTarget(void);
 
 private:

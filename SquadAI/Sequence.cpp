@@ -12,7 +12,7 @@
 // Includes
 #include "Sequence.h"
 
-Sequence::Sequence(Entity* pEntity, const char* name) : Composite(pEntity, name)
+Sequence::Sequence(const char* name) : Composite(name)
 {
 }
 

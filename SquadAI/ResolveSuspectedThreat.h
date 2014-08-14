@@ -10,12 +10,12 @@
 #define RESOLVE_SUSPECTED_THREAT_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class ResolveSuspectedThreat : public Behaviour
+class ResolveSuspectedThreat : public UniversalIndividualBehaviour
 {
 public:
-	ResolveSuspectedThreat(Entity* pEntity, const char* name);
+	ResolveSuspectedThreat(const char* name, Entity* pEntity);
 	~ResolveSuspectedThreat(void);
 
 private:

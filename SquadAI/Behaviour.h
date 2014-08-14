@@ -1,16 +1,13 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
 *  Behaviour.h
-*  Abstract base class for entity behaviours.
+*  Abstract base class for all behaviours.
 *  Based on Alex Champandard's presentation "Understanding the Second-Generation of Behavior Trees"
 *  and the associated "Behavior Tree Starter Kit" (BTSK).
 */
 
 #ifndef BEHAVIOUR_H
 #define BEHAVIOUR_H
-
-// Forward declarations
-class Entity;
 
 //--------------------------------------------------------------------------------------
 // Possible states for behaviours. Used as return codes.
@@ -28,7 +25,7 @@ enum BehaviourStatus
 class Behaviour
 {
 public:
-	Behaviour(Entity* pEntity, const char* name);
+	Behaviour(const char* name);
 	Behaviour(const Behaviour& sourceBehaviour);
 	virtual ~Behaviour(void);
 
@@ -41,8 +38,7 @@ public:
 
 	bool IsTerminated(void) const;
 	bool IsRunning(void) const;
-	
-	Entity*         GetEntity(void);
+
 	unsigned long   GetId(void) const;
 	const char*     GetName(void) const;
 	BehaviourStatus GetStatus(void) const;
@@ -73,7 +69,6 @@ private:
 
 	static unsigned long s_BehaviourId; // This id is incremented with each created object and assigned to the new behaviour, 0 is an invalid value
 
-	Entity*         m_pEntity; // The entity that this behaviour belongs to
 	unsigned long   m_id;      // Each behaviour is assigned a unique id
 	const char*     m_name;    // The name of this behaviour
 	BehaviourStatus m_status;  // The current state of the behaviour

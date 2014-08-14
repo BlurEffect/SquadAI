@@ -8,7 +8,8 @@
 #include "Entity.h"
 #include "TestEnvironment.h"
 
-TeamAI::TeamAI(void) : m_team(None),
+TeamAI::TeamAI(void) : m_pBehaviour(nullptr),
+				       m_team(None),
 					   m_pTestEnvironment(nullptr),
 					   m_timeLeft(1.0f)
 {
@@ -20,9 +21,18 @@ TeamAI::TeamAI(void) : m_team(None),
 
 TeamAI::~TeamAI(void)
 {
+	if(m_pBehaviour)
+	{
+		delete m_pBehaviour;
+		m_pBehaviour = nullptr;
+	}
 }
 
-
+//--------------------------------------------------------------------------------------
+// Initialises the team AI.
+// Param1: The team that this Ai will control.
+// Param2: A pointer to the test environment, in which the matches take place.
+//--------------------------------------------------------------------------------------
 bool TeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment)
 {
 	if(!pEnvironment)

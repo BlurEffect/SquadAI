@@ -8,12 +8,12 @@
 #define ENTITY_ALIVE_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class EntityAlive : public Behaviour
+class EntityAlive : public UniversalIndividualBehaviour
 {
 public:
-	EntityAlive(Entity* pEntity, const char* name);
+	EntityAlive(const char* name, Entity* pEntity);
 	~EntityAlive(void);
 
 private:

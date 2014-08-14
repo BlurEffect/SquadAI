@@ -9,7 +9,7 @@
 #include "ProcessMessages.h"
 #include "Entity.h"
 
-ProcessMessages::ProcessMessages(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+ProcessMessages::ProcessMessages(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

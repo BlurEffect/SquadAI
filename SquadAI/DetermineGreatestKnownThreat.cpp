@@ -9,7 +9,7 @@
 #include "DetermineGreatestKnownThreat.h"
 #include "Entity.h"
 
-DetermineGreatestKnownThreat::DetermineGreatestKnownThreat(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+DetermineGreatestKnownThreat::DetermineGreatestKnownThreat(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

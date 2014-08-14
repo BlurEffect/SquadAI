@@ -8,7 +8,7 @@
 #include "EntityAlive.h"
 #include "Entity.h"
 
-EntityAlive::EntityAlive(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+EntityAlive::EntityAlive(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

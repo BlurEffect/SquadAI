@@ -9,12 +9,12 @@
 #define PROCESS_MESSAGES_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class ProcessMessages : public Behaviour
+class ProcessMessages : public UniversalIndividualBehaviour
 {
 public:
-	ProcessMessages(Entity* pEntity, const char* name);
+	ProcessMessages(const char* name, Entity* pEntity);
 	~ProcessMessages(void);
 
 private:

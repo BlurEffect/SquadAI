@@ -8,7 +8,7 @@
 #include "UpdateThreats.h"
 #include "Entity.h"
 
-UpdateThreats::UpdateThreats(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+UpdateThreats::UpdateThreats(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

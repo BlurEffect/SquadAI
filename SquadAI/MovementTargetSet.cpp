@@ -9,7 +9,7 @@
 #include "MovementTargetSet.h"
 #include "Entity.h"
 
-MovementTargetSet::MovementTargetSet(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+MovementTargetSet::MovementTargetSet(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

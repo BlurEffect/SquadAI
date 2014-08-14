@@ -40,7 +40,7 @@ class Parallel : public Composite
 {
 public:
 
-	Parallel(Entity* pEntity, const char* name, ParallelPolicy successPolicy, ParallelPolicy failurePolicy);
+	Parallel(const char* name, ParallelPolicy successPolicy, ParallelPolicy failurePolicy);
 	virtual ~Parallel(void);
 
 protected:

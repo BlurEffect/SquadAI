@@ -9,12 +9,12 @@
 #define DETERMINE_GREATEST_SUSPECTED_THREAT_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class DetermineGreatestSuspectedThreat : public Behaviour
+class DetermineGreatestSuspectedThreat : public UniversalIndividualBehaviour
 {
 public:
-	DetermineGreatestSuspectedThreat(Entity* pEntity, const char* name);
+	DetermineGreatestSuspectedThreat(const char* name, Entity* pEntity);
 	~DetermineGreatestSuspectedThreat(void);
 
 private:

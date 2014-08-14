@@ -9,7 +9,7 @@
 #include "DeterminePatrolTarget.h"
 #include "Entity.h"
 
-DeterminePatrolTarget::DeterminePatrolTarget(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+DeterminePatrolTarget::DeterminePatrolTarget(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

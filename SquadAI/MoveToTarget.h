@@ -9,12 +9,12 @@
 #define MOVE_TO_TARGET_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class MoveToTarget : public Behaviour
+class MoveToTarget : public UniversalIndividualBehaviour
 {
 public:
-	MoveToTarget(Entity* pEntity, const char* name);
+	MoveToTarget(const char* name, Entity* pEntity);
 	~MoveToTarget(void);
 
 private:

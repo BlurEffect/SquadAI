@@ -10,7 +10,7 @@
 #include "ResolveSuspectedThreat.h"
 #include "Entity.h"
 
-ResolveSuspectedThreat::ResolveSuspectedThreat(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+ResolveSuspectedThreat::ResolveSuspectedThreat(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

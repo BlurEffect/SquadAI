@@ -9,12 +9,12 @@
 #define GREATEST_KNOWN_THREAT_SET_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class GreatestKnownThreatSet : public Behaviour
+class GreatestKnownThreatSet : public UniversalIndividualBehaviour
 {
 public:
-	GreatestKnownThreatSet(Entity* pEntity, const char* name);
+	GreatestKnownThreatSet(const char* name, Entity* pEntity);
 	~GreatestKnownThreatSet(void);
 
 private:

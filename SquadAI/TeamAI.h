@@ -70,11 +70,12 @@ public:
 	virtual void ProcessEvent(EventType type, void* pEventData);
 
 protected:
+
 	virtual void ProcessMessage(Message* pMessage);
 	
+	Behaviour* m_pBehaviour;              // The behaviour tree controlling the decisions of the team AI
 
 private:
-	Behaviour*                           m_pBehaviour;              // The behaviour tree controlling the decisions of the team AI
 	EntityTeam						     m_team;					// The team that the AI is controlling
 	std::vector<Entity*>                 m_teamMembers;				// The entities being controlled by this team AI
 	std::map<unsigned long, EnemyRecord> m_enemyRecords;			// The team AI creates and obtains a record for every enemy spotted in the environment

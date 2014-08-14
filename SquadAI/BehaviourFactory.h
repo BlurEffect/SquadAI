@@ -43,20 +43,15 @@
 
 // Forward declarations
 class Entity;
+class TeamAI;
+class MultiflagCTFTeamAI;
 
 //--------------------------------------------------------------------------------------
-// Identifies the behaviours that are available.
+// Identifies the individual behaviours that are available and can be used on all types
+// of entities.
 //--------------------------------------------------------------------------------------
-enum BehaviourType
+enum UniversalIndividualBehaviourType
 {
-	SelectorType,
-	ActiveSelectorType,
-	SequenceType,
-	ParallelType,
-	MonitorType,
-	RepeatType,
-	ReturnSpecificStatusType,
-
 	MovementTargetSetType,
 	ReadyToAttackType,
 	AttackTargetSetType,
@@ -81,23 +76,61 @@ enum BehaviourType
 };
 
 //--------------------------------------------------------------------------------------
+// Identifies the behaviours that can be universally applied.
+//--------------------------------------------------------------------------------------
+enum UniversalBehaviourType
+{
+	SelectorType,
+	ActiveSelectorType,
+	SequenceType,
+	ParallelType,
+	MonitorType,
+	RepeatType,
+	ReturnSpecificStatusType
+};
+
+//--------------------------------------------------------------------------------------
+// Identifies the behaviours that can be universally applied by all team AIs.
+//--------------------------------------------------------------------------------------
+enum UniversalTeamBehaviourType
+{
+	
+};
+
+//--------------------------------------------------------------------------------------
+// Identifies the behaviours that can be used for team AIs in the game mode Multiflag CTF.
+//--------------------------------------------------------------------------------------
+enum MultiflagCTFTeamBehaviourType
+{
+	
+};
+
+//--------------------------------------------------------------------------------------
 // Lists available types of behaviour trees.
 //--------------------------------------------------------------------------------------
 enum BehaviourTreeType
 {
-	SimpleMovementTree,
-	SimpleCombatTree,
+	SimpleIndividualMovementTree,
+	SimpleIndividualCombatTree,
+	SimpleTeamMultiflagCTFTree
 };
 
 
 class BehaviourFactory
 {
 public:
-	static Behaviour* CreateBehaviourTree(BehaviourTreeType entityType, Entity* pEntity);
+	static Behaviour* CreateBehaviourTree(BehaviourTreeType treeType, void* pTreeOwner);
+
 private:
 	static Behaviour* CreateSimpleMovementTree(Entity* pEntity);
 	static Behaviour* CreateSimpleCombatTree(Entity* pEntity);
-	static Behaviour* CreateBehaviour(BehaviourType behaviourType, Entity* pEntity, const char* name, void* pInitData);
+	static Behaviour* CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI*);
+
+	// Factory functions for the different types of behaviours
+	static Behaviour* CreateUniversalBehaviour(UniversalBehaviourType behaviourType, const char* name, void* pInitData);
+	static Behaviour* CreateUniversalIndividualBehaviour(UniversalIndividualBehaviourType behaviourType, Entity* pEntity, const char* name, void* pInitData);
+	static Behaviour* CreateUniversalTeamBehaviour(UniversalTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, void* pInitData);
+	static Behaviour* CreateMultiflagCTFTeamBehaviour(MultiflagCTFTeamBehaviourType behaviourType, MultiflagCTFTeamAI* pMultiflagCTFTeamAI, const char* name, void* pInitData);
 };
 
 #endif // BEHAVIOUR_FACTORY_H

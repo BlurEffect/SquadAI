@@ -40,6 +40,8 @@
 #include "Logger.h"
 #include "GameContext.h"
 #include "MultiflagCTFGameContext.h"
+#include "TeamAI.h"
+#include "MultiflagCTFTeamAI.h"
 
 using namespace DirectX;
 
@@ -125,6 +127,8 @@ private:
 	unsigned int        m_numberOfGridPartitions; // The number of grid fields along x and y axis
 	float               m_gridSpacing;			  // The size of a grid field along x and y axis
 	Node**              m_pNodes;                 // The graph made up of nodes representing the test environment when in simulation mode
+
+	TeamAI*  m_pTeamAI[NumberOfTeams-1]; // The team AIs controlling the entities of the teams
 
 	// Objects
 	std::vector<EditModeObject> m_staticObjects;									// The static test environment objects, as set up by the user in edit mode

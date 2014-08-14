@@ -8,12 +8,12 @@
 #define READY_TO_ATTACK_H
 
 // Includes
-#include "Behaviour.h"
+#include "UniversalIndividualBehaviour.h"
 
-class ReadyToAttack : public Behaviour
+class ReadyToAttack : public UniversalIndividualBehaviour
 {
 public:
-	ReadyToAttack(Entity* pEntity, const char* name);
+	ReadyToAttack(const char* name, Entity* pEntity);
 	~ReadyToAttack(void);
 
 private:

@@ -10,9 +10,9 @@
 // Includes
 #include "Parallel.h"
 
-Parallel::Parallel(Entity* pEntity, const char* name, ParallelPolicy successPolicy, ParallelPolicy failurePolicy) : Composite(pEntity, name),
-																		  											m_successPolicy(successPolicy),
-																													m_failurePolicy(failurePolicy)
+Parallel::Parallel(const char* name, ParallelPolicy successPolicy, ParallelPolicy failurePolicy) : Composite(name),
+																		  						   m_successPolicy(successPolicy),
+																							   	   m_failurePolicy(failurePolicy)
 {
 }
 

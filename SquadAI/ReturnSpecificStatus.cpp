@@ -9,8 +9,8 @@
 #include "ReturnSpecificStatus.h"
 
 
-ReturnSpecificStatus::ReturnSpecificStatus(Entity* pEntity, const char* name, Behaviour* pChild, BehaviourStatus returnStatus) 
-						: Decorator(pEntity, name, pChild),
+ReturnSpecificStatus::ReturnSpecificStatus(const char* name, Behaviour* pChild, BehaviourStatus returnStatus) 
+						: Decorator(name, pChild),
 						  m_returnStatus(returnStatus)
 {
 }

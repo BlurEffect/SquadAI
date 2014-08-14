@@ -17,7 +17,7 @@ class Monitor : public Parallel
 {
 public:
 
-	Monitor(Entity* pEntity, const char* name);
+	Monitor(const char* name);
 	virtual ~Monitor(void);
 
 	void AddCondition(Behaviour* pCondition);

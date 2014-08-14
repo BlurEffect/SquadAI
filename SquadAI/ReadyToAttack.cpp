@@ -8,7 +8,7 @@
 #include "ReadyToAttack.h"
 #include "Entity.h"
 
-ReadyToAttack::ReadyToAttack(Entity* pEntity, const char* name) : Behaviour(pEntity, name)
+ReadyToAttack::ReadyToAttack(const char* name, Entity* pEntity) : UniversalIndividualBehaviour(name, pEntity)
 {
 }
 

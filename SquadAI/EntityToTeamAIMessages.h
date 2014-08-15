@@ -112,38 +112,37 @@ private:
 	UpdateEnemyPositionMessageData m_data; // The contents of the message
 };
 
-
-
-
 //--------------------------------------------------------------------------------------
-// Contains data required for a message sent when an entity has killed an enemy and wants
+// Contains data required for a message sent when an entity was attacked by an enemy and wants
 // to inform the team AI of that event.
 //--------------------------------------------------------------------------------------
-struct EnemyKilledMessageData
+struct AttackedByEnemyMessageData
 {
-	EnemyKilledMessageData(unsigned long entityId, unsigned long enemyId) : m_entityId(entityId),
-																			m_enemyId(enemyId)
+	AttackedByEnemyMessageData(unsigned long entityId, unsigned long enemyId, const XMFLOAT2& attackPos) : m_entityId(entityId),
+																										   m_enemyId(enemyId),
+																										   m_attackPosition(attackPos)
 	{}
 
-	unsigned long m_entityId; // The id of the entity that killed the enemy
-	unsigned long m_enemyId;  // The id of the enemy, that was killed
+	unsigned long m_entityId;		// The id of the entity that attacked by an enemy
+	unsigned long m_enemyId;		// The id of the enemy, that attacked the entity
+	XMFLOAT2      m_attackPosition; // The position, from which the entity was attacked
 };
 
 //--------------------------------------------------------------------------------------
-// Message sent when an entity has killed an enemy and wants
+// Message sent when an entity was attacked by an enemy and wants
 // to inform the team AI of that event.
 //--------------------------------------------------------------------------------------
-class EnemyKilledMessage : public Message
+class AttackedByEnemyMessage : public Message
 {
 public:
-	EnemyKilledMessage(const EnemyKilledMessageData& data) : Message(EnemyKilledMessageType),
-															 m_data(data)
+	AttackedByEnemyMessage(const AttackedByEnemyMessageData& data) : Message(AttackedByEnemyMessageType),
+																	 m_data(data)
 	{}
 
-	const EnemyKilledMessageData& GetData(void) const { return m_data; }
+	const AttackedByEnemyMessageData& GetData(void) const { return m_data; }
 
 private:
-	EnemyKilledMessageData m_data; // The contents of the message
+	AttackedByEnemyMessageData m_data; // The contents of the message
 };
 
 

@@ -9,8 +9,8 @@
 #include "MultiflagCTFGameContext.h"
 #include "Entity.h"
 
-MultiflagCTFGameContext::MultiflagCTFGameContext(float maxTime, unsigned int winScore, float flagResetTimeLimit) 
-	: GameContext(MultiflagCTF, maxTime, winScore),
+MultiflagCTFGameContext::MultiflagCTFGameContext(float maxTime, float notifyTimeInterval, unsigned int winScore, float flagResetTimeLimit) 
+	: GameContext(MultiflagCTF, maxTime, notifyTimeInterval, winScore),
 	  m_flagResetTimeLimit(flagResetTimeLimit)
 {
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
@@ -114,7 +114,7 @@ void MultiflagCTFGameContext::ProcessEvent(EventType type, void* pEventData)
 		switch(m_flagStates[pEntityReachedObjectiveData->m_pObjective->GetTeam()])
 		{
 		case InBase:
-			if(pEntityReachedObjectiveData->m_pEntity->GetTeam() != pEntityReachedObjectiveData->m_pEntity->GetTeam())
+			if(pEntityReachedObjectiveData->m_pEntity->GetTeam() != pEntityReachedObjectiveData->m_pObjective->GetTeam())
 			{
 				// An entity of a hostile team reached the flag, make the entity the new flag carrier
 				FlagPickedUp(pEntityReachedObjectiveData->m_pObjective->GetTeam(), pEntityReachedObjectiveData->m_pEntity);
@@ -221,6 +221,10 @@ void MultiflagCTFGameContext::FlagPickedUp(EntityTeam flagOwner, Entity* pCarrie
 {
 	m_flagStates[flagOwner]   = Stolen;
 	m_flagCarriers[flagOwner] = pCarrier;
+
+	// Notify teams.
+	FlagPickedUpMessageData data(flagOwner, pCarrier->GetId());
+	BroadcastMessage(FlagPickedUpMessageType, &data);
 }
 
 //--------------------------------------------------------------------------------------
@@ -232,6 +236,10 @@ void MultiflagCTFGameContext::FlagDropped(EntityTeam flagOwner)
 	m_flagStates[flagOwner]      = Dropped;
 	m_flagCarriers[flagOwner]    = nullptr;
 	m_flagResetTimers[flagOwner] = m_flagResetTimeLimit;
+
+	// Notify teams.
+	FlagDroppedMessageData data(flagOwner, m_flagPositions[flagOwner]);
+	BroadcastMessage(FlagDroppedMessageType, &data);
 }
 
 //--------------------------------------------------------------------------------------
@@ -246,6 +254,10 @@ void MultiflagCTFGameContext::FlagReturned(EntityTeam flagOwner)
 
 	m_flags[flagOwner]->SetPosition(m_flagPositions[flagOwner]);
 	m_flags[flagOwner]->UpdateColliderPosition(m_flagPositions[flagOwner]);
+
+	// Notify teams.
+	FlagReturnedMessageData data(flagOwner);
+	BroadcastMessage(FlagReturnedMessageType, &data);
 }
 
 //--------------------------------------------------------------------------------------

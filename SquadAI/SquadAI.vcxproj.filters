@@ -157,6 +157,18 @@
     <Filter Include="Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions">
       <UniqueIdentifier>{91cc1760-4be1-47e1-ac85-02966fca51c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\BehaviourTree\UniversalTeamBehaviours\Actions">
+      <UniqueIdentifier>{6853e739-22da-4d19-9c88-eaff05e86ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BehaviourTree\UniversalTeamBehaviours\Conditions">
+      <UniqueIdentifier>{ce2e531f-6cd8-434d-b6f0-8b7bd25a43ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\UniversalTeamBehaviours\Actions">
+      <UniqueIdentifier>{3b4ca9c2-30c7-41ed-b3c9-249faf206adb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\UniversalTeamBehaviours\Conditions">
+      <UniqueIdentifier>{959c0705-874b-4cfc-9771-415999d762f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SimplePixelShader.cpp">
@@ -401,6 +413,9 @@
     </ClCompile>
     <ClCompile Include="MultiflagCTFTeamBehaviour.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamProcessMessages.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalTeamBehaviours\Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -706,6 +721,9 @@
     </ClInclude>
     <ClInclude Include="UniversalIndividualBehaviour.h">
       <Filter>Header Files\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamProcessMessages.h">
+      <Filter>Header Files\BehaviourTree\UniversalTeamBehaviours\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

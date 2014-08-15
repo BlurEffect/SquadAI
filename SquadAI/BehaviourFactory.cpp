@@ -219,8 +219,21 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 // Returns a pointer to the root behaviour of the created tree. The pointer is null if 
 // something failed during creation.
 //--------------------------------------------------------------------------------------
-Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI*)
+Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI* pTeamAI)
 {
+	Behaviour* pTeamRoot = CreateUniversalBehaviour(ActiveSelectorType, "TeamRoot", nullptr);
+
+	if(pTeamRoot)
+	{
+		Behaviour* pTeamProcessMessagesAction = CreateUniversalTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", nullptr);
+
+		if(pTeamProcessMessagesAction)
+		{
+			reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pTeamProcessMessagesAction);
+			return pTeamRoot;
+		}
+	}
+
 	return nullptr;
 }
 
@@ -358,7 +371,14 @@ Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndivid
 //--------------------------------------------------------------------------------------
 Behaviour* BehaviourFactory::CreateUniversalTeamBehaviour(UniversalTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, void* pInitData)
 {
-	return nullptr;
+	switch(behaviourType)
+	{
+	case TeamProcessMessagesType:
+		return new TeamProcessMessages(name, pTeamAI);
+		break;
+	default:
+		return nullptr;
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -372,5 +392,9 @@ Behaviour* BehaviourFactory::CreateUniversalTeamBehaviour(UniversalTeamBehaviour
 //--------------------------------------------------------------------------------------
 Behaviour* BehaviourFactory::CreateMultiflagCTFTeamBehaviour(MultiflagCTFTeamBehaviourType behaviourType, MultiflagCTFTeamAI* pMultiflagCTFTeamAI, const char* name, void* pInitData)
 {
-	return nullptr;
+	switch(behaviourType)
+	{
+	default:
+		return nullptr;
+	}
 }

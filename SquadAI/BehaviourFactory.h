@@ -40,6 +40,8 @@
 #include "MoveToTarget.h"
 #include "ResolveSuspectedThreat.h"
 #include "ProcessMessages.h"
+// Team behaviours
+#include "TeamProcessMessages.h"
 
 // Forward declarations
 class Entity;
@@ -94,7 +96,7 @@ enum UniversalBehaviourType
 //--------------------------------------------------------------------------------------
 enum UniversalTeamBehaviourType
 {
-	
+	TeamProcessMessagesType
 };
 
 //--------------------------------------------------------------------------------------
@@ -124,7 +126,7 @@ public:
 private:
 	static Behaviour* CreateSimpleMovementTree(Entity* pEntity);
 	static Behaviour* CreateSimpleCombatTree(Entity* pEntity);
-	static Behaviour* CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI*);
+	static Behaviour* CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI* pTeamAI);
 
 	// Factory functions for the different types of behaviours
 	static Behaviour* CreateUniversalBehaviour(UniversalBehaviourType behaviourType, const char* name, void* pInitData);

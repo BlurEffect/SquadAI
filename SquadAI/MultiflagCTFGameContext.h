@@ -32,7 +32,7 @@ enum FlagState
 class MultiflagCTFGameContext : public GameContext
 {
 public:
-	MultiflagCTFGameContext(float maxTime, unsigned int winScore, float flagResetTimeLimit);
+	MultiflagCTFGameContext(float maxTime, float notifyTimeInterval, unsigned int winScore, float flagResetTimeLimit);
 	~MultiflagCTFGameContext(void);
 	
 	void Update(float deltaTime);

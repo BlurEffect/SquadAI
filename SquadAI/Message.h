@@ -26,7 +26,7 @@ enum MessageType
 	
 	// Messages sent from the test environment to the entities
 	//HitMessageType,						// The entity receiving this message was hit by a projectile
-	EntityKilledMessageType,			// An entity was killed and other entities are notified of this event (also sent from entities to the test environment)
+	EntityKilledMessageType,			// An entity was killed and other entities are notified of this event (also sent from game context to team AI)
 	//ReadyToRespawnMessageType,			// Tells an entity that it is ready to respawn
 	
 	// Messages sent from the test environment to the game context
@@ -37,7 +37,7 @@ enum MessageType
 	EnemySpottedMessageType,			// An enemy was spotted by an entity
 	LostSightOfEnemyMessageType,		// An entity has lost sight of an enemy
 	UpdateEnemyPositionMessageType,		// Updates the position of an enemy 
-	EnemyKilledMessageType,				// An enemy has been killed by an entity
+	AttackedByEnemyMessageType,			// An entity was attacked by a hostile entity
 	
 	// Messages sent from the general game context to the team AI
 	ScoreUpdateMessageType,				// A team scored

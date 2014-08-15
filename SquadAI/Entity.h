@@ -20,6 +20,7 @@
 
 // Forward declarations
 class TestEnvironment;
+class TeamAI;
 class Message;
 
 //--------------------------------------------------------------------------------------
@@ -98,6 +99,7 @@ public:
 	Behaviour*						    GetBehaviour(void);
 	TestEnvironment*					GetTestEnvironment(void);
 	EntityTeam							GetTeam(void) const;
+	TeamAI*                             GetTeamAI(void);
 	bool								IsAlive(void) const;
 	std::vector<KnownThreat>&			GetKnownThreats(void);
 	std::vector<SuspectedThreat>&		GetSuspectedThreats(void);
@@ -113,6 +115,7 @@ public:
 
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 	void SetTeam(EntityTeam team);
+	void SetTeamAI(TeamAI* pTeamAI);
 	void SetGreatestKnownThreat(KnownThreat* pThreat);
 	void SetGreatestSuspectedThreat(SuspectedThreat* pThreat);
 	void SetReadyForAttack(bool readyForAttack);
@@ -186,6 +189,8 @@ private:
 	Behaviour*       m_pBehaviour;   // The behaviour tree controlling the behaviour of this entity
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 	EntityTeam       m_team;		 // The team the entity belongs to
+
+	TeamAI*          m_pTeamAI; // The team AI in charge of this entity
 
 	// This is pretty much used like a blackboard to communicate between different
 	// nodes of the behaviour tree

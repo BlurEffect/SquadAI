@@ -68,28 +68,34 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 	m_obstacles.clear();
 	m_staticObjects.clear();
 
+	m_pGameContext = new MultiflagCTFGameContext(g_kGameRoundTimeLimit, g_kNotifyTimeInterval, g_kWinScore, g_kFlagResetTimer);
+	if(!m_pGameContext)
+	{
+		return false;
+	}
+
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
 		m_soldierCount[i] = 0;
 		m_flagSet[i]      = false;
 		m_spawnPointCount[i] = 0;
 		m_pTeamAI[i] = new MultiflagCTFTeamAI();
-		if(!m_pTeamAI || !m_pTeamAI[i]->Initialise(EntityTeam(i), this))
+		if(!m_pTeamAI[i])
 		{
 			return false;
 		}
+
+		if(!m_pTeamAI[i]->Initialise(EntityTeam(i), this))
+		{
+			return false;
+		}
+
+		m_pGameContext->RegisterTeamAI(m_pTeamAI[i]);
 	}
 
 	// initialise the random number generator
 	srand(static_cast<unsigned int>(time(NULL)));
 
-	m_pGameContext = new MultiflagCTFGameContext(g_kGameRoundTimeLimit, g_kWinScore, g_kFlagResetTimer);
-	if(!m_pGameContext)
-	{
-		return false;
-	}
-
-	
 
 	return InitialiseGrid() && m_pathfinder.Initialise(this);
 }
@@ -120,6 +126,15 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 		{
 			UpdateRespawns(deltaTime);
 			SortOutProcessedMessages();
+
+			// Update the team AIs
+			for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+			{
+				if(m_pTeamAI[i])
+				{
+					m_pTeamAI[i]->Update(deltaTime);
+				}
+			}
 		}
 
 		// Update soldiers
@@ -386,10 +401,10 @@ void TestEnvironment::ProcessEvent(EventType type, void* pEventData)
 		
 		if(pEntityDiedData->m_team == TeamRed)
 		{
-			m_pGameContext->AddKills(TeamBlue, 1);
+			m_pGameContext->AddKill(TeamBlue, pEntityDiedData->m_team, pEntityDiedData->m_id);
 		}else
 		{
-			m_pGameContext->AddKills(TeamRed, 1);
+			m_pGameContext->AddKill(TeamRed, pEntityDiedData->m_team, pEntityDiedData->m_id);
 		}
 
 		AddDeadEntity(pEntityDiedData->m_id);
@@ -494,11 +509,15 @@ bool TestEnvironment::PrepareSimulation(void)
 
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[RedSoldierType] * 0.5f);
 
-			if(!m_soldiers[soldierIndex++].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
+			if(!m_soldiers[soldierIndex].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
 												      &colliderData, this, TeamRed, properties))
 			{
 				return false;
 			}
+
+			// Set the team AI for the soldier
+			m_soldiers[soldierIndex].SetTeamAI(m_pTeamAI[TeamRed]);
+			++soldierIndex;
 			break;
 			}
 		case BlueSoldierType:
@@ -520,11 +539,15 @@ bool TestEnvironment::PrepareSimulation(void)
 
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[BlueSoldierType] * 0.5f);
 
-			if(!m_soldiers[soldierIndex++].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
+			if(!m_soldiers[soldierIndex].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
 												      &colliderData, this, TeamBlue, properties))
 			{
 				return false;
 			}
+
+			// Set the team AI for the soldier
+			m_soldiers[soldierIndex].SetTeamAI(m_pTeamAI[TeamBlue]);
+			++soldierIndex;
 			break;
 			}
 		case ObstacleType:

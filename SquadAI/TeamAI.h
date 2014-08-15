@@ -58,6 +58,8 @@ public:
 
 	virtual void Update(float deltaTime);
 	virtual void Reset(void);
+	
+	virtual void ProcessEvent(EventType type, void* pEventData);
 
 	// Data access functions
 
@@ -67,7 +69,7 @@ public:
 	void SetTeam(EntityTeam team);
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 
-	virtual void ProcessEvent(EventType type, void* pEventData);
+	
 
 protected:
 

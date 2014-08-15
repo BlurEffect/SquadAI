@@ -9,11 +9,13 @@
 #include "Entity.h"
 #include "TestEnvironment.h"
 #include "Message.h"
+#include "TeamAI.h"
 
 Entity::Entity(void) : CollidableObject(),
 					   m_pBehaviour(nullptr),
 					   m_pEnvironment(nullptr),
 					   m_team(EntityTeam(None)),
+					   m_pTeamAI(nullptr),
 					   m_readyForAttack(false),
 					   m_movementTargetSet(false),
 					   m_movementTarget(0.0f, 0.0f),
@@ -387,6 +389,10 @@ void Entity::ProcessHit(float damage, unsigned long id, bool shooterAlive, const
 	// Update the health of the entity.
 	SetCurrentHealth(GetCurrentHealth() - damage);
 
+	// Notify team AI
+	AttackedByEnemyMessageData data(GetId(), id, position);
+	SendMessage(GetTeamAI(), AttackedByEnemyMessageType, &data);
+
 	// Only update threat state if the attacker is still alive.
 	if(shooterAlive)
 	{
@@ -419,9 +425,7 @@ void Entity::ProcessHit(float damage, unsigned long id, bool shooterAlive, const
 
 	if(!IsAlive())
 	{
-		// The entity just died, send a message to the test environment
-		//EntityKilledMessage entityKilledMessage(GetTeam(), GetId());
-
+		// The entity just died, send an event to the test environment
 		EntityDiedEventData data(GetTeam(), GetId());
 		SendEvent(GetTestEnvironment(),EntityDiedEventType, &data);
 	}
@@ -476,6 +480,11 @@ TestEnvironment* Entity::GetTestEnvironment(void)
 EntityTeam Entity::GetTeam(void) const
 {
 	return m_team;
+}
+
+TeamAI* Entity::GetTeamAI(void)
+{
+	return m_pTeamAI;
 }
 
 bool Entity::IsAlive(void) const
@@ -549,6 +558,11 @@ void Entity::SetTestEnvironment(TestEnvironment* pEnvironment)
 void Entity::SetTeam(EntityTeam team)
 {
 	m_team = team;
+}
+
+void Entity::SetTeamAI(TeamAI* pTeamAI)
+{
+	m_pTeamAI = pTeamAI;
 }
 
 void Entity::SetGreatestKnownThreat(KnownThreat* pThreat)

@@ -162,6 +162,7 @@
     <ClCompile Include="SquareDrawable.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TeamAI.cpp" />
+    <ClCompile Include="TeamProcessMessages.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
     <ClCompile Include="TriangleDrawable.cpp" />
     <ClCompile Include="UniversalIndividualBehaviour.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="EventTypes.h" />
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
+    <ClInclude Include="TeamProcessMessages.h" />
     <ClInclude Include="UniversalIndividualBehaviour.h" />
     <ClInclude Include="MultiflagCTFTeamBehaviour.h" />
     <ClInclude Include="ProcessMessages.h" />

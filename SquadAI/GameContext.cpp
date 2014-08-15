@@ -8,12 +8,15 @@
 
 // Includes
 #include "GameContext.h"
+#include "TeamAI.h"
 
-GameContext::GameContext(GameMode mode, float maxTime, unsigned int winScore) : m_gameMode(mode),
-																			    m_terminated(false),
-																			    m_maxTime(maxTime),
-																			    m_time(0.0f),
-																			    m_maxScore(winScore)
+GameContext::GameContext(GameMode mode, float maxTime, float notifyTimeInterval, unsigned int winScore) : m_gameMode(mode),
+																									  	  m_terminated(false),
+																										  m_maxTime(maxTime),
+																										  m_time(0.0f),
+																										  m_notifyTimeInterval(0.0f),
+																										  m_notifyTimer(0.0f),
+																										  m_maxScore(winScore)
 {
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
@@ -37,19 +40,28 @@ void GameContext::AddScore(EntityTeam team, unsigned int score)
 	if(!m_terminated)
 	{
 		m_score[team] += score;
+
+		// Notify the teams of the new score.
+		ScoreUpdateMessageData data(team, m_score[team], GetMaxScore());
+		BroadcastMessage(ScoreUpdateMessageType, &data);
 	}
 }
 
 //--------------------------------------------------------------------------------------
 // Adds a a number of kills to the total killcount of a team.
 // Param1: The team, for which to increase the killcount.
-// Param2: The number of kills add to the total killcount of the specified team.
+// Param1: The team, a member of which was killed.
+// Param2: The id of the entity that was killed.
 //--------------------------------------------------------------------------------------
-void GameContext::AddKills(EntityTeam team, unsigned int kills)
+void GameContext::AddKill(EntityTeam team, EntityTeam victimTeam, unsigned long entityId)
 {
 	if(!m_terminated)
 	{
-		m_kills[team] += kills;
+		m_kills[team] += 1;
+
+		// Notify the team AIs
+		EntityKilledMessageData data(victimTeam, entityId);
+		BroadcastMessage(EntityKilledMessageType, &data);
 	}
 }
 
@@ -67,13 +79,50 @@ void GameContext::AddShotFired(EntityTeam team, unsigned int shotsFired)
 }
 
 //--------------------------------------------------------------------------------------
+// Registers a certain team AI with the game context. Registered team AIs are informed
+// by the context of game related events through messages.
+// Param1: A pointer to the team AI to register.
+//--------------------------------------------------------------------------------------
+void GameContext::RegisterTeamAI(TeamAI* pTeamAI)
+{
+	m_teamAIs[pTeamAI->GetTeam()] = pTeamAI;
+}
+
+//--------------------------------------------------------------------------------------
+// Broadcasts a message to all registered team AIs.
+// Param1: The type of the message.
+// Param2: A pointer to the contents of the message
+//--------------------------------------------------------------------------------------
+void GameContext::BroadcastMessage(MessageType type, void* pMessageData)
+{
+	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+	{
+		if(m_teamAIs[i])
+		{
+			SendMessage(m_teamAIs[i], type, pMessageData);
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Updates the game timer.
 // Param1: The time to add to the timer. Usually the time passed since the last game update.
 //--------------------------------------------------------------------------------------
 void GameContext::Update(float deltaTime)
 {
 	m_time += deltaTime;
-	
+	m_notifyTimer += deltaTime;
+
+	if(m_notifyTimer >= m_notifyTimeInterval)
+	{
+		// Notify teams of the time passed
+
+		TimeUpdateMessageData data(GetTimeLeft(), GetMaxTime());
+		BroadcastMessage(TimeUpdateMessageType, &data);
+
+		m_notifyTimer = 0.0f;
+	}
+
 	if(m_time >= m_maxTime)
 	{
 		m_terminated = true;
@@ -148,6 +197,11 @@ float GameContext::GetTimeLeft(void) const
 	return (m_maxTime - m_time);
 }
 
+float GameContext::GetNotifyTimeInterval(void) const
+{
+	return m_notifyTimeInterval;
+}
+
 unsigned int GameContext::GetMaxScore(void) const
 {
 	return m_maxScore;
@@ -171,6 +225,11 @@ unsigned int GameContext::GetShotsFired(EntityTeam team) const
 void GameContext::SetMaxTime(float time)
 {
 	m_maxTime = time;
+}
+
+void GameContext::SetNotifyTimeInterval(float timeInterval)
+{
+	m_notifyTimeInterval = timeInterval;
 }
 
 void GameContext::SetMaxScore(unsigned int score)

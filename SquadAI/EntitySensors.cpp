@@ -110,11 +110,6 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 		// Check for any previously known threats that are no longer visible and move them to the list of
 		// suspected threats.
 
-		if(m_pEntity->GetKnownThreats().size() > 0)
-		{
-			int a = 7;
-		}
-
 		std::vector<KnownThreat>::iterator it = m_pEntity->GetKnownThreats().begin();
 		while(it != m_pEntity->GetKnownThreats().end())
 		{
@@ -125,6 +120,10 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 				{
 					// The previously known threat can no longer be seen -> add to suspected threats
 					m_pEntity->AddSuspectedThreat(it->m_pEntity->GetId(), it->m_pEntity->GetPosition(), false);
+
+					// Notify team AI
+					LostSightOfEnemyMessageData data(m_pEntity->GetId(), it->m_pEntity->GetId());
+					m_pEntity->SendMessage(m_pEntity->GetTeamAI(), LostSightOfEnemyMessageType, &data);
 				}
 
 				it = m_pEntity->GetKnownThreats().erase(it);
@@ -156,6 +155,11 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 			// Check if the threat was known before
 			if(!m_pEntity->IsKnownThreat((*it)->GetId()))
 			{
+
+				// Notify team AI
+				EnemySpottedMessageData data(m_pEntity->GetId(), (*it)->GetId(), (*it)->GetPosition());
+				m_pEntity->SendMessage(m_pEntity->GetTeamAI(), EnemySpottedMessageType, &data);
+
 				if(m_pEntity->IsSuspectedThreat((*it)->GetId()))
 				{
 					// If this known threat previously was a suspected threat (that has become visible now), remove it
@@ -170,6 +174,14 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 				{
 					m_pEntity->AddKnownThreat((*it), false);
 				}
+			}else
+			{
+				// Note: Should only be called if enemy actually moved
+
+				// Notify team AI.
+				// Update the team AI's knowledge of the position of the enemy.
+				UpdateEnemyPositionMessageData data((*it)->GetId(), (*it)->GetPosition());
+				m_pEntity->SendMessage(m_pEntity->GetTeamAI(), UpdateEnemyPositionMessageType, &data);
 			}
 		}
 

@@ -29,6 +29,8 @@ bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironme
 		{
 			return false;
 		}
+
+		return true;
 	}
 
 	return false;

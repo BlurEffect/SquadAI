@@ -104,14 +104,32 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		}
 		break;
 		}
-	case EnemyKilledMessageType:
+	case EntityKilledMessageType:
 		{
-		EnemyKilledMessage* pMsg = reinterpret_cast<EnemyKilledMessage*>(pMessage);
-		std::map<unsigned long, EnemyRecord>::iterator foundIt = m_enemyRecords.find(pMsg->GetData().m_enemyId);
-		if(foundIt != m_enemyRecords.end())
+		EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(pMessage);
+		
+		if(pMsg->GetData().m_team != GetTeam())
 		{
-			m_enemyRecords.erase(foundIt);
+			// An enemy was killed
+			std::map<unsigned long, EnemyRecord>::iterator foundIt = m_enemyRecords.find(pMsg->GetData().m_id);
+			if(foundIt != m_enemyRecords.end())
+			{
+				m_enemyRecords.erase(foundIt);
+			}
+		}else
+		{
+			// A friendly was killed
+			for(std::map<unsigned long, EnemyRecord>::iterator it = m_enemyRecords.begin(); it != m_enemyRecords.end(); ++it)
+			{
+				it->second.m_spotterIds.erase(pMsg->GetData().m_id);
+			}
 		}
+		break;
+		}
+	case AttackedByEnemyMessageType:
+		{
+		AttackedByEnemyMessage* pMsg = reinterpret_cast<AttackedByEnemyMessage*>(pMessage);
+		// Add processing code
 		break;
 		}
 	case ScoreUpdateMessageType:

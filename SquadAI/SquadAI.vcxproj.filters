@@ -417,6 +417,9 @@
     <ClCompile Include="TeamProcessMessages.cpp">
       <Filter>Source Files\BehaviourTree\UniversalTeamBehaviours\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="Order.cpp">
+      <Filter>Source Files\TeamAI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -724,6 +727,9 @@
     </ClInclude>
     <ClInclude Include="TeamProcessMessages.h">
       <Filter>Header Files\BehaviourTree\UniversalTeamBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Order.h">
+      <Filter>Header Files\TeamAI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

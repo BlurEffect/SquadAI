@@ -11,6 +11,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <list>
 #include <algorithm>
 #include <DirectXMath.h>
 
@@ -20,6 +21,7 @@
 #include "GameContextToTeamAIMessages.h"
 #include "Communicator.h"
 #include "Behaviour.h"
+#include "Order.h"
 
 using namespace DirectX;
 
@@ -76,6 +78,7 @@ protected:
 	virtual void ProcessMessage(Message* pMessage);
 	
 	Behaviour* m_pBehaviour;              // The behaviour tree controlling the decisions of the team AI
+	//std::list
 
 private:
 	EntityTeam						     m_team;					// The team that the AI is controlling

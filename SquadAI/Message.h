@@ -25,10 +25,8 @@ enum MessageType
 	//ProjectileFiredMessageType,			// A projectile was fired by an entity
 	
 	// Messages sent from the test environment to the entities
-	//HitMessageType,						// The entity receiving this message was hit by a projectile
 	EntityKilledMessageType,			// An entity was killed and other entities are notified of this event (also sent from game context to team AI)
-	//ReadyToRespawnMessageType,			// Tells an entity that it is ready to respawn
-	
+
 	// Messages sent from the test environment to the game context
 	//AddObjectiveMessageType,			// Puts an objective object under the control of a specific game context
 	//EntityReachedObjectiveMessageType,	// An entity collided with an objective object.
@@ -47,6 +45,9 @@ enum MessageType
 	FlagPickedUpMessageType,			// A flag has been picked up
 	FlagDroppedMessageType,				// A flag has been dropped
 	FlagReturnedMessageType,			// A flag has been returned
+
+	// Messages sent from the team AI to entities
+	FollowOrderMessageType
 };
 
 //--------------------------------------------------------------------------------------

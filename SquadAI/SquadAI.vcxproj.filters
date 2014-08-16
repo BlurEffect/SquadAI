@@ -731,6 +731,9 @@
     <ClInclude Include="Order.h">
       <Filter>Header Files\TeamAI</Filter>
     </ClInclude>
+    <ClInclude Include="TeamAIToEntityMessages.h">
+      <Filter>Header Files\Messages/Events\Messages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PS_Simple.FX">

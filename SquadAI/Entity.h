@@ -17,6 +17,7 @@
 #include "Behaviour.h"
 #include "BehaviourFactory.h"
 #include "Communicator.h"
+#include "Order.h"
 
 // Forward declarations
 class TestEnvironment;
@@ -176,8 +177,13 @@ public:
 
 protected:
 
-	
 	virtual void ProcessMessage(Message* pMessage);
+	virtual void ProcessOrder(Order* pOrder);
+
+	// Process Orders
+	virtual void ProcessAttackOrder(AttackOrder* pOrder);
+	virtual void ProcessMoveOrder(MoveOrder* pOrder);
+	virtual void ProcessDefendOrder(DefendOrder* pOrder);
 
 	// Called to process events
 	virtual void ProcessHit(float damage, unsigned long id, bool shooterAlive, const XMFLOAT2& position);
@@ -191,6 +197,8 @@ private:
 	EntityTeam       m_team;		 // The team the entity belongs to
 
 	TeamAI*          m_pTeamAI; // The team AI in charge of this entity
+
+	Order*           m_pCurrentOrder; // The currently active order for this entity, can be null if no order at the moment
 
 	// This is pretty much used like a blackboard to communicate between different
 	// nodes of the behaviour tree

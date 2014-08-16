@@ -77,8 +77,8 @@ protected:
 
 	virtual void ProcessMessage(Message* pMessage);
 	
-	Behaviour* m_pBehaviour;              // The behaviour tree controlling the decisions of the team AI
-	//std::list
+	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
+	std::list<Order*> m_activeOrders; // The current orders of the team AI that have been sent to entities
 
 private:
 	EntityTeam						     m_team;					// The team that the AI is controlling

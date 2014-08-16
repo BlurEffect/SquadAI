@@ -10,12 +10,14 @@
 #include "TestEnvironment.h"
 #include "Message.h"
 #include "TeamAI.h"
+#include "TeamAIToEntityMessages.h"
 
 Entity::Entity(void) : CollidableObject(),
 					   m_pBehaviour(nullptr),
 					   m_pEnvironment(nullptr),
 					   m_team(EntityTeam(None)),
 					   m_pTeamAI(nullptr),
+					   m_pCurrentOrder(nullptr),
 					   m_readyForAttack(false),
 					   m_movementTargetSet(false),
 					   m_movementTarget(0.0f, 0.0f),
@@ -109,6 +111,8 @@ void Entity::Reset(void)
 	m_movementTargetSet		   = false;
 	m_movementTarget		   = XMFLOAT2(0.0f, 0.0f);
 	m_currentHealth			   = m_maximalHealth;
+
+	m_pCurrentOrder = nullptr;
 
 	ResetCommunication();
 }
@@ -368,11 +372,91 @@ void Entity::ProcessMessage(Message* pMessage)
 		}
 		break;
 		}
+	case FollowOrderMessageType:
+		{
+		FollowOrderMessage* pFollowOrderMessage = reinterpret_cast<FollowOrderMessage*>(pMessage);
+		// Orders are processed separately
+		ProcessOrder(pFollowOrderMessage->GetData().m_pOrder);
+		break;
+		}
 	default:
 		Communicator::ProcessMessage(pMessage);
 	}
 }
 
+//--------------------------------------------------------------------------------------
+// Processes a given order.
+// Param1: A pointer to the order to process.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessOrder(Order* pOrder)
+{
+	switch(pOrder->GetOrderType())
+	{
+	case AttackEnemyOrder:
+		ProcessAttackOrder(reinterpret_cast<AttackOrder*>(pOrder));
+		break;
+	case MoveToPositionOrder:
+		ProcessMoveOrder(reinterpret_cast<MoveOrder*>(pOrder));
+		break;
+	case DefendPositionOrder:
+		ProcessDefendOrder(reinterpret_cast<DefendOrder*>(pOrder));
+		break;
+	default:
+		;
+		// Notify team AI that order couldn't be processed?
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a given attack order.
+// Param1: A pointer to the attack order to process.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessAttackOrder(AttackOrder* pOrder)
+{
+	switch(pOrder->GetOrderPriority())
+	{
+	case LowPriority:
+		break;
+	case MediumPriority:
+		break;
+	case HighPriority:
+		break;
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a given move order.
+// Param1: A pointer to the move order to process.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessMoveOrder(MoveOrder* pOrder)
+{
+	switch(pOrder->GetOrderPriority())
+	{
+	case LowPriority:
+		break;
+	case MediumPriority:
+		break;
+	case HighPriority:
+		break;
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a given defend order.
+// Param1: A pointer to the defend order to process.
+//--------------------------------------------------------------------------------------
+void Entity::ProcessDefendOrder(DefendOrder* pOrder)
+{
+	switch(pOrder->GetOrderPriority())
+	{
+	case LowPriority:
+		break;
+	case MediumPriority:
+		break;
+	case HighPriority:
+		break;
+	}
+}
 
 // The following functions provide default implementations for the different events and
 // messages that the entity can receive from the test environment.

@@ -122,7 +122,7 @@ private:
 //--------------------------------------------------------------------------------------
 // Encapsulates all the data required for a defense order.
 //--------------------------------------------------------------------------------------
-class DefendOrder : Order
+class DefendOrder : public Order
 {
 public:
 	DefendOrder(unsigned long entityId, OrderType orderType, OrderPriority priority, const XMFLOAT2& defendPosition);

@@ -204,6 +204,7 @@
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
     <ClInclude Include="Order.h" />
+    <ClInclude Include="TeamAIToEntityMessages.h" />
     <ClInclude Include="TeamProcessMessages.h" />
     <ClInclude Include="UniversalIndividualBehaviour.h" />
     <ClInclude Include="MultiflagCTFTeamBehaviour.h" />

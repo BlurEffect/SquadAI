@@ -131,9 +131,9 @@ const XMFLOAT2& MoveOrder::GetTargetPosition(void) const
 	return m_targetPosition;
 }
 
-std::vector<XMFLOAT2>& MoveOrder::GetPath(void)
+std::vector<XMFLOAT2>* MoveOrder::GetPath(void)
 {
-	return m_path;
+	return &m_path;
 }
 
 void MoveOrder::SetTargetPosition(const XMFLOAT2& targetPosition)

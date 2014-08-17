@@ -112,6 +112,7 @@
     <ClCompile Include="EntityCombatManager.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
     <ClCompile Include="LookAtTarget.cpp" />
+    <ClCompile Include="MovingToHighestPriorityTarget.cpp" />
     <ClCompile Include="MultiflagCTFTeamAI.cpp" />
     <ClCompile Include="MultiflagCTFTeamBehaviour.cpp" />
     <ClCompile Include="Objective.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
     <ClInclude Include="LookAtTarget.h" />
+    <ClInclude Include="MovingToHighestPriorityTarget.h" />
     <ClInclude Include="ObservationTargetSet.h" />
     <ClInclude Include="PathToTargetSet.h" />
     <ClInclude Include="Order.h" />

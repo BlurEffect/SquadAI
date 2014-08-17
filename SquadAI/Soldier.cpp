@@ -13,7 +13,8 @@
 
 Soldier::Soldier(void) : Entity(),
 						 m_fireWeaponTimer(0.0f),
-						 m_changeObservationTargetTimer(0.0f)
+						 m_changeObservationTargetTimer(0.0f),
+						 m_currentMovementTarget(0.0f, 0.0f)
 {
 }
 
@@ -155,7 +156,39 @@ BehaviourStatus Soldier::Idle(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::DetermineMovementTarget(float deltaTime)
 {
-	// Get a new random target position within the test environment
+	// if defend order and already at position -> false, if not there yet -> true
+	// if movement order -> target
+
+	// Reset movement target
+	SetMovementTarget(XMFLOAT2(0.0f, 0.0f));
+	SetMovementTargetSet(false);
+
+	if(GetCurrentOrder())
+	{
+		if(GetCurrentOrder()->GetOrderType() == DefendPositionOrder)
+		{
+			if(IsAtTarget(reinterpret_cast<DefendOrder*>(GetCurrentOrder())->GetDefendPosition()))
+			{
+				SetMovementTargetSet(false);
+			}else
+			{
+				SetMovementTarget(reinterpret_cast<DefendOrder*>(GetCurrentOrder())->GetDefendPosition());
+				SetMovementTargetSet(true);
+			}
+
+			return StatusSuccess;
+		}
+
+		if(GetCurrentOrder()->GetOrderType() == MoveToPositionOrder)
+		{
+			SetMovementTarget(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetTargetPosition());
+			SetMovementTargetSet(true);
+
+			return StatusSuccess;
+		}
+	}
+
+	// If there is no order, just pick a random target position within the test environment to patrol
 	XMFLOAT2 patrolTarget(0.0f, 0.0f);
 	if(GetTestEnvironment()->GetRandomUnblockedTarget(patrolTarget))
 	{
@@ -213,7 +246,45 @@ BehaviourStatus Soldier::UpdateThreats(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::DetermineGreatestKnownThreat(float deltaTime)
 {
-	m_combatManager.DetermineGreatestKnownThreat();
+	// Reset greatest known threat
+	SetGreatestKnownThreat(nullptr);
+
+	if(GetCurrentOrder())
+	{
+		// Check if there is a current order that requires to attack a certain enemy.
+		if(GetCurrentOrder()->GetOrderType() == AttackEnemyOrder && GetCurrentOrder()->GetOrderPriority() == HighPriority)
+		{
+			// If the target enemy is in a known threat of this soldier -> set him as greatest threat to make sure the soldier
+			// attacks that target.
+			unsigned long enemyId = reinterpret_cast<AttackOrder*>(GetCurrentOrder())->GetEnemyId();
+			if(IsKnownThreat(enemyId))
+			{
+				SetGreatestKnownThreat(GetKnownThreat(enemyId));
+			}else
+			{
+				// The required enemy is not visible to the soldier but due to the high priority of the attack order, the
+				// soldier is not allowed to attack other threats. Moving to the position of the require enemy is now his
+				// main concern. Thus, no greatest known threat is set in order to bail out of the attack behaviour.
+				SetGreatestKnownThreat(nullptr);
+			}
+
+			return StatusSuccess;
+		}
+
+		if((GetCurrentOrder()->GetOrderType() == MoveToPositionOrder && GetCurrentOrder()->GetOrderPriority() == HighPriority) ||
+			((GetCurrentOrder()->GetOrderType() == DefendPositionOrder && GetCurrentOrder()->GetOrderPriority() == HighPriority) 
+			&& !IsAtTarget(reinterpret_cast<DefendOrder*>(GetCurrentOrder())->GetDefendPosition())))
+		{
+			// The soldier has a high priority move order or has to move to a defend position asap. This means the soldier has 
+			// to ignore all enemies and try to reach his target. Thus, no greatest known threat is being set.
+			SetGreatestKnownThreat(nullptr);
+			return StatusSuccess;
+		}
+	}
+
+	// No orders given that require special measures, just choose the greatest known threat as perceived by the soldier.
+	SetGreatestKnownThreat(m_combatManager.DetermineGreatestKnownThreat());
+
 	return StatusSuccess;
 }
 
@@ -224,7 +295,28 @@ BehaviourStatus Soldier::DetermineGreatestKnownThreat(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::DetermineGreatestSuspectedThreat(float deltaTime)
 {
-	m_combatManager.DetermineGreatestSuspectedThreat();
+	if(GetCurrentOrder())
+	{
+		if(GetCurrentOrder()->GetOrderPriority() == HighPriority || GetCurrentOrder()->GetOrderPriority() == MediumPriority)
+		{
+			if(GetCurrentOrder()->GetOrderPriority() == HighPriority && GetCurrentOrder()->GetOrderType() == AttackEnemyOrder)
+			{
+				// Only move to the requested enemy
+
+				SetGreatestSuspectedThreat(GetSuspectedThreat(reinterpret_cast<AttackOrder*>(GetCurrentOrder())->GetEnemyId()));
+				return StatusSuccess;
+			}
+
+			// For any other orders of priority high and medium, soliders should not investigate any suspected threats (that also
+			// means not pursue any enemies) as there are other objectives of higher priority.
+			SetGreatestSuspectedThreat(nullptr);
+			return StatusSuccess;
+		}
+	}
+
+	// No orders given that require special measures, just choose the greatest suspected threat as perceived by the soldier.
+	SetGreatestSuspectedThreat(m_combatManager.DetermineGreatestSuspectedThreat());
+
 	return StatusSuccess;
 }
 
@@ -270,7 +362,23 @@ BehaviourStatus Soldier::ResolveSuspectedThreat(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::DeterminePathToTarget(float deltaTime)
 {
-	SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
+	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == MoveToPositionOrder)
+	{
+		if(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath())
+		{
+			// Use the path provided by the team AI
+			SetPath(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath());
+		}else
+		{
+			// Let the soldier find a path himself.
+			SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
+		}
+	}else
+	{
+		// Let the soldier find a path himself.
+		SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
+	}
+
 	return StatusSuccess;
 }
 
@@ -313,6 +421,47 @@ BehaviourStatus Soldier::LookAtTarget(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
+// Tells whether the entity is currently moving towards the highest priority movement target 
+// or whether there now is a higher priority target that the entity should move towards instead.
+// Returns true if the target being moved towards is still the highest priority target,
+// false otherwise and also if there is no movement target set at all.
+//--------------------------------------------------------------------------------------
+bool Soldier::IsMovingToHighestPriorityTarget(void)
+{
+	if(!IsMovementTargetSet())
+	{
+		return false;
+	}
+
+	// if defense order, might have to bail out if not moving to defend position
+	// if movement order comes in and not currently moving to that taregt -> bail out
+
+	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == MoveToPositionOrder)
+	{
+		const XMFLOAT2& orderTarget = reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetTargetPosition();
+
+		if(GetMovementTarget().x != orderTarget.x || GetMovementTarget().y != orderTarget.y)
+		{
+			// Soldier should stop moving to current target and follow order instead
+			return false;
+		}
+	}
+
+	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == DefendPositionOrder)
+	{
+		const XMFLOAT2& orderTarget = reinterpret_cast<DefendOrder*>(GetCurrentOrder())->GetDefendPosition();
+
+		if(GetMovementTarget().x != orderTarget.x || GetMovementTarget().y != orderTarget.y)
+		{
+			// Soldier should stop moving to current target and follow order instead
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
 // Resets the soldier entity.
 //--------------------------------------------------------------------------------------
 void Soldier::Reset(void)
@@ -332,6 +481,20 @@ void Soldier::ProcessEvent(EventType type, void* pEventData)
 {
 	// Forward all calls to the base class
 	Entity::ProcessEvent(type, pEventData);
+}
+
+//--------------------------------------------------------------------------------------
+// Tells whether a soldier is at a certain target or not. Accounts for the target reached
+// radius used by the soldier.
+// Param1: The target position, for which to check if the soldier has reached it.
+// Returns true if the soldier has reached the target, false otherwise. 
+//--------------------------------------------------------------------------------------
+bool Soldier::IsAtTarget(const XMFLOAT2& target)
+{
+	float distance(0.0f);
+	XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&target) - XMLoadFloat2(&GetPosition())));
+
+	return (distance <= m_soldierProperties.m_targetReachedRadius);
 }
 
 //--------------------------------------------------------------------------------------

@@ -92,13 +92,16 @@ public:
 	void RemoveKnownThreat(unsigned long id);
 	void ClearKnownThreats(void);
 	bool IsKnownThreat(unsigned long id);
-	const KnownThreat* GetKnownThreat(unsigned long id);
+	KnownThreat* GetKnownThreat(unsigned long id);
 	void AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasHitEntity);
 	void RemoveSuspectedThreat(unsigned long id);
 	void ClearSuspectedThreats(void);
 	bool IsSuspectedThreat(unsigned long id);
-	const SuspectedThreat* GetSuspectedThreat(unsigned long id);
+	SuspectedThreat* GetSuspectedThreat(unsigned long id);
+	
 	bool IsInvestigatingGreatestSuspectedThreat(void);
+	virtual bool IsMovingToHighestPriorityTarget(void);
+	virtual bool IsAtTarget(const XMFLOAT2& target);
 
 	// Data access functions
 	Behaviour*						    GetBehaviour(void);
@@ -118,6 +121,7 @@ public:
 	float								GetCurrentHealth(void) const;
 	float								GetMaximalHealth(void) const;
 
+	Order*                              GetCurrentOrder(void);
 	bool								IsObservationTargetSet(void) const;
 	const XMFLOAT2&						GetObservationTarget(void) const;
 	bool                                IsPathSet(void) const;

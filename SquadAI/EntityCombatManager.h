@@ -14,6 +14,8 @@
 // Forward declarations
 class Entity;
 class TestEnvironment;
+struct KnownThreat;
+struct SuspectedThreat;
 
 using namespace DirectX;
 
@@ -26,8 +28,8 @@ public:
 	bool Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment);
 	void Reset(void);
 
-	void DetermineGreatestKnownThreat(void);
-	void DetermineGreatestSuspectedThreat(void);
+	KnownThreat* DetermineGreatestKnownThreat(void);
+	SuspectedThreat* DetermineGreatestSuspectedThreat(void);
 
 	void ShootAt(const XMFLOAT2& target);
 

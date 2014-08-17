@@ -87,7 +87,11 @@ public:
 	BehaviourStatus DetermineObservationTarget(float deltaTime);
 	BehaviourStatus LookAtTarget(float deltaTime);
 
+	bool IsMovingToHighestPriorityTarget(void);
+
 	void ProcessEvent(EventType type, void* pEventData);
+
+	bool IsAtTarget(const XMFLOAT2& target);
 
 	// Data access functions
 	 
@@ -148,6 +152,8 @@ private:
 
 	float                 m_fireWeaponTimer;   // Used to determine when the soldier is ready to fire his weapon
 	float                 m_changeObservationTargetTimer;  // Used to determine when the soldier should change his observation target
+
+	XMFLOAT2              m_currentMovementTarget; // Used to check whether the soldier is still moving towards the correct position (that is highest priority movement target)
 };
 
 #endif // SOLDIER_H

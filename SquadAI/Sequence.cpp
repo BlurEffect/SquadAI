@@ -36,6 +36,8 @@ void Sequence::OnInitialise(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Sequence::Update(float deltaTime)
 {
+	const char* name = GetName();
+
 	if(m_children.size() < 1)
 	{
 		return StatusInvalid;

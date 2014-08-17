@@ -47,11 +47,12 @@ void EntityCombatManager::Reset(void)
 }
 
 //--------------------------------------------------------------------------------------
-// Determines and sets the currently greatest known threat based on the distance of the
-// threats to the entity. It also takes into account whether threats have successfully 
+// Determines the currently greatest known threat based on the distance of the
+// threats to the entity and returns a pointer to it. It also takes into account whether threats have successfully 
 // attacked the entity to give special prioritisation to these threats.
+// Returns a pointer to the greatest known threat to the entity at the moment.
 //--------------------------------------------------------------------------------------
-void EntityCombatManager::DetermineGreatestKnownThreat(void)
+KnownThreat* EntityCombatManager::DetermineGreatestKnownThreat(void)
 {
 	if(!m_pEntity->GetKnownThreats().empty())
 	{
@@ -80,24 +81,25 @@ void EntityCombatManager::DetermineGreatestKnownThreat(void)
 
 		if(pPriorityKnownThreat)
 		{
-			m_pEntity->SetGreatestKnownThreat(pPriorityKnownThreat);
+			return pPriorityKnownThreat;
 		}else
 		{
-			m_pEntity->SetGreatestKnownThreat(pGreatestKnownThreat);
+			return pGreatestKnownThreat;
 		}
 
 	}else
 	{
-		m_pEntity->SetGreatestKnownThreat(nullptr);
+		return nullptr;
 	}
 }
 
 //--------------------------------------------------------------------------------------
-// Determines and sets the currently greatest suspected threat based on the distance of the
-// threats to the entity. It also takes into account whether threats have successfully 
+// Determines the currently greatest suspected threat based on the distance of the
+// threats to the entity and returns a pointer to it. It also takes into account whether threats have successfully 
 // attacked the entity to give special prioritisation to these threats.
+// Returns a pointer to the greatest suspected threat to the entity at the moment.
 //--------------------------------------------------------------------------------------
-void EntityCombatManager::DetermineGreatestSuspectedThreat(void)
+SuspectedThreat* EntityCombatManager::DetermineGreatestSuspectedThreat(void)
 {
 	if(!m_pEntity->GetSuspectedThreats().empty())
 	{
@@ -127,14 +129,14 @@ void EntityCombatManager::DetermineGreatestSuspectedThreat(void)
 
 		if(pPrioritySuspectedThreat)
 		{
-			m_pEntity->SetGreatestSuspectedThreat(pPrioritySuspectedThreat);
+			return pPrioritySuspectedThreat;
 		}else
 		{
-			m_pEntity->SetGreatestSuspectedThreat(pGreatestSuspectedThreat);
+			return pGreatestSuspectedThreat;
 		}
 	}else
 	{
-		m_pEntity->SetGreatestSuspectedThreat(nullptr);
+		return nullptr;
 	}
 }
 

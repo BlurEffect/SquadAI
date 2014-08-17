@@ -110,7 +110,7 @@ public:
 	// Data access functions
 
 	const XMFLOAT2& GetTargetPosition(void) const;
-	std::vector<XMFLOAT2>& GetPath(void);
+	std::vector<XMFLOAT2>* GetPath(void);
 
 	void SetTargetPosition(const XMFLOAT2& targetPosition);
 

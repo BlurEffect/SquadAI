@@ -435,6 +435,9 @@
     <ClCompile Include="LookAtTarget.cpp">
       <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="MovingToHighestPriorityTarget.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -763,6 +766,9 @@
     </ClInclude>
     <ClInclude Include="LookAtTarget.h">
       <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="MovingToHighestPriorityTarget.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

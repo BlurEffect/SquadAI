@@ -28,6 +28,7 @@
 #include "InvestigatingGreatestSuspectedThreat.h"
 #include "ObservationTargetSet.h"
 #include "PathToTargetSet.h"
+#include "MovingToHighestPriorityTarget.h"
 // Actions
 #include "DetermineMovementTarget.h"
 #include "DetermineApproachThreatPosition.h"
@@ -68,6 +69,7 @@ enum UniversalIndividualBehaviourType
 	InvestigatingGreatestSuspectedThreatType,
 	ObservationTargetSetType,
 	PathToTargetSetType,
+	MovingToHighestPriorityTargetType,
 
 	DetermineMovementTargetType,
 	DetermineApproachThreatPositionType,

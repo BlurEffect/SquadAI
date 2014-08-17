@@ -288,6 +288,9 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 					Behaviour* pDeterminePathToMovementTargetAction = CreateUniversalIndividualBehaviour(DeterminePathToTargetType, pEntity, "DeterminePathToMovementTargetAction", nullptr);
 					Behaviour* pPathToMovementTargetSetCondition = CreateUniversalIndividualBehaviour(PathToTargetSetType, pEntity, "PathToMovementTargetSetCondition", nullptr);
 
+					ParallelInitData parallelInitData2(ParallelPolicy::RequireAll, ParallelPolicy::RequireOne);
+					Behaviour* pCheckMovementTargetMonitor               = CreateUniversalBehaviour(MonitorType, "CheckMovementTargetMonitor ", &parallelInitData2);   
+					Behaviour* pMovingToHighestPriorityTargetCondition		 = CreateUniversalIndividualBehaviour(MovingToHighestPriorityTargetType, pEntity, "MovingToHighestPriorityTargetCondition", nullptr);
 					Behaviour* pMoveToTargetAction		 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToTargetAction", nullptr);
 		
 					Behaviour* pChangeObservationTargetSequence = CreateUniversalBehaviour(SequenceType, "ChangeObservationTargetSequence", nullptr);
@@ -296,8 +299,8 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 
 					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
 					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pDeterminePathToSuspectedThreatAction && pPathToSuspectedThreatSetCondition && pCheckInvestigatedThreatMonitor && pCheckInvestigatedTargetSequence && pDetermineGreatestSuspectedThreatUpdateAction && 
-					   pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDetermineMovementTargetAction && pMovementTargetSetCondition && pDeterminePathToMovementTargetAction && pPathToMovementTargetSetCondition && pMoveToTargetAction
-					   && pChangeObservationTargetSequence && pIdleAction)
+					   pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDetermineMovementTargetAction && pMovementTargetSetCondition && pDeterminePathToMovementTargetAction && pPathToMovementTargetSetCondition && pCheckMovementTargetMonitor 
+					   && pMovingToHighestPriorityTargetCondition && pMoveToTargetAction && pChangeObservationTargetSequence && pIdleAction)
 					{
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
@@ -325,7 +328,10 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pDeterminePathToMovementTargetAction);
 						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pPathToMovementTargetSetCondition);
 
-						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pMoveToTargetAction);
+						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pCheckMovementTargetMonitor);
+						
+						reinterpret_cast<Monitor*>(pCheckMovementTargetMonitor)->AddCondition(pMovingToHighestPriorityTargetCondition);
+						reinterpret_cast<Monitor*>(pCheckMovementTargetMonitor)->AddAction(pMoveToTargetAction);
 
 						
 						reinterpret_cast<Composite*>(pHoldPositionSelector)->AddChild(pChangeObservationTargetSequence);
@@ -354,14 +360,14 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 							Behaviour* pAttackTargetSetCondition		= CreateUniversalIndividualBehaviour(AttackTargetSetType, pEntity, "AttackTargetSetCondition", nullptr);
 							Behaviour* pAimAtTargetAction				= CreateUniversalIndividualBehaviour(AimAtTargetType, pEntity, "AimAtTargetAction", nullptr);
 							Behaviour* pAttackTargetAction				= CreateUniversalIndividualBehaviour(AttackTargetType, pEntity, "AttackTargetAction", nullptr);
-	
+							
 							if(pReadyToAttackCondition && pDetermineAttackTargetAction && pAttackTargetSetCondition && 
 							   pAimAtTargetAction && pAttackTargetAction)
 							{
-								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pReadyToAttackCondition);
 								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pDetermineAttackTargetAction);
 								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAttackTargetSetCondition);
 								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAimAtTargetAction);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pReadyToAttackCondition);
 								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAttackTargetAction);
 
 								return &(*pRoot);
@@ -487,6 +493,9 @@ Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndivid
 		break;
 	case PathToTargetSetType:
 		return new PathToTargetSet(name, pEntity);
+		break;
+	case MovingToHighestPriorityTargetType:
+		return new MovingToHighestPriorityTarget(name, pEntity);
 		break;
 	case DetermineMovementTargetType:
 		return new DetermineMovementTarget(name, pEntity);

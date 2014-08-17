@@ -290,6 +290,11 @@ bool EntityMovementManager::FollowPath(float nodeReachedRadius, float speed)
 //--------------------------------------------------------------------------------------
 bool EntityMovementManager::FollowPath(std::vector<XMFLOAT2>* pPath, float nodeReachedRadius, float speed)
 {
+	if(!pPath)
+	{
+		return false;
+	}
+
 	if(!pPath->empty())
 	{
 		// There is an active path

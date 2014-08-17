@@ -223,7 +223,7 @@ bool Entity::IsKnownThreat(unsigned long id)
 // Returns a pointer to the known threat, null if the entity doesn't have a known
 // threat associated to the provided id.
 //--------------------------------------------------------------------------------------
-const KnownThreat* Entity::GetKnownThreat(unsigned long id)
+KnownThreat* Entity::GetKnownThreat(unsigned long id)
 {
 	std::vector<KnownThreat>::iterator foundIt = std::find_if(m_knownThreats.begin(), m_knownThreats.end(), Entity::FindKnownThreatById(id));
 
@@ -287,7 +287,7 @@ bool Entity::IsSuspectedThreat(unsigned long id)
 // Returns a pointer to the suspected threat, null if the entity doesn't have a suspected
 // threat associated to the provided id.
 //--------------------------------------------------------------------------------------
-const SuspectedThreat* Entity::GetSuspectedThreat(unsigned long id)
+SuspectedThreat* Entity::GetSuspectedThreat(unsigned long id)
 {
 	std::vector<SuspectedThreat>::iterator foundIt = std::find_if(m_suspectedThreats.begin(), m_suspectedThreats.end(), Entity::FindSuspectedThreatById(id));
 
@@ -320,6 +320,35 @@ bool Entity::IsInvestigatingGreatestSuspectedThreat(void)
 	}
 
 	return false;
+}
+
+//--------------------------------------------------------------------------------------
+// Tells whether the entity is currently moving towards the highest priority movement target 
+// or whether there now is a higher priority target that the entity should move towards instead.
+// Returns true if the target being moved towards is still the highest priority target,
+// false otherwise and also if there is no movement target set at all.
+//--------------------------------------------------------------------------------------
+bool Entity::IsMovingToHighestPriorityTarget(void)
+{
+	if(!IsMovementTargetSet())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Tells whether an entity is at a certain target or not
+// Param1: The target position, for which to check if the entity has reached it.
+// Returns true if the entity has reached the target, false otherwise. 
+//--------------------------------------------------------------------------------------
+bool Entity::IsAtTarget(const XMFLOAT2& target)
+{
+	float distance(0.0f);
+	XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&target) - XMLoadFloat2(&GetPosition())));
+
+	return (distance == 0.0f);
 }
 
 //--------------------------------------------------------------------------------------
@@ -629,6 +658,11 @@ float Entity::GetCurrentHealth(void) const
 float Entity::GetMaximalHealth(void) const
 {
 	return m_maximalHealth;
+}
+
+Order* Entity::GetCurrentOrder(void)
+{
+	return m_pCurrentOrder;
 }
 
 bool Entity::IsObservationTargetSet(void) const

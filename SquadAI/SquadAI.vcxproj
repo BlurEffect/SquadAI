@@ -100,7 +100,9 @@
     <ClCompile Include="DetermineApproachThreatPosition.cpp" />
     <ClCompile Include="DetermineAttackTarget.cpp" />
     <ClCompile Include="DetermineGreatestSuspectedThreat.cpp" />
-    <ClCompile Include="DeterminePatrolTarget.cpp" />
+    <ClCompile Include="DetermineMovementTarget.cpp" />
+    <ClCompile Include="DetermineObservationTarget.cpp" />
+    <ClCompile Include="DeterminePathToTarget.cpp" />
     <ClCompile Include="EditModeObject.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
@@ -109,6 +111,7 @@
     <ClCompile Include="EntityAlive.cpp" />
     <ClCompile Include="EntityCombatManager.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
+    <ClCompile Include="LookAtTarget.cpp" />
     <ClCompile Include="MultiflagCTFTeamAI.cpp" />
     <ClCompile Include="MultiflagCTFTeamBehaviour.cpp" />
     <ClCompile Include="Objective.cpp" />
@@ -127,6 +130,7 @@
     <ClCompile Include="MultiflagCTFGameContext.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ObservationTargetSet.cpp" />
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Order.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
@@ -140,6 +144,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Parallel.cpp" />
     <ClCompile Include="Pathfinder.cpp" />
+    <ClCompile Include="PathToTargetSet.cpp" />
     <ClCompile Include="PerformanceTimer.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="ProcessMessages.cpp" />
@@ -190,7 +195,9 @@
     <ClInclude Include="DetermineAttackTarget.h" />
     <ClInclude Include="DetermineGreatestKnownThreat.h" />
     <ClInclude Include="DetermineGreatestSuspectedThreat.h" />
-    <ClInclude Include="DeterminePatrolTarget.h" />
+    <ClInclude Include="DetermineMovementTarget.h" />
+    <ClInclude Include="DetermineObservationTarget.h" />
+    <ClInclude Include="DeterminePathToTarget.h" />
     <ClInclude Include="EditModeObject.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
@@ -203,6 +210,9 @@
     <ClInclude Include="EventTypes.h" />
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
+    <ClInclude Include="LookAtTarget.h" />
+    <ClInclude Include="ObservationTargetSet.h" />
+    <ClInclude Include="PathToTargetSet.h" />
     <ClInclude Include="Order.h" />
     <ClInclude Include="TeamAIToEntityMessages.h" />
     <ClInclude Include="TeamProcessMessages.h" />

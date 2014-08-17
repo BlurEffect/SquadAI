@@ -33,7 +33,8 @@ struct SoldierProperties
 							  m_fireWeaponInterval(0.0f),
 							  m_fieldOfView(0.0f),
 							  m_viewingDistance(0.0f),
-							  m_maxHealth(0.0f)
+							  m_maxHealth(0.0f),
+							  m_lookAroundInterval(0.0f)
 	{}
 
 	// Movement
@@ -56,6 +57,7 @@ struct SoldierProperties
 
 	// Other
 	float m_maxHealth;                  // The maximal health of the soldier
+	float m_lookAroundInterval;         // Determines how often the entity changes its look at position when holding a spot
 };
 
 class Soldier : public Entity
@@ -73,13 +75,17 @@ public:
 	BehaviourStatus AimAt(float deltaTime);
 	BehaviourStatus DetermineAttackTargetPosition(float deltaTime);
 	BehaviourStatus Idle(float deltaTime);
-	BehaviourStatus DeterminePatrolTarget(float deltaTime);
+	BehaviourStatus DetermineMovementTarget(float deltaTime);
 	BehaviourStatus DetermineApproachThreatTarget(float deltaTime);
 	BehaviourStatus UpdateThreats(float deltaTime);
 	BehaviourStatus DetermineGreatestKnownThreat(float deltaTime);
 	BehaviourStatus DetermineGreatestSuspectedThreat(float deltaTime);
 	BehaviourStatus UpdateAttackReadiness(float deltaTime);
 	BehaviourStatus ResolveSuspectedThreat(float deltaTime);
+
+	BehaviourStatus DeterminePathToTarget(float deltaTime);
+	BehaviourStatus DetermineObservationTarget(float deltaTime);
+	BehaviourStatus LookAtTarget(float deltaTime);
 
 	void ProcessEvent(EventType type, void* pEventData);
 
@@ -141,7 +147,7 @@ private:
 	SoldierProperties     m_soldierProperties; // Determines some properties of the soldier related to movement, combat and sensors
 
 	float                 m_fireWeaponTimer;   // Used to determine when the soldier is ready to fire his weapon
-
+	float                 m_changeObservationTargetTimer;  // Used to determine when the soldier should change his observation target
 };
 
 #endif // SOLDIER_H

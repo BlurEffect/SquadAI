@@ -506,6 +506,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			properties.m_viewingDistance			= g_kSoldierViewingDistance;
 			properties.m_fireWeaponInterval         = g_kFireWeaponInterval;
 			properties.m_maxHealth					= g_kSoldierMaxHealth;
+			properties.m_lookAroundInterval         = g_kSoldierLookAroundInterval;
 
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[RedSoldierType] * 0.5f);
 
@@ -536,6 +537,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			properties.m_viewingDistance			= g_kSoldierViewingDistance;
 			properties.m_fireWeaponInterval         = g_kFireWeaponInterval;
 			properties.m_maxHealth					= g_kSoldierMaxHealth;
+			properties.m_lookAroundInterval         = g_kSoldierLookAroundInterval;
 
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[BlueSoldierType] * 0.5f);
 

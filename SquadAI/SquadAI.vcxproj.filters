@@ -297,9 +297,6 @@
     <ClCompile Include="BehaviourFactory.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
-    <ClCompile Include="DeterminePatrolTarget.cpp">
-      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
-    </ClCompile>
     <ClCompile Include="Idle.cpp">
       <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClCompile>
@@ -419,6 +416,24 @@
     </ClCompile>
     <ClCompile Include="Order.cpp">
       <Filter>Source Files\TeamAI</Filter>
+    </ClCompile>
+    <ClCompile Include="DetermineMovementTarget.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="DetermineObservationTarget.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="DeterminePathToTarget.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="PathToTargetSet.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="ObservationTargetSet.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="LookAtTarget.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -587,9 +602,6 @@
     <ClInclude Include="MovementTargetSet.h">
       <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="DeterminePatrolTarget.h">
-      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="Idle.h">
       <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClInclude>
@@ -733,6 +745,24 @@
     </ClInclude>
     <ClInclude Include="TeamAIToEntityMessages.h">
       <Filter>Header Files\Messages/Events\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="DetermineMovementTarget.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="DeterminePathToTarget.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="DetermineObservationTarget.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="PathToTargetSet.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="ObservationTargetSet.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="LookAtTarget.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

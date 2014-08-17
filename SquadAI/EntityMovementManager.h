@@ -29,9 +29,11 @@ public:
 	void UpdatePosition(float deltaTime, float maxSpeed, float maxForce);
 	void Reset(void);
 
-	bool SetPathTo(const XMFLOAT2& targetPosition);
+	//bool SetPathTo(const XMFLOAT2& targetPosition);
+	std::vector<XMFLOAT2>* CreatePathTo(const XMFLOAT2& targetPosition);
+
 	bool Seek(const XMFLOAT2& targetPosition, float targetReachedRadius, float speed);
-	bool FollowPath(float nodeReachedRadius, float speed);
+	bool FollowPath(std::vector<XMFLOAT2>* pPath, float nodeReachedRadius, float speed);
 	void LookAt(const XMFLOAT2& targetPosition);
 	void Wait();
 	
@@ -39,7 +41,7 @@ public:
 	void StayAwayFromWalls(float avoidWallsRadius, float maximalForce);
 	void Separate(float separationRadius, float maximalForce);
 
-	bool IsPathSet(void) const;
+	//bool IsPathSet(void) const;
 
 	// Data access functions
 	

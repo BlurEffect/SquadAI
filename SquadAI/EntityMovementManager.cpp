@@ -134,6 +134,7 @@ void EntityMovementManager::Reset(void)
 	m_currentNode = 0;
 }
 
+/*
 //--------------------------------------------------------------------------------------
 // Calculate a path to the target position and set it active.
 // Param1: The target position of the path.
@@ -153,6 +154,26 @@ bool EntityMovementManager::SetPathTo(const XMFLOAT2& targetPosition)
 	}
 
 	return result;
+}*/
+
+//--------------------------------------------------------------------------------------
+// Calculate a path to the target position.
+// Param1: The target position of the path.
+// Returns a pointer to the path that was created, nullptr if no path exists.
+//--------------------------------------------------------------------------------------
+std::vector<XMFLOAT2>* EntityMovementManager::CreatePathTo(const XMFLOAT2& targetPosition)
+{
+	bool result = false;
+	result = m_pEnvironment->GetPathfinder().CalculatePath(AStar, EuclideanDistance, m_pEntity->GetPosition(), targetPosition, m_path);
+
+	if(result)
+	{
+		m_currentNode = 0;
+		return &m_path;
+	}else
+	{
+		return nullptr;
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -214,6 +235,7 @@ void EntityMovementManager::Wait()
 	m_steeringForce = XMFLOAT2(0.0f, 0.0f);
 }
 
+/*
 //--------------------------------------------------------------------------------------
 // Calculate the path following force and add it to the total force.
 // Param1: When the entity has approached the target by this distance, it counts as reached.
@@ -251,6 +273,52 @@ bool EntityMovementManager::FollowPath(float nodeReachedRadius, float speed)
 		}else
 		{
 			Seek(m_path[m_currentNode], nodeReachedRadius, speed);
+			return false;
+		}
+	}
+
+	return true;
+}*/
+
+
+//--------------------------------------------------------------------------------------
+// Calculate the path following force and add it to the total force.
+// Param1: A pointer to the path to follow.
+// Param2: When the entity has approached the target by this distance, it counts as reached.
+// Param3: The speed, at which the entity should follow the path.
+// Returns true if the end of the current path was reached, false if there is still way to go.
+//--------------------------------------------------------------------------------------
+bool EntityMovementManager::FollowPath(std::vector<XMFLOAT2>* pPath, float nodeReachedRadius, float speed)
+{
+	if(!pPath->empty())
+	{
+		// There is an active path
+		XMFLOAT2 target = (*pPath)[m_currentNode];
+	
+		// Calculate the distance between the current position of the entity and the target
+		float distance = 0.0f;
+		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&target) - XMLoadFloat2(&m_pEntity->GetPosition())));
+
+		if(distance <= nodeReachedRadius)
+		{
+			// The entity has reached the node
+			++m_currentNode;
+
+			if(m_currentNode >= pPath->size())
+			{
+				// Final destination reached, clear the path
+				pPath->clear();
+				m_velocity = XMFLOAT2(0.0f, 0.0f);
+			
+				return true;
+			}else
+			{
+				Seek((*pPath)[m_currentNode], nodeReachedRadius, speed);
+				return false;
+			}
+		}else
+		{
+			Seek((*pPath)[m_currentNode], nodeReachedRadius, speed);
 			return false;
 		}
 	}
@@ -405,6 +473,7 @@ void EntityMovementManager::Separate(float separationRadius, float maximalForce)
 	}
 }
 
+/*
 //--------------------------------------------------------------------------------------
 // Tells whether there currently is a path set for the entity to follow.
 // Returns true if there is a patn set, false otherwise.
@@ -412,7 +481,7 @@ void EntityMovementManager::Separate(float separationRadius, float maximalForce)
 bool EntityMovementManager::IsPathSet(void) const
 {
 	return (!m_path.empty());
-}
+}*/
 
 // Data access functions
 

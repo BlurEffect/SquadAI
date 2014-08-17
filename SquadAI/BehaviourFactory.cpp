@@ -36,6 +36,9 @@ Behaviour* BehaviourFactory::CreateBehaviourTree(BehaviourTreeType treeType, voi
 	case SimpleIndividualCombatTree:
 		return CreateSimpleCombatTree(reinterpret_cast<Entity*>(pTreeOwner));
 		break;
+	case ModifiedSimpleIndividualCombatTree:
+		return CreateModifiedSimpleCombatTree(reinterpret_cast<Entity*>(pTreeOwner));
+		break;
 	case SimpleTeamMultiflagCTFTree:
 		return CreateSimpleTeamMultiflagCTFTree(reinterpret_cast<MultiflagCTFTeamAI*>(pTreeOwner));
 		break;
@@ -64,13 +67,13 @@ Behaviour* BehaviourFactory::CreateSimpleMovementTree(Entity* pEntity)
 			reinterpret_cast<Composite*>(pRoot)->AddChild(pPatrolSequence);
 			reinterpret_cast<Composite*>(pRoot)->AddChild(pIdleAction);
 
-			Behaviour* pDeterminePatrolTargetAction = CreateUniversalIndividualBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
+			Behaviour* pDetermineMovementTargetAction = CreateUniversalIndividualBehaviour(DetermineMovementTargetType, pEntity, "DetermineMovementTargetAction", nullptr);
 			Behaviour* pMovementTargetSetCondition = CreateUniversalIndividualBehaviour(MovementTargetSetType, pEntity, "MovementTargetSetCondition", nullptr);
 			Behaviour* pMoveToTargetAction = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToTargetAction", nullptr);
 		
-			if(pDeterminePatrolTargetAction && pMovementTargetSetCondition && pMoveToTargetAction)
+			if(pDetermineMovementTargetAction && pMovementTargetSetCondition && pMoveToTargetAction)
 			{
-				reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pDeterminePatrolTargetAction);
+				reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pDetermineMovementTargetAction);
 				reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMovementTargetSetCondition);
 				reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMoveToTargetAction);
 				return &(*pRoot);
@@ -146,13 +149,13 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 					Behaviour* pMoveToApproachThreatTargetAction	 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToApproachThreatTargetAction", nullptr);
 					Behaviour* pResolveSuspectedThreatAction		 = CreateUniversalIndividualBehaviour(ResolveSuspectedThreatType, pEntity, "ResolveSuspectedThreatAction", nullptr);
 
-					Behaviour* pDeterminePatrolTargetAction      = CreateUniversalIndividualBehaviour(DeterminePatrolTargetType, pEntity, "DeterminePatrolTargetAction", nullptr);
+					Behaviour* pDetermineMovementTargetAction      = CreateUniversalIndividualBehaviour(DetermineMovementTargetType, pEntity, "DetermineMovementTargetAction", nullptr);
 					Behaviour* pMovementTargetPatrolSetCondition = CreateUniversalIndividualBehaviour(MovementTargetSetType, pEntity, "MovementTargetPatrolSetCondition", nullptr);
 					Behaviour* pMoveToPatrolTargetAction		 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToPatrolTargetAction", nullptr);
 		
 					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
 					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pCheckInvestigatedThreatMonitor && pCheckInvestigatedTargetSequence && pDetermineGreatestSuspectedThreatUpdateAction && 
-					   pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDeterminePatrolTargetAction && pMovementTargetPatrolSetCondition && pMoveToPatrolTargetAction)
+					   pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDetermineMovementTargetAction && pMovementTargetPatrolSetCondition && pMoveToPatrolTargetAction)
 					{
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
@@ -173,7 +176,7 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 						//reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMoveToApproachThreatTargetAction);
 						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pResolveSuspectedThreatAction);
 
-						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pDeterminePatrolTargetAction);
+						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pDetermineMovementTargetAction);
 						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMovementTargetPatrolSetCondition);
 						reinterpret_cast<Composite*>(pPatrolSequence)->AddChild(pMoveToPatrolTargetAction);
 
@@ -184,6 +187,167 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 						{
 							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pAttackSequence);
 							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pWaitForAttackReadinessIdleAction);
+
+							Behaviour* pReadyToAttackCondition		    = CreateUniversalIndividualBehaviour(ReadyToAttackType, pEntity, "ReadyToAttackCondition", nullptr);
+							Behaviour* pDetermineAttackTargetAction		= CreateUniversalIndividualBehaviour(DetermineAttackTargetType, pEntity, "DetermineAttackTargetAction", nullptr);
+							Behaviour* pAttackTargetSetCondition		= CreateUniversalIndividualBehaviour(AttackTargetSetType, pEntity, "AttackTargetSetCondition", nullptr);
+							Behaviour* pAimAtTargetAction				= CreateUniversalIndividualBehaviour(AimAtTargetType, pEntity, "AimAtTargetAction", nullptr);
+							Behaviour* pAttackTargetAction				= CreateUniversalIndividualBehaviour(AttackTargetType, pEntity, "AttackTargetAction", nullptr);
+	
+							if(pReadyToAttackCondition && pDetermineAttackTargetAction && pAttackTargetSetCondition && 
+							   pAimAtTargetAction && pAttackTargetAction)
+							{
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pReadyToAttackCondition);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pDetermineAttackTargetAction);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAttackTargetSetCondition);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAimAtTargetAction);
+								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAttackTargetAction);
+
+								return &(*pRoot);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+//--------------------------------------------------------------------------------------
+// Similar to SimpleCombatTree but modified to allow for better order processing.
+// Param1: A pointer to the entity that the behaviour tree should be created for.
+// Returns a pointer to the root behaviour of the created tree. The pointer is null if 
+// something failed during creation.
+//--------------------------------------------------------------------------------------
+Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
+{
+	Behaviour* pRoot = CreateUniversalBehaviour(ActiveSelectorType, "Root", nullptr);
+
+	if(pRoot)
+	{
+		Behaviour* pUpdateEntitySequence = CreateUniversalBehaviour(SequenceType, "UpdateEntitySequence", nullptr);
+		
+		if(pUpdateEntitySequence)
+		{
+			ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
+			Behaviour* pAlwaysFailDecorator = CreateUniversalBehaviour(ReturnSpecificStatusType, "AlwaysFailDecorator", &data);
+
+			Behaviour* pProcessMessagesAction		    = CreateUniversalIndividualBehaviour(ProcessMessagesType, pEntity, "ProcessMessagesAction", nullptr);
+			Behaviour* pEntityAliveCondition		    = CreateUniversalIndividualBehaviour(EntityAliveType, pEntity, "EntityAliveCondition", nullptr);
+			Behaviour* pUpdateThreatsAction				= CreateUniversalIndividualBehaviour(UpdateThreatsType, pEntity, "UpdateThreatsAction", nullptr);
+			Behaviour* pUpdateAttackReadinessAction		= CreateUniversalIndividualBehaviour(UpdateAttackReadinessType, pEntity, "UpdateAttackReadinessAction", nullptr);
+
+			if(pProcessMessagesAction && pAlwaysFailDecorator && pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
+			{
+				reinterpret_cast<Composite*>(pRoot)->AddChild(pAlwaysFailDecorator);
+
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pProcessMessagesAction);
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pEntityAliveCondition);
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateThreatsAction);
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pUpdateAttackReadinessAction);
+
+				Behaviour* pFightSequence		   = CreateUniversalBehaviour(SequenceType, "FightSequence", nullptr);
+				Behaviour* pApproachThreatSequence = CreateUniversalBehaviour(SequenceType, "ApproachThreatSequence", nullptr);
+				Behaviour* pMovementSequence		   = CreateUniversalBehaviour(SequenceType, "MovementSequence", nullptr);
+				Behaviour* pHoldPositionSelector  = CreateUniversalBehaviour(SelectorType, "HoldPositionSelector", nullptr);
+				
+				if(pFightSequence && pApproachThreatSequence && pMovementSequence && pHoldPositionSelector)
+				{
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pFightSequence);
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pApproachThreatSequence);
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pMovementSequence);
+					reinterpret_cast<Composite*>(pRoot)->AddChild(pHoldPositionSelector);
+
+
+					Behaviour* pDetermineGreatestKnownThreatAction = CreateUniversalIndividualBehaviour(DetermineGreatestKnownThreatType, pEntity, "DetermineGreatestKnownThreatAction", nullptr);
+					Behaviour* pGreatestKnownThreatSetCondition    = CreateUniversalIndividualBehaviour(GreatestKnownThreatSetType, pEntity, "GreatestKnownThreatSetCondition", nullptr);
+					Behaviour* pAttackSelector		               = CreateUniversalBehaviour(SelectorType, "AttackSelector", nullptr);
+						
+					Behaviour* pDetermineGreatestSuspectedThreatAction   = CreateUniversalIndividualBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatAction", nullptr);
+					Behaviour* pGreatestSuspectedThreatSetCondition	     = CreateUniversalIndividualBehaviour(GreatestSuspectedThreatSetType, pEntity, "GreatestSuspectedThreatSetCondition", nullptr);
+					Behaviour* pDetermineApproachThreatPositionAction    = CreateUniversalIndividualBehaviour(DetermineApproachThreatPositionType, pEntity, "DetermineApproachThreatPositionAction", nullptr);
+					Behaviour* pMovementTargetApproachThreatSetCondition = CreateUniversalIndividualBehaviour(MovementTargetSetType, pEntity, "MovementTargetApproachThreatSetCondition", nullptr);
+					
+					Behaviour* pDeterminePathToSuspectedThreatAction     = CreateUniversalIndividualBehaviour(DeterminePathToTargetType, pEntity, "DeterminePathToSuspectedThreatAction", nullptr);
+					Behaviour* pPathToSuspectedThreatSetCondition        = CreateUniversalIndividualBehaviour(PathToTargetSetType, pEntity, "PathToSuspectedThreatSetCondition", nullptr);
+
+					ParallelInitData parallelInitData(ParallelPolicy::RequireAll, ParallelPolicy::RequireOne);
+					Behaviour* pCheckInvestigatedThreatMonitor               = CreateUniversalBehaviour(MonitorType, "CheckInvestigatedThreatMonitor", &parallelInitData);   
+					Behaviour* pCheckInvestigatedTargetSequence              = CreateUniversalBehaviour(SequenceType, "CheckInvestigatedTargetSequence", nullptr);
+					Behaviour* pDetermineGreatestSuspectedThreatUpdateAction = CreateUniversalIndividualBehaviour(DetermineGreatestSuspectedThreatType, pEntity, "DetermineGreatestSuspectedThreatUpdateAction", nullptr);
+					Behaviour* pStillInvestigatingGreatestThreatCondition    = CreateUniversalIndividualBehaviour(InvestigatingGreatestSuspectedThreatType, pEntity, "StillInvestigatingGreatestThreatCondition", nullptr);
+
+					Behaviour* pMoveToApproachThreatTargetAction	 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToApproachThreatTargetAction", nullptr);
+					Behaviour* pResolveSuspectedThreatAction		 = CreateUniversalIndividualBehaviour(ResolveSuspectedThreatType, pEntity, "ResolveSuspectedThreatAction", nullptr);
+
+					Behaviour* pDetermineMovementTargetAction      = CreateUniversalIndividualBehaviour(DetermineMovementTargetType, pEntity, "DetermineMovementTargetAction", nullptr);
+					Behaviour* pMovementTargetSetCondition = CreateUniversalIndividualBehaviour(MovementTargetSetType, pEntity, "MovementTargetSetCondition", nullptr);
+					
+					Behaviour* pDeterminePathToMovementTargetAction = CreateUniversalIndividualBehaviour(DeterminePathToTargetType, pEntity, "DeterminePathToMovementTargetAction", nullptr);
+					Behaviour* pPathToMovementTargetSetCondition = CreateUniversalIndividualBehaviour(PathToTargetSetType, pEntity, "PathToMovementTargetSetCondition", nullptr);
+
+					Behaviour* pMoveToTargetAction		 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToTargetAction", nullptr);
+		
+					Behaviour* pChangeObservationTargetSequence = CreateUniversalBehaviour(SequenceType, "ChangeObservationTargetSequence", nullptr);
+					Behaviour* pIdleAction			   = CreateUniversalIndividualBehaviour(IdleType, pEntity, "IdleAction", nullptr);
+
+
+					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
+					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pDeterminePathToSuspectedThreatAction && pPathToSuspectedThreatSetCondition && pCheckInvestigatedThreatMonitor && pCheckInvestigatedTargetSequence && pDetermineGreatestSuspectedThreatUpdateAction && 
+					   pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDetermineMovementTargetAction && pMovementTargetSetCondition && pDeterminePathToMovementTargetAction && pPathToMovementTargetSetCondition && pMoveToTargetAction
+					   && pChangeObservationTargetSequence && pIdleAction)
+					{
+						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
+						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
+						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pAttackSelector);
+
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDetermineGreatestSuspectedThreatAction);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pGreatestSuspectedThreatSetCondition);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDetermineApproachThreatPositionAction);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMovementTargetApproachThreatSetCondition);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pDeterminePathToSuspectedThreatAction);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pPathToSuspectedThreatSetCondition);
+
+						// Alternatives
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pCheckInvestigatedThreatMonitor);
+						reinterpret_cast<Monitor*>(pCheckInvestigatedThreatMonitor)->AddCondition(pCheckInvestigatedTargetSequence);
+						reinterpret_cast<Composite*>(pCheckInvestigatedTargetSequence)->AddChild(pDetermineGreatestSuspectedThreatUpdateAction);
+						reinterpret_cast<Composite*>(pCheckInvestigatedTargetSequence)->AddChild(pStillInvestigatingGreatestThreatCondition);
+						
+						reinterpret_cast<Monitor*>(pCheckInvestigatedThreatMonitor)->AddAction(pMoveToApproachThreatTargetAction);
+						//reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pMoveToApproachThreatTargetAction);
+						reinterpret_cast<Composite*>(pApproachThreatSequence)->AddChild(pResolveSuspectedThreatAction);
+
+						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pDetermineMovementTargetAction);
+						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pMovementTargetSetCondition);
+						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pDeterminePathToMovementTargetAction);
+						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pPathToMovementTargetSetCondition);
+
+						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pMoveToTargetAction);
+
+						
+						reinterpret_cast<Composite*>(pHoldPositionSelector)->AddChild(pChangeObservationTargetSequence);
+						reinterpret_cast<Composite*>(pHoldPositionSelector)->AddChild(pIdleAction);
+							
+					 
+
+						Behaviour* pAttackSequence = CreateUniversalBehaviour(SequenceType, "AttackSequence", nullptr);
+						Behaviour* pWaitForAttackReadinessIdleAction = CreateUniversalIndividualBehaviour(IdleType, pEntity, "WaitForAttackReadinessIdleAction", nullptr);
+
+						Behaviour* pDetermineObservationTargetAction = CreateUniversalIndividualBehaviour(DetermineObservationTargetType, pEntity, "DetermineObservationTargetAction", nullptr);
+						Behaviour* pObservationTargetSetCondition = CreateUniversalIndividualBehaviour(ObservationTargetSetType, pEntity, "ObservationTargetSetCondition", nullptr);
+						Behaviour* pLookAtObservationTargetAction = CreateUniversalIndividualBehaviour(LookAtTargetType, pEntity, "LookAtObservationTargetAction", nullptr);
+
+						if(pAttackSequence && pWaitForAttackReadinessIdleAction && pDetermineObservationTargetAction && pObservationTargetSetCondition && pLookAtObservationTargetAction)
+						{
+							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pAttackSequence);
+							reinterpret_cast<Composite*>(pAttackSelector)->AddChild(pWaitForAttackReadinessIdleAction);
+
+							reinterpret_cast<Composite*>(pChangeObservationTargetSequence)->AddChild(pDetermineObservationTargetAction);
+							reinterpret_cast<Composite*>(pChangeObservationTargetSequence)->AddChild(pObservationTargetSetCondition);
+							reinterpret_cast<Composite*>(pChangeObservationTargetSequence)->AddChild(pLookAtObservationTargetAction);
 
 							Behaviour* pReadyToAttackCondition		    = CreateUniversalIndividualBehaviour(ReadyToAttackType, pEntity, "ReadyToAttackCondition", nullptr);
 							Behaviour* pDetermineAttackTargetAction		= CreateUniversalIndividualBehaviour(DetermineAttackTargetType, pEntity, "DetermineAttackTargetAction", nullptr);
@@ -318,8 +482,14 @@ Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndivid
 	case InvestigatingGreatestSuspectedThreatType:
 		return new InvestigatingGreatestSuspectedThreat(name, pEntity);
 		break;
-	case DeterminePatrolTargetType:
-		return new DeterminePatrolTarget(name, pEntity);
+	case ObservationTargetSetType:
+		return new ObservationTargetSet(name, pEntity);
+		break;
+	case PathToTargetSetType:
+		return new PathToTargetSet(name, pEntity);
+		break;
+	case DetermineMovementTargetType:
+		return new DetermineMovementTarget(name, pEntity);
 		break;
 	case DetermineApproachThreatPositionType:
 		return new DetermineApproachThreatPosition(name, pEntity);
@@ -353,8 +523,19 @@ Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndivid
 		break;
 	case ResolveSuspectedThreatType:
 		return new ResolveSuspectedThreat(name, pEntity);
+		break;
 	case ProcessMessagesType:
 		return new ProcessMessages(name, pEntity);
+		break;
+	case DetermineObservationTargetType:
+		return new DetermineObservationTarget(name, pEntity);
+		break;
+	case DeterminePathToTargetType:
+		return new DeterminePathToTarget(name, pEntity);
+		break;
+	case LookAtTargetType:
+		return new LookAtTarget(name, pEntity);
+		break;
 	default:
 		return nullptr;
 	}

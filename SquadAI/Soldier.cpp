@@ -12,7 +12,8 @@
 #include "Message.h"
 
 Soldier::Soldier(void) : Entity(),
-						 m_fireWeaponTimer(0.0f)
+						 m_fireWeaponTimer(0.0f),
+						 m_changeObservationTargetTimer(0.0f)
 {
 }
 
@@ -55,6 +56,8 @@ bool Soldier::Initialise(unsigned long id, const XMFLOAT2& position, float rotat
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 {
+	/*
+	
 	if(!m_movementManager.IsPathSet())
 	{
 		// There is no path set, create a new one
@@ -64,8 +67,8 @@ BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 			return StatusFailure;
 		}
 	}
-
-	if(m_movementManager.FollowPath(m_soldierProperties.m_targetReachedRadius, m_soldierProperties.m_maxSpeed))
+	*/
+	if(m_movementManager.FollowPath(GetPath(), m_soldierProperties.m_targetReachedRadius, m_soldierProperties.m_maxSpeed))
 	{
 		// The target was reached
 		if(GetGreatestSuspectedThreat() && GetGreatestSuspectedThreat()->m_lastKnownPosition.x == GetMovementTarget().x &&
@@ -150,7 +153,7 @@ BehaviourStatus Soldier::Idle(float deltaTime)
 // Param1: The time in seconds passed since the last frame.
 // Returns the current state of the action.
 //--------------------------------------------------------------------------------------
-BehaviourStatus Soldier::DeterminePatrolTarget(float deltaTime)
+BehaviourStatus Soldier::DetermineMovementTarget(float deltaTime)
 {
 	// Get a new random target position within the test environment
 	XMFLOAT2 patrolTarget(0.0f, 0.0f);
@@ -257,6 +260,55 @@ BehaviourStatus Soldier::ResolveSuspectedThreat(float deltaTime)
 	{
 		RemoveSuspectedThreat(GetGreatestSuspectedThreat()->m_enemyId);
 	}
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines/Calculates a path to the current movement target and sets it as the active path.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::DeterminePathToTarget(float deltaTime)
+{
+	SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Determines a point to observe for the soldier and sets it as the active observation point.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::DetermineObservationTarget(float deltaTime)
+{
+	// Reset observation target
+	SetObservationTarget(XMFLOAT2(0.0f, 0.0f));
+	SetObservationTargetSet(false);
+	
+	// Update the timer
+	m_changeObservationTargetTimer += deltaTime;
+
+	// Check if the soldier should change his observation target
+	if(m_changeObservationTargetTimer >= m_soldierProperties.m_lookAroundInterval)
+	{
+		// Determine a random lookAt position
+
+		SetObservationTarget(XMFLOAT2(GetPosition().x + (rand() * 2 - 1), GetPosition().y + (rand() * 2 - 1)));
+		SetObservationTargetSet(true);
+		m_changeObservationTargetTimer = 0.0f;
+	}
+
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Makes the entity look at the currently set observation target.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::LookAtTarget(float deltaTime)
+{
+	m_movementManager.LookAt(GetObservationTarget());
 	return StatusSuccess;
 }
 

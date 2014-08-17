@@ -75,7 +75,7 @@ public:
 	virtual BehaviourStatus AimAt(float deltaTime)								    = 0;
 	virtual BehaviourStatus DetermineAttackTargetPosition(float deltaTime)          = 0;
 	virtual BehaviourStatus Idle(float deltaTime)									= 0;
-	virtual BehaviourStatus DeterminePatrolTarget(float deltaTime)			        = 0;
+	virtual BehaviourStatus DetermineMovementTarget(float deltaTime)			    = 0;
 	virtual BehaviourStatus DetermineApproachThreatTarget(float deltaTime)          = 0;
 	virtual BehaviourStatus UpdateThreats(float deltaTime)					        = 0;
 	virtual BehaviourStatus DetermineGreatestKnownThreat(float deltaTime)           = 0;
@@ -83,6 +83,10 @@ public:
 	virtual BehaviourStatus UpdateAttackReadiness(float deltaTime)					= 0;
 	virtual BehaviourStatus ResolveSuspectedThreat(float deltaTime)					= 0;
 	
+	virtual BehaviourStatus DeterminePathToTarget(float deltaTime)			        = 0;
+	virtual BehaviourStatus DetermineObservationTarget(float deltaTime)			    = 0;
+	virtual BehaviourStatus LookAtTarget(float deltaTime)			                = 0;
+
 	// Threat management
 	void AddKnownThreat(Entity* pThreat, bool hasHitEntity);
 	void RemoveKnownThreat(unsigned long id);
@@ -114,6 +118,11 @@ public:
 	float								GetCurrentHealth(void) const;
 	float								GetMaximalHealth(void) const;
 
+	bool								IsObservationTargetSet(void) const;
+	const XMFLOAT2&						GetObservationTarget(void) const;
+	bool                                IsPathSet(void) const;
+	std::vector<XMFLOAT2>*              GetPath(void);
+
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 	void SetTeam(EntityTeam team);
 	void SetTeamAI(TeamAI* pTeamAI);
@@ -126,6 +135,10 @@ public:
 	void SetMovementTarget(const XMFLOAT2& target);
 	void SetCurrentHealth(float health);
 	void SetMaximalHealth(float maxHealth);
+
+	void SetObservationTargetSet(bool targetSet);
+	void SetObservationTarget(const XMFLOAT2& target);
+	void SetPath(std::vector<XMFLOAT2>* pPath);
 
 	//--------------------------------------------------------------------------------------
 	// Functor used to find an entity within a container based on its id.
@@ -214,6 +227,9 @@ private:
 	float						 m_currentHealth;			 // The current health state of the entity (percentage between 0.0 and 1.0 in relation to maximal health)
 	float                        m_maximalHealth;			 // The maximal amount of health for this entity
 
+	std::vector<XMFLOAT2>*       m_pPath;                    // The path to the current movement target
+	XMFLOAT2			         m_observationTarget;		 // The position to observe while holding a position
+	bool						 m_observationTargetSet;	 // Tells whether an observation target was set
 };
 
 #endif // ENTITY_H

@@ -61,7 +61,7 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
-	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleIndividualCombatTree, this);
+	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(ModifiedSimpleIndividualCombatTree, this);
 	if(!m_pBehaviour)
 	{
 		return false;
@@ -631,6 +631,26 @@ float Entity::GetMaximalHealth(void) const
 	return m_maximalHealth;
 }
 
+bool Entity::IsObservationTargetSet(void) const
+{
+	return m_observationTargetSet;
+}
+
+const XMFLOAT2& Entity::GetObservationTarget(void) const
+{
+	return m_observationTarget;
+}
+
+bool Entity::IsPathSet(void) const
+{
+	return m_pPath != nullptr;
+}
+
+std::vector<XMFLOAT2>* Entity::GetPath(void)
+{
+	return m_pPath;
+}
+
 void Entity::SetTestEnvironment(TestEnvironment* pEnvironment)
 {
 	if(pEnvironment)
@@ -693,3 +713,19 @@ void Entity::SetMaximalHealth(float maxHealth)
 {
 	m_maximalHealth = maxHealth;
 }
+
+void Entity::SetObservationTargetSet(bool targetSet)
+{
+	m_observationTargetSet = targetSet;
+}
+
+void Entity::SetObservationTarget(const XMFLOAT2& target)
+{
+	m_observationTarget = target;
+}
+
+void Entity::SetPath(std::vector<XMFLOAT2>* pPath)
+{
+	m_pPath = pPath;
+}
+

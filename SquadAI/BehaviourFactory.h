@@ -26,8 +26,10 @@
 #include "GreatestSuspectedThreatSet.h"
 #include "EntityAlive.h"
 #include "InvestigatingGreatestSuspectedThreat.h"
+#include "ObservationTargetSet.h"
+#include "PathToTargetSet.h"
 // Actions
-#include "DeterminePatrolTarget.h"
+#include "DetermineMovementTarget.h"
 #include "DetermineApproachThreatPosition.h"
 #include "DetermineAttackTarget.h"
 #include "DetermineGreatestKnownThreat.h"
@@ -40,6 +42,9 @@
 #include "MoveToTarget.h"
 #include "ResolveSuspectedThreat.h"
 #include "ProcessMessages.h"
+#include "DetermineObservationTarget.h"
+#include "DeterminePathToTarget.h"
+#include "LookAtTarget.h"
 // Team behaviours
 #include "TeamProcessMessages.h"
 
@@ -61,8 +66,10 @@ enum UniversalIndividualBehaviourType
 	GreatestSuspectedThreatSetType,
 	EntityAliveType,
 	InvestigatingGreatestSuspectedThreatType,
+	ObservationTargetSetType,
+	PathToTargetSetType,
 
-	DeterminePatrolTargetType,
+	DetermineMovementTargetType,
 	DetermineApproachThreatPositionType,
 	DetermineAttackTargetType,
 	DetermineGreatestKnownThreatType,
@@ -74,7 +81,10 @@ enum UniversalIndividualBehaviourType
 	IdleType,
 	MoveToTargetType,
 	ResolveSuspectedThreatType,
-	ProcessMessagesType
+	ProcessMessagesType,
+	DetermineObservationTargetType,
+	DeterminePathToTargetType,
+	LookAtTargetType,
 };
 
 //--------------------------------------------------------------------------------------
@@ -114,6 +124,7 @@ enum BehaviourTreeType
 {
 	SimpleIndividualMovementTree,
 	SimpleIndividualCombatTree,
+	ModifiedSimpleIndividualCombatTree,
 	SimpleTeamMultiflagCTFTree
 };
 
@@ -126,6 +137,7 @@ public:
 private:
 	static Behaviour* CreateSimpleMovementTree(Entity* pEntity);
 	static Behaviour* CreateSimpleCombatTree(Entity* pEntity);
+	static Behaviour* CreateModifiedSimpleCombatTree(Entity* pEntity);
 	static Behaviour* CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI* pTeamAI);
 
 	// Factory functions for the different types of behaviours

@@ -12,6 +12,7 @@
 #include "TeamAI.h"
 #include "ObjectTypes.h"
 #include "MultiflagCTFGameContext.h" // needs to know flag state -> move flag state somewhere else (game mode spceifc data structs?)
+#include "TeamAIToEntityMessages.h"
 
 // Forward declarations
 class TestEnvironment;
@@ -49,6 +50,12 @@ public:
 	void Reset(void);
 
 	void ProcessEvent(EventType type, void* pEventData);
+
+	// Available manoeuvres
+	BehaviourStatus AllAttack(float deltaTime);
+	BehaviourStatus AllDefend(float deltaTime);
+	BehaviourStatus AllMove(float deltaTime);
+
 protected:
 	void ProcessMessage(Message* pMessage);
 	

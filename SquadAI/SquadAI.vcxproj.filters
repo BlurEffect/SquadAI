@@ -438,6 +438,18 @@
     <ClCompile Include="MovingToHighestPriorityTarget.cpp">
       <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="FinaliseMovement.cpp">
+      <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamAllAttack.cpp">
+      <Filter>Source Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamAllDefend.cpp">
+      <Filter>Source Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamAllMove.cpp">
+      <Filter>Source Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -769,6 +781,18 @@
     </ClInclude>
     <ClInclude Include="MovingToHighestPriorityTarget.h">
       <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="FinaliseMovement.h">
+      <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamAllAttack.h">
+      <Filter>Header Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamAllDefend.h">
+      <Filter>Header Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamAllMove.h">
+      <Filter>Header Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

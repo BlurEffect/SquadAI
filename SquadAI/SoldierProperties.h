@@ -32,6 +32,6 @@ const float g_kSoldierViewingDistance(20.0f);	 // 10.0f	     // Determines how f
 
 // Other
 const float g_kSoldierMaxHealth(100.0f);				 // The maximal health of a soldier entity.
-const float g_kSoldierLookAroundInterval(2.0f);          // The soldier changes his lookat position every x seconds when holding a position
+const float g_kSoldierLookAroundInterval(1.0f);          // The soldier changes his lookat position every x seconds when holding a position
 
 #endif // SOLDIER_PROPERTIES_H

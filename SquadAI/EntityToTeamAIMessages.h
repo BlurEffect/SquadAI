@@ -11,6 +11,7 @@
 // Includes
 #include <DirectXMath.h>
 #include "Message.h"
+#include "Order.h"
 
 using namespace DirectX;
 
@@ -145,6 +146,35 @@ private:
 	AttackedByEnemyMessageData m_data; // The contents of the message
 };
 
+//--------------------------------------------------------------------------------------
+// Contains data required for a message sent when an entity wants to inform the team AI 
+// of an updated status of its current order.
+//--------------------------------------------------------------------------------------
+struct UpdateOrderStateMessageData
+{
+	UpdateOrderStateMessageData(unsigned long entityId, OrderState orderState) : m_entityId(entityId),
+																				 m_orderState(orderState)
+	{}
 
+	unsigned long m_entityId;	 //The id of the entity that wants to report an update
+	OrderState    m_orderState;  // The current state of the entity's active order
+};
+
+//--------------------------------------------------------------------------------------
+// Message sent when an entity wants to inform the team AI 
+// of an updated status of its current order.
+//--------------------------------------------------------------------------------------
+class UpdateOrderStateMessage : public Message
+{
+public:
+	UpdateOrderStateMessage(const UpdateOrderStateMessageData& data) : Message(UpdateOrderStateMessageType),
+																	   m_data(data)
+	{}
+
+	const UpdateOrderStateMessageData& GetData(void) const { return m_data; }
+
+private:
+	UpdateOrderStateMessageData m_data; // The contents of the message
+};
 
 #endif // ENTITY_TO_TEAM_AI_MESSAGES_H

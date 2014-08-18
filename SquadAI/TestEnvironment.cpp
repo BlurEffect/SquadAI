@@ -93,6 +93,7 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 		m_pGameContext->RegisterTeamAI(m_pTeamAI[i]);
 	}
 
+
 	// initialise the random number generator
 	srand(static_cast<unsigned int>(time(NULL)));
 
@@ -518,6 +519,9 @@ bool TestEnvironment::PrepareSimulation(void)
 
 			// Set the team AI for the soldier
 			m_soldiers[soldierIndex].SetTeamAI(m_pTeamAI[TeamRed]);
+
+			m_pTeamAI[TeamRed]->AddTeamMember(&m_soldiers[soldierIndex]);
+
 			++soldierIndex;
 			break;
 			}
@@ -549,6 +553,9 @@ bool TestEnvironment::PrepareSimulation(void)
 
 			// Set the team AI for the soldier
 			m_soldiers[soldierIndex].SetTeamAI(m_pTeamAI[TeamBlue]);
+
+			m_pTeamAI[TeamBlue]->AddTeamMember(&m_soldiers[soldierIndex]);
+
 			++soldierIndex;
 			break;
 			}
@@ -1457,6 +1464,7 @@ void TestEnvironment::EndSimulation(void)
 	{
 		//m_flags[i].OnReset();
 		m_spawnPoints[i].clear();
+		m_pTeamAI[i]->Reset();
 	}
 
 	m_id = 0;
@@ -1465,6 +1473,9 @@ void TestEnvironment::EndSimulation(void)
 	m_isPaused = true;
 
 	m_pGameContext->Reset();
+
+
+
 	ResetCommunication();
 }
 

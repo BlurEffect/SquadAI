@@ -86,7 +86,9 @@ public:
 	BehaviourStatus DeterminePathToTarget(float deltaTime);
 	BehaviourStatus DetermineObservationTarget(float deltaTime);
 	BehaviourStatus LookAtTarget(float deltaTime);
+	BehaviourStatus FinaliseMovement(float deltaTime);
 
+	bool IsInvestigatingGreatestSuspectedThreat(void);
 	bool IsMovingToHighestPriorityTarget(void);
 
 	void ProcessEvent(EventType type, void* pEventData);
@@ -109,6 +111,7 @@ public:
 	const XMFLOAT2& GetViewDirection(void) const;
 	float			GetFieldOfView(void) const;
 	float			GetViewingDistance(void) const;
+	unsigned int    GetResumePathNode(void) const;
 
 	void SetMaxSpeed(float speed);
 	void SetMaxTotalForce(float maxForce);
@@ -122,6 +125,7 @@ public:
 	void SetFireWeaponInterval(float fireWeaponInterval);
 	void SetFieldOfView(float fieldOfView);
 	void SetViewingDistance(float viewingDistance);
+	void SetResumePathNode(unsigned int node);
 
 	//--------------------------------------------------------------------------------------
 	// Functor that can be used to find a soldier with a specific ID.
@@ -153,7 +157,7 @@ private:
 	float                 m_fireWeaponTimer;   // Used to determine when the soldier is ready to fire his weapon
 	float                 m_changeObservationTargetTimer;  // Used to determine when the soldier should change his observation target
 
-	XMFLOAT2              m_currentMovementTarget; // Used to check whether the soldier is still moving towards the correct position (that is highest priority movement target)
+	unsigned int          m_resumePathNode; // Pick up movement from this node of a path (used to resume movement order when interrupted by combat)
 };
 
 #endif // SOLDIER_H

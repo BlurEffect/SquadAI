@@ -8,7 +8,7 @@
 #define TEAM_AI_H
 
 // Includes
-#include <map>
+#include <unordered_map>
 #include <set>
 #include <vector>
 #include <list>
@@ -62,12 +62,17 @@ public:
 	virtual void Reset(void);
 	
 	virtual void ProcessEvent(EventType type, void* pEventData);
-
+	void ClearOrders(void);
 	// Data access functions
 
-	EntityTeam			   GetTeam(void) const;
-	const TestEnvironment* GetTestEnvironment(void) const;
-
+	EntityTeam							  GetTeam(void) const;
+	const TestEnvironment*				  GetTestEnvironment(void) const;
+	std::vector<Entity*>&				  GetTeamMembers(void);
+	std::unordered_map<unsigned long, EnemyRecord>& GetEnemyRecords(void);
+	std::unordered_map<unsigned long, Order*>& GetActiveOrders(void);
+	float                                 GetScore(EntityTeam team) const;
+	float                                 GetTimeLeft(void) const;
+	
 	void SetTeam(EntityTeam team);
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 
@@ -75,15 +80,17 @@ public:
 
 protected:
 
+	void CancelOrder(unsigned long id);
+
 	virtual void ProcessMessage(Message* pMessage);
 	
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
-	std::list<Order*> m_activeOrders; // The current orders of the team AI that have been sent to entities
 
 private:
 	EntityTeam						     m_team;					// The team that the AI is controlling
 	std::vector<Entity*>                 m_teamMembers;				// The entities being controlled by this team AI
-	std::map<unsigned long, EnemyRecord> m_enemyRecords;			// The team AI creates and obtains a record for every enemy spotted in the environment
+	std::unordered_map<unsigned long, EnemyRecord> m_enemyRecords;			// The team AI creates and obtains a record for every enemy spotted in the environment
+	std::unordered_map<unsigned long, Order*>      m_activeOrders;            // The active orders currently being carried out by the team members
 	TestEnvironment*                     m_pTestEnvironment;        // The environment, in which the current match plays
 	float								 m_scores[NumberOfTeams-1]; // The current score for each team as a percentual value in relation to the score required for victory
 	float                                m_timeLeft;                // The time left as a percentual value in relation to the maximal time a round can last

@@ -42,4 +42,28 @@ private:
 	FollowOrderMessageData m_data; // The contents of the message
 };
 
+/* Currently no data required
+//--------------------------------------------------------------------------------------
+// Contains data required for a message sent when a team Ai wants to inform a
+// subordinate entity that an order was cancelled.
+//--------------------------------------------------------------------------------------
+struct CancelOrderMessageData
+{
+	CancelOrderMessageData(void)
+	{}
+};
+*/
+
+//--------------------------------------------------------------------------------------
+// Message sent when a team Ai wants to inform a subordinate entity that an order 
+// was cancelled.
+//--------------------------------------------------------------------------------------
+class CancelOrderMessage : public Message
+{
+public:
+	CancelOrderMessage(void) 
+		: Message(CancelOrderMessageType)
+	{}
+};
+
 #endif // TEAM_AI_TO_ENTITY_MESSAGES_H

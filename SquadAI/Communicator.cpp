@@ -85,6 +85,15 @@ bool Communicator::SendMessage(Communicator* pReceiver, MessageType messageType,
 	case FlagReturnedMessageType:
 		pMessage = new FlagReturnedMessage(*(reinterpret_cast<FlagReturnedMessageData*>(pData)));
 		break;
+	case FollowOrderMessageType:
+		pMessage = new FollowOrderMessage(*(reinterpret_cast<FollowOrderMessageData*>(pData)));
+		break;
+	case UpdateOrderStateMessageType:
+		pMessage = new UpdateOrderStateMessage(*(reinterpret_cast<UpdateOrderStateMessageData*>(pData)));
+		break;
+	case CancelOrderMessageType:
+		pMessage = new CancelOrderMessage();
+		break;
 	}
 
 	if(pMessage)

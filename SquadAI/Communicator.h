@@ -16,6 +16,7 @@
 #include "EntityToTeamAIMessages.h"
 #include "GameContextToTeamAIMessages.h"
 #include "TestEnvironmentToEntityMessages.h"
+#include "TeamAIToEntityMessages.h"
 #include "EventTypes.h"
 #include "EventDataStructures.h"
 

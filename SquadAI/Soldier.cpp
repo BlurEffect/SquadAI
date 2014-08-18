@@ -14,7 +14,7 @@
 Soldier::Soldier(void) : Entity(),
 						 m_fireWeaponTimer(0.0f),
 						 m_changeObservationTargetTimer(0.0f),
-						 m_currentMovementTarget(0.0f, 0.0f)
+						 m_resumePathNode(0)
 {
 }
 
@@ -90,6 +90,13 @@ BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 	m_movementManager.StayAwayFromWalls(m_soldierProperties.m_avoidWallsRadius, m_soldierProperties.m_maxAvoidWallsForce);
 
 	m_movementManager.UpdatePosition(deltaTime, m_soldierProperties.m_maxSpeed, m_soldierProperties.m_maxTotalForce);
+
+	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == MoveToPositionOrder && GetCurrentOrder()->GetOrderPriority() != LowPriority)
+	{
+		// Remember the current path node in case the soldier gets interrupted by enemies. Soldier will be able to resume movement afterwards.
+		// Does only work though if soldier doesn't move away (only fighting known threats)
+		SetResumePathNode(m_movementManager.GetCurrentNode());
+	}
 
 	return StatusRunning;
 }
@@ -282,6 +289,21 @@ BehaviourStatus Soldier::DetermineGreatestKnownThreat(float deltaTime)
 		}
 	}
 
+	if((GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == DefendPositionOrder && GetCurrentOrder()->GetOrderPriority() == HighPriority))
+	{
+		if(!GetKnownThreats().empty())
+		{
+			int a = 2;
+		}
+		
+		
+	}
+
+	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == DefendPositionOrder)
+	{
+		int a = 2;
+	}
+
 	// No orders given that require special measures, just choose the greatest known threat as perceived by the soldier.
 	SetGreatestKnownThreat(m_combatManager.DetermineGreatestKnownThreat());
 
@@ -364,19 +386,31 @@ BehaviourStatus Soldier::DeterminePathToTarget(float deltaTime)
 {
 	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == MoveToPositionOrder)
 	{
-		if(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath())
+		if(!reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath()->empty())
 		{
-			// Use the path provided by the team AI
-			SetPath(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath());
+			if(GetCurrentOrder()->GetOrderPriority() == MediumPriority || GetCurrentOrder()->GetOrderPriority() == HighPriority)
+			{
+				// Use the path provided by the team AI
+				SetPath(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath());
+				// If the path was started before, resume it.
+				m_movementManager.SetCurrentNode(GetResumePathNode());
+			}else
+			{
+				// Let the soldier find a path himself.
+				SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
+				m_movementManager.SetCurrentNode(0);
+			}
 		}else
 		{
 			// Let the soldier find a path himself.
 			SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
+			m_movementManager.SetCurrentNode(0);
 		}
 	}else
 	{
 		// Let the soldier find a path himself.
 		SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
+		m_movementManager.SetCurrentNode(0);
 	}
 
 	return StatusSuccess;
@@ -389,6 +423,23 @@ BehaviourStatus Soldier::DeterminePathToTarget(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::DetermineObservationTarget(float deltaTime)
 {
+
+	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == DefendPositionOrder)
+	{
+		const XMFLOAT2& viewDirection = reinterpret_cast<DefendOrder*>(GetCurrentOrder())->GetViewDirection();
+		
+		if(viewDirection.x != 0.0f || viewDirection.y != 0.0f)
+		{
+			// There is a defend order and a specific view direction that the entity should guard has been provided
+			SetObservationTarget(XMFLOAT2(GetPosition().x + viewDirection.x, GetPosition().y + viewDirection.y));
+			SetObservationTargetSet(true);
+
+			return StatusSuccess;
+		}
+	}
+
+	// Otherwise determine a random look at target and change it in a fix interval
+
 	// Reset observation target
 	SetObservationTarget(XMFLOAT2(0.0f, 0.0f));
 	SetObservationTargetSet(false);
@@ -401,11 +452,10 @@ BehaviourStatus Soldier::DetermineObservationTarget(float deltaTime)
 	{
 		// Determine a random lookAt position
 
-		SetObservationTarget(XMFLOAT2(GetPosition().x + (rand() * 2 - 1), GetPosition().y + (rand() * 2 - 1)));
+		SetObservationTarget(XMFLOAT2(GetPosition().x + (rand() % 128 - 64), GetPosition().y + (rand() % 128 - 64)));
 		SetObservationTargetSet(true);
 		m_changeObservationTargetTimer = 0.0f;
 	}
-
 	return StatusSuccess;
 }
 
@@ -418,6 +468,48 @@ BehaviourStatus Soldier::LookAtTarget(float deltaTime)
 {
 	m_movementManager.LookAt(GetObservationTarget());
 	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Finalise the movement of the entity when it reaches its objective.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus Soldier::FinaliseMovement(float deltaTime)
+{
+	SetResumePathNode(0);
+
+	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == MoveToPositionOrder)
+	{
+		UpdateOrderStateMessageData data(GetId(), SucceededOrderState);
+		SendMessage(GetTeamAI(), UpdateOrderStateMessageType, &data);
+	}
+	
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Tells whether the soldier is currently moving towards the greatest suspected threat in
+// order to investigate it or whether there now is a greater suspected threat that the
+// entity should tend to. It also factors in whether there are orders from the team AI based
+// on which the soldier should stop pursuing a target and tend to other objectives instead.
+// Returns true if the suspected threat being investigated is still the greatest suspected threat,
+// false otherwise and also if there is no suspected threat at all.
+//--------------------------------------------------------------------------------------
+bool Soldier::IsInvestigatingGreatestSuspectedThreat(void)
+{
+	if(GetCurrentOrder())
+	{
+		if((GetCurrentOrder()->GetOrderType() == MoveToPositionOrder || GetCurrentOrder()->GetOrderType() == DefendPositionOrder) &&
+			(GetCurrentOrder()->GetOrderPriority() != LowPriority))
+		{
+			// A higher level move or defend order has become active -> abort the pursuit of enemies.
+			return false;
+		}
+	}
+
+	// No specific orders, just check if there is a greater suspected threat (also valid for attack orders)
+	return Entity::IsInvestigatingGreatestSuspectedThreat();
 }
 
 //--------------------------------------------------------------------------------------
@@ -580,6 +672,11 @@ float Soldier::GetViewingDistance(void) const
 	return m_soldierProperties.m_viewingDistance;
 }
 
+unsigned int Soldier::GetResumePathNode(void) const
+{
+	return m_resumePathNode;
+}
+
 void Soldier::SetMaxSpeed(float maxSpeed)
 {
 	m_soldierProperties.m_maxSpeed = maxSpeed;
@@ -638,4 +735,9 @@ void Soldier::SetFieldOfView(float fieldOfView)
 void Soldier::SetViewingDistance(float viewingDistance)
 {
 	m_soldierProperties.m_viewingDistance = viewingDistance;
+}
+
+void Soldier::SetResumePathNode(unsigned int node)
+{
+	m_resumePathNode = node;
 }

@@ -292,7 +292,10 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 					Behaviour* pCheckMovementTargetMonitor               = CreateUniversalBehaviour(MonitorType, "CheckMovementTargetMonitor ", &parallelInitData2);   
 					Behaviour* pMovingToHighestPriorityTargetCondition		 = CreateUniversalIndividualBehaviour(MovingToHighestPriorityTargetType, pEntity, "MovingToHighestPriorityTargetCondition", nullptr);
 					Behaviour* pMoveToTargetAction		 = CreateUniversalIndividualBehaviour(MoveToTargetType, pEntity, "MoveToTargetAction", nullptr);
-		
+
+					Behaviour* pFinaliseMovementAction		 = CreateUniversalIndividualBehaviour(FinaliseMovementType, pEntity, "FinaliseMovementAction", nullptr);
+
+
 					Behaviour* pChangeObservationTargetSequence = CreateUniversalBehaviour(SequenceType, "ChangeObservationTargetSequence", nullptr);
 					Behaviour* pIdleAction			   = CreateUniversalIndividualBehaviour(IdleType, pEntity, "IdleAction", nullptr);
 
@@ -300,7 +303,7 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
 					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pDeterminePathToSuspectedThreatAction && pPathToSuspectedThreatSetCondition && pCheckInvestigatedThreatMonitor && pCheckInvestigatedTargetSequence && pDetermineGreatestSuspectedThreatUpdateAction && 
 					   pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDetermineMovementTargetAction && pMovementTargetSetCondition && pDeterminePathToMovementTargetAction && pPathToMovementTargetSetCondition && pCheckMovementTargetMonitor 
-					   && pMovingToHighestPriorityTargetCondition && pMoveToTargetAction && pChangeObservationTargetSequence && pIdleAction)
+					   && pMovingToHighestPriorityTargetCondition && pMoveToTargetAction && pFinaliseMovementAction && pChangeObservationTargetSequence && pIdleAction)
 					{
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
@@ -333,6 +336,7 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 						reinterpret_cast<Monitor*>(pCheckMovementTargetMonitor)->AddCondition(pMovingToHighestPriorityTargetCondition);
 						reinterpret_cast<Monitor*>(pCheckMovementTargetMonitor)->AddAction(pMoveToTargetAction);
 
+						reinterpret_cast<Composite*>(pMovementSequence)->AddChild(pFinaliseMovementAction);
 						
 						reinterpret_cast<Composite*>(pHoldPositionSelector)->AddChild(pChangeObservationTargetSequence);
 						reinterpret_cast<Composite*>(pHoldPositionSelector)->AddChild(pIdleAction);
@@ -395,12 +399,28 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI
 
 	if(pTeamRoot)
 	{
-		Behaviour* pTeamProcessMessagesAction = CreateUniversalTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", nullptr);
+		Behaviour* pUpdateEntitySequence = CreateUniversalBehaviour(SequenceType, "UpdateEntitySequence", nullptr);
 
-		if(pTeamProcessMessagesAction)
+		Behaviour* pAllAttackAction = CreateMultiflagCTFTeamBehaviour(TeamAllAttackType, pTeamAI, "AllAttackAction", nullptr);
+		Behaviour* pAllDefendAction = CreateMultiflagCTFTeamBehaviour(TeamAllDefendType, pTeamAI, "AllDefendAction", nullptr);
+		Behaviour* pAllMoveAction = CreateMultiflagCTFTeamBehaviour(TeamAllMoveType, pTeamAI, "AllMoveAction", nullptr);
+
+		if(pUpdateEntitySequence && pAllAttackAction && pAllDefendAction && pAllMoveAction)
 		{
-			reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pTeamProcessMessagesAction);
-			return pTeamRoot;
+			ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
+			Behaviour* pAlwaysFailDecorator = CreateUniversalBehaviour(ReturnSpecificStatusType, "AlwaysFailDecorator", &data);
+
+			Behaviour* pTeamProcessMessagesAction = CreateUniversalTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", nullptr);
+
+			if(pAlwaysFailDecorator && pTeamProcessMessagesAction)
+			{
+				reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pAlwaysFailDecorator);
+				reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pAllDefendAction);
+
+				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pTeamProcessMessagesAction);
+				
+				return pTeamRoot;
+			}
 		}
 	}
 
@@ -545,6 +565,9 @@ Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndivid
 	case LookAtTargetType:
 		return new LookAtTarget(name, pEntity);
 		break;
+	case FinaliseMovementType:
+		return new FinaliseMovement(name, pEntity);
+		break;
 	default:
 		return nullptr;
 	}
@@ -584,6 +607,15 @@ Behaviour* BehaviourFactory::CreateMultiflagCTFTeamBehaviour(MultiflagCTFTeamBeh
 {
 	switch(behaviourType)
 	{
+	case TeamAllAttackType:
+		return new TeamAllAttack(name, pMultiflagCTFTeamAI);
+		break;
+	case TeamAllDefendType:
+		return new TeamAllDefend(name, pMultiflagCTFTeamAI);
+		break;
+	case TeamAllMoveType:
+		return new TeamAllMove(name, pMultiflagCTFTeamAI);
+		break;
 	default:
 		return nullptr;
 	}

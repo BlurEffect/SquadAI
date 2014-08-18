@@ -17,8 +17,7 @@ unsigned long Order::s_OrderId = 0;
 Order::Order(unsigned long entityId, OrderType orderType, OrderPriority priority) : m_orderId(++s_OrderId),
 																					m_entityId(entityId),
 																					m_orderType(orderType),
-																					m_orderPriority(priority),
-																					m_orderState(PendingOrderState)
+																					m_orderPriority(priority)
 {
 }
 
@@ -47,11 +46,6 @@ OrderPriority Order::GetOrderPriority(void) const
 {
 	return m_orderPriority;
 }
-   
-OrderState Order::GetOrderState(void) const
-{
-	return m_orderState;
-}   
 
 void Order::SetEntityId(unsigned long entityId)
 {
@@ -66,11 +60,6 @@ void Order::SetOrderType(OrderType type)
 void Order::SetOrderPriority(OrderPriority priority)
 {
 	m_orderPriority = priority;
-}
-	
-void Order::SetOrderState(OrderState state)
-{
-	m_orderState = state;
 }
 	
 //--------------------------------------------------------------------------------------
@@ -146,9 +135,10 @@ void MoveOrder::SetTargetPosition(const XMFLOAT2& targetPosition)
 // class DefendOrder
 //--------------------------------------------------------------------------------------
 
-DefendOrder::DefendOrder(unsigned long entityId, OrderType orderType, OrderPriority priority, const XMFLOAT2& defendPosition)
+DefendOrder::DefendOrder(unsigned long entityId, OrderType orderType, OrderPriority priority, const XMFLOAT2& defendPosition, const XMFLOAT2& viewDirection)
 	: Order(entityId, orderType, priority),
-	m_defendPosition(defendPosition)
+	m_defendPosition(defendPosition),
+	m_viewDirection(viewDirection)
 {
 }
 
@@ -163,8 +153,17 @@ const XMFLOAT2& DefendOrder::GetDefendPosition(void) const
 	return m_defendPosition;
 }
 
+const XMFLOAT2& DefendOrder::GetViewDirection(void) const
+{
+	return m_viewDirection;
+}
+
 void DefendOrder::SetDefendPosition(const XMFLOAT2& defendPosition)
 {
 	m_defendPosition = defendPosition;
 }
 
+void DefendOrder::SetViewDirection(const XMFLOAT2& viewDirection)
+{
+	m_viewDirection = viewDirection;
+}

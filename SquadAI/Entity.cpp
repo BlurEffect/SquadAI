@@ -110,6 +110,10 @@ void Entity::Reset(void)
 	m_readyForAttack		   = false;
 	m_movementTargetSet		   = false;
 	m_movementTarget		   = XMFLOAT2(0.0f, 0.0f);
+	m_attackTargetSet          = false;
+	m_attackTarget		       = XMFLOAT2(0.0f, 0.0f);
+	m_observationTargetSet     = false;
+	m_observationTarget		   = XMFLOAT2(0.0f, 0.0f);
 	m_currentHealth			   = m_maximalHealth;
 
 	m_pCurrentOrder = nullptr;
@@ -408,6 +412,12 @@ void Entity::ProcessMessage(Message* pMessage)
 		ProcessOrder(pFollowOrderMessage->GetData().m_pOrder);
 		break;
 		}
+	case CancelOrderMessageType:
+		{
+		// Cancel the currently active order
+		m_pCurrentOrder = nullptr;
+		break;
+		}
 	default:
 		Communicator::ProcessMessage(pMessage);
 	}
@@ -419,6 +429,8 @@ void Entity::ProcessMessage(Message* pMessage)
 //--------------------------------------------------------------------------------------
 void Entity::ProcessOrder(Order* pOrder)
 {
+	m_pCurrentOrder = pOrder;
+
 	switch(pOrder->GetOrderType())
 	{
 	case AttackEnemyOrder:
@@ -572,7 +584,19 @@ void Entity::ProcessEnemyKilled(EntityTeam team, unsigned long id)
 //--------------------------------------------------------------------------------------
 void Entity::ProcessRespawn(const XMFLOAT2& respawnPosition)
 {
-	Reset();
+	m_knownThreats.clear();
+	m_suspectedThreats.clear();
+	m_pGreatestKnownThreat     = nullptr;
+	m_pGreatestSuspectedThreat = nullptr;
+	m_readyForAttack		   = false;
+	m_movementTargetSet		   = false;
+	m_movementTarget		   = XMFLOAT2(0.0f, 0.0f);
+	m_attackTargetSet          = false;
+	m_attackTarget		       = XMFLOAT2(0.0f, 0.0f);
+	m_observationTargetSet     = false;
+	m_observationTarget		   = XMFLOAT2(0.0f, 0.0f);
+	m_currentHealth			   = m_maximalHealth;
+
 	SetPosition(respawnPosition);
 	UpdateColliderPosition(respawnPosition);
 	SetRotation(static_cast<float>(rand() % 360));

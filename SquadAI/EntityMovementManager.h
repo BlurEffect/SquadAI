@@ -48,6 +48,9 @@ public:
 	const XMFLOAT2& GetVelocity(void) const;
 	const XMFLOAT2& GetViewDirection(void) const;
 
+	unsigned int GetCurrentNode(void) const;
+	void SetCurrentNode(unsigned int node);
+
 private:
 
 	void SetInitialViewDirection(void);

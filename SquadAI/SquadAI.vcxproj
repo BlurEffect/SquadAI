@@ -85,6 +85,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
+    <ClCompile Include="TeamAllAttack.cpp" />
+    <ClCompile Include="TeamAllDefend.cpp" />
+    <ClCompile Include="TeamAllMove.cpp" />
     <ClCompile Include="Communicator.cpp" />
     <ClCompile Include="DetermineGreatestKnownThreat.cpp" />
     <ClCompile Include="AimAtTarget.cpp" />
@@ -111,6 +114,7 @@
     <ClCompile Include="EntityAlive.cpp" />
     <ClCompile Include="EntityCombatManager.cpp" />
     <ClCompile Include="EntitySensors.cpp" />
+    <ClCompile Include="FinaliseMovement.cpp" />
     <ClCompile Include="LookAtTarget.cpp" />
     <ClCompile Include="MovingToHighestPriorityTarget.cpp" />
     <ClCompile Include="MultiflagCTFTeamAI.cpp" />
@@ -209,6 +213,7 @@
     <ClInclude Include="EntitySensors.h" />
     <ClInclude Include="EventDataStructures.h" />
     <ClInclude Include="EventTypes.h" />
+    <ClInclude Include="FinaliseMovement.h" />
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
     <ClInclude Include="LookAtTarget.h" />
@@ -218,6 +223,9 @@
     <ClInclude Include="Order.h" />
     <ClInclude Include="TeamAIToEntityMessages.h" />
     <ClInclude Include="TeamProcessMessages.h" />
+    <ClInclude Include="TeamAllAttack.h" />
+    <ClInclude Include="TeamAllDefend.h" />
+    <ClInclude Include="TeamAllMove.h" />
     <ClInclude Include="UniversalIndividualBehaviour.h" />
     <ClInclude Include="MultiflagCTFTeamBehaviour.h" />
     <ClInclude Include="ProcessMessages.h" />

@@ -36,7 +36,8 @@ enum MessageType
 	LostSightOfEnemyMessageType,		// An entity has lost sight of an enemy
 	UpdateEnemyPositionMessageType,		// Updates the position of an enemy 
 	AttackedByEnemyMessageType,			// An entity was attacked by a hostile entity
-	
+	UpdateOrderStateMessageType,        // An entity reports an update detailing the status of its current order
+
 	// Messages sent from the general game context to the team AI
 	ScoreUpdateMessageType,				// A team scored
 	TimeUpdateMessageType,				// A certain amount of time has passed in the current round
@@ -47,7 +48,8 @@ enum MessageType
 	FlagReturnedMessageType,			// A flag has been returned
 
 	// Messages sent from the team AI to entities
-	FollowOrderMessageType
+	FollowOrderMessageType,				// The team AI has a new objective for the entity
+	CancelOrderMessageType				// The team AI has decided to cancel the currently active order for the entity
 };
 
 //--------------------------------------------------------------------------------------

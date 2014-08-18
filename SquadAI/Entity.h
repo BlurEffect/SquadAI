@@ -86,6 +86,7 @@ public:
 	virtual BehaviourStatus DeterminePathToTarget(float deltaTime)			        = 0;
 	virtual BehaviourStatus DetermineObservationTarget(float deltaTime)			    = 0;
 	virtual BehaviourStatus LookAtTarget(float deltaTime)			                = 0;
+	virtual BehaviourStatus FinaliseMovement(float deltaTime)			            = 0;
 
 	// Threat management
 	void AddKnownThreat(Entity* pThreat, bool hasHitEntity);
@@ -99,7 +100,7 @@ public:
 	bool IsSuspectedThreat(unsigned long id);
 	SuspectedThreat* GetSuspectedThreat(unsigned long id);
 	
-	bool IsInvestigatingGreatestSuspectedThreat(void);
+	virtual bool IsInvestigatingGreatestSuspectedThreat(void);
 	virtual bool IsMovingToHighestPriorityTarget(void);
 	virtual bool IsAtTarget(const XMFLOAT2& target);
 

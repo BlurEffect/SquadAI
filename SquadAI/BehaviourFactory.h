@@ -46,8 +46,14 @@
 #include "DetermineObservationTarget.h"
 #include "DeterminePathToTarget.h"
 #include "LookAtTarget.h"
+#include "FinaliseMovement.h"
 // Team behaviours
 #include "TeamProcessMessages.h"
+// Multiflag team behaviours
+// Actions
+#include "TeamAllAttack.h"
+#include "TeamAllDefend.h"
+#include "TeamAllMove.h"
 
 // Forward declarations
 class Entity;
@@ -87,6 +93,7 @@ enum UniversalIndividualBehaviourType
 	DetermineObservationTargetType,
 	DeterminePathToTargetType,
 	LookAtTargetType,
+	FinaliseMovementType
 };
 
 //--------------------------------------------------------------------------------------
@@ -116,7 +123,9 @@ enum UniversalTeamBehaviourType
 //--------------------------------------------------------------------------------------
 enum MultiflagCTFTeamBehaviourType
 {
-	
+	TeamAllAttackType,
+	TeamAllDefendType,
+	TeamAllMoveType
 };
 
 //--------------------------------------------------------------------------------------

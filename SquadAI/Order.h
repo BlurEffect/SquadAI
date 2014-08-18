@@ -29,7 +29,7 @@ enum OrderType
 //--------------------------------------------------------------------------------------
 enum OrderState
 {
-	PendingOrderState,		// The order was issued but was not yet carried out completely
+	PendingOrderState,      // The order is still being executed
 	SucceededOrderState,	// The order was carried out successfully
 	FailedOrderState		// The execution of the order failed
 };
@@ -59,12 +59,10 @@ public:
 	unsigned long GetEntityId(void) const;   
 	OrderType     GetOrderType(void) const;   
 	OrderPriority GetOrderPriority(void) const;   
-	OrderState    GetOrderState(void) const;   
 
 	void SetEntityId(unsigned long entityId);		
 	void SetOrderType(OrderType type);		
 	void SetOrderPriority(OrderPriority priority);	
-	void SetOrderState(OrderState state);	
 
 private:
 	static unsigned long s_OrderId; // This id is incremented and assigned to every created order, 0 is an invalid value
@@ -73,7 +71,6 @@ private:
 	unsigned long m_entityId;		// The entity that should execute the order
 	OrderType     m_orderType;		// Determines the type of order that the entity should carry out
 	OrderPriority m_orderPriority;	// The priority associated to this order
-	OrderState    m_orderState;		// The current state of the order
 };
 
 //--------------------------------------------------------------------------------------
@@ -109,10 +106,11 @@ public:
 
 	// Data access functions
 
-	const XMFLOAT2& GetTargetPosition(void) const;
+	const XMFLOAT2&		   GetTargetPosition(void) const;
 	std::vector<XMFLOAT2>* GetPath(void);
 
 	void SetTargetPosition(const XMFLOAT2& targetPosition);
+	
 
 private:
 	XMFLOAT2              m_targetPosition; // The position, to which the entity should move
@@ -125,15 +123,19 @@ private:
 class DefendOrder : public Order
 {
 public:
-	DefendOrder(unsigned long entityId, OrderType orderType, OrderPriority priority, const XMFLOAT2& defendPosition);
+	DefendOrder(unsigned long entityId, OrderType orderType, OrderPriority priority, const XMFLOAT2& defendPosition, const XMFLOAT2& viewDirection);
 	~DefendOrder(void);
 
 	// Data access functions
 	const XMFLOAT2& GetDefendPosition(void) const;
+	const XMFLOAT2& GetViewDirection(void) const;
 	void SetDefendPosition(const XMFLOAT2& defendPosition);
+	void SetViewDirection(const XMFLOAT2& viewDirection);
 
 private:
 	XMFLOAT2 m_defendPosition; // The position to defend
+	XMFLOAT2 m_viewDirection;  // The direction, into which the entity should look (the direction to observe when on the defense position)
+							   // This is optional data, set view direction to (0,0) if not needed
 };
 
 

@@ -499,3 +499,13 @@ const XMFLOAT2& EntityMovementManager::GetViewDirection(void) const
 {
 	return m_viewDirection;
 }
+
+unsigned int EntityMovementManager::GetCurrentNode(void) const
+{
+	return m_currentNode;
+}
+
+void EntityMovementManager::SetCurrentNode(unsigned int node)
+{
+	m_currentNode = node;
+}

@@ -83,6 +83,161 @@ void MultiflagCTFTeamAI::ProcessEvent(EventType type, void* pEventData)
 	// Not expecting any events, forward to the base class
 	TeamAI::ProcessEvent(type, pEventData);
 }
+
+//--------------------------------------------------------------------------------------
+// Sends all team members to attack a certain enemy.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus MultiflagCTFTeamAI::AllAttack(float deltaTime)
+{
+	if(!GetEnemyRecords().empty())
+	{
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			// Check if there currently is another order for the entity
+			std::unordered_map<unsigned long, Order*>::iterator foundIt = GetActiveOrders().find((*it)->GetId());
+			if(foundIt != GetActiveOrders().end())
+			{
+				break;
+			}
+			
+			Order* pNewOrder = new AttackOrder((*it)->GetId(), AttackEnemyOrder, LowPriority, GetEnemyRecords().begin()->first, GetEnemyRecords().begin()->second.m_lastKnownPosition);
+			
+			if(!pNewOrder)
+			{
+				return StatusFailure;
+			}
+
+			FollowOrderMessageData data(pNewOrder);
+			SendMessage(*it, FollowOrderMessageType, &data);
+
+			GetActiveOrders().insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
+		}
+	}
+
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Sends all team members to defend a certain position.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus MultiflagCTFTeamAI::AllDefend(float deltaTime)
+{
+	if(GetTeam() == TeamRed)
+	{
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			// Check if there currently is another order for the entity
+			std::unordered_map<unsigned long, Order*>::iterator foundIt = GetActiveOrders().find((*it)->GetId());
+			if(foundIt != GetActiveOrders().end())
+			{
+				break;
+			}
+
+			Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, XMFLOAT2(0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+			
+			if(!pNewOrder)
+			{
+				return StatusFailure;
+			}
+
+			FollowOrderMessageData data(pNewOrder);
+			SendMessage(*it, FollowOrderMessageType, &data);
+
+			GetActiveOrders().insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
+		}
+	}else
+	{
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			// Check if there currently is another order for the entity
+			std::unordered_map<unsigned long, Order*>::iterator foundIt = GetActiveOrders().find((*it)->GetId());
+			if(foundIt != GetActiveOrders().end())
+			{
+				break;
+			}
+			/*
+			Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, XMFLOAT2(-20.0f, -20.0f));
+			
+			if(!pNewOrder)
+			{
+				return StatusFailure;
+			}
+
+			FollowOrderMessageData data(pNewOrder);
+			SendMessage(*it, FollowOrderMessageType, &data);
+
+			GetActiveOrders().insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
+			*/
+		}
+	}
+
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Sends all team members to move to a certain position.
+// Param1: The time in seconds passed since the last frame.
+// Returns the current state of the action.
+//--------------------------------------------------------------------------------------
+BehaviourStatus MultiflagCTFTeamAI::AllMove(float deltaTime)
+{
+	if(GetTeam() == TeamRed)
+	{
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			// Check if there currently is another order for the entity
+			std::unordered_map<unsigned long, Order*>::iterator foundIt = GetActiveOrders().find((*it)->GetId());
+			if(foundIt != GetActiveOrders().end())
+			{
+				break;
+			}
+
+			Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, HighPriority, XMFLOAT2(20.0f, 20.0f));
+			
+			if(!pNewOrder)
+			{
+				return StatusFailure;
+			}
+
+			FollowOrderMessageData data(pNewOrder);
+			SendMessage(*it, FollowOrderMessageType, &data);
+
+			GetActiveOrders().insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
+		}
+	}else
+	{
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			// Check if there currently is another order for the entity
+			std::unordered_map<unsigned long, Order*>::iterator foundIt = GetActiveOrders().find((*it)->GetId());
+			if(foundIt != GetActiveOrders().end())
+			{
+				break;
+			}
+			/*
+			Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, MediumPriority, XMFLOAT2(-20.0f, -20.0f));
+			
+			if(!pNewOrder)
+			{
+				return StatusFailure;
+			}
+
+			FollowOrderMessageData data(pNewOrder);
+			SendMessage(*it, FollowOrderMessageType, &data);
+
+			GetActiveOrders().insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
+			*/
+		}
+	}
+
+	return StatusSuccess;
+}
+
+
 /*
 //--------------------------------------------------------------------------------------
 // Processes a message sent to the team AI.
@@ -136,6 +291,8 @@ void MultiflagCTFTeamAI::Reset(void)
 		m_flagData[i].m_position  = m_flagData[i].m_basePosition;
 		m_flagData[i].m_carrierId = 0;
 	}
+
+	ClearOrders();
 
 	TeamAI::Reset();
 }

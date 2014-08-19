@@ -83,7 +83,9 @@ protected:
 	void CancelOrder(unsigned long id);
 
 	virtual void ProcessMessage(Message* pMessage);
-	
+	virtual void UpdateAttackOrders(unsigned long enemyId);
+
+
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
 
 private:

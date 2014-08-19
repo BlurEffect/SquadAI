@@ -102,7 +102,7 @@ BehaviourStatus MultiflagCTFTeamAI::AllAttack(float deltaTime)
 				break;
 			}
 			
-			Order* pNewOrder = new AttackOrder((*it)->GetId(), AttackEnemyOrder, LowPriority, GetEnemyRecords().begin()->first, GetEnemyRecords().begin()->second.m_lastKnownPosition);
+			Order* pNewOrder = new AttackOrder((*it)->GetId(), AttackEnemyOrder, HighPriority, GetEnemyRecords().begin()->first, GetEnemyRecords().begin()->second.m_lastKnownPosition);
 			
 			if(!pNewOrder)
 			{
@@ -137,7 +137,7 @@ BehaviourStatus MultiflagCTFTeamAI::AllDefend(float deltaTime)
 				break;
 			}
 
-			Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, XMFLOAT2(0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+			Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, XMFLOAT2(0.0f, 0.0f), XMFLOAT2(-1.0f, 0.0f));
 			
 			if(!pNewOrder)
 			{
@@ -178,6 +178,9 @@ BehaviourStatus MultiflagCTFTeamAI::AllDefend(float deltaTime)
 	return StatusSuccess;
 }
 
+bool blueDone = false;
+bool redDone = false;
+
 //--------------------------------------------------------------------------------------
 // Sends all team members to move to a certain position.
 // Param1: The time in seconds passed since the last frame.
@@ -187,6 +190,8 @@ BehaviourStatus MultiflagCTFTeamAI::AllMove(float deltaTime)
 {
 	if(GetTeam() == TeamRed)
 	{
+		if(redDone)
+			return StatusSuccess;
 		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
 		{
 			// Check if there currently is another order for the entity
@@ -196,7 +201,7 @@ BehaviourStatus MultiflagCTFTeamAI::AllMove(float deltaTime)
 				break;
 			}
 
-			Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, HighPriority, XMFLOAT2(20.0f, 20.0f));
+			Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, MediumPriority, XMFLOAT2(20.0f, 20.0f));
 			
 			if(!pNewOrder)
 			{
@@ -208,8 +213,11 @@ BehaviourStatus MultiflagCTFTeamAI::AllMove(float deltaTime)
 
 			GetActiveOrders().insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
 		}
+		redDone = true;
 	}else
 	{
+		if(blueDone)
+			return StatusSuccess;
 		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
 		{
 			// Check if there currently is another order for the entity
@@ -218,8 +226,8 @@ BehaviourStatus MultiflagCTFTeamAI::AllMove(float deltaTime)
 			{
 				break;
 			}
-			/*
-			Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, MediumPriority, XMFLOAT2(-20.0f, -20.0f));
+			
+			Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, HighPriority, XMFLOAT2(-20.0f, -20.0f));
 			
 			if(!pNewOrder)
 			{
@@ -230,10 +238,11 @@ BehaviourStatus MultiflagCTFTeamAI::AllMove(float deltaTime)
 			SendMessage(*it, FollowOrderMessageType, &data);
 
 			GetActiveOrders().insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
-			*/
+			
 		}
+		blueDone = true;
 	}
-
+	
 	return StatusSuccess;
 }
 

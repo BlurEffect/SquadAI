@@ -176,12 +176,16 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 				}
 			}else
 			{
-				// Note: Should only be called if enemy actually moved
+				// Note: Should only be called if enemy actually moved (or allow team AI direct access to enemy entity object
+				//       while it is spotted by friendlies
 
-				// Notify team AI.
+				// Notify team AI. But only in a regular interval for performance reasons.
 				// Update the team AI's knowledge of the position of the enemy.
-				UpdateEnemyPositionMessageData data((*it)->GetId(), (*it)->GetPosition());
-				m_pEntity->SendMessage(m_pEntity->GetTeamAI(), UpdateEnemyPositionMessageType, &data);
+				if(m_pEntity->DoUpdate())
+				{
+					UpdateEnemyPositionMessageData data((*it)->GetId(), (*it)->GetPosition());
+					m_pEntity->SendMessage(m_pEntity->GetTeamAI(), UpdateEnemyPositionMessageType, &data);
+				}
 			}
 		}
 

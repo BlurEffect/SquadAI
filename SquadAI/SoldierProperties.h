@@ -31,7 +31,9 @@ const float g_kSoldierFieldOfView(XM_PI/6.0f);	// /6.0f	     // Determines the f
 const float g_kSoldierViewingDistance(20.0f);	 // 10.0f	     // Determines how far soldiers can see in order to spot enemies
 
 // Other
-const float g_kSoldierMaxHealth(100.0f);				 // The maximal health of a soldier entity.
+const float g_kSoldierMaxHealth(10000.0f);				 // The maximal health of a soldier entity.
 const float g_kSoldierLookAroundInterval(1.0f);          // The soldier changes his lookat position every x seconds when holding a position
+const float g_kReportInterval(1.0f);                     // Determines how often the soldier sends a position update of all his known enemies to the team AI (in seconds).
+
 
 #endif // SOLDIER_PROPERTIES_H

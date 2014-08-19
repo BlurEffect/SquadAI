@@ -399,15 +399,15 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI
 
 	if(pTeamRoot)
 	{
-		Behaviour* pUpdateEntitySequence = CreateUniversalBehaviour(SequenceType, "UpdateEntitySequence", nullptr);
+		Behaviour* pUpdateTeamAISequence = CreateUniversalBehaviour(SequenceType, "UpdateTeamAISequence", nullptr);
 
 		Behaviour* pAllAttackAction = CreateMultiflagCTFTeamBehaviour(TeamAllAttackType, pTeamAI, "AllAttackAction", nullptr);
 		Behaviour* pAllDefendAction = CreateMultiflagCTFTeamBehaviour(TeamAllDefendType, pTeamAI, "AllDefendAction", nullptr);
 		Behaviour* pAllMoveAction = CreateMultiflagCTFTeamBehaviour(TeamAllMoveType, pTeamAI, "AllMoveAction", nullptr);
 
-		if(pUpdateEntitySequence && pAllAttackAction && pAllDefendAction && pAllMoveAction)
+		if(pUpdateTeamAISequence && pAllAttackAction && pAllDefendAction && pAllMoveAction)
 		{
-			ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
+			ReturnSpecificStatusInitData data(pUpdateTeamAISequence, StatusFailure);
 			Behaviour* pAlwaysFailDecorator = CreateUniversalBehaviour(ReturnSpecificStatusType, "AlwaysFailDecorator", &data);
 
 			Behaviour* pTeamProcessMessagesAction = CreateUniversalTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", nullptr);
@@ -415,10 +415,10 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI
 			if(pAlwaysFailDecorator && pTeamProcessMessagesAction)
 			{
 				reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pAlwaysFailDecorator);
-				reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pAllDefendAction);
+				reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pAllAttackAction);
 
-				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pTeamProcessMessagesAction);
-				
+				reinterpret_cast<Composite*>(pUpdateTeamAISequence)->AddChild(pTeamProcessMessagesAction);
+
 				return pTeamRoot;
 			}
 		}

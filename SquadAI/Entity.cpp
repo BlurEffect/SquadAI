@@ -22,7 +22,10 @@ Entity::Entity(void) : CollidableObject(),
 					   m_movementTargetSet(false),
 					   m_movementTarget(0.0f, 0.0f),
 					   m_currentHealth(0.0f),
-					   m_maximalHealth(0.0f)
+					   m_maximalHealth(0.0f),
+					   m_reportInterval(0.0f),
+					   m_reportTimer(0.0f),
+					   m_doReport(false)
 {
 }
 
@@ -46,9 +49,10 @@ Entity::~Entity(void)
 // Param8:  A pointer to the test environment that the entity is part of.
 // Param9:  The maximal health for this entity.
 // Param10: Identifies the team that this entity belongs to.
+// Param11: Determines at what interval the entity will report updates to the associated team AI
 // Returns true if the entity was initialised successfully, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team)
+bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team, float reportInterval)
 {
 	if(!CollidableObject::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData))
 	{
@@ -71,6 +75,7 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 	m_team = team;
 	m_maximalHealth = maxHealth;
 	m_currentHealth = m_maximalHealth;
+	m_reportInterval = reportInterval;
 
 	return true;
 }
@@ -87,7 +92,19 @@ void Entity::Update(float deltaTime)
 		return;
 	}
 
+	m_reportTimer += deltaTime;
+	if(m_reportTimer >= m_reportInterval)
+	{
+		m_doReport = true;
+		m_reportTimer = 0.0f;
+	}else
+	{
+		m_doReport = false;
+	}
+	
 	m_pBehaviour->Tick(deltaTime);
+
+	
 }
 	
 //--------------------------------------------------------------------------------------
@@ -709,6 +726,16 @@ std::vector<XMFLOAT2>* Entity::GetPath(void)
 	return m_pPath;
 }
 
+float Entity::GetReportInterval(void) const
+{
+	return m_reportInterval;
+}
+
+bool Entity::DoUpdate(void) const
+{
+	return m_doReport;
+}
+
 void Entity::SetTestEnvironment(TestEnvironment* pEnvironment)
 {
 	if(pEnvironment)
@@ -787,3 +814,7 @@ void Entity::SetPath(std::vector<XMFLOAT2>* pPath)
 	m_pPath = pPath;
 }
 
+void Entity::SetReportInterval(float reportInterval)
+{
+	m_reportInterval = reportInterval;
+}

@@ -49,10 +49,14 @@ void Communicator::SortOutProcessedMessages(void)
 //--------------------------------------------------------------------------------------
 bool Communicator::SendMessage(Communicator* pReceiver, MessageType messageType, void* pData)
 {
+	// Some messages don't have data
+	/*
 	if(!pData)
 	{
 		return false;
 	}
+	*/
+
 
 	Message* pMessage = nullptr;
 

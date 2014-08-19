@@ -66,11 +66,12 @@ bool Pathfinder::CalculatePath(PathfindingAlgorithm algorithm, Heuristic heurist
 	m_pEnvironment->WorldToGridPosition(startPosition, startGridPosition);
 	m_pEnvironment->WorldToGridPosition(targetPosition, targetGridPosition);
 
+	/*
 	if((startGridPosition.x == targetGridPosition.x) && (startGridPosition.y == targetGridPosition.y))
 	{
 		// Start and target position are identical.
 		return false;
-	}
+	}*/
 
 	if((startGridPosition.x < 0) || (targetGridPosition.x < 0) && 
 	   (startGridPosition.x >= m_pEnvironment->GetNumberOfGridPartitions()) || (targetGridPosition.x >= m_pEnvironment->GetNumberOfGridPartitions()) &&

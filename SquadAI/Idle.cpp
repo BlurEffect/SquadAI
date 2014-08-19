@@ -23,5 +23,10 @@ Idle::~Idle(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Idle::Update(float deltaTime)
 {
+	if(GetEntity()->GetTeam() == TeamBlue && GetName() == "IdleAction")
+	{
+		int a = 4;
+	}
+
 	return GetEntity()->Idle(deltaTime);
 }

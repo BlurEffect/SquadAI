@@ -34,7 +34,8 @@ struct SoldierProperties
 							  m_fieldOfView(0.0f),
 							  m_viewingDistance(0.0f),
 							  m_maxHealth(0.0f),
-							  m_lookAroundInterval(0.0f)
+							  m_lookAroundInterval(0.0f),
+							  m_reportInterval(0.0f)
 	{}
 
 	// Movement
@@ -58,6 +59,7 @@ struct SoldierProperties
 	// Other
 	float m_maxHealth;                  // The maximal health of the soldier
 	float m_lookAroundInterval;         // Determines how often the entity changes its look at position when holding a spot
+	float m_reportInterval;  // Determines how often the soldier sends a position update of all his known enemies to the team AI (in seconds).
 };
 
 class Soldier : public Entity

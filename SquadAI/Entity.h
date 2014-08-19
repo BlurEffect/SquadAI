@@ -62,7 +62,7 @@ public:
 	Entity(void);
 	virtual ~Entity(void) = 0;
 
-	bool         Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team);
+	bool         Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team, float reportInterval);
 	//void         ProcessMessage(Message* pMessage);
 
 	virtual void Update(float deltaTime);
@@ -127,6 +127,8 @@ public:
 	const XMFLOAT2&						GetObservationTarget(void) const;
 	bool                                IsPathSet(void) const;
 	std::vector<XMFLOAT2>*              GetPath(void);
+	float         GetReportInterval(void) const;
+	bool DoUpdate(void) const;
 
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 	void SetTeam(EntityTeam team);
@@ -144,6 +146,7 @@ public:
 	void SetObservationTargetSet(bool targetSet);
 	void SetObservationTarget(const XMFLOAT2& target);
 	void SetPath(std::vector<XMFLOAT2>* pPath);
+	void SetReportInterval(float reportInterval);
 
 	//--------------------------------------------------------------------------------------
 	// Functor used to find an entity within a container based on its id.
@@ -235,6 +238,9 @@ private:
 	std::vector<XMFLOAT2>*       m_pPath;                    // The path to the current movement target
 	XMFLOAT2			         m_observationTarget;		 // The position to observe while holding a position
 	bool						 m_observationTargetSet;	 // Tells whether an observation target was set
+	float                        m_reportInterval;           // Determines at which interval the entity will report updates to the team AI associated to it
+	float						 m_reportTimer;				 // Used to determine when to report to the team AI
+	bool                         m_doReport;                 // Determines whether certain updates are sent to the team AI or not during a frame
 };
 
 #endif // ENTITY_H

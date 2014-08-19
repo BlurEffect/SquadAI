@@ -107,6 +107,10 @@ void TeamAI::ProcessMessage(Message* pMessage)
 			result.first->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
 			result.first->second.m_spotterIds.insert(pMsg->GetData().m_spotterId);
 		}
+
+		// Update any attack orders on this enemy with the newest position
+		UpdateAttackOrders(pMsg->GetData().m_enemyId);
+
 		break;
 		}
 	case LostSightOfEnemyMessageType:
@@ -128,6 +132,7 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		if(foundIt != m_enemyRecords.end())
 		{
 			foundIt->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
+			//UpdateAttackOrders(pMsg->GetData().m_enemyId);
 		}
 		break;
 		}
@@ -200,6 +205,35 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		}
 	}
 	
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the currently active attack orders by making sure the contained enemy 
+// positions are up to data.
+// Param1: The id of the enemy that moved and for which associated attack orders have to be updated.
+//--------------------------------------------------------------------------------------
+void TeamAI::UpdateAttackOrders(unsigned long enemyId)
+{
+	// Find the record for the enemy
+	std::unordered_map<unsigned long, EnemyRecord>::iterator foundIt = m_enemyRecords.find(enemyId);
+
+	if(foundIt == m_enemyRecords.end())
+	{
+		return;
+	}
+
+	for(std::unordered_map<unsigned long, Order*>::iterator it = m_activeOrders.begin(); it != m_activeOrders.end(); ++it)
+	{
+		if(it->second->GetOrderType() == AttackEnemyOrder)
+		{
+			AttackOrder* pAttackOrder = reinterpret_cast<AttackOrder*>(it->second);
+			if(pAttackOrder->GetEnemyId() == enemyId)
+			{
+				// Update the order with the latest known position of the enemy
+				pAttackOrder->SetEnemyPosition(foundIt->second.m_lastKnownPosition);
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------

@@ -1,28 +1,28 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  ReturnSpecificStatus.cpp
-*  A decorator that always returns the specific status code that was set on it
+*  TeamReturnSpecificStatus.cpp
+*  A team decorator that always returns the specific status code that was set on it
 *  despite its actual state.
 */
 
 // Includes
-#include "ReturnSpecificStatus.h"
+#include "TeamReturnSpecificStatus.h"
+#include "TeamAI.h"
 
-
-ReturnSpecificStatus::ReturnSpecificStatus(const char* name, Behaviour* pChild, BehaviourStatus returnStatus) 
-						: Decorator(name, pChild),
+TeamReturnSpecificStatus::TeamReturnSpecificStatus(const char* name, TeamAI* pTeamAI, TeamBehaviour* pChild, BehaviourStatus returnStatus) 
+						: TeamDecorator(name, pTeamAI, pChild),
 						  m_returnStatus(returnStatus)
 {
 }
 
-ReturnSpecificStatus::~ReturnSpecificStatus(void)
+TeamReturnSpecificStatus::~TeamReturnSpecificStatus(void)
 {
 }
 
 //--------------------------------------------------------------------------------------
 // Initialises the return specific status decorator.
 //--------------------------------------------------------------------------------------
-void ReturnSpecificStatus::OnInitialise(void)
+void TeamReturnSpecificStatus::OnInitialise(void)
 {
 	SetReturnStatus(m_returnStatus);
 }
@@ -32,7 +32,7 @@ void ReturnSpecificStatus::OnInitialise(void)
 // Param1: The time in seconds passed since the last frame.
 // Returns the state of the decorator.
 //--------------------------------------------------------------------------------------
-BehaviourStatus ReturnSpecificStatus::Update(float deltaTime)
+BehaviourStatus TeamReturnSpecificStatus::Update(float deltaTime)
 {
 	if(!m_pChild)
 	{
@@ -44,7 +44,7 @@ BehaviourStatus ReturnSpecificStatus::Update(float deltaTime)
 	return m_returnStatus;
 }
 
-void ReturnSpecificStatus::SetReturnStatus(BehaviourStatus returnStatus)
+void TeamReturnSpecificStatus::SetReturnStatus(BehaviourStatus returnStatus)
 {
 	m_returnStatus = returnStatus;
 }

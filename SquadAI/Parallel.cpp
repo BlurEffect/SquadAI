@@ -69,11 +69,6 @@ BehaviourStatus Parallel::Update(float deltaTime)
 		return StatusFailure;
     }
 
-	if(m_children[1]->GetStatus() == StatusSuccess)
-	{
-		int a = 9;
-	}
-
     if(m_successPolicy == RequireAll && successCount == m_children.size())
     {
 		// All children succeeded.

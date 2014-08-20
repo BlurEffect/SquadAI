@@ -10,6 +10,7 @@
 
 TeamAI::TeamAI(void) : m_pBehaviour(nullptr),
 				       m_team(None),
+					   m_characteristic(CharNone),
 					   m_pTestEnvironment(nullptr),
 					   m_timeLeft(1.0f)
 {
@@ -35,7 +36,7 @@ TeamAI::~TeamAI(void)
 // Param1: The team that this Ai will control.
 // Param2: A pointer to the test environment, in which the matches take place.
 //--------------------------------------------------------------------------------------
-bool TeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment)
+bool TeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic)
 {
 	if(!pEnvironment)
 	{
@@ -43,6 +44,7 @@ bool TeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment)
 	}
 	
 	m_team = team;
+	m_characteristic = characteristic;
 	m_pTestEnvironment = pEnvironment;
 	
 	return true;
@@ -264,6 +266,36 @@ void TeamAI::ClearOrders(void)
 	m_activeOrders.clear();
 }
 
+//--------------------------------------------------------------------------------------
+// Processes a message sent to the team AI.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void TeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
+{
+	
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a message sent to the team AI.
+// Param1: A pointer to the message to process.
+// Param2: The time passed since the last update.
+// Returns a behaviour status code representing the current state of the manoeuvre.
+//--------------------------------------------------------------------------------------
+BehaviourStatus TeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime)
+{
+	return StatusSuccess;
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a message sent to the team AI.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void TeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
+{
+
+}
+
+
 /*
 //--------------------------------------------------------------------------------------
 // Processes a message sent to the team AI.
@@ -390,6 +422,11 @@ EntityTeam TeamAI::GetTeam(void) const
 	return m_team;
 }
 
+TeamAICharacteristic TeamAI::GetCharacteristic(void) const
+{
+	return m_characteristic;
+}
+
 const TestEnvironment* TeamAI::GetTestEnvironment(void) const
 {
 	return m_pTestEnvironment;
@@ -423,6 +460,11 @@ float TeamAI::GetTimeLeft(void) const
 void TeamAI::SetTeam(EntityTeam team)
 {
 	m_team = team;
+}
+
+void TeamAI::SetCharacteristic(TeamAICharacteristic characteristic)
+{
+	m_characteristic = characteristic;
 }
 
 void TeamAI::SetTestEnvironment(TestEnvironment* pEnvironment)

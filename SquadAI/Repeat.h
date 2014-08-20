@@ -13,7 +13,7 @@
 #include "Decorator.h"
 
 //--------------------------------------------------------------------------------------
-// Contains all additional data required for the creation of a parallel behaviour.
+// Contains all additional data required for the creation of a repeat behaviour.
 //--------------------------------------------------------------------------------------
 struct RepeatInitData
 {

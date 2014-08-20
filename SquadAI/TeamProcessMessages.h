@@ -9,12 +9,15 @@
 #define TEAM_PROCESS_MESSAGES_H
 
 // Includes
-#include "UniversalTeamBehaviour.h"
+#include "TeamBehaviour.h"
 
-class TeamProcessMessages : public UniversalTeamBehaviour
+// Forward declarations
+class TeamAI;
+
+class TeamProcessMessages : public TeamBehaviour
 {
 public:
-	TeamProcessMessages(const char* name, TeamAI* pTeamAI);
+	TeamProcessMessages(const char* name, TeamAI* pTeamAI, float aggressiveness, float defensiveness);
 	~TeamProcessMessages(void);
 
 private:

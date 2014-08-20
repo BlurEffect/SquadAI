@@ -44,22 +44,24 @@ public:
 	MultiflagCTFTeamAI(void);
 	~MultiflagCTFTeamAI(void);
 
-	bool Initialise(EntityTeam team, TestEnvironment* pEnvironment);
+	bool Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic);
 
 	//void ProcessMessage(Message* pMessage);
 	void Reset(void);
 
 	void ProcessEvent(EventType type, void* pEventData);
 
-	// Available manoeuvres
-	BehaviourStatus AllAttack(float deltaTime);
-	BehaviourStatus AllDefend(float deltaTime);
-	BehaviourStatus AllMove(float deltaTime);
+	virtual void InitiateManoeuvre(TeamManoeuvreType manoeuvre);
+	virtual BehaviourStatus UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime);
+	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
 
 protected:
 	void ProcessMessage(Message* pMessage);
 	
-
+	// Available manoeuvres
+	BehaviourStatus AllAttack(float deltaTime);
+	BehaviourStatus AllDefend(float deltaTime);
+	BehaviourStatus AllMove(float deltaTime);
 private:
 
 	FlagData m_flagData[NumberOfTeams-1]; // Data about the flags of the two teams

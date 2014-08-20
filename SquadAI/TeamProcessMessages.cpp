@@ -9,7 +9,8 @@
 #include "TeamProcessMessages.h"
 #include "TeamAI.h"
 
-TeamProcessMessages::TeamProcessMessages(const char* name, TeamAI* pTeamAI) : UniversalTeamBehaviour(name, pTeamAI)
+TeamProcessMessages::TeamProcessMessages(const char* name, TeamAI* pTeamAI, float aggressiveness, float defensiveness) 
+	: TeamBehaviour(name, pTeamAI, aggressiveness, defensiveness)
 {
 }
 

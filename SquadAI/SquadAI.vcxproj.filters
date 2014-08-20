@@ -124,12 +124,6 @@
     <Filter Include="Header Files\BehaviourTree\UniversalBehaviours">
       <UniqueIdentifier>{f8bc8722-f276-40db-bf72-98e07edf8ef9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\BehaviourTree\MultiflagCTFTeamBehaviours">
-      <UniqueIdentifier>{396c282a-4f82-404d-bc63-2ee0f9bd33d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\BehaviourTree\UniversalTeamBehaviours">
-      <UniqueIdentifier>{d4253bf3-0816-451b-9e0f-1b0cae9ec546}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\BehaviourTree\UniversalIndividualBehaviours">
       <UniqueIdentifier>{b7d4ac7e-caa2-448a-b2d4-7cc18a2bc9db}</UniqueIdentifier>
     </Filter>
@@ -139,14 +133,8 @@
     <Filter Include="Header Files\BehaviourTree\UniversalIndividualBehaviours\Conditions">
       <UniqueIdentifier>{b4dbc500-ff9e-4c4d-bf38-ebae69fd13ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\BehaviourTree\UniversalTeamBehaviours">
-      <UniqueIdentifier>{6eb60492-9dc2-4b5e-88e5-114e84053d9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\BehaviourTree\UniversalBehaviours">
       <UniqueIdentifier>{269fe543-b0f2-49d7-af75-951fc9c7450b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\BehaviourTree\MultiflagCTFTeamBehaviours">
-      <UniqueIdentifier>{94eff158-b8ee-4d95-9ee8-ec61cce4e7df}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\BehaviourTree\UniversalIndividualBehaviours">
       <UniqueIdentifier>{170f1d6a-16bd-43f0-87af-acec4277b931}</UniqueIdentifier>
@@ -157,17 +145,35 @@
     <Filter Include="Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions">
       <UniqueIdentifier>{91cc1760-4be1-47e1-ac85-02966fca51c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\BehaviourTree\UniversalTeamBehaviours\Actions">
+    <Filter Include="Header Files\Manoeuvres">
+      <UniqueIdentifier>{aa5b0f32-298b-4e34-8bdf-b64b1b174379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Manoeuvres">
+      <UniqueIdentifier>{def0906f-1488-41c0-96a0-5a661e7290a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BehaviourTree\TeamBehaviours">
+      <UniqueIdentifier>{d4253bf3-0816-451b-9e0f-1b0cae9ec546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BehaviourTree\TeamBehaviours\Actions">
       <UniqueIdentifier>{6853e739-22da-4d19-9c88-eaff05e86ff5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\BehaviourTree\UniversalTeamBehaviours\Conditions">
+    <Filter Include="Header Files\BehaviourTree\TeamBehaviours\Conditions">
       <UniqueIdentifier>{ce2e531f-6cd8-434d-b6f0-8b7bd25a43ad}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\BehaviourTree\UniversalTeamBehaviours\Actions">
+    <Filter Include="Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes">
+      <UniqueIdentifier>{c16e42c4-a6af-4d25-8ffb-a36b01725f34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\TeamBehaviours">
+      <UniqueIdentifier>{6eb60492-9dc2-4b5e-88e5-114e84053d9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\TeamBehaviours\Actions">
       <UniqueIdentifier>{3b4ca9c2-30c7-41ed-b3c9-249faf206adb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\BehaviourTree\UniversalTeamBehaviours\Conditions">
+    <Filter Include="Source Files\BehaviourTree\TeamBehaviours\Conditions">
       <UniqueIdentifier>{959c0705-874b-4cfc-9771-415999d762f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes">
+      <UniqueIdentifier>{d439ae08-4067-42d5-9a25-d8997e788218}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -405,14 +411,8 @@
     <ClCompile Include="UniversalIndividualBehaviour.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
-    <ClCompile Include="UniversalTeamBehaviour.cpp">
-      <Filter>Source Files\BehaviourTree</Filter>
-    </ClCompile>
-    <ClCompile Include="MultiflagCTFTeamBehaviour.cpp">
-      <Filter>Source Files\BehaviourTree</Filter>
-    </ClCompile>
     <ClCompile Include="TeamProcessMessages.cpp">
-      <Filter>Source Files\BehaviourTree\UniversalTeamBehaviours\Actions</Filter>
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Order.cpp">
       <Filter>Source Files\TeamAI</Filter>
@@ -441,14 +441,47 @@
     <ClCompile Include="FinaliseMovement.cpp">
       <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="TeamAllAttack.cpp">
-      <Filter>Source Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    <ClCompile Include="Manoeuvre.cpp">
+      <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
-    <ClCompile Include="TeamAllDefend.cpp">
-      <Filter>Source Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    <ClCompile Include="AllDefendBase.cpp">
+      <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
-    <ClCompile Include="TeamAllMove.cpp">
-      <Filter>Source Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    <ClCompile Include="TeamBehaviour.cpp">
+      <Filter>Source Files\BehaviourTree</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamSelector.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamSequence.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamActiveSelector.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamParallel.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamDecorator.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamActiveCharacteristicSelector.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamComposite.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamReturnSpecificStatus.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecuteTeamManoeuvre.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamRepeat.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TeamMonitor.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -743,17 +776,11 @@
     <ClInclude Include="BehaviourFactory.h">
       <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
-    <ClInclude Include="MultiflagCTFTeamBehaviour.h">
-      <Filter>Header Files\BehaviourTree</Filter>
-    </ClInclude>
-    <ClInclude Include="UniversalTeamBehaviour.h">
-      <Filter>Header Files\BehaviourTree</Filter>
-    </ClInclude>
     <ClInclude Include="UniversalIndividualBehaviour.h">
       <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
     <ClInclude Include="TeamProcessMessages.h">
-      <Filter>Header Files\BehaviourTree\UniversalTeamBehaviours\Actions</Filter>
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Actions</Filter>
     </ClInclude>
     <ClInclude Include="Order.h">
       <Filter>Header Files\TeamAI</Filter>
@@ -785,14 +812,47 @@
     <ClInclude Include="FinaliseMovement.h">
       <Filter>Header Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="TeamAllAttack.h">
-      <Filter>Header Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    <ClInclude Include="TeamManoeuvre.h">
+      <Filter>Header Files\Manoeuvres</Filter>
     </ClInclude>
-    <ClInclude Include="TeamAllDefend.h">
-      <Filter>Header Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    <ClInclude Include="AllDefendBase.h">
+      <Filter>Header Files\Manoeuvres</Filter>
     </ClInclude>
-    <ClInclude Include="TeamAllMove.h">
-      <Filter>Header Files\BehaviourTree\MultiflagCTFTeamBehaviours</Filter>
+    <ClInclude Include="TeamBehaviour.h">
+      <Filter>Header Files\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecuteTeamManoeuvre.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamSelector.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamSequence.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamActiveSelector.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamComposite.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamActiveCharacteristicSelector.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamDecorator.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamParallel.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamReturnSpecificStatus.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamMonitor.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TeamRepeat.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

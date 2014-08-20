@@ -29,6 +29,30 @@ using namespace DirectX;
 class Entity;
 class TestEnvironment;
 
+
+//--------------------------------------------------------------------------------------
+// Lists the available manoeuvres that team AIs can execute. Some make only sense for
+// specific game modes.
+//--------------------------------------------------------------------------------------
+enum TeamManoeuvreType
+{
+	// Test manoeuvres
+	TestAllAttackManoeuvre,
+	TestAllMoveManoeuvre,
+	TestAllDefendManoeuvre
+};
+
+//--------------------------------------------------------------------------------------
+// Available characteristics for the team AI. A characteristic influences the way a 
+// team AI plays, that is the tactics and manoeuvres it chooses during a game.
+//--------------------------------------------------------------------------------------
+enum TeamAICharacteristic
+{
+	CharNone,
+	CharAggressive,
+	CharDefensive
+};
+
 //--------------------------------------------------------------------------------------
 // The team AI uses these records to bundle the available information about certain
 // enemy entities.
@@ -52,7 +76,7 @@ public:
 	TeamAI(void);
 	virtual ~TeamAI(void) = 0;
 
-	virtual bool Initialise(EntityTeam team, TestEnvironment* pEnvironment);
+	virtual bool Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic);
 
 	//virtual void ProcessMessage(Message* pMessage);
 	void AddTeamMember(Entity* pEntity);
@@ -63,9 +87,15 @@ public:
 	
 	virtual void ProcessEvent(EventType type, void* pEventData);
 	void ClearOrders(void);
+
+	virtual void InitiateManoeuvre(TeamManoeuvreType manoeuvre);
+	virtual BehaviourStatus UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime);
+	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
+
 	// Data access functions
 
 	EntityTeam							  GetTeam(void) const;
+	TeamAICharacteristic                  GetCharacteristic(void) const;
 	const TestEnvironment*				  GetTestEnvironment(void) const;
 	std::vector<Entity*>&				  GetTeamMembers(void);
 	std::unordered_map<unsigned long, EnemyRecord>& GetEnemyRecords(void);
@@ -74,6 +104,7 @@ public:
 	float                                 GetTimeLeft(void) const;
 	
 	void SetTeam(EntityTeam team);
+	void SetCharacteristic(TeamAICharacteristic characteristic);
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 
 	
@@ -90,6 +121,7 @@ protected:
 
 private:
 	EntityTeam						     m_team;					// The team that the AI is controlling
+	TeamAICharacteristic                 m_characteristic;     // The characteristic of the team AI
 	std::vector<Entity*>                 m_teamMembers;				// The entities being controlled by this team AI
 	std::unordered_map<unsigned long, EnemyRecord> m_enemyRecords;			// The team AI creates and obtains a record for every enemy spotted in the environment
 	std::unordered_map<unsigned long, Order*>      m_activeOrders;            // The active orders currently being carried out by the team members
@@ -97,5 +129,8 @@ private:
 	float								 m_scores[NumberOfTeams-1]; // The current score for each team as a percentual value in relation to the score required for victory
 	float                                m_timeLeft;                // The time left as a percentual value in relation to the maximal time a round can last
 };
+
+
+
 
 #endif // TEAM_AI_H

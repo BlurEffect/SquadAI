@@ -20,9 +20,9 @@ MultiflagCTFTeamAI::~MultiflagCTFTeamAI(void)
 // Param1: The team that this Ai will control.
 // Param2: A pointer to the test environment, in which the matches take place.
 //--------------------------------------------------------------------------------------
-bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment)
+bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic)
 {
-	if(TeamAI::Initialise(team, pEnvironment))
+	if(TeamAI::Initialise(team, pEnvironment, characteristic))
 	{
 		m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleTeamMultiflagCTFTree, this);
 		if(!m_pBehaviour)
@@ -82,6 +82,68 @@ void MultiflagCTFTeamAI::ProcessEvent(EventType type, void* pEventData)
 {
 	// Not expecting any events, forward to the base class
 	TeamAI::ProcessEvent(type, pEventData);
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a message sent to the team AI.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
+{
+	switch(manoeuvre)
+	{
+	case TestAllAttackManoeuvre:
+		break;
+	case TestAllMoveManoeuvre:
+		break;
+	case TestAllDefendManoeuvre:
+		break;
+	default:
+		TeamAI::InitiateManoeuvre(manoeuvre);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a message sent to the team AI.
+// Param1: A pointer to the message to process.
+// Param2: The time passed since the last update.
+// Returns a behaviour status code representing the current state of the manoeuvre.
+//--------------------------------------------------------------------------------------
+BehaviourStatus MultiflagCTFTeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime)
+{
+	switch(manoeuvre)
+	{
+	case TestAllAttackManoeuvre:
+		return AllAttack(deltaTime);
+		break;
+	case TestAllMoveManoeuvre:
+		return AllMove(deltaTime);
+		break;
+	case TestAllDefendManoeuvre:
+		return AllDefend(deltaTime);
+		break;
+	default:
+		return TeamAI::UpdateManoeuvre(manoeuvre, deltaTime);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Processes a message sent to the team AI.
+// Param1: A pointer to the message to process.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFTeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
+{
+	switch(manoeuvre)
+	{
+	case TestAllAttackManoeuvre:
+		break;
+	case TestAllMoveManoeuvre:
+		break;
+	case TestAllDefendManoeuvre:
+		break;
+	default:
+		TeamAI::TerminateManoeuvre(manoeuvre);
+	}
 }
 
 //--------------------------------------------------------------------------------------

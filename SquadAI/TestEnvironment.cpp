@@ -85,10 +85,20 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 			return false;
 		}
 
-		if(!m_pTeamAI[i]->Initialise(EntityTeam(i), this))
+		if(i == TeamRed)
 		{
-			return false;
+			if(!m_pTeamAI[i]->Initialise(EntityTeam(i), this, CharAggressive))
+			{
+				return false;
+			}
+		}else
+		{
+			if(!m_pTeamAI[i]->Initialise(EntityTeam(i), this, CharDefensive))
+			{
+				return false;
+			}
 		}
+		
 
 		m_pGameContext->RegisterTeamAI(m_pTeamAI[i]);
 	}

@@ -393,31 +393,34 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 // Returns a pointer to the root behaviour of the created tree. The pointer is null if 
 // something failed during creation.
 //--------------------------------------------------------------------------------------
-Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(MultiflagCTFTeamAI* pTeamAI)
+Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 {
-	Behaviour* pTeamRoot = CreateUniversalBehaviour(ActiveSelectorType, "TeamRoot", nullptr);
+	TeamBehaviour* pTeamRoot = CreateParentTeamBehaviour(TeamActiveSelectorType, pTeamAI, "TeamRoot", nullptr);
 
 	if(pTeamRoot)
 	{
-		Behaviour* pUpdateTeamAISequence = CreateUniversalBehaviour(SequenceType, "UpdateTeamAISequence", nullptr);
+		TeamBehaviour* pUpdateTeamAISequence = CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "UpdateTeamAISequence", nullptr);
 
-		Behaviour* pAllAttackAction = CreateMultiflagCTFTeamBehaviour(TeamAllAttackType, pTeamAI, "AllAttackAction", nullptr);
-		Behaviour* pAllDefendAction = CreateMultiflagCTFTeamBehaviour(TeamAllDefendType, pTeamAI, "AllDefendAction", nullptr);
-		Behaviour* pAllMoveAction = CreateMultiflagCTFTeamBehaviour(TeamAllMoveType, pTeamAI, "AllMoveAction", nullptr);
+		//Behaviour* pAllAttackAction = CreateTeamBehaviour(TeamAllAttackType, pTeamAI, "AllAttackAction", nullptr);
+		//Behaviour* pAllDefendAction = CreateTeamBehaviour(TeamAllDefendType, pTeamAI, "AllDefendAction", nullptr);
+		//Behaviour* pAllMoveAction = CreateTeamBehaviour(TeamAllMoveType, pTeamAI, "AllMoveAction", nullptr);
 
-		if(pUpdateTeamAISequence && pAllAttackAction && pAllDefendAction && pAllMoveAction)
+		ExecuteTeamManoeuvreInitData executedManoeuvre(TestAllMoveManoeuvre);
+		TeamBehaviour* pExecuteManoeuvreAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "TeamExecuteManoeuvreAction", 0.5f, 0.5f, &executedManoeuvre);
+
+		if(pUpdateTeamAISequence && pExecuteManoeuvreAction)// && pAllAttackAction && pAllDefendAction && pAllMoveAction)
 		{
 			ReturnSpecificStatusInitData data(pUpdateTeamAISequence, StatusFailure);
-			Behaviour* pAlwaysFailDecorator = CreateUniversalBehaviour(ReturnSpecificStatusType, "AlwaysFailDecorator", &data);
+			TeamBehaviour* pAlwaysFailDecorator = CreateParentTeamBehaviour(TeamReturnSpecificStatusType, pTeamAI, "TeamAlwaysFailDecorator", &data);
 
-			Behaviour* pTeamProcessMessagesAction = CreateUniversalTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", nullptr);
+			TeamBehaviour* pTeamProcessMessagesAction = CreatePrimitiveTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", 1.0f, 1.0f, nullptr);
 
 			if(pAlwaysFailDecorator && pTeamProcessMessagesAction)
 			{
-				reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pAlwaysFailDecorator);
-				reinterpret_cast<Composite*>(pTeamRoot)->AddChild(pAllAttackAction);
+				reinterpret_cast<TeamComposite*>(pTeamRoot)->AddChild(pAlwaysFailDecorator);
+				reinterpret_cast<TeamComposite*>(pTeamRoot)->AddChild(pExecuteManoeuvreAction);
 
-				reinterpret_cast<Composite*>(pUpdateTeamAISequence)->AddChild(pTeamProcessMessagesAction);
+				reinterpret_cast<TeamComposite*>(pUpdateTeamAISequence)->AddChild(pTeamProcessMessagesAction);
 
 				return pTeamRoot;
 			}
@@ -574,7 +577,48 @@ Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndivid
 }
 
 //--------------------------------------------------------------------------------------
-// Creates a certain universal team behaviour for the provided team AI.
+// Creates a certain primitive team behaviour for the provided team AI.
+// Param1: Determines which behaviour will be created from a range of available types.
+// Param2: A pointer to the team AI that the behaviour tree should be created for.
+// Param3: The name that will be associated to the newly created behaviour.
+// Param4: The aggressiveness value associated to this behaviour.
+// Param5: The aggressiveness value associated to this behaviour.
+// Param6: A pointer to a data structure holding the initialisation data for some behaviours.
+// Returns a pointer to the newly created behaviour. The pointer is null if something failed 
+// during creation or if the factory does not support the given behaviour type.
+//--------------------------------------------------------------------------------------
+TeamBehaviour* BehaviourFactory::CreatePrimitiveTeamBehaviour(PrimitiveTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, float aggressiveness, float defensiveness, void* pInitData)
+{
+	switch(behaviourType)
+	{
+	case TeamProcessMessagesType:
+		{
+		return new TeamProcessMessages(name, pTeamAI, aggressiveness, defensiveness);
+		break;
+		}
+	case TeamExecuteManoeuvreType:
+		{
+		ExecuteTeamManoeuvreInitData* pData = reinterpret_cast<ExecuteTeamManoeuvreInitData*>(pInitData);
+		return new ExecuteTeamManoeuvre(name, pTeamAI, pData->m_manoeuvreType, aggressiveness, defensiveness);
+		break;
+		}
+		/*
+	case TeamAllAttackType:
+		return new TeamAllAttack(name, pTeamAI);
+		break;
+	case TeamAllDefendType:
+		return new TeamAllDefend(name, pTeamAI);
+		break;
+	case TeamAllMoveType:
+		return new TeamAllMove(name, pTeamAI);
+		break;*/
+	default:
+		return nullptr;
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Creates a certain parent team behaviour for the provided team AI.
 // Param1: Determines which behaviour will be created from a range of available types.
 // Param2: A pointer to the team AI that the behaviour tree should be created for.
 // Param3: The name that will be associated to the newly created behaviour.
@@ -582,18 +626,51 @@ Behaviour* BehaviourFactory::CreateUniversalIndividualBehaviour(UniversalIndivid
 // Returns a pointer to the newly created behaviour. The pointer is null if something failed 
 // during creation or if the factory does not support the given behaviour type.
 //--------------------------------------------------------------------------------------
-Behaviour* BehaviourFactory::CreateUniversalTeamBehaviour(UniversalTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, void* pInitData)
+TeamBehaviour* BehaviourFactory::CreateParentTeamBehaviour(ParentTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, void* pInitData)
 {
 	switch(behaviourType)
 	{
-	case TeamProcessMessagesType:
-		return new TeamProcessMessages(name, pTeamAI);
+	case TeamSelectorType:
+		return new TeamSelector(name, pTeamAI);
 		break;
+	case TeamActiveSelectorType:
+		return new TeamActiveSelector(name, pTeamAI);
+		break;
+	case TeamActiveCharacteristicSelectorType:
+		return new TeamActiveCharacteristicSelector(name, pTeamAI);
+		break;
+	case TeamSequenceType:
+		return new TeamSequence(name, pTeamAI);
+		break;
+	case TeamParallelType:
+		{
+		TeamParallelInitData* pData = reinterpret_cast<TeamParallelInitData*>(pInitData);
+		return new TeamParallel(name, pTeamAI, pData->m_successPolicy, pData->m_failurePolicy);
+		break;
+		}
+	case TeamMonitorType:
+		return new TeamMonitor(name, pTeamAI);
+		break;
+	case TeamRepeatType:
+		{
+		TeamRepeatInitData* pData = reinterpret_cast<TeamRepeatInitData*>(pInitData);
+		return new TeamRepeat(name, pTeamAI, pData->m_pChild, pData->m_numberOfRepeats);
+		break;
+		}
+	case TeamReturnSpecificStatusType:
+		{
+		TeamReturnSpecificStatusInitData* pData = reinterpret_cast<TeamReturnSpecificStatusInitData*>(pInitData);
+		return new TeamReturnSpecificStatus(name, pTeamAI, pData->m_pChild, pData->m_returnStatus);
+		break;
+		}
 	default:
 		return nullptr;
 	}
 }
 
+
+
+/*
 //--------------------------------------------------------------------------------------
 // Creates a certain multiflag CTF team behaviour for the provided multiflag CTF team AI.
 // Param1: Determines which behaviour will be created from a range of available types.
@@ -620,3 +697,4 @@ Behaviour* BehaviourFactory::CreateMultiflagCTFTeamBehaviour(MultiflagCTFTeamBeh
 		return nullptr;
 	}
 }
+*/

@@ -109,6 +109,7 @@ void Behaviour::OnInitialise(void)
 
 //--------------------------------------------------------------------------------------
 // Terminates the behaviour.
+// Param1: The status of the behaviour on termination.
 //--------------------------------------------------------------------------------------
 void Behaviour::OnTerminate(BehaviourStatus status)
 {

@@ -29,6 +29,15 @@ TeamAI::~TeamAI(void)
 	}
 
 	ClearOrders();
+
+	for(std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator it = m_manoeuvres.begin(); it != m_manoeuvres.end(); ++it)
+	{
+		if(it->second)
+		{
+			delete it->second;
+			it->second = nullptr;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -47,6 +56,15 @@ bool TeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICh
 	m_characteristic = characteristic;
 	m_pTestEnvironment = pEnvironment;
 	
+	return InitialiseManoeuvres();
+}
+
+//--------------------------------------------------------------------------------------
+// Initialises the available manoeuvres for this team AI.
+// Returns true if all manouevres were initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TeamAI::InitialiseManoeuvres(void)
+{
 	return true;
 }
 
@@ -91,7 +109,7 @@ void TeamAI::CancelOrder(unsigned long id)
 }
 
 //--------------------------------------------------------------------------------------
-// Processes all inbox messages that the team AI received.
+// Processes an inbox message that the team AI received.
 // Param1: A pointer to the message to process.
 //--------------------------------------------------------------------------------------
 void TeamAI::ProcessMessage(Message* pMessage)
@@ -134,7 +152,7 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		if(foundIt != m_enemyRecords.end())
 		{
 			foundIt->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
-			//UpdateAttackOrders(pMsg->GetData().m_enemyId);
+			UpdateAttackOrders(pMsg->GetData().m_enemyId);
 		}
 		break;
 		}
@@ -208,6 +226,23 @@ void TeamAI::ProcessMessage(Message* pMessage)
 	}
 	
 }
+
+//--------------------------------------------------------------------------------------
+// Forwards a given message to all currently active manoeuvres of the team AI.
+// Param1: A pointer to the message to forward.
+//--------------------------------------------------------------------------------------
+void TeamAI::ForwardMessageToActiveManoeuvers(Message* pMessage)
+{
+	for(std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator it = m_manoeuvres.begin(); it != m_manoeuvres.end(); ++it)
+	{
+		if(it->second->IsActive())
+		{
+			//SendMessage
+
+		}
+	}
+}
+
 
 //--------------------------------------------------------------------------------------
 // Updates the currently active attack orders by making sure the contained enemy 

@@ -22,6 +22,7 @@
 #include "Communicator.h"
 #include "Behaviour.h"
 #include "Order.h"
+#include "TeamManoeuvre.h"
 
 using namespace DirectX;
 
@@ -30,17 +31,6 @@ class Entity;
 class TestEnvironment;
 
 
-//--------------------------------------------------------------------------------------
-// Lists the available manoeuvres that team AIs can execute. Some make only sense for
-// specific game modes.
-//--------------------------------------------------------------------------------------
-enum TeamManoeuvreType
-{
-	// Test manoeuvres
-	TestAllAttackManoeuvre,
-	TestAllMoveManoeuvre,
-	TestAllDefendManoeuvre
-};
 
 //--------------------------------------------------------------------------------------
 // Available characteristics for the team AI. A characteristic influences the way a 
@@ -111,6 +101,8 @@ public:
 
 protected:
 
+	virtual bool InitialiseManoeuvres(void);
+
 	void CancelOrder(unsigned long id);
 
 	virtual void ProcessMessage(Message* pMessage);
@@ -118,8 +110,12 @@ protected:
 
 
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*> m_manoeuvres; // The available team manoeuvres for this team AI
 
 private:
+
+	void ForwardMessageToActiveManoeuvers(Message* pMessage);
+
 	EntityTeam						     m_team;					// The team that the AI is controlling
 	TeamAICharacteristic                 m_characteristic;     // The characteristic of the team AI
 	std::vector<Entity*>                 m_teamMembers;				// The entities being controlled by this team AI
@@ -128,6 +124,7 @@ private:
 	TestEnvironment*                     m_pTestEnvironment;        // The environment, in which the current match plays
 	float								 m_scores[NumberOfTeams-1]; // The current score for each team as a percentual value in relation to the score required for victory
 	float                                m_timeLeft;                // The time left as a percentual value in relation to the maximal time a round can last
+
 };
 
 

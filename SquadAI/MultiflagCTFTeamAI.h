@@ -13,6 +13,8 @@
 #include "ObjectTypes.h"
 #include "MultiflagCTFGameContext.h" // needs to know flag state -> move flag state somewhere else (game mode spceifc data structs?)
 #include "TeamAIToEntityMessages.h"
+#include "TeamManoeuvreFactory.h"
+
 
 // Forward declarations
 class TestEnvironment;
@@ -56,6 +58,9 @@ public:
 	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
 
 protected:
+
+	virtual bool InitialiseManoeuvres(void);
+
 	void ProcessMessage(Message* pMessage);
 	
 	// Available manoeuvres

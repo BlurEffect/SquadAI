@@ -1,0 +1,80 @@
+/* 
+*  Kevin Meergans, SquadAI, 2014
+*  TeamManoeuvre.h
+*  Abstract base class for all team manoeuvres.
+*/
+
+#ifndef TEAM_MANOEUVRE_H
+#define TEAM_MANOEUVRE_H
+
+// Includes
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+#include "Communicator.h"
+
+// Forward declarations
+class Entity;
+class Order;
+enum BehaviourStatus;
+
+//--------------------------------------------------------------------------------------
+// Lists the available manoeuvres that team AIs can execute. Some make only sense for
+// specific game modes.
+//--------------------------------------------------------------------------------------
+enum TeamManoeuvreType
+{
+	// Test manoeuvres
+	TestAllAttackManoeuvre,
+	TestAllMoveManoeuvre,
+	TestAllDefendManoeuvre
+};
+
+
+class TeamManoeuvre : public Communicator
+{
+public:
+	TeamManoeuvre(TeamManoeuvreType type, unsigned int minNumberParticipants, unsigned int maxNumberParticipants);
+	~TeamManoeuvre(void);
+
+	void AddParticipant(Entity* pEntity);
+	void RemoveParticipant(unsigned long id);
+
+	// To be overwritten by derived manoeuvre classes
+
+	virtual void 			Initiate(void) = 0;
+	virtual BehaviourStatus Update(float deltaTime) = 0;
+	virtual void			Terminate(void) = 0;
+
+	virtual void ProcessEvent(EventType type, void* pEventData);
+
+	// Data access functions
+
+	bool              IsActive(void) const;
+	TeamManoeuvreType GetType(void) const;
+	unsigned int	  GetMinNumberOfParticipants(void) const;
+	unsigned int	  GetMaxNumberOfParticipants(void) const;
+
+	void SetActive(bool active);
+	void SetType(TeamManoeuvreType type);
+	void SetMinNumberOfParticipants(unsigned int minNumberOfParticipants);
+	void SetMaxNumberOfParticipants(unsigned int maxNumberOfParticipants);
+
+protected:
+	virtual void ProcessMessage(Message* pMessage);
+
+	void CancelOrder(Entity* pEntity);
+	void CancelOrder(unsigned long id);
+	void ClearOrders(void);
+
+	std::vector<Entity*>				      m_participants; // The entities currently participating in the manoeuvre
+	std::unordered_map<unsigned long, Order*> m_activeOrders; // The active orders currently being carried out by the entities participating in the manoeuvre
+	
+private:
+	bool              m_active;                  // Tells whether the manoeuvre is currently being executed or inactive
+	TeamManoeuvreType m_type;					 // Identifies the type of the manoeuvre
+	unsigned int      m_minNumberOfParticipants; // The minimal number of entities required to execute the manoeuvre
+	unsigned int	  m_maxNumberOfParticipants; // The maximal number of entities allowed to execute the manoeuvre
+};
+
+#endif // TEAM_MANOEUVRE_H

@@ -87,7 +87,7 @@
     <ClCompile Include="ActiveSelector.cpp" />
     <ClCompile Include="AllDefendBase.cpp" />
     <ClCompile Include="ExecuteTeamManoeuvre.cpp" />
-    <ClCompile Include="Manoeuvre.cpp" />
+    <ClCompile Include="TeamManoeuvre.cpp" />
     <ClCompile Include="TeamActiveCharacteristicSelector.cpp" />
     <ClCompile Include="TeamActiveSelector.cpp" />
     <ClCompile Include="Communicator.cpp" />
@@ -176,6 +176,7 @@
     <ClCompile Include="TeamAI.cpp" />
     <ClCompile Include="TeamComposite.cpp" />
     <ClCompile Include="TeamDecorator.cpp" />
+    <ClCompile Include="TeamManoeuvreFactory.cpp" />
     <ClCompile Include="TeamMonitor.cpp" />
     <ClCompile Include="TeamParallel.cpp" />
     <ClCompile Include="TeamProcessMessages.cpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="TeamSelector.cpp" />
     <ClCompile Include="TeamSequence.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
+    <ClCompile Include="TestManoeuvre.cpp" />
     <ClCompile Include="TriangleDrawable.cpp" />
     <ClCompile Include="UniversalIndividualBehaviour.cpp" />
     <ClCompile Include="TeamBehaviour.cpp" />
@@ -231,6 +233,7 @@
     <ClInclude Include="LookAtTarget.h" />
     <ClInclude Include="TeamComposite.h" />
     <ClInclude Include="TeamDecorator.h" />
+    <ClInclude Include="TeamManoeuvreFactory.h" />
     <ClInclude Include="TeamMonitor.h" />
     <ClInclude Include="TeamParallel.h" />
     <ClInclude Include="TeamRepeat.h" />
@@ -246,6 +249,7 @@
     <ClInclude Include="TeamBehaviour.h" />
     <ClInclude Include="TeamManoeuvre.h" />
     <ClInclude Include="TeamProcessMessages.h" />
+    <ClInclude Include="TestManoeuvre.h" />
     <ClInclude Include="UniversalIndividualBehaviour.h" />
     <ClInclude Include="ProcessMessages.h" />
     <ClInclude Include="TestEnvironmentToEntityMessages.h" />

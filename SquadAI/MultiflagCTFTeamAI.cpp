@@ -37,6 +37,25 @@ bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironme
 }
 
 //--------------------------------------------------------------------------------------
+// Initialises the available manoeuvres for this team AI.
+// Returns true if all manouevres were initialised successfully, false otherwise.
+//--------------------------------------------------------------------------------------
+bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
+{
+	// Use the manoeuvre factory to create the manoeuvres for the team AI
+	TeamManoeuvre* pTestManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(TestAllMoveManoeuvre, 8, 8, this, nullptr);
+	
+	if(!pTestManoeuvre)
+	{
+		return false;
+	}
+
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(TestAllMoveManoeuvre, pTestManoeuvre));
+	
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
 // Processes all inbox messages that the team AI received.
 // Param1: A pointer to the message to process.
 //--------------------------------------------------------------------------------------
@@ -90,15 +109,21 @@ void MultiflagCTFTeamAI::ProcessEvent(EventType type, void* pEventData)
 //--------------------------------------------------------------------------------------
 void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 {
-	switch(manoeuvre)
+	// Check if this AI has a manoeuvre of that type associated to it
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt != m_manoeuvres.end())
 	{
-	case TestAllAttackManoeuvre:
-		break;
-	case TestAllMoveManoeuvre:
-		break;
-	case TestAllDefendManoeuvre:
-		break;
-	default:
+		// Add available entities to the manoeuvre
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			foundIt->second->AddParticipant(*it);
+		}
+
+		// Initiate the manoeuvre
+		foundIt->second->Initiate();
+	}else
+	{
+		// Forward the call to the base class
 		TeamAI::InitiateManoeuvre(manoeuvre);
 	}
 }
@@ -111,18 +136,15 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 //--------------------------------------------------------------------------------------
 BehaviourStatus MultiflagCTFTeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime)
 {
-	switch(manoeuvre)
+	// Check if this AI has a manoeuvre of that type associated to it
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt != m_manoeuvres.end())
 	{
-	case TestAllAttackManoeuvre:
-		return AllAttack(deltaTime);
-		break;
-	case TestAllMoveManoeuvre:
-		return AllMove(deltaTime);
-		break;
-	case TestAllDefendManoeuvre:
-		return AllDefend(deltaTime);
-		break;
-	default:
+		// Update the manoeuvre
+		return foundIt->second->Update(deltaTime);
+	}else
+	{
+		// Forward the call to the base class
 		return TeamAI::UpdateManoeuvre(manoeuvre, deltaTime);
 	}
 }
@@ -133,15 +155,15 @@ BehaviourStatus MultiflagCTFTeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre,
 //--------------------------------------------------------------------------------------
 void MultiflagCTFTeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
 {
-	switch(manoeuvre)
+	// Check if this AI has a manoeuvre of that type associated to it
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt != m_manoeuvres.end())
 	{
-	case TestAllAttackManoeuvre:
-		break;
-	case TestAllMoveManoeuvre:
-		break;
-	case TestAllDefendManoeuvre:
-		break;
-	default:
+		// Terminate the manoeuvre
+		foundIt->second->Terminate();
+	}else
+	{
+		// Forward the call to the base class
 		TeamAI::TerminateManoeuvre(manoeuvre);
 	}
 }

@@ -382,12 +382,14 @@ void TestEnvironment::Cleanup()
 //--------------------------------------------------------------------------------------
 // Processes a given message.
 // Param1: A pointer to the message to process.
+// Returns true if this was the final communicator to process the message, false if the
+// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-void TestEnvironment::ProcessMessage(Message* pMessage)
+bool TestEnvironment::ProcessMessage(Message* pMessage)
 {
 	// Not expecting any messages, call the default implementation that simply marks all
 	// messages as processed.
-	Communicator::ProcessMessage(pMessage);
+	return Communicator::ProcessMessage(pMessage);
 }
 
 //--------------------------------------------------------------------------------------

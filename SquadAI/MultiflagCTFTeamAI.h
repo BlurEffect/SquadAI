@@ -61,7 +61,7 @@ protected:
 
 	virtual bool InitialiseManoeuvres(void);
 
-	void ProcessMessage(Message* pMessage);
+	bool ProcessMessage(Message* pMessage);
 	
 	// Available manoeuvres
 	BehaviourStatus AllAttack(float deltaTime);

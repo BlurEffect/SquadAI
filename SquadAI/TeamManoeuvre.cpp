@@ -60,6 +60,17 @@ void TeamManoeuvre::RemoveParticipant(unsigned long id)
 }
 
 //--------------------------------------------------------------------------------------
+// Resets the manoeuvre. Should only be called to reset the manoeuver in between game rounds.
+//--------------------------------------------------------------------------------------
+void TeamManoeuvre::Reset(void)
+{
+	ResetCommunication();
+	ClearOrders();
+	m_participants.clear();
+	m_active = false;
+}
+
+//--------------------------------------------------------------------------------------
 // Cancels an order and deletes it from the list of active orders.
 // Param1: A pointer for the entity, whose active order should be cancelled.
 //--------------------------------------------------------------------------------------
@@ -123,23 +134,88 @@ void TeamManoeuvre::ProcessEvent(EventType type, void* pEventData)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the team AI received.
 // Param1: A pointer to the message to process.
+// Returns true if this was the final communicator to process the message, false if the
+// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-void TeamManoeuvre::ProcessMessage(Message* pMessage)
+bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 {
+	// Default implementations of some messages that can be forwarded from a team AI
+
 	switch(pMessage->GetType())
 	{
 	case EnemySpottedMessageType:
-		// Update attack orders for that enemy
+		{
+		// Update any attack orders on this enemy with the newest position
+		EnemySpottedMessage* pMsg = reinterpret_cast<EnemySpottedMessage*>(pMessage);
+		UpdateAttackOrders(pMsg->GetData().m_enemyId, pMsg->GetData().m_enemyPosition);
+		return true;
 		break;
+		}
 	case UpdateEnemyPositionMessageType:
+		{
 		// Update attack orders
+		UpdateEnemyPositionMessage* pMsg = reinterpret_cast<UpdateEnemyPositionMessage*>(pMessage);
+		UpdateAttackOrders(pMsg->GetData().m_enemyId, pMsg->GetData().m_enemyPosition);
+		return true;
 		break;
+		}
 	case EntityKilledMessageType:
+		{
 		// Cancel all attack orders, cancel/remove a participant (dependign on manoeuvre)
+		EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(pMessage);
+		
+		// Make sure to cancel all active attack orders associated to the killed enemy
+		std::unordered_map<unsigned long, Order*>::iterator it = m_activeOrders.begin();
+		while(it != m_activeOrders.end())
+		{
+			if(it->second->GetOrderType() == AttackEnemyOrder && reinterpret_cast<AttackOrder*>(it->second)->GetEnemyId() == pMsg->GetData().m_id)
+			{
+				// TODO: Check if this actually works, involves erasing of the iterator
+				CancelOrder(it->first);
+			}else
+			{
+				++it;
+			}
+		}
+		return true;
 		break;
+		}
 	case UpdateOrderStateMessageType:
+		{
 		// Cancel old order, Send Follow-Up Orders, finish manoeuvre etc
+		UpdateOrderStateMessage* pMsg = reinterpret_cast<UpdateOrderStateMessage*>(pMessage);
+		if(pMsg->GetData().m_orderState == SucceededOrderState || pMsg->GetData().m_orderState == FailedOrderState)
+		{
+			CancelOrder(pMsg->GetData().m_entityId);
+		}
+		return true;
 		break;
+		}
+	default:
+		return Communicator::ProcessMessage(pMessage);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Updates the currently active attack orders by making sure the contained enemy 
+// positions are up to data.
+// Param1: The id of the enemy that moved and for which associated attack orders have to be updated.
+// Param2: The new position of the enemy.
+//--------------------------------------------------------------------------------------
+void TeamManoeuvre::UpdateAttackOrders(unsigned long enemyId, const XMFLOAT2 newPosition)
+{
+	// Check if there are any attack orders that have to be updated.
+	for(std::unordered_map<unsigned long, Order*>::iterator it = m_activeOrders.begin(); it != m_activeOrders.end(); ++it)
+	{
+		if(it->second->GetOrderType() == AttackEnemyOrder)
+		{
+			AttackOrder* pAttackOrder = reinterpret_cast<AttackOrder*>(it->second);
+			if(pAttackOrder->GetEnemyId() == enemyId)
+			{
+				// Update the order with the latest known position of the enemy
+				pAttackOrder->SetEnemyPosition(newPosition);
+			}
+		}
 	}
 }
 
@@ -165,6 +241,9 @@ void TeamManoeuvre::Initiate(void)
 //--------------------------------------------------------------------------------------
 BehaviourStatus TeamManoeuvre::Update(float deltaTime)
 {
+	SortOutProcessedMessages();
+	ProcessMessages();
+
 	if(m_active)
 	{
 		return StatusSuccess;
@@ -216,6 +295,16 @@ unsigned int TeamManoeuvre::GetMinNumberOfParticipants(void) const
 unsigned int TeamManoeuvre::GetMaxNumberOfParticipants(void) const
 {
 	return m_maxNumberOfParticipants;
+}
+
+const std::vector<Entity*>& TeamManoeuvre::GetParticipants(void) const
+{
+	return m_participants;
+}
+
+unsigned int TeamManoeuvre::GetNumberOfParticipants(void) const
+{
+	return m_participants.size();
 }
 
 void TeamManoeuvre::SetActive(bool active)

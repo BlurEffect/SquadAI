@@ -145,7 +145,7 @@ public:
 	};
 
 protected:
-	void ProcessMessage(Message* pMessage);
+	bool ProcessMessage(Message* pMessage);
 
 private:
 

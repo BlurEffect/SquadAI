@@ -46,14 +46,17 @@ public:
 	virtual BehaviourStatus Update(float deltaTime) = 0;
 	virtual void			Terminate(void) = 0;
 
+	virtual void Reset(void);
 	virtual void ProcessEvent(EventType type, void* pEventData);
 
 	// Data access functions
 
-	bool              IsActive(void) const;
-	TeamManoeuvreType GetType(void) const;
-	unsigned int	  GetMinNumberOfParticipants(void) const;
-	unsigned int	  GetMaxNumberOfParticipants(void) const;
+	bool						IsActive(void) const;
+	TeamManoeuvreType			GetType(void) const;
+	unsigned int				GetMinNumberOfParticipants(void) const;
+	unsigned int				GetMaxNumberOfParticipants(void) const;
+	const std::vector<Entity*>& GetParticipants(void) const;
+	unsigned int                GetNumberOfParticipants(void) const;
 
 	void SetActive(bool active);
 	void SetType(TeamManoeuvreType type);
@@ -61,7 +64,9 @@ public:
 	void SetMaxNumberOfParticipants(unsigned int maxNumberOfParticipants);
 
 protected:
-	virtual void ProcessMessage(Message* pMessage);
+	virtual void UpdateAttackOrders(unsigned long enemyId, const XMFLOAT2 newPosition);
+
+	virtual bool ProcessMessage(Message* pMessage);
 
 	void CancelOrder(Entity* pEntity);
 	void CancelOrder(unsigned long id);

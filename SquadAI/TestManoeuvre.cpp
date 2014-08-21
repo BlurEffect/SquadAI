@@ -25,11 +25,13 @@ TestManoeuvre::~TestManoeuvre(void)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the team AI received.
 // Param1: A pointer to the message to process.
+// Returns true if this was the final communicator to process the message, false if the
+// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-void TestManoeuvre::ProcessMessage(Message* pMessage)
+bool TestManoeuvre::ProcessMessage(Message* pMessage)
 {
 	
-
+	return TeamManoeuvre::ProcessMessage(pMessage);
 	// Update any active attack orders?
 	// Send cancel if order update received?
 }
@@ -94,6 +96,16 @@ void TestManoeuvre::Initiate(void)
 BehaviourStatus TestManoeuvre::Update(float deltaTime)
 {
 	// Keep track of who has reached the target and let those defend until all have arrived
+	SortOutProcessedMessages();
+	ProcessMessages();
+
+	if(!IsActive())
+	{
+		// The manoeuvre will become fail if something failed during the initiation or if it wasn't
+		// initiated at all.
+		return StatusFailure;
+	}
+
 
 	return StatusRunning;
 	//TestManoeuvre::Update(deltaTime);

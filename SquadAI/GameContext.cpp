@@ -163,11 +163,13 @@ void GameContext::ProcessEvent(EventType type, void* pEventData)
 //--------------------------------------------------------------------------------------
 // Processes a given message.
 // Param1: A pointer to the message to process.
+// Returns true if this was the final communicator to process the message, false if the
+// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-void GameContext::ProcessMessage(Message* pMessage)
+bool GameContext::ProcessMessage(Message* pMessage)
 {
 	// No messages expected, forward call to default implementation
-	Communicator::ProcessMessage(pMessage);
+	return Communicator::ProcessMessage(pMessage);
 }
 
 // Data access functions

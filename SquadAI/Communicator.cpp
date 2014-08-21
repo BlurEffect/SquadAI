@@ -49,15 +49,6 @@ void Communicator::SortOutProcessedMessages(void)
 //--------------------------------------------------------------------------------------
 bool Communicator::SendMessage(Communicator* pReceiver, MessageType messageType, void* pData)
 {
-	// Some messages don't have data
-	/*
-	if(!pData)
-	{
-		return false;
-	}
-	*/
-
-
 	Message* pMessage = nullptr;
 
 	switch(messageType)
@@ -108,6 +99,24 @@ bool Communicator::SendMessage(Communicator* pReceiver, MessageType messageType,
 	}
 
 	return false;
+}
+
+//--------------------------------------------------------------------------------------
+// Forwards an existing message to another communicator.
+// Param1: A pointer to the receiving communicator that the message should be sent to.
+// Param2: A pointer to the message that should be forwarded.
+//--------------------------------------------------------------------------------------
+void Communicator::ForwardMessage(Communicator* pReceiver, Message* pMessage)
+{
+	if(pMessage)
+	{
+		if(pMessage)
+		{
+			// No need to store the message in the outbox, as it is already in the outbox of the
+			// original sender, who will take care of deleting it.
+			pReceiver->GetInboxMessages().push(pMessage);
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -165,8 +174,10 @@ void Communicator::ProcessMessages(void)
 {
 	while(!m_inboxMessages.empty())
 	{
-		ProcessMessage(m_inboxMessages.front());
-		m_inboxMessages.front()->SetProcessed(true);
+		bool wasFinalProcessing = ProcessMessage(m_inboxMessages.front());
+		// If the message was forwarded, don't set it as processed yet. Wait for the receiver of the 
+		// forwarded message to set it as processed.
+		m_inboxMessages.front()->SetProcessed(wasFinalProcessing);
 		m_inboxMessages.pop();
 	}
 }
@@ -174,10 +185,12 @@ void Communicator::ProcessMessages(void)
 //--------------------------------------------------------------------------------------
 // Processes a given message. Default implementation.
 // Param1: A pointer to the message to process.
+// Returns true if this was the final communicator to process the message, false if the
+// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-void Communicator::ProcessMessage(Message* pMessage)
+bool Communicator::ProcessMessage(Message* pMessage)
 {
-	// Do nothing
+	return true;
 }
 
 std::queue<Message*>& Communicator::GetInboxMessages(void)

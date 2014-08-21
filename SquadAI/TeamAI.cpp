@@ -111,8 +111,10 @@ void TeamAI::CancelOrder(unsigned long id)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the team AI received.
 // Param1: A pointer to the message to process.
+// Returns true if this was the final communicator to process the message, false if the
+// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-void TeamAI::ProcessMessage(Message* pMessage)
+bool TeamAI::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -129,8 +131,11 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		}
 
 		// Update any attack orders on this enemy with the newest position
-		UpdateAttackOrders(pMsg->GetData().m_enemyId);
-
+		//UpdateAttackOrders(pMsg->GetData().m_enemyId);
+		if(ForwardMessageToActiveManoeuvers(pMessage))
+			{
+				return false;
+			}
 		break;
 		}
 	case LostSightOfEnemyMessageType:
@@ -152,7 +157,11 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		if(foundIt != m_enemyRecords.end())
 		{
 			foundIt->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
-			UpdateAttackOrders(pMsg->GetData().m_enemyId);
+			//UpdateAttackOrders(pMsg->GetData().m_enemyId);
+			if(ForwardMessageToActiveManoeuvers(pMessage))
+			{
+				return false;
+			}
 		}
 		break;
 		}
@@ -168,7 +177,7 @@ void TeamAI::ProcessMessage(Message* pMessage)
 			{
 				m_enemyRecords.erase(foundIt);
 			}
-
+			/*
 			// Make sure to cancel all active attack orders associated to the killed enemy
 			std::unordered_map<unsigned long, Order*>::iterator it = m_activeOrders.begin();
 			while(it != m_activeOrders.end())
@@ -182,7 +191,7 @@ void TeamAI::ProcessMessage(Message* pMessage)
 					++it;
 				}
 			}
-
+			*/
 		}else
 		{
 			// A friendly was killed
@@ -193,6 +202,11 @@ void TeamAI::ProcessMessage(Message* pMessage)
 
 			// Team AI can decide whether it wants to cancel the orders of the killed member or not
 		}
+
+		if(ForwardMessageToActiveManoeuvers(pMessage))
+			{
+				return false;
+			}
 		break;
 		}
 	case AttackedByEnemyMessageType:
@@ -215,32 +229,49 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		}
 	case UpdateOrderStateMessageType:
 		{
+
+			if(ForwardMessageToActiveManoeuvers(pMessage))
+			{
+				return false;
+			}
+			/*
 		UpdateOrderStateMessage* pMsg = reinterpret_cast<UpdateOrderStateMessage*>(pMessage);
 		
 		if(pMsg->GetData().m_orderState == SucceededOrderState || pMsg->GetData().m_orderState == FailedOrderState)
 		{
 			CancelOrder(pMsg->GetData().m_entityId);
-		}
+		}*/
+			
 		break;
 		}
+	default:
+		return Communicator::ProcessMessage(pMessage);
 	}
-	
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
 // Forwards a given message to all currently active manoeuvres of the team AI.
 // Param1: A pointer to the message to forward.
+// Returns true if the message was successfully forwarded to at least one manoeuver, false
+// if the message wasn't forwarded to anyone.
 //--------------------------------------------------------------------------------------
-void TeamAI::ForwardMessageToActiveManoeuvers(Message* pMessage)
+bool TeamAI::ForwardMessageToActiveManoeuvers(Message* pMessage)
 {
+	bool wasForwarded = false;
+
 	for(std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator it = m_manoeuvres.begin(); it != m_manoeuvres.end(); ++it)
 	{
 		if(it->second->IsActive())
 		{
-			//SendMessage
-
+			// Forward the message
+			ForwardMessage(it->second, pMessage);
+			wasForwarded = true;
 		}
 	}
+
+	return wasForwarded;
 }
 
 
@@ -414,6 +445,8 @@ void TeamAI::AddTeamMember(Entity* pEntity)
 		{
 			// Add the team member only if it is not already a member.
 			m_teamMembers.push_back(pEntity);
+			// Also, add an entry to the map that keeps track of which entities are engaged in manoeuvres.
+			m_entityManoeuvreMap.insert(std::pair<unsigned long, TeamManoeuvre*>(pEntity->GetId(), nullptr));
 		}
 	}
 }
@@ -448,6 +481,18 @@ void TeamAI::Reset(void)
 
 	// Clear team members
 	m_teamMembers.clear();
+
+	// Reset the entity/manoeuvre map
+	for(std::unordered_map<unsigned long, TeamManoeuvre*>::iterator it = m_entityManoeuvreMap.begin(); it != m_entityManoeuvreMap.end(); ++it)
+	{
+		it->second = nullptr;
+	}
+
+	// Reset all manoeuvres
+	for(std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator it = m_manoeuvres.begin(); it != m_manoeuvres.end(); ++it)
+	{
+		it->second->Reset();
+	}
 }
 
 // Data access functions

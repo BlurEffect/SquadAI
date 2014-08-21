@@ -29,6 +29,7 @@ public:
 
 	void SortOutProcessedMessages(void);
 	bool SendMessage(Communicator* pReceiver, MessageType messageType, void* pData);
+	void ForwardMessage(Communicator* pReceiver, Message* pMessage);
 	bool SendEvent(Communicator* pReceiver, EventType eventType, void* pData);
 	void ResetCommunication(void);
 	void ProcessMessages(void);
@@ -39,7 +40,7 @@ public:
 	virtual void ProcessEvent(EventType type, void* pEventData) = 0;
 
 protected:
-	virtual void ProcessMessage(Message* pMessage) = 0;
+	virtual bool ProcessMessage(Message* pMessage) = 0;
 
 private:
 

@@ -105,16 +105,17 @@ protected:
 
 	void CancelOrder(unsigned long id);
 
-	virtual void ProcessMessage(Message* pMessage);
+	virtual bool ProcessMessage(Message* pMessage);
 	virtual void UpdateAttackOrders(unsigned long enemyId);
 
 
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*> m_manoeuvres; // The available team manoeuvres for this team AI
+		std::unordered_map<unsigned long, TeamManoeuvre*> m_entityManoeuvreMap; // Keeps track of which team members are currently engaged in which manoeuvres
 
 private:
 
-	void ForwardMessageToActiveManoeuvers(Message* pMessage);
+	bool ForwardMessageToActiveManoeuvers(Message* pMessage);
 
 	EntityTeam						     m_team;					// The team that the AI is controlling
 	TeamAICharacteristic                 m_characteristic;     // The characteristic of the team AI

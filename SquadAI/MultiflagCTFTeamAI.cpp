@@ -58,8 +58,10 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 //--------------------------------------------------------------------------------------
 // Processes all inbox messages that the team AI received.
 // Param1: A pointer to the message to process.
+// Returns true if this was the final communicator to process the message, false if the
+// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
+bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -68,6 +70,7 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		FlagPickedUpMessage* pMsg = reinterpret_cast<FlagPickedUpMessage*>(pMessage);
 		m_flagData[pMsg->GetData().m_flagOwner].m_state     = Stolen;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = pMsg->GetData().m_carrierId;
+		return true;
 		break;
 		}
 	case FlagDroppedMessageType:
@@ -76,6 +79,7 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetData().m_flagOwner].m_state     = Dropped;
 		m_flagData[pMsg->GetData().m_flagOwner].m_position  = pMsg->GetData().m_dropPosition;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
+		return true;
 		break;
 		}
 	case FlagReturnedMessageType:
@@ -84,11 +88,12 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetData().m_flagOwner].m_state     = InBase;
 		m_flagData[pMsg->GetData().m_flagOwner].m_position  = m_flagData[pMsg->GetData().m_flagOwner].m_basePosition;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
+		return true;
 		break;
 		}
 	default:
 		// Forward other messages to the base class implementation of the function
-		TeamAI::ProcessMessage(pMessage);
+		return TeamAI::ProcessMessage(pMessage);
 	}
 }
 
@@ -117,6 +122,8 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
 		{
 			foundIt->second->AddParticipant(*it);
+			// Remember that this entity is now executing that manoeuver
+			m_entityManoeuvreMap[(*it)->GetId()] = foundIt->second;
 		}
 
 		// Initiate the manoeuvre
@@ -159,6 +166,12 @@ void MultiflagCTFTeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
 	if(foundIt != m_manoeuvres.end())
 	{
+		// Release all entities from the manoeuvre that is about to terminate
+		for(std::vector<Entity*>::const_iterator it = foundIt->second->GetParticipants().begin(); it != foundIt->second->GetParticipants().end(); ++it)
+		{
+			m_entityManoeuvreMap[(*it)->GetId()] = nullptr;
+		}
+
 		// Terminate the manoeuvre
 		foundIt->second->Terminate();
 	}else

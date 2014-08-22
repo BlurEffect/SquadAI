@@ -401,26 +401,34 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 	{
 		TeamBehaviour* pUpdateTeamAISequence = CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "UpdateTeamAISequence", nullptr);
 
-		//Behaviour* pAllAttackAction = CreateTeamBehaviour(TeamAllAttackType, pTeamAI, "AllAttackAction", nullptr);
-		//Behaviour* pAllDefendAction = CreateTeamBehaviour(TeamAllDefendType, pTeamAI, "AllDefendAction", nullptr);
-		//Behaviour* pAllMoveAction = CreateTeamBehaviour(TeamAllMoveType, pTeamAI, "AllMoveAction", nullptr);
+		TeamBehaviour* pTestActiveCharacteristicSelector = CreateParentTeamBehaviour(TeamActiveCharacteristicSelectorType, pTeamAI, "TestActiveCharacteristicSelector", nullptr);
+		
+		TeamBehaviour* pTestManoeuvreSequence = CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "TestManoeuvreSequence", nullptr);
 
-		ExecuteTeamManoeuvreInitData executedManoeuvre(TestAllMoveManoeuvre);
-		TeamBehaviour* pExecuteManoeuvreAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "TeamExecuteManoeuvreAction", 0.5f, 0.5f, &executedManoeuvre);
-
-		if(pUpdateTeamAISequence && pExecuteManoeuvreAction)// && pAllAttackAction && pAllDefendAction && pAllMoveAction)
+		if(pUpdateTeamAISequence && pTestActiveCharacteristicSelector && pTestManoeuvreSequence)// && pAllAttackAction && pAllDefendAction && pAllMoveAction)
 		{
 			ReturnSpecificStatusInitData data(pUpdateTeamAISequence, StatusFailure);
 			TeamBehaviour* pAlwaysFailDecorator = CreateParentTeamBehaviour(TeamReturnSpecificStatusType, pTeamAI, "TeamAlwaysFailDecorator", &data);
 
 			TeamBehaviour* pTeamProcessMessagesAction = CreatePrimitiveTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", 1.0f, 1.0f, nullptr);
+			
+			ManoeuvrePreconditionsFulfilledInitData conditionCheckData(TestAllMoveManoeuvre);
+			TeamBehaviour* pTestCheckManoeuvrePreconditions = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "TestCheckManoeuvrePreconditions", 0.0f, 0.0f, &conditionCheckData);
+			
+			ExecuteTeamManoeuvreInitData executedManoeuvre(TestAllMoveManoeuvre);
+			TeamBehaviour* pTestExecuteManoeuvreAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "TeamExecuteManoeuvreAction", 0.5f, 0.5f, &executedManoeuvre);
 
-			if(pAlwaysFailDecorator && pTeamProcessMessagesAction)
+			if(pAlwaysFailDecorator && pTeamProcessMessagesAction && pTestCheckManoeuvrePreconditions && pTestExecuteManoeuvreAction)
 			{
 				reinterpret_cast<TeamComposite*>(pTeamRoot)->AddChild(pAlwaysFailDecorator);
-				reinterpret_cast<TeamComposite*>(pTeamRoot)->AddChild(pExecuteManoeuvreAction);
+				reinterpret_cast<TeamComposite*>(pTeamRoot)->AddChild(pTestActiveCharacteristicSelector);
 
 				reinterpret_cast<TeamComposite*>(pUpdateTeamAISequence)->AddChild(pTeamProcessMessagesAction);
+
+				reinterpret_cast<TeamComposite*>(pTestActiveCharacteristicSelector)->AddChild(pTestManoeuvreSequence);
+
+				reinterpret_cast<TeamComposite*>(pTestManoeuvreSequence)->AddChild(pTestCheckManoeuvrePreconditions);
+				reinterpret_cast<TeamComposite*>(pTestManoeuvreSequence)->AddChild(pTestExecuteManoeuvreAction);
 
 				return pTeamRoot;
 			}
@@ -600,6 +608,18 @@ TeamBehaviour* BehaviourFactory::CreatePrimitiveTeamBehaviour(PrimitiveTeamBehav
 		{
 		ExecuteTeamManoeuvreInitData* pData = reinterpret_cast<ExecuteTeamManoeuvreInitData*>(pInitData);
 		return new ExecuteTeamManoeuvre(name, pTeamAI, pData->m_manoeuvreType, aggressiveness, defensiveness);
+		break;
+		}
+	case TeamManoeuvrePreconditionsFulfilledType:
+		{
+		ManoeuvrePreconditionsFulfilledInitData* pData = reinterpret_cast<ManoeuvrePreconditionsFulfilledInitData*>(pInitData);
+		return new ManoeuvrePreconditionsFulfilled(name, pTeamAI, pData->m_manoeuvreType, aggressiveness, defensiveness);
+		break;
+		}
+	case TeamManoeuvreStillValidType:
+		{
+		ManoeuvreStillValidInitData* pData = reinterpret_cast<ManoeuvreStillValidInitData*>(pInitData);
+		return new ManoeuvreStillValid(name, pTeamAI, pData->m_manoeuvreType, aggressiveness, defensiveness);
 		break;
 		}
 		/*

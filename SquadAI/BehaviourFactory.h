@@ -50,6 +50,8 @@
 // Primitive Team Behaviours
 #include "TeamProcessMessages.h"
 #include "ExecuteTeamManoeuvre.h"
+#include "ManoeuvrePreconditionsFulfilled.h"
+#include "ManoeuvreStillValid.h"
 // Parent Team Behaviours
 #include "TeamSelector.h"
 #include "TeamActiveSelector.h"
@@ -126,7 +128,9 @@ enum UniversalBehaviourType
 enum PrimitiveTeamBehaviourType
 {
 	TeamProcessMessagesType,
-	TeamExecuteManoeuvreType
+	TeamExecuteManoeuvreType,
+	TeamManoeuvrePreconditionsFulfilledType,
+	TeamManoeuvreStillValidType
 	//TeamAllAttackType,
 	//TeamAllDefendType,
 	//TeamAllMoveType

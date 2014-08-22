@@ -11,6 +11,7 @@
 
 TeamManoeuvre::TeamManoeuvre(TeamManoeuvreType type, unsigned int minNumberParticipants, unsigned int maxNumberParticipants)
 	: m_active(false),
+	  m_succeeded(false),
 	  m_type(type),
 	  m_minNumberOfParticipants(minNumberParticipants),
 	  m_maxNumberOfParticipants(maxNumberParticipants)
@@ -52,8 +53,11 @@ void TeamManoeuvre::RemoveParticipant(unsigned long id)
 	std::vector<Entity*>::iterator foundIt = std::find_if(m_participants.begin(), m_participants.end(), Entity::FindEntityById(id));
 	if(foundIt != m_participants.end())
 	{
-		// Cancel the currently active order for the entity that will be deleted.
+		// Cancel and delete the currently active order for the entity that will be deleted.
 		CancelOrder(*foundIt);
+		std::unordered_map<unsigned long, Order*>::iterator foundOrder = m_activeOrders.find((*foundIt)->GetId());
+		m_activeOrders.erase(foundOrder);
+
 		// Remove the entity from the participants
 		m_participants.erase(foundIt);
 	}
@@ -68,10 +72,12 @@ void TeamManoeuvre::Reset(void)
 	ClearOrders();
 	m_participants.clear();
 	m_active = false;
+	m_succeeded = false;
 }
 
 //--------------------------------------------------------------------------------------
-// Cancels an order and deletes it from the list of active orders.
+// Cancels an order and notifies the associated entity of the cancelling. The order has
+// to be deleted separately from the list of active orders after cancelling it.
 // Param1: A pointer for the entity, whose active order should be cancelled.
 //--------------------------------------------------------------------------------------
 void TeamManoeuvre::CancelOrder(Entity* pEntity)
@@ -83,7 +89,6 @@ void TeamManoeuvre::CancelOrder(Entity* pEntity)
 		delete foundIt->second;
 		foundIt->second = nullptr;
 
-		m_activeOrders.erase(foundIt);
 	}
 
 	// Notify the entity that the order was cancelled
@@ -91,7 +96,8 @@ void TeamManoeuvre::CancelOrder(Entity* pEntity)
 }
 
 //--------------------------------------------------------------------------------------
-// Cancels an order and deletes it from the list of active orders.
+// Cancels an order and notifies the associated entity of the cancelling. The order has
+// to be deleted separately from the list of active orders after cancelling it.
 // Param1: The id of the entity for which to cancel the active order.
 //--------------------------------------------------------------------------------------
 void TeamManoeuvre::CancelOrder(unsigned long id)
@@ -172,6 +178,7 @@ bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 			{
 				// TODO: Check if this actually works, involves erasing of the iterator
 				CancelOrder(it->first);
+				it = m_activeOrders.erase(it);
 			}else
 			{
 				++it;
@@ -187,6 +194,10 @@ bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 		if(pMsg->GetData().m_orderState == SucceededOrderState || pMsg->GetData().m_orderState == FailedOrderState)
 		{
 			CancelOrder(pMsg->GetData().m_entityId);
+
+			// Find the order based on the entity's ID
+			std::unordered_map<unsigned long, Order*>::iterator foundIt = m_activeOrders.find(pMsg->GetData().m_entityId);
+			m_activeOrders.erase(foundIt);
 		}
 		return true;
 		break;
@@ -244,6 +255,11 @@ BehaviourStatus TeamManoeuvre::Update(float deltaTime)
 	SortOutProcessedMessages();
 	ProcessMessages();
 
+	if(GetNumberOfParticipants() < GetMinNumberOfParticipants())
+	{
+		return StatusFailure;
+	}
+
 	if(m_active)
 	{
 		return StatusSuccess;
@@ -262,14 +278,12 @@ void TeamManoeuvre::Terminate(void)
 	// Default implementation
 	
 	// Cancel orders for all participants
-	std::unordered_map<unsigned long, Order*>::iterator it = m_activeOrders.begin();
-	while(it != m_activeOrders.end())
+	for(std::unordered_map<unsigned long, Order*>::iterator it = m_activeOrders.begin(); it != m_activeOrders.end(); ++it)
 	{
-		// This call includes erasing of the current iterator, thus incrementing is not necessary.
-		// TODO: Check if this is safe.
 		CancelOrder(it->first);
 	}
 
+	m_activeOrders.clear();
 	m_participants.clear();
 
 	m_active = false;
@@ -280,6 +294,11 @@ void TeamManoeuvre::Terminate(void)
 bool TeamManoeuvre::IsActive(void) const
 {
 	return m_active;
+}
+
+bool TeamManoeuvre::HasSucceeded(void) const
+{
+	return m_succeeded;
 }
 
 TeamManoeuvreType TeamManoeuvre::GetType(void) const
@@ -310,6 +329,11 @@ unsigned int TeamManoeuvre::GetNumberOfParticipants(void) const
 void TeamManoeuvre::SetActive(bool active)
 {
 	m_active = active;
+}
+
+void TeamManoeuvre::SetSucceeded(bool succeeded)
+{
+	m_succeeded = succeeded;
 }
 
 void TeamManoeuvre::SetType(TeamManoeuvreType type)

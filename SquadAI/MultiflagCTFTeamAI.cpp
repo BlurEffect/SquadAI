@@ -30,6 +30,8 @@ bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironme
 			return false;
 		}
 
+		reinterpret_cast<TeamBehaviour*>(m_pBehaviour)->CalculateCharacteristicValues();
+
 		return true;
 	}
 
@@ -108,6 +110,63 @@ void MultiflagCTFTeamAI::ProcessEvent(EventType type, void* pEventData)
 	TeamAI::ProcessEvent(type, pEventData);
 }
 
+int g_count = 0;
+
+//--------------------------------------------------------------------------------------
+// Checks whether the preconditions for a certain manoeuvre are fulfilled.
+// Param1: Identifies the manoeuvre, for which to check the preconditions.
+//--------------------------------------------------------------------------------------
+bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre)
+{
+	if(g_count >= 2)
+	{
+		return false;
+	}
+
+	unsigned int numberOfAvailableEntities = 0;
+	std::vector<Entity*> availableEntities;
+
+	// Check how many entities are freely available to engage in new manoeuvres
+	for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+	{
+		// If the entity is not registered with a manoeuvre, remember it as available
+		if(!m_entityManoeuvreMap[(*it)->GetId()])
+		{
+			++numberOfAvailableEntities;
+			availableEntities.push_back(*it);
+		}
+	}
+
+	switch(manoeuvre)
+	{
+	case TestAllMoveManoeuvre:
+		++g_count;
+		return (numberOfAvailableEntities >= m_manoeuvres[TestAllMoveManoeuvre]->GetMinNumberOfParticipants());
+		break;
+	default:
+		return TeamAI::ManoeuvrePreconditionsFulfilled(manoeuvre);
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Checks whether the necessary conditions for the execution of a certain manoeuvre are 
+// still given
+// Param1: Identifies the manoeuvre, for which to check the conditions.
+// Returns true if the conditions for the manoeuvre are still fulfilled, false otherwise.
+//--------------------------------------------------------------------------------------
+bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
+{
+	switch(manoeuvre)
+	{
+	case TestAllMoveManoeuvre:
+		return true;
+		break;
+	default:
+		return TeamAI::ManoeuvreStillValid(manoeuvre);
+	}
+}
+
+
 //--------------------------------------------------------------------------------------
 // Processes a message sent to the team AI.
 // Param1: A pointer to the message to process.
@@ -118,12 +177,23 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
 	if(foundIt != m_manoeuvres.end())
 	{
-		// Add available entities to the manoeuvre
-		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		// Keep track of how many entities have been added to the manoeuvre.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = GetTeamMembers().begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities <= foundIt->second->GetMaxNumberOfParticipants()) && (it != GetTeamMembers().end()))
 		{
-			foundIt->second->AddParticipant(*it);
-			// Remember that this entity is now executing that manoeuver
-			m_entityManoeuvreMap[(*it)->GetId()] = foundIt->second;
+			// If the entity is not engaged in another manoeuver, add it to this one.
+			if(!m_entityManoeuvreMap[(*it)->GetId()])
+			{
+				foundIt->second->AddParticipant(*it);
+				// Remember that this entity is now executing that manoeuver
+				m_entityManoeuvreMap[(*it)->GetId()] = foundIt->second;
+				++addedEntities;
+			}
+			++it;
 		}
 
 		// Initiate the manoeuvre

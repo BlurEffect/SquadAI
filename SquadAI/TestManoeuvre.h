@@ -8,6 +8,7 @@
 #define TEST_MANOEUVRE_H
 
 // Includes
+#include <algorithm>
 #include "TeamManoeuvre.h"
 
 // Forward declarations
@@ -34,6 +35,8 @@ protected:
 
 private:
 	TeamAI* m_pTeamAI; // The team AI able to use this manoeuvre
+
+	unsigned int m_entitiesReachedDestinationCount; // Keeps track of how many entities have reached the destination
 };
 
 #endif // TEAM_MANOEUVRE_H

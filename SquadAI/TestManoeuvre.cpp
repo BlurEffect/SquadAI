@@ -13,7 +13,8 @@
 
 TestManoeuvre::TestManoeuvre(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, TeamAI* pTeamAI)
 	: TeamManoeuvre(TestAllMoveManoeuvre, minNumberParticipants, maxNumberParticipants),
-	  m_pTeamAI(pTeamAI)
+	  m_pTeamAI(pTeamAI),
+	  m_entitiesReachedDestinationCount(0)
 {
 }
 
@@ -30,8 +31,56 @@ TestManoeuvre::~TestManoeuvre(void)
 //--------------------------------------------------------------------------------------
 bool TestManoeuvre::ProcessMessage(Message* pMessage)
 {
-	
-	return TeamManoeuvre::ProcessMessage(pMessage);
+	switch(pMessage->GetType())
+	{
+	case UpdateOrderStateMessageType:
+	{
+	// Cancel old order, Send Follow-Up Orders, finish manoeuvre etc
+	UpdateOrderStateMessage* pMsg = reinterpret_cast<UpdateOrderStateMessage*>(pMessage);
+	if(pMsg->GetData().m_orderState == SucceededOrderState)
+	{
+		// Officially cancel the old order that was fulfilled and delete it.
+		CancelOrder(pMsg->GetData().m_entityId);
+		m_activeOrders.erase(m_activeOrders.find(pMsg->GetData().m_entityId));
+
+		if(m_pTeamAI->GetTeam() == TeamRed)
+		{
+			// The entity reached its destination, let it wait until all entities have arrived.
+			++m_entitiesReachedDestinationCount;
+			Order* pNewOrder = new DefendOrder(pMsg->GetData().m_entityId, DefendPositionOrder, MediumPriority, XMFLOAT2(20.0f, 20.0f), XMFLOAT2(0.0f,0.0f));
+		
+			if(!pNewOrder)
+			{
+				SetActive(false);
+			}
+		
+			// Find the participant
+			std::vector<Entity*>::iterator foundIt = std::find_if(m_participants.begin(), m_participants.end(), Entity::FindEntityById(pMsg->GetData().m_entityId));
+
+			FollowOrderMessageData data(pNewOrder);
+			SendMessage(*foundIt, FollowOrderMessageType, &data);
+
+			m_activeOrders.insert(std::pair<unsigned long, Order*>(pMsg->GetData().m_entityId, pNewOrder));
+		}
+		if(m_entitiesReachedDestinationCount == GetNumberOfParticipants())
+		{
+			// All entities reached the destination, initiate termination of the manoeuvre
+			SetActive(false);
+			SetSucceeded(true);
+		}
+
+	}else if(pMsg->GetData().m_orderState == FailedOrderState)
+	{
+		// The order failed -> release the entity from the manoeuvre
+		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
+	}
+	return true;
+	break;
+	}
+	default:
+		return TeamManoeuvre::ProcessMessage(pMessage);
+	}
+
 	// Update any active attack orders?
 	// Send cancel if order update received?
 }
@@ -98,12 +147,15 @@ BehaviourStatus TestManoeuvre::Update(float deltaTime)
 	// Keep track of who has reached the target and let those defend until all have arrived
 	SortOutProcessedMessages();
 	ProcessMessages();
-
-	if(!IsActive())
+	
+	if((!IsActive() && !HasSucceeded()) || (GetNumberOfParticipants() < GetMinNumberOfParticipants()))
 	{
-		// The manoeuvre will become fail if something failed during the initiation or if it wasn't
+		// The manoeuvre will fail if something failed during the initiation or if it wasn't
 		// initiated at all.
 		return StatusFailure;
+	}else if(HasSucceeded())
+	{
+		return StatusSuccess;
 	}
 
 
@@ -117,5 +169,6 @@ BehaviourStatus TestManoeuvre::Update(float deltaTime)
 //--------------------------------------------------------------------------------------
 void TestManoeuvre::Terminate(void)
 {
+	m_entitiesReachedDestinationCount = 0;
 	TeamManoeuvre::Terminate();
 }

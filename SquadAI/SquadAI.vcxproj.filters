@@ -489,6 +489,12 @@
     <ClCompile Include="TeamManoeuvreFactory.cpp">
       <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
+    <ClCompile Include="ManoeuvrePreconditionsFulfilled.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="ManoeuvreStillValid.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -865,6 +871,12 @@
     </ClInclude>
     <ClInclude Include="TeamManoeuvreFactory.h">
       <Filter>Header Files\Manoeuvres</Filter>
+    </ClInclude>
+    <ClInclude Include="ManoeuvrePreconditionsFulfilled.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="ManoeuvreStillValid.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

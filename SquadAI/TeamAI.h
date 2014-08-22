@@ -78,9 +78,13 @@ public:
 	virtual void ProcessEvent(EventType type, void* pEventData);
 	void ClearOrders(void);
 
+	virtual bool ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre);
+	virtual bool ManoeuvreStillValid(TeamManoeuvreType manoeuvre);
 	virtual void InitiateManoeuvre(TeamManoeuvreType manoeuvre);
 	virtual BehaviourStatus UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime);
 	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
+
+	void ReleaseEntityFromManoeuvre(unsigned long entityId);
 
 	// Data access functions
 

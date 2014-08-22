@@ -87,6 +87,8 @@
     <ClCompile Include="ActiveSelector.cpp" />
     <ClCompile Include="AllDefendBase.cpp" />
     <ClCompile Include="ExecuteTeamManoeuvre.cpp" />
+    <ClCompile Include="ManoeuvrePreconditionsFulfilled.cpp" />
+    <ClCompile Include="ManoeuvreStillValid.cpp" />
     <ClCompile Include="TeamManoeuvre.cpp" />
     <ClCompile Include="TeamActiveCharacteristicSelector.cpp" />
     <ClCompile Include="TeamActiveSelector.cpp" />
@@ -229,11 +231,13 @@
     <ClInclude Include="FinaliseMovement.h" />
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
+    <ClInclude Include="ManoeuvrePreconditionsFulfilled.h" />
     <ClInclude Include="TeamActiveCharacteristicSelector.h" />
     <ClInclude Include="LookAtTarget.h" />
     <ClInclude Include="TeamComposite.h" />
     <ClInclude Include="TeamDecorator.h" />
     <ClInclude Include="TeamManoeuvreFactory.h" />
+    <ClInclude Include="ManoeuvreStillValid.h" />
     <ClInclude Include="TeamMonitor.h" />
     <ClInclude Include="TeamParallel.h" />
     <ClInclude Include="TeamRepeat.h" />

@@ -52,6 +52,7 @@ public:
 	// Data access functions
 
 	bool						IsActive(void) const;
+	bool						HasSucceeded(void) const;
 	TeamManoeuvreType			GetType(void) const;
 	unsigned int				GetMinNumberOfParticipants(void) const;
 	unsigned int				GetMaxNumberOfParticipants(void) const;
@@ -59,6 +60,7 @@ public:
 	unsigned int                GetNumberOfParticipants(void) const;
 
 	void SetActive(bool active);
+	void SetSucceeded(bool succeeded);
 	void SetType(TeamManoeuvreType type);
 	void SetMinNumberOfParticipants(unsigned int minNumberOfParticipants);
 	void SetMaxNumberOfParticipants(unsigned int maxNumberOfParticipants);
@@ -77,6 +79,7 @@ protected:
 	
 private:
 	bool              m_active;                  // Tells whether the manoeuvre is currently being executed or inactive
+	bool              m_succeeded;               // Tells whether the manoeuvre succeeded or failed
 	TeamManoeuvreType m_type;					 // Identifies the type of the manoeuvre
 	unsigned int      m_minNumberOfParticipants; // The minimal number of entities required to execute the manoeuvre
 	unsigned int	  m_maxNumberOfParticipants; // The maximal number of entities allowed to execute the manoeuvre

@@ -333,8 +333,29 @@ void TeamAI::ClearOrders(void)
 }
 
 //--------------------------------------------------------------------------------------
+// Checks whether the preconditions for a certain manoeuvre are fulfilled.
+// Param1: Identifies the manoeuvre, for which to check the preconditions.
+// Returns true if the preconditions for the manoeuvre are fulfilled, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Checks whether the necessary conditions for the execution of a certain manoeuvre are 
+// still given
+// Param1: Identifies the manoeuvre, for which to check the conditions.
+// Returns true if the conditions for the manoeuvre are still fulfilled, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
+{
+	return true;
+}
+
+//--------------------------------------------------------------------------------------
 // Processes a message sent to the team AI.
-// Param1: A pointer to the message to process.
+// Param1: Identifies the manoeuvre to initiate.
 //--------------------------------------------------------------------------------------
 void TeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 {
@@ -342,8 +363,8 @@ void TeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 }
 
 //--------------------------------------------------------------------------------------
-// Processes a message sent to the team AI.
-// Param1: A pointer to the message to process.
+// Updates a certain manoeuvre.
+// Param1: Identifies the manoeuvre to update.
 // Param2: The time passed since the last update.
 // Returns a behaviour status code representing the current state of the manoeuvre.
 //--------------------------------------------------------------------------------------
@@ -353,15 +374,26 @@ BehaviourStatus TeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre, float delta
 }
 
 //--------------------------------------------------------------------------------------
-// Processes a message sent to the team AI.
-// Param1: A pointer to the message to process.
+// Terminates a certain manoeuvre.
+// Param1: Identifies the manoeuvre to terminate.
 //--------------------------------------------------------------------------------------
 void TeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
 {
 
 }
 
-
+//--------------------------------------------------------------------------------------
+// Releases an entity from the manoeuvre it is currently engaged in.
+// Param1: The id of the entity to release from its current manoeuvre.
+//--------------------------------------------------------------------------------------
+void TeamAI::ReleaseEntityFromManoeuvre(unsigned long entityId)
+{
+	if(m_entityManoeuvreMap[entityId])
+	{
+		m_entityManoeuvreMap[entityId]->RemoveParticipant(entityId);
+		m_entityManoeuvreMap[entityId] = nullptr;
+	}
+}
 /*
 //--------------------------------------------------------------------------------------
 // Processes a message sent to the team AI.

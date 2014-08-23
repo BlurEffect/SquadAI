@@ -8,6 +8,7 @@
 // Includes
 #include "TeamManoeuvreFactory.h"
 #include "TeamAI.h"
+#include "MultiflagCTFTeamAI.h"
 
 //--------------------------------------------------------------------------------------
 // Creates a certain team manoeuvre for use by the provided team AI.
@@ -27,6 +28,17 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 	case TestAllMoveManoeuvre:
 		return new TestManoeuvre(minNumberOfParticipants, maxNumberOfParticipants, pTeamAI);
 		break;
+	case DefendBaseEntrancesManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		DefendBaseEntrancesInitData* pData = reinterpret_cast<DefendBaseEntrancesInitData*>(pAdditionalData);
+		return new DefendBaseEntrances(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_switchPositionsInterval);
+		break;
+		}
 	default:
 		return nullptr;
 	}

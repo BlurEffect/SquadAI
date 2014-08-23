@@ -16,6 +16,7 @@
 
 using namespace DirectX;
 
+/*
 //--------------------------------------------------------------------------------------
 // Defines possible values for a node's property of providing access into a team's base.
 //--------------------------------------------------------------------------------------
@@ -26,6 +27,7 @@ enum BaseEntranceType
 	NoEntrance,
 	RedAndBlueEntrance
 };
+*/
 
 class Node
 {
@@ -47,7 +49,7 @@ public:
 	CollidableObject*		  GetObstacle(void);
 	bool					  IsCovered(Direction direction) const;
 	EntityTeam				  GetTerritoryOwner(void) const;
-	BaseEntranceType		  GetEntranceToBase(void) const;
+	bool  		              IsEntranceToBase(void) const;
 	const std::vector<Node*>& GetAdjacentNodes(void) const;
 	float					  GetMovementCost(void) const;
 	float					  GetHeurisitcValue(void) const;
@@ -60,7 +62,7 @@ public:
 	void SetObstacle(CollidableObject* pObstacle);
 	void SetCovered(Direction direction, bool isCovered);
 	void SetTerritoryOwner(EntityTeam team);
-	void SetEntranceToBase(BaseEntranceType entrance);
+	void SetEntranceToBase(bool isEntrance);
 	void SetMovementCost(float cost);
 	void SetHeurisitcValue(float heuristicValue);
 
@@ -73,7 +75,7 @@ private:
 	CollidableObject* m_pObstacle;					       // The obstacle placed on this node, null if there is no obstacle
 	bool		      m_coverProvided[NumberOfDirections]; // Tells whether this node is covered from some directions or is all in the open
 	EntityTeam        m_territoryOwner;					   // Tells whether this node is part of the base of a team
-	BaseEntranceType  m_entranceToBase;				       // Tells whether the node is an entrance node into a team base
+	bool              m_isEntranceToBase;				   // Tells whether the node is an entrance node into a team base
 
 	// Needed for pathfinding
 	std::vector<Node*> m_adjacentNodes;				   // The nodes in the graph that can be directly reached from this one

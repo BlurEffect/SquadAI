@@ -54,7 +54,26 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(TestAllMoveManoeuvre, pTestManoeuvre));
 	
+	// Defend base entrances manoeuvre
+	DefendBaseEntrancesInitData defendEntrancesData(5.0f);
+	TeamManoeuvre* pDefendBaseEntrancesManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(DefendBaseEntrancesManoeuvre, 1, 8, this, &defendEntrancesData);
+	if(!pDefendBaseEntrancesManoeuvre)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(DefendBaseEntrancesManoeuvre, pDefendBaseEntrancesManoeuvre));
+
+
 	return true;
+}
+
+//--------------------------------------------------------------------------------------
+// Prepares the team AI for the simulation.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFTeamAI::PrepareForSimulation(void)
+{
+	// Create a list of all base entrances for both teams.
+	
 }
 
 //--------------------------------------------------------------------------------------
@@ -284,6 +303,24 @@ BehaviourStatus MultiflagCTFTeamAI::AllAttack(float deltaTime)
 	}
 
 	return StatusSuccess;
+}
+
+const FlagData& MultiflagCTFTeamAI::GetFlagData(EntityTeam team) const
+{
+	return m_flagData[team];
+}
+
+//--------------------------------------------------------------------------------------
+// Registers an objective, in this case a flag, with the team AI.
+// Param1: A pointer to the objective to register.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFTeamAI::RegisterObjective(Objective* pObjective)
+{
+	if(pObjective)
+	{
+		m_flagData[pObjective->GetTeam()].m_basePosition = pObjective->GetPosition();
+		m_flagData[pObjective->GetTeam()].m_position     = pObjective->GetPosition();
+	}
 }
 
 //--------------------------------------------------------------------------------------

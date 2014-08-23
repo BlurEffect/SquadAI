@@ -441,9 +441,6 @@
     <ClCompile Include="FinaliseMovement.cpp">
       <Filter>Source Files\BehaviourTree\UniversalIndividualBehaviours\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="AllDefendBase.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
-    </ClCompile>
     <ClCompile Include="TeamBehaviour.cpp">
       <Filter>Source Files\BehaviourTree</Filter>
     </ClCompile>
@@ -494,6 +491,9 @@
     </ClCompile>
     <ClCompile Include="ManoeuvreStillValid.cpp">
       <Filter>Source Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="DefendBaseEntrances.cpp">
+      <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -827,9 +827,6 @@
     <ClInclude Include="TeamManoeuvre.h">
       <Filter>Header Files\Manoeuvres</Filter>
     </ClInclude>
-    <ClInclude Include="AllDefendBase.h">
-      <Filter>Header Files\Manoeuvres</Filter>
-    </ClInclude>
     <ClInclude Include="TeamBehaviour.h">
       <Filter>Header Files\BehaviourTree</Filter>
     </ClInclude>
@@ -877,6 +874,9 @@
     </ClInclude>
     <ClInclude Include="ManoeuvreStillValid.h">
       <Filter>Header Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="DefendBaseEntrances.h">
+      <Filter>Header Files\Manoeuvres</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

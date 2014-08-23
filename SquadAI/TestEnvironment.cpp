@@ -627,6 +627,17 @@ bool TestEnvironment::PrepareSimulation(void)
 
 	UpdateNodeGraph();
 
+	// Prepare the team AIs for simulation.
+	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
+	{
+		for(unsigned int k = 0; k < NumberOfTeams-1; ++k)
+		{
+			m_pTeamAI[i]->RegisterObjective(&m_objectives[k]);
+		}
+
+		m_pTeamAI[i]->PrepareForSimulation();
+	}
+
 	return true;
 }
 
@@ -1479,6 +1490,7 @@ void TestEnvironment::EndSimulation(void)
 		//m_flags[i].OnReset();
 		m_spawnPoints[i].clear();
 		m_pTeamAI[i]->Reset();
+		m_baseEntrances[i].clear();
 	}
 
 	m_id = 0;
@@ -1722,6 +1734,162 @@ void TestEnvironment::UpdateBaseEntrances(void)
 	{
 		for(unsigned int y = 0; y < m_numberOfGridPartitions; ++y)
 		{
+			if(m_pNodes[x][y].GetTerritoryOwner() != EntityTeam::None)
+			{
+				// Check west direction
+				if((x > 0) && (!m_pNodes[x-1][y].IsObstacle()) && (m_pNodes[x-1][y].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(West);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(West, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][West].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}
+				// Check east direction
+				if((x < m_numberOfGridPartitions-1) && (!m_pNodes[x+1][y].IsObstacle()) && (m_pNodes[x+1][y].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(East);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(East, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][East].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}
+				// Check north direction
+				if((y < m_numberOfGridPartitions-1) && (!m_pNodes[x][y+1].IsObstacle()) && (m_pNodes[x][y+1].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(North);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(North, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][North].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}
+				// Check south direction
+				if((y > 0) && (!m_pNodes[x][y-1].IsObstacle()) && (m_pNodes[x][y-1].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(South);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(South, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][South].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}
+				/*
+				// Check north-east direction
+				if((x < m_numberOfGridPartitions-1) && (y < m_numberOfGridPartitions-1) && (!m_pNodes[x+1][y+1].IsObstacle()) && (m_pNodes[x+1][y+1].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()) && ((!m_pNodes[x][y+1].IsObstacle()) || (!m_pNodes[x+1][y].IsObstacle())))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(NorthEast);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(NorthEast, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][NorthEast].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}
+				// Check North-west direction
+				if((x > 0) && (y < m_numberOfGridPartitions-1) && (!m_pNodes[x-1][y+1].IsObstacle()) && (m_pNodes[x-1][y+1].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()) && ((!m_pNodes[x][y+1].IsObstacle()) || (!m_pNodes[x-1][y].IsObstacle())))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(NorthWest);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(NorthWest, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][NorthWest].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}
+				// Check South-east direction
+				if((x < m_numberOfGridPartitions-1) && (y > 0) && (!m_pNodes[x+1][y-1].IsObstacle()) && (m_pNodes[x+1][y-1].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()) && ((!m_pNodes[x][y-1].IsObstacle()) || (!m_pNodes[x+1][y].IsObstacle())))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(SouthEast);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(SouthEast, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][SouthEast].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}
+				// Check South-west direction
+				if((x > 0) && (y > 0) && (!m_pNodes[x-1][y-1].IsObstacle()) && (m_pNodes[x-1][y-1].GetTerritoryOwner() != m_pNodes[x][y].GetTerritoryOwner()) && ((!m_pNodes[x][y-1].IsObstacle()) || (!m_pNodes[x-1][y].IsObstacle())))
+				{
+					// Entrance from the west
+					std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator foundIt = m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].find(SouthWest);
+					if(foundIt != m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].end())
+					{
+						// Add the entrance position to that direction
+						foundIt->second.push_back(m_pNodes[x][y].GetWorldPosition());
+					}else
+					{
+						// Add a new entry for that direction
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()].insert(std::pair<Direction, std::vector<XMFLOAT2>>(SouthWest, std::vector<XMFLOAT2>()));
+						m_baseEntrances[m_pNodes[x][y].GetTerritoryOwner()][SouthWest].push_back(m_pNodes[x][y].GetWorldPosition());
+					}
+					m_pNodes[x][y].SetEntranceToBase(true);
+				}*/
+
+				/*
+					(x > 0) && (y > 0) && (m_pNodes[x-1][y-1].GetTerritoryOwner() == TeamRed) ||
+					(x > 0) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x-1][y+1].GetTerritoryOwner() == TeamRed) ||
+					(x < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y].GetTerritoryOwner() == TeamRed) ||
+					(x < m_numberOfGridPartitions-1) && (y > 0) && (m_pNodes[x+1][y-1].GetTerritoryOwner() == TeamRed) ||
+					(x < m_numberOfGridPartitions-1) && (y < m_numberOfGridPartitions-1) && (m_pNodes[x+1][y+1].GetTerritoryOwner() == TeamRed) ||
+					(y > 0) && (m_pNodes[x][y-1].GetTerritoryOwner() == TeamRed) ||
+					(y < m_numberOfGridPartitions-1) && (m_pNodes[x][y+1].GetTerritoryOwner() == TeamRed))
+				{
+
+				}*/
+
+			}
+
+
+			/*
 			if(!m_pNodes[x][y].IsObstacle() && m_pNodes[x][y].GetTerritoryOwner() == None)
 			{
 				// Note: Look for a better way of doing this.
@@ -1759,6 +1927,7 @@ void TestEnvironment::UpdateBaseEntrances(void)
 					}
 				}
 			}
+			*/
 		}
 	}
 }
@@ -1773,6 +1942,11 @@ bool TestEnvironment::IsPaused(void) const
 const GameContext* TestEnvironment::GetGameContext(void) const
 {
 	return m_pGameContext;
+}
+
+const std::unordered_map<Direction, std::vector<XMFLOAT2>>& TestEnvironment::GetBaseEntrances(EntityTeam team) const
+{
+	return m_baseEntrances[team];
 }
 
 float TestEnvironment::GetGridSize(void) const

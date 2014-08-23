@@ -72,6 +72,7 @@ public:
 	void AddTeamMember(Entity* pEntity);
 	void RemoveTeamMember(unsigned long id);
 
+	virtual void PrepareForSimulation(void);
 	virtual void Update(float deltaTime);
 	virtual void Reset(void);
 	
@@ -101,7 +102,7 @@ public:
 	void SetCharacteristic(TeamAICharacteristic characteristic);
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
 
-	
+	virtual void RegisterObjective(Objective* pObjective) = 0;
 
 protected:
 

@@ -47,7 +47,7 @@ public:
 	~MultiflagCTFTeamAI(void);
 
 	bool Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic);
-
+	virtual void PrepareForSimulation(void);
 	//void ProcessMessage(Message* pMessage);
 	void Reset(void);
 
@@ -58,6 +58,10 @@ public:
 	virtual void InitiateManoeuvre(TeamManoeuvreType manoeuvre);
 	virtual BehaviourStatus UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime);
 	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
+
+	const FlagData& GetFlagData(EntityTeam team) const;
+
+	virtual void RegisterObjective(Objective* pObjective);
 
 protected:
 
@@ -72,6 +76,9 @@ protected:
 private:
 
 	FlagData m_flagData[NumberOfTeams-1]; // Data about the flags of the two teams
+
+	//std::unordered_map<Direction, XMFLOAT2> m_friendlyBaseEntrances; // Contains information about the entrances to the base of team of this AI
+	//std::unordered_map<Direction, XMFLOAT2> m_enemyBaseEntrances;    // Contains information about the entrances to the base of the hostile team
 };
 
 #endif // MULTIFLAG_CTF_TEAM_AI_H

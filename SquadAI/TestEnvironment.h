@@ -21,6 +21,7 @@
 #include <limits>
 #include <stdlib.h>     
 #include <time.h>      
+#include <unordered_map>
 
 #include "RenderContext.h"
 #include "TestEnvironmentData.h"
@@ -91,6 +92,7 @@ public:
 	bool         IsPaused(void) const;
 	const GameContext* GetGameContext(void) const;
 
+	const std::unordered_map<Direction, std::vector<XMFLOAT2>>& GetBaseEntrances(EntityTeam team) const;
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);
 
@@ -137,6 +139,8 @@ private:
 	std::list<Obstacle>         m_obstacles;										// The obstacles within the environment 
 	std::list<Projectile>       m_projectiles;										// Holds the currently active projectiles
 	std::vector<XMFLOAT2>       m_spawnPoints[NumberOfTeams-1];					    // Holds the spawn points of all teams
+
+	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_baseEntrances[NumberOfTeams-1]; // The base entrances and the directions they're facing at
 
 	Pathfinder   m_pathfinder;                              // The pathfinder associated to this environment.
 	float        m_objectScaleFactors[NumberOfObjectTypes]; // Determines the scale of the different objects in relation to a grid field

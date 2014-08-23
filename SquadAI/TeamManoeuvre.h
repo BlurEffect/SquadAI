@@ -27,7 +27,9 @@ enum TeamManoeuvreType
 	// Test manoeuvres
 	TestAllAttackManoeuvre,
 	TestAllMoveManoeuvre,
-	TestAllDefendManoeuvre
+	TestAllDefendManoeuvre,
+	// Actual manoeuvres
+	DefendBaseEntrancesManoeuvre
 };
 
 

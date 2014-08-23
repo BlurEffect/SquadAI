@@ -69,6 +69,14 @@ bool TeamAI::InitialiseManoeuvres(void)
 }
 
 //--------------------------------------------------------------------------------------
+// Prepares the team AI for the simulation.
+//--------------------------------------------------------------------------------------
+void TeamAI::PrepareForSimulation(void)
+{
+	// Do nothing. Default implementation
+}
+
+//--------------------------------------------------------------------------------------
 // Updates the team AI.
 // Param1: The time in seconds passed since the last frame.
 //--------------------------------------------------------------------------------------

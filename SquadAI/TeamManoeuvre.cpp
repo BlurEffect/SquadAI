@@ -138,7 +138,7 @@ void TeamManoeuvre::ProcessEvent(EventType type, void* pEventData)
 }
 
 //--------------------------------------------------------------------------------------
-// Processes an inbox message that the team AI received.
+// Processes an inbox message that the manoeuvre received.
 // Param1: A pointer to the message to process.
 // Returns true if this was the final communicator to process the message, false if the
 // message was forwarded to another one.

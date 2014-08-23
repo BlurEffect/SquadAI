@@ -85,7 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
-    <ClCompile Include="AllDefendBase.cpp" />
+    <ClCompile Include="DefendBaseEntrances.cpp" />
     <ClCompile Include="ExecuteTeamManoeuvre.cpp" />
     <ClCompile Include="ManoeuvrePreconditionsFulfilled.cpp" />
     <ClCompile Include="ManoeuvreStillValid.cpp" />
@@ -198,7 +198,7 @@
   <ItemGroup>
     <ClInclude Include="ActiveSelector.h" />
     <ClInclude Include="AimAtTarget.h" />
-    <ClInclude Include="AllDefendBase.h" />
+    <ClInclude Include="DefendBaseEntrances.h" />
     <ClInclude Include="AppData.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="ApplicationSettings.h" />

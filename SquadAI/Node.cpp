@@ -15,7 +15,7 @@ Node::Node() : m_nodeId(0),
 			   m_isObstacle(false),
 			   m_pObstacle(nullptr),
 			   m_territoryOwner(EntityTeam(None)),
-			   m_entranceToBase(BaseEntranceType(NoEntrance)),
+			   m_isEntranceToBase(false),
 			   m_movementCost(0.0f),
 			   m_heuristicValue(0.0f)
 {
@@ -76,7 +76,7 @@ void Node::Reset(void)
 {
 	m_isObstacle     = false;
 	m_pObstacle      = nullptr;
-	m_entranceToBase = NoEntrance;
+	m_isEntranceToBase = false;
 	m_territoryOwner = None;
 
 	for(unsigned int i = 0; i < NumberOfDirections; ++i)
@@ -127,9 +127,9 @@ EntityTeam Node::GetTerritoryOwner(void) const
 	return m_territoryOwner;
 }
 
-BaseEntranceType Node::GetEntranceToBase(void) const
+bool Node::IsEntranceToBase(void) const
 {
-	return m_entranceToBase;
+	return m_isEntranceToBase;
 }
 
 const std::vector<Node*>& Node::GetAdjacentNodes(void) const
@@ -189,9 +189,9 @@ void Node::SetTerritoryOwner(EntityTeam team)
 	m_territoryOwner = team;
 }
 
-void Node::SetEntranceToBase(BaseEntranceType entrance)
+void Node::SetEntranceToBase(bool isEntrance)
 {
-	m_entranceToBase = entrance;
+	m_isEntranceToBase = isEntrance;
 }
 
 void Node::SetMovementCost(float cost) 

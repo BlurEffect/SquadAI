@@ -85,10 +85,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
+    <ClCompile Include="RunTheFlagHome.cpp" />
     <ClCompile Include="DefendBaseEntrances.cpp" />
     <ClCompile Include="ExecuteTeamManoeuvre.cpp" />
     <ClCompile Include="ManoeuvrePreconditionsFulfilled.cpp" />
     <ClCompile Include="ManoeuvreStillValid.cpp" />
+    <ClCompile Include="RushBaseAttack.cpp" />
     <ClCompile Include="TeamManoeuvre.cpp" />
     <ClCompile Include="TeamActiveCharacteristicSelector.cpp" />
     <ClCompile Include="TeamActiveSelector.cpp" />
@@ -198,6 +200,7 @@
   <ItemGroup>
     <ClInclude Include="ActiveSelector.h" />
     <ClInclude Include="AimAtTarget.h" />
+    <ClInclude Include="RunTheFlagHome.h" />
     <ClInclude Include="DefendBaseEntrances.h" />
     <ClInclude Include="AppData.h" />
     <ClInclude Include="Application.h" />
@@ -232,6 +235,7 @@
     <ClInclude Include="GameContextToTeamAIMessages.h" />
     <ClInclude Include="Communicator.h" />
     <ClInclude Include="ManoeuvrePreconditionsFulfilled.h" />
+    <ClInclude Include="RushBaseAttack.h" />
     <ClInclude Include="TeamActiveCharacteristicSelector.h" />
     <ClInclude Include="LookAtTarget.h" />
     <ClInclude Include="TeamComposite.h" />

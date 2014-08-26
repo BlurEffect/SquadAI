@@ -29,7 +29,8 @@ enum TeamManoeuvreType
 	TestAllMoveManoeuvre,
 	TestAllDefendManoeuvre,
 	// Actual manoeuvres
-	DefendBaseEntrancesManoeuvre
+	DefendBaseEntrancesManoeuvre,
+	RushBaseAttackManoeuvre
 };
 
 
@@ -51,6 +52,8 @@ public:
 	virtual void Reset(void);
 	virtual void ProcessEvent(EventType type, void* pEventData);
 
+	bool IsParticipant(unsigned long id) const;
+
 	// Data access functions
 
 	bool						IsActive(void) const;
@@ -59,6 +62,7 @@ public:
 	unsigned int				GetMinNumberOfParticipants(void) const;
 	unsigned int				GetMaxNumberOfParticipants(void) const;
 	const std::vector<Entity*>& GetParticipants(void) const;
+	const Entity*               GetParticipant(unsigned long id) const;
 	unsigned int                GetNumberOfParticipants(void) const;
 
 	void SetActive(bool active);

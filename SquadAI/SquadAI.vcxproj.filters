@@ -495,6 +495,12 @@
     <ClCompile Include="DefendBaseEntrances.cpp">
       <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
+    <ClCompile Include="RushBaseAttack.cpp">
+      <Filter>Source Files\Manoeuvres</Filter>
+    </ClCompile>
+    <ClCompile Include="RunTheFlagHome.cpp">
+      <Filter>Source Files\Manoeuvres</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -876,6 +882,12 @@
       <Filter>Header Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="DefendBaseEntrances.h">
+      <Filter>Header Files\Manoeuvres</Filter>
+    </ClInclude>
+    <ClInclude Include="RushBaseAttack.h">
+      <Filter>Header Files\Manoeuvres</Filter>
+    </ClInclude>
+    <ClInclude Include="RunTheFlagHome.h">
       <Filter>Header Files\Manoeuvres</Filter>
     </ClInclude>
   </ItemGroup>

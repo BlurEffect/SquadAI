@@ -38,14 +38,17 @@ bool DefendBaseEntrances::ProcessMessage(Message* pMessage)
 	{
 	// Cancel old order, Send Follow-Up Orders, finish manoeuvre etc
 	UpdateOrderStateMessage* pMsg = reinterpret_cast<UpdateOrderStateMessage*>(pMessage);
-	if(pMsg->GetData().m_orderState == FailedOrderState)
+	if(IsParticipant(pMsg->GetData().m_entityId))
 	{
-		// Entities executing a defend manoeuvre won't send success messages concerning the order state
-		// as the defend order is a passive behaviour that is unlimited in time and thus cannot succeed.
-		// It is thus sufficient to check for failure.
+		if(pMsg->GetData().m_orderState == FailedOrderState)
+		{
+			// Entities executing a defend manoeuvre won't send success messages concerning the order state
+			// as the defend order is a passive behaviour that is unlimited in time and thus cannot succeed.
+			// It is thus sufficient to check for failure.
 
-		// The order failed -> release the entity from the manoeuvre
-		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
+			// The order failed -> release the entity from the manoeuvre
+			m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
+		}
 	}
 	return true;
 	break;
@@ -56,9 +59,8 @@ bool DefendBaseEntrances::ProcessMessage(Message* pMessage)
 }
 
 //--------------------------------------------------------------------------------------
-// Initiates the manoeuvre. This mostly consists of sending initial orders to all
-// participating entities and everything that is involved in that process, such as 
-// determining targets etc.
+// isDtributes the participating entities over all base entrances to ensure that all
+// directions are guarded.
 //--------------------------------------------------------------------------------------
 void DefendBaseEntrances::DistributeEntities(void)
 {
@@ -69,14 +71,14 @@ void DefendBaseEntrances::DistributeEntities(void)
 	}
 
 	m_guardedEntrances.clear();
-	
-	// avoid sending two to the same entrance
-	// remember which entity is guarding waht entrance?
 
 	// Keeps track of how many entities are guarding each direction
 	unsigned int entityCount[NumberOfDirections] = {0};
 
+	int startIndex = rand() % m_pTeamAI->GetTestEnvironment()->GetBaseEntrances(m_pTeamAI->GetTeam()).size(); 
+
 	std::unordered_map<Direction, std::vector<XMFLOAT2>>::const_iterator entranceIt = m_pTeamAI->GetTestEnvironment()->GetBaseEntrances(m_pTeamAI->GetTeam()).begin();
+	std::advance(entranceIt, startIndex);
 
 	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
 	{
@@ -143,24 +145,6 @@ bool DefendBaseEntrances::IsGuarded(Direction direction, const XMFLOAT2& entranc
 //--------------------------------------------------------------------------------------
 void DefendBaseEntrances::Initiate(void)
 {
-	/*
-	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
-	{
-		//Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, XMFLOAT2(defnedPos), XMFLOAT2(viewDire));
-			
-		if(!pNewOrder)
-		{
-			SetActive(false);
-			return;
-		}
-
-		FollowOrderMessageData data(pNewOrder);
-		SendMessage(*it, FollowOrderMessageType, &data);
-
-		m_activeOrders.insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
-	}
-	
-	SetActive(true);*/
 	DistributeEntities();
 	SetActive(true);
 }

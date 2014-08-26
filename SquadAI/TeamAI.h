@@ -112,7 +112,8 @@ protected:
 
 	virtual bool ProcessMessage(Message* pMessage);
 	virtual void UpdateAttackOrders(unsigned long enemyId);
-
+	
+	bool ForwardMessageToActiveManoeuvers(Message* pMessage);
 
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*> m_manoeuvres; // The available team manoeuvres for this team AI
@@ -120,7 +121,7 @@ protected:
 
 private:
 
-	bool ForwardMessageToActiveManoeuvers(Message* pMessage);
+	
 
 	EntityTeam						     m_team;					// The team that the AI is controlling
 	TeamAICharacteristic                 m_characteristic;     // The characteristic of the team AI

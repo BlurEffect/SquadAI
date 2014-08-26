@@ -85,6 +85,8 @@ public:
 	
 	//void ProcessMessage(Message* pMessage);
 
+	bool IsBlocked(const XMFLOAT2 worldPos) const;
+
 	// Data access functions
 	float		 GetGridSize(void) const;
 	unsigned int GetNumberOfGridPartitions(void) const;

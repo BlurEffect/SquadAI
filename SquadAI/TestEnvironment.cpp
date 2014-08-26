@@ -1432,6 +1432,27 @@ void TestEnvironment::RecordEvent(LogEventType type, void* pObject1, void* pObje
 }
 
 //--------------------------------------------------------------------------------------
+// Tells whether a certain world position is blocked by an obstacle.
+// Param1: The world position to check.
+// Returns true if the position is blocked by an obstacle or if the position does not lie
+// within the grid at all, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::IsBlocked(const XMFLOAT2 worldPos) const
+{
+
+	XMFLOAT2 gridPos(0.0f, 0.0f);
+	WorldToGridPosition(worldPos, gridPos);
+
+	// If the position is invalid, return blocked in any case
+	if(static_cast<unsigned int>(gridPos.x) > GetNumberOfGridPartitions() || static_cast<unsigned int>(gridPos.y) > GetNumberOfGridPartitions())
+	{
+		return true;
+	}
+
+	return m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].IsObstacle();
+}
+
+//--------------------------------------------------------------------------------------
 // Starts the simulation, switches from edit to simulation mode.
 // Returns true if the simulation could be started successfully.
 //--------------------------------------------------------------------------------------

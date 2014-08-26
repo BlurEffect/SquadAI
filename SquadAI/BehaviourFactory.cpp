@@ -412,10 +412,10 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 
 			TeamBehaviour* pTeamProcessMessagesAction = CreatePrimitiveTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", 1.0f, 1.0f, nullptr);
 			
-			ManoeuvrePreconditionsFulfilledInitData conditionCheckData(DefendBaseEntrancesManoeuvre);//(TestAllMoveManoeuvre);
+			ManoeuvrePreconditionsFulfilledInitData conditionCheckData(RushBaseAttackManoeuvre);//(TestAllMoveManoeuvre);
 			TeamBehaviour* pTestCheckManoeuvrePreconditions = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "TestCheckManoeuvrePreconditions", 0.0f, 0.0f, &conditionCheckData);
 			
-			ExecuteTeamManoeuvreInitData executedManoeuvre(DefendBaseEntrancesManoeuvre);//(TestAllMoveManoeuvre);
+			ExecuteTeamManoeuvreInitData executedManoeuvre(RushBaseAttackManoeuvre);//(DefendBaseEntrancesManoeuvre);//(TestAllMoveManoeuvre);
 			TeamBehaviour* pTestExecuteManoeuvreAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "TeamExecuteManoeuvreAction", 0.5f, 0.5f, &executedManoeuvre);
 
 			if(pAlwaysFailDecorator && pTeamProcessMessagesAction && pTestCheckManoeuvrePreconditions && pTestExecuteManoeuvreAction)

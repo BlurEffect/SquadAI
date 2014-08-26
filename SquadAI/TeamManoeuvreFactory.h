@@ -12,6 +12,7 @@
 #include "TeamManoeuvre.h"
 #include "TestManoeuvre.h"
 #include "DefendBaseEntrances.h"
+#include "RushBaseAttack.h"
 
 // Forward declarations
 class TeamAI;

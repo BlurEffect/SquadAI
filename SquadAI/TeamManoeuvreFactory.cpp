@@ -39,6 +39,17 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 		return new DefendBaseEntrances(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_switchPositionsInterval);
 		break;
 		}
+	case RushBaseAttackManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		RushBaseAttackInitData* pData = reinterpret_cast<RushBaseAttackInitData*>(pAdditionalData);
+		return new RushBaseAttack(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_waitForParticipantsInterval, pData->m_assemblyPointDistance);
+		break;
+		}
 	default:
 		return nullptr;
 	}

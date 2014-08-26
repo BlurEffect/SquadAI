@@ -227,6 +227,11 @@ bool TeamAI::ProcessMessage(Message* pMessage)
 		{
 		ScoreUpdateMessage* pMsg = reinterpret_cast<ScoreUpdateMessage*>(pMessage);
 		m_scores[pMsg->GetData().m_team] = static_cast<float>(pMsg->GetData().m_score) / pMsg->GetData().m_maxScore;
+		
+		if(ForwardMessageToActiveManoeuvers(pMessage))
+		{
+			return false;
+		}
 		break;
 		}
 	case TimeUpdateMessageType:

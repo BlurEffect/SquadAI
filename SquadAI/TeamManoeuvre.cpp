@@ -208,6 +208,17 @@ bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 }
 
 //--------------------------------------------------------------------------------------
+// Checks whether an entity is taking part in this manoeuvre.
+// Param1: The id of the entity to check.
+// Returns true if the checked entity is taking part in the manoeuvre, false otherwise.
+//--------------------------------------------------------------------------------------
+bool TeamManoeuvre::IsParticipant(unsigned long id) const
+{
+	std::vector<Entity*>::const_iterator foundIt = std::find_if(m_participants.begin(), m_participants.end(), Entity::FindEntityById(id));
+	return foundIt != m_participants.end();
+}
+
+//--------------------------------------------------------------------------------------
 // Updates the currently active attack orders by making sure the contained enemy 
 // positions are up to data.
 // Param1: The id of the enemy that moved and for which associated attack orders have to be updated.
@@ -287,6 +298,19 @@ void TeamManoeuvre::Terminate(void)
 	m_participants.clear();
 
 	m_active = false;
+}
+
+
+const Entity* TeamManoeuvre::GetParticipant(unsigned long id) const
+{
+	std::vector<Entity*>::const_iterator foundIt = std::find_if(m_participants.begin(), m_participants.end(), Entity::FindEntityById(id));
+
+	if(foundIt != m_participants.end())
+	{
+		return (*foundIt);
+	}
+
+	return nullptr;
 }
 
 // Data access functions

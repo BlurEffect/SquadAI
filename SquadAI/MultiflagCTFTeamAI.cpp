@@ -63,6 +63,15 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	}
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(DefendBaseEntrancesManoeuvre, pDefendBaseEntrancesManoeuvre));
 
+	// Rush base attack manoeuvre
+	RushBaseAttackInitData rushBaseData(10.0f, 15.0f);
+	TeamManoeuvre* pRushBaseAttackManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(RushBaseAttackManoeuvre, 4, 8, this, &rushBaseData);
+	if(!pRushBaseAttackManoeuvre)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(RushBaseAttackManoeuvre, pRushBaseAttackManoeuvre));
+
 
 	return true;
 }
@@ -91,7 +100,12 @@ bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		FlagPickedUpMessage* pMsg = reinterpret_cast<FlagPickedUpMessage*>(pMessage);
 		m_flagData[pMsg->GetData().m_flagOwner].m_state     = Stolen;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = pMsg->GetData().m_carrierId;
-		return true;
+		
+		if(ForwardMessageToActiveManoeuvers(pMsg))
+		{
+			return false;
+		}
+
 		break;
 		}
 	case FlagDroppedMessageType:
@@ -100,7 +114,12 @@ bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetData().m_flagOwner].m_state     = Dropped;
 		m_flagData[pMsg->GetData().m_flagOwner].m_position  = pMsg->GetData().m_dropPosition;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
-		return true;
+		
+		if(ForwardMessageToActiveManoeuvers(pMsg))
+		{
+			return false;
+		}
+
 		break;
 		}
 	case FlagReturnedMessageType:
@@ -109,13 +128,20 @@ bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetData().m_flagOwner].m_state     = InBase;
 		m_flagData[pMsg->GetData().m_flagOwner].m_position  = m_flagData[pMsg->GetData().m_flagOwner].m_basePosition;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
-		return true;
+		
+		if(ForwardMessageToActiveManoeuvers(pMsg))
+		{
+			return false;
+		}
+
 		break;
 		}
 	default:
 		// Forward other messages to the base class implementation of the function
 		return TeamAI::ProcessMessage(pMessage);
 	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -129,19 +155,12 @@ void MultiflagCTFTeamAI::ProcessEvent(EventType type, void* pEventData)
 	TeamAI::ProcessEvent(type, pEventData);
 }
 
-int g_count = 0;
-
 //--------------------------------------------------------------------------------------
 // Checks whether the preconditions for a certain manoeuvre are fulfilled.
 // Param1: Identifies the manoeuvre, for which to check the preconditions.
 //--------------------------------------------------------------------------------------
 bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre)
 {
-	if(g_count >= 2)
-	{
-		return false;
-	}
-
 	unsigned int numberOfAvailableEntities = 0;
 	std::vector<Entity*> availableEntities;
 
@@ -156,11 +175,29 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 		}
 	}
 
+	EntityTeam enemyTeam = None;
+	if(GetTeam() == TeamRed)
+	{
+		enemyTeam = TeamBlue;
+	}else
+	{
+		enemyTeam = TeamRed;
+	}
+
+
 	switch(manoeuvre)
 	{
 	case TestAllMoveManoeuvre:
-		++g_count;
+		
 		return (numberOfAvailableEntities >= m_manoeuvres[TestAllMoveManoeuvre]->GetMinNumberOfParticipants());
+		break;
+	case DefendBaseEntrancesManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[DefendBaseEntrancesManoeuvre]->GetMinNumberOfParticipants()) &&
+			   (m_flagData[GetTeam()].m_state == InBase);
+		break;
+	case RushBaseAttackManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[RushBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
+			   (m_flagData[enemyTeam].m_state == InBase);
 		break;
 	default:
 		return TeamAI::ManoeuvrePreconditionsFulfilled(manoeuvre);

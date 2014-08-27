@@ -65,10 +65,19 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
-	m_pBehaviour = BehaviourFactory::CreateBehaviourTree(ModifiedSimpleIndividualCombatTree, this);
+	if(m_pBehaviour)
+	{
+		delete m_pBehaviour;
+		m_pBehaviour = nullptr;
+	}
+
 	if(!m_pBehaviour)
 	{
-		return false;
+		m_pBehaviour = BehaviourFactory::CreateBehaviourTree(ModifiedSimpleIndividualCombatTree, this);
+		if(!m_pBehaviour)
+		{
+			return false;
+		}
 	}
 
 	m_pEnvironment = pEnvironment;
@@ -136,6 +145,8 @@ void Entity::Reset(void)
 	m_pCurrentOrder = nullptr;
 
 	ResetCommunication();
+
+	m_pBehaviour->Reset();
 }
 /*
 //--------------------------------------------------------------------------------------

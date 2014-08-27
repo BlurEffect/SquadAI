@@ -52,10 +52,10 @@ public:
 			return (rand() % 2 == 0); // random order
 			break;
 		case CharAggressive:
-			return pLeft->GetAggressiveness() < pRight->GetAggressiveness();
+			return pLeft->GetAggressiveness() > pRight->GetAggressiveness();
 			break;
 		case CharDefensive:
-			return pLeft->GetDefensiveness() < pRight->GetDefensiveness();
+			return pLeft->GetDefensiveness() > pRight->GetDefensiveness();
 			break;
 		default:
 			return false;

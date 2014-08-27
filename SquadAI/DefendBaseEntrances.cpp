@@ -34,6 +34,17 @@ bool DefendBaseEntrances::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
+	case EntityKilledMessageType:
+	{
+	EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(pMessage);
+	if(IsParticipant(pMsg->GetData().m_id) && pMsg->GetData().m_team == GetTeamAI()->GetTeam())
+	{
+		// Participants that get killed, drop out of the manoeuvre
+		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_id);
+	}
+	return true;
+	break;
+	}
 	case UpdateOrderStateMessageType:
 	{
 	// Cancel old order, Send Follow-Up Orders, finish manoeuvre etc

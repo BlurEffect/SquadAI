@@ -28,7 +28,7 @@ void Communicator::SortOutProcessedMessages(void)
 		std::vector<Message*>::iterator it = m_outboxMessages.begin();
 		while(it != m_outboxMessages.end())
 		{
-			if((*it)->IsProcessed())
+			if((*it)->IsProcessed() && (*it))
 			{
 				delete (*it);
 				(*it) = nullptr;

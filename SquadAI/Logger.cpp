@@ -10,6 +10,8 @@
 #include "Entity.h"
 #include "Behaviour.h"
 #include "Projectile.h"
+#include "TeamManoeuvre.h"
+#include "ObjectTypes.h"
 
 Logger::Logger(void)
 {
@@ -72,6 +74,15 @@ void Logger::LogEvent(LogEventType type, void* pObject1, void* pObject2)
 	case EntityKilledLogEvent:
 		LogEntityKilled(reinterpret_cast<Entity*>(pObject1), reinterpret_cast<unsigned long*>(pObject2));
 		break;
+	case TeamManoeuvreInitLogEvent:
+		LogManoeuvreInit(reinterpret_cast<EntityTeam*>(pObject1), reinterpret_cast<TeamManoeuvreType*>(pObject2));
+		break;
+	case TeamManoeuvreTerminateLogEvent:
+		LogManoeuvreTerminate(reinterpret_cast<EntityTeam*>(pObject1), reinterpret_cast<TeamManoeuvreType*>(pObject2));
+		break;
+	case TeamManoeuvrePreconditionCheckLogEvent:
+		LogManoeuvrePreconditionCheck(reinterpret_cast<EntityTeam*>(pObject1), reinterpret_cast<TeamManoeuvreType*>(pObject2));
+		break;
 	}
 }
 
@@ -127,6 +138,51 @@ void Logger::LogEntityKilled(Entity* pKilled, unsigned long* pShooterId)
 	if(m_out.is_open())
 	{
 		m_out << '\n' << "Entity with ID " << pKilled->GetId() << " of team " << pKilled->GetTeam() << " was killed by a projectile fired from entity with ID " << (*pShooterId) << '.';
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Writes a new entry to the log file that tells that a team manoeuvre was initiated by
+// one of the teams.
+// Param1: A pointer to the team identifier for the team that initiated the manoeuvre.
+// Param2: A pointer to the identifier for the team manoeuvre that tells which type of
+//         manoeuvre was initiated.
+//--------------------------------------------------------------------------------------
+void Logger::LogManoeuvreInit(EntityTeam* team, TeamManoeuvreType* manoeuvre)
+{
+	if(m_out.is_open())
+	{
+		m_out << '\n' << GetTeamName(*team) << " initiated manoeuvre " << TeamManoeuvre::GetManoeuvreNameFromType(*manoeuvre) << '.';
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Writes a new entry to the log file that tells that a team manoeuvre was terminated by
+// one of the teams.
+// Param1: A pointer to the team identifier for the team that terminated the manoeuvre.
+// Param2: A pointer to the identifier for the team manoeuvre that tells which type of
+//         manoeuvre was terminated.
+//--------------------------------------------------------------------------------------
+void Logger::LogManoeuvreTerminate(EntityTeam* team, TeamManoeuvreType* manoeuvre)
+{
+	if(m_out.is_open())
+	{
+		m_out << '\n' << GetTeamName(*team) << " terminated manoeuvre " << TeamManoeuvre::GetManoeuvreNameFromType(*manoeuvre) << '.';
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Writes a new entry to the log file that tells that the preconditions of a team manoeuvre 
+// were checked by a team AI.
+// Param1: A pointer to the team identifier for the team that checked the preconditions of the manoeuvre.
+// Param2: A pointer to the identifier for the team manoeuvre that tells which type of
+//         manoeuvre the preconditions were checked for.
+//--------------------------------------------------------------------------------------
+void Logger::LogManoeuvrePreconditionCheck(EntityTeam* team, TeamManoeuvreType* manoeuvre)
+{
+	if(m_out.is_open())
+	{
+		m_out << '\n' << GetTeamName(*team) << " checked preconditions for manoeuvre " << TeamManoeuvre::GetManoeuvreNameFromType(*manoeuvre) << '.';
 	}
 }
 

@@ -6,6 +6,7 @@
 
 #include "MultiflagCTFTeamAI.h"
 #include "TestEnvironment.h"
+#include "Logger.h"
 
 MultiflagCTFTeamAI::MultiflagCTFTeamAI(void) : TeamAI()
 {
@@ -24,13 +25,17 @@ bool MultiflagCTFTeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironme
 {
 	if(TeamAI::Initialise(team, pEnvironment, characteristic))
 	{
-		m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleTeamMultiflagCTFTree, this);
+
 		if(!m_pBehaviour)
 		{
-			return false;
-		}
+			m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleTeamMultiflagCTFTree, this);
+			if(!m_pBehaviour)
+			{
+				return false;
+			}
 
-		reinterpret_cast<TeamBehaviour*>(m_pBehaviour)->CalculateCharacteristicValues();
+			reinterpret_cast<TeamBehaviour*>(m_pBehaviour)->CalculateCharacteristicValues();
+		}
 
 		return true;
 	}
@@ -56,7 +61,7 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	
 	// Defend base entrances manoeuvre
 	DefendBaseEntrancesInitData defendEntrancesData(5.0f);
-	TeamManoeuvre* pDefendBaseEntrancesManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(DefendBaseEntrancesManoeuvre, 1, 8, this, &defendEntrancesData);
+	TeamManoeuvre* pDefendBaseEntrancesManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(DefendBaseEntrancesManoeuvre, 4, 8, this, &defendEntrancesData);
 	if(!pDefendBaseEntrancesManoeuvre)
 	{
 		return false;
@@ -88,8 +93,23 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 //--------------------------------------------------------------------------------------
 void MultiflagCTFTeamAI::PrepareForSimulation(void)
 {
-	// Create a list of all base entrances for both teams.
-	
+	if(m_pBehaviour)
+	{
+		delete m_pBehaviour;
+		m_pBehaviour = nullptr;
+	}
+
+	// Hack, resetting would be better
+	if(!m_pBehaviour)
+		{
+			m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleTeamMultiflagCTFTree, this);
+			if(!m_pBehaviour)
+			{
+				//return false;
+			}
+
+			reinterpret_cast<TeamBehaviour*>(m_pBehaviour)->CalculateCharacteristicValues();
+		}
 }
 
 //--------------------------------------------------------------------------------------
@@ -168,14 +188,17 @@ void MultiflagCTFTeamAI::ProcessEvent(EventType type, void* pEventData)
 //--------------------------------------------------------------------------------------
 bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre)
 {
+	EntityTeam team = GetTeam();
+	GetTestEnvironment()->RecordEvent(TeamManoeuvrePreconditionCheckLogEvent, &team, &manoeuvre);
+
 	unsigned int numberOfAvailableEntities = 0;
 	std::vector<Entity*> availableEntities;
 
 	// Check how many entities are freely available to engage in new manoeuvres
 	for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
 	{
-		// If the entity is not registered with a manoeuvre, remember it as available
-		if(!m_entityManoeuvreMap[(*it)->GetId()])
+		// If the entity is alive and not yet registered with a manoeuvre, remember it as available
+		if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()])
 		{
 			++numberOfAvailableEntities;
 			availableEntities.push_back(*it);
@@ -194,6 +217,18 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 	switch(manoeuvre)
 	{
 	case DefendBaseEntrancesManoeuvre:
+		// If one of the entities is the flag carrier, it has to be ensured not to involve him in the defend manoeuvre
+		if(m_flagData[enemyTeam].m_state == Stolen)
+		{
+			std::vector<Entity*>::iterator foundIt = std::find_if(availableEntities.begin(), availableEntities.end(), Entity::FindEntityById(m_flagData[enemyTeam].m_carrierId));
+			if(foundIt != availableEntities.end())
+			{
+				// Deduce the flag carrier from the available entities
+				--numberOfAvailableEntities;
+			}
+		}
+
+		// Don't count flag carriers!
 		return (numberOfAvailableEntities >= m_manoeuvres[DefendBaseEntrancesManoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[GetTeam()].m_state == InBase);
 		break;
@@ -202,6 +237,7 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 			   (m_flagData[enemyTeam].m_state == InBase);
 		break;
 	case RunTheFlagHomeManoeuvre:
+		// Only check for flag carrier
 		return (numberOfAvailableEntities >= m_manoeuvres[RunTheFlagHomeManoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[enemyTeam].m_state == Stolen);
 		break;
@@ -250,6 +286,93 @@ bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 //--------------------------------------------------------------------------------------
 void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 {
+	EntityTeam team = GetTeam();
+	GetTestEnvironment()->RecordEvent(TeamManoeuvreInitLogEvent, &team, &manoeuvre);
+
+	EntityTeam enemyTeam = None;
+	if(GetTeam() == TeamRed)
+	{
+		enemyTeam = TeamBlue;
+	}else
+	{
+		enemyTeam = TeamRed;
+	}
+
+	switch(manoeuvre)
+	{
+	case DefendBaseEntrancesManoeuvre:
+		{
+		// Keep track of how many entities have been added to the manoeuvre.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = GetTeamMembers().begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities <= m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants()) && (it != GetTeamMembers().end()))
+		{
+			// If the entity is not engaged in another manoeuver, add it to this one.
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()] && (m_flagData[enemyTeam].m_state != Stolen || (*it)->GetId() != m_flagData[enemyTeam].m_carrierId))
+			{
+				m_manoeuvres[manoeuvre]->AddParticipant(*it);
+				// Remember that this entity is now executing that manoeuver
+				m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+				++addedEntities;
+			}
+			++it;
+		}
+
+		// Initiate the manoeuvre
+		m_manoeuvres[manoeuvre]->Initiate();
+		break;
+		}
+	case RushBaseAttackManoeuvre:
+		{
+		// Keep track of how many entities have been added to the manoeuvre.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = GetTeamMembers().begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities <= m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants()) && (it != GetTeamMembers().end()))
+		{
+			// If the entity is not engaged in another manoeuver, add it to this one.
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()])
+			{
+				m_manoeuvres[manoeuvre]->AddParticipant(*it);
+				// Remember that this entity is now executing that manoeuver
+				m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+				++addedEntities;
+			}
+			++it;
+		}
+
+		// Initiate the manoeuvre
+		m_manoeuvres[manoeuvre]->Initiate();
+		break;
+		}
+	case RunTheFlagHomeManoeuvre:
+
+		// Add the new flag carrier as participant to the manoeuvre
+		if(GetTeam() == TeamRed)
+		{
+			std::vector<Entity*>::iterator foundIt = std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[TeamBlue].m_carrierId));
+			m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
+			m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
+		}else
+		{
+			std::vector<Entity*>::iterator foundIt = std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[TeamRed].m_carrierId));
+			m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
+			m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
+		}
+
+		m_manoeuvres[manoeuvre]->Initiate();
+
+		break;
+	default:
+		// Forward the call to the base class
+		TeamAI::InitiateManoeuvre(manoeuvre);
+	}
+	/*
 	// Check if this AI has a manoeuvre of that type associated to it
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
 	if(foundIt != m_manoeuvres.end())
@@ -280,6 +403,7 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 		// Forward the call to the base class
 		TeamAI::InitiateManoeuvre(manoeuvre);
 	}
+	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -309,6 +433,9 @@ BehaviourStatus MultiflagCTFTeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre,
 //--------------------------------------------------------------------------------------
 void MultiflagCTFTeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
 {
+	EntityTeam team = GetTeam();
+	GetTestEnvironment()->RecordEvent(TeamManoeuvreTerminateLogEvent, &team, &manoeuvre);
+
 	// Check if this AI has a manoeuvre of that type associated to it
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
 	if(foundIt != m_manoeuvres.end())

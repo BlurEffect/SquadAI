@@ -21,6 +21,30 @@ enum EntityTeam
 };
 
 //--------------------------------------------------------------------------------------
+// Global helper to get the string representation of a team name.
+// Param1: Identifier for the team, for which to retrieve the name in string form.
+// Returns a string containing the name of the team. If the provided team identifier is
+// invalid, an empty string is returned.
+//--------------------------------------------------------------------------------------
+static const char* GetTeamName(EntityTeam team)
+{
+	switch(team)
+	{
+	case TeamRed:
+		return "Team Red";
+		break;
+	case TeamBlue:
+		return "Team Blue";
+		break;
+	case None:
+		return "No Team";
+		break;
+	default:
+		return "";
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Identifies the different types of objects that can be present in the test environment, 
 // some of which are placable while others are created at runtime.
 //--------------------------------------------------------------------------------------

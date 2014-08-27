@@ -60,6 +60,10 @@ void TeamManoeuvre::RemoveParticipant(unsigned long id)
 
 		// Remove the entity from the participants
 		m_participants.erase(foundIt);
+	}else
+	{
+		//DEBUG
+		int a = 3;
 	}
 }
 
@@ -86,11 +90,13 @@ void TeamManoeuvre::CancelOrder(Entity* pEntity)
 
 	if(foundIt != m_activeOrders.end())
 	{
-		delete foundIt->second;
-		foundIt->second = nullptr;
-
+		if(foundIt->second)
+		{
+			delete foundIt->second;
+			foundIt->second = nullptr;
+		}
 	}
-
+	
 	// Notify the entity that the order was cancelled
 	SendMessage(pEntity, CancelOrderMessageType, nullptr);
 }
@@ -219,6 +225,31 @@ bool TeamManoeuvre::IsParticipant(unsigned long id) const
 }
 
 //--------------------------------------------------------------------------------------
+// Static helper function to get the string representation of the name of a given
+// manoeuvre type.
+// Param1: The type of manoeuvre, for which to retrieve the string name.
+// Returns a string containing the name of the manoeuvre. If the provided type is invalid,
+// the returned string will be empty.
+//--------------------------------------------------------------------------------------
+const char* TeamManoeuvre::GetManoeuvreNameFromType(TeamManoeuvreType type)
+{
+	switch(type)
+	{
+	case DefendBaseEntrancesManoeuvre:
+		return "Defend Base Entrances";
+		break;
+	case RushBaseAttackManoeuvre:
+		return "Rush Base Attack";
+		break;
+	case RunTheFlagHomeManoeuvre:
+		return "Run The Flag Home";
+		break;
+	default:
+		return "";
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Updates the currently active attack orders by making sure the contained enemy 
 // positions are up to data.
 // Param1: The id of the enemy that moved and for which associated attack orders have to be updated.
@@ -298,6 +329,7 @@ void TeamManoeuvre::Terminate(void)
 	m_participants.clear();
 
 	m_active = false;
+	m_succeeded = false;
 }
 
 

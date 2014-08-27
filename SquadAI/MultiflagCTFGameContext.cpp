@@ -130,7 +130,7 @@ void MultiflagCTFGameContext::ProcessEvent(EventType type, void* pEventData)
 					if(m_flagCarriers[i] && (pEntityReachedObjectiveData->m_pEntity->GetId() == m_flagCarriers[i]->GetId()))
 					{
 						// The flag carrier reached the base position of his own flag -> captured
-						FlagCaptured(pEntityReachedObjectiveData->m_pObjective->GetTeam());
+						FlagCaptured(EntityTeam(i));
 					}
 				}
 			}

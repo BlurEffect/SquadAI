@@ -18,6 +18,8 @@
 class Entity;
 class Behaviour;
 class Projectile;
+enum EntityTeam;
+enum TeamManoeuvreType;
 
 //--------------------------------------------------------------------------------------
 // Lists all types of events that can be recorded.
@@ -26,8 +28,11 @@ enum LogEventType
 {
 	IndividualBehaviourUpdatedLogEvent, // Called when an individual behaviour of an entity is updated
 	EnemySpottedLogEvent,               // Called when an entity spots an enemy
-	EntityHitLogEvent,					 // Called when an entity is hit by a projectile
-	EntityKilledLogEvent				 // Called when an entity was killed
+	EntityHitLogEvent,					// Called when an entity is hit by a projectile
+	EntityKilledLogEvent,				// Called when an entity was killed
+	TeamManoeuvreInitLogEvent,				// Called when a team manoeuvre is initiated
+	TeamManoeuvreTerminateLogEvent,			// Called when a team manoeuvre is terminated
+	TeamManoeuvrePreconditionCheckLogEvent // Called when the preconditions of a team manoeuvre are checked
 };
 
 //--------------------------------------------------------------------------------------
@@ -53,6 +58,9 @@ private:
 	void LogEnemySpotted(Entity* pSpotter, Entity* pSpotted);
 	void LogEntityHit(Entity* pHit, unsigned long* pShooterId);
 	void LogEntityKilled(Entity* pKilled, unsigned long* pShooterId);
+	void LogManoeuvreInit(EntityTeam* team, TeamManoeuvreType* manoeuvre);
+	void LogManoeuvreTerminate(EntityTeam* team, TeamManoeuvreType* manoeuvre);
+	void LogManoeuvrePreconditionCheck(EntityTeam* team, TeamManoeuvreType* manoeuvre);
 
 	std::ofstream  m_out; // The out file stream that the logger uses to write messages to the file
 };

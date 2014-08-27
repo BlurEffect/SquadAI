@@ -55,6 +55,8 @@ public:
 
 	bool IsParticipant(unsigned long id) const;
 
+	static const char* GetManoeuvreNameFromType(TeamManoeuvreType type);
+
 	// Data access functions
 
 	bool						IsActive(void) const;

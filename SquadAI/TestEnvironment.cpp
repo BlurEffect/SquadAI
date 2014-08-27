@@ -316,7 +316,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 					}
 				}
 
-				m_projectiles.erase(it++);
+				it = m_projectiles.erase(it);
 			}else if((*it).GetFriendlyTeam() == TeamBlue && CheckCollision(&(*it), oldPos, GroupTeamRedAndObstacles, pHitEntity))
 			{
 				if(pHitEntity->GetCategory() == CategoryEntity)
@@ -339,7 +339,7 @@ void TestEnvironment::Update(RenderContext& pRenderContext, float deltaTime)
 					}
 				}
 
-				m_projectiles.erase(it++);
+				it = m_projectiles.erase(it);
 			}else
 			{
 				++it;
@@ -368,7 +368,7 @@ void TestEnvironment::Cleanup()
 
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
-		if(m_pTeamAI[i]  )
+		if(m_pTeamAI[i])
 		{
 			delete m_pTeamAI[i];
 			m_pTeamAI[i] = nullptr;

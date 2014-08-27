@@ -368,7 +368,7 @@ void RushBaseAttack::Reset(void)
 	TeamManoeuvre::Reset();
 }
 
-const MultiflagCTFTeamAI* RushBaseAttack::GetTeamAI(void) const
+MultiflagCTFTeamAI* RushBaseAttack::GetTeamAI(void)
 {
 	return m_pTeamAI;
 }

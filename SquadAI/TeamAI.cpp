@@ -34,6 +34,7 @@ TeamAI::~TeamAI(void)
 	{
 		if(it->second)
 		{
+			it->second->Reset();
 			delete it->second;
 			it->second = nullptr;
 		}
@@ -521,8 +522,10 @@ void TeamAI::Reset(void)
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
 		m_scores[i] = 0;
-
-	}	m_timeLeft = 1.0f;
+		
+	}	
+	
+	m_timeLeft = 1.0f;
 
 	// Clear team members
 	m_teamMembers.clear();
@@ -533,11 +536,15 @@ void TeamAI::Reset(void)
 		it->second = nullptr;
 	}
 
+	m_entityManoeuvreMap.clear();
+
 	// Reset all manoeuvres
 	for(std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator it = m_manoeuvres.begin(); it != m_manoeuvres.end(); ++it)
 	{
 		it->second->Reset();
 	}
+
+	m_pBehaviour->Reset();
 }
 
 // Data access functions
@@ -552,7 +559,7 @@ TeamAICharacteristic TeamAI::GetCharacteristic(void) const
 	return m_characteristic;
 }
 
-const TestEnvironment* TeamAI::GetTestEnvironment(void) const
+TestEnvironment* TeamAI::GetTestEnvironment(void)
 {
 	return m_pTestEnvironment;
 }

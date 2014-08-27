@@ -91,7 +91,7 @@ public:
 
 	EntityTeam							  GetTeam(void) const;
 	TeamAICharacteristic                  GetCharacteristic(void) const;
-	const TestEnvironment*				  GetTestEnvironment(void) const;
+	TestEnvironment*				  GetTestEnvironment(void);
 	std::vector<Entity*>&				  GetTeamMembers(void);
 	std::unordered_map<unsigned long, EnemyRecord>& GetEnemyRecords(void);
 	std::unordered_map<unsigned long, Order*>& GetActiveOrders(void);

@@ -30,7 +30,8 @@ enum TeamManoeuvreType
 	TestAllDefendManoeuvre,
 	// Actual manoeuvres
 	DefendBaseEntrancesManoeuvre,
-	RushBaseAttackManoeuvre
+	RushBaseAttackManoeuvre,
+	RunTheFlagHomeManoeuvre
 };
 
 

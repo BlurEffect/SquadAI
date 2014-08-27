@@ -218,7 +218,7 @@ void RushBaseAttack::DetermineAssemblyPoint(void)
 
 	do
 	{
-		float randomAngle = XMConvertToRadians(rand() % 180);
+		float randomAngle = XMConvertToRadians(static_cast<float>(rand() % 180));
 		
 		float sine = sin(randomAngle);
 		float cosine = cos(randomAngle);

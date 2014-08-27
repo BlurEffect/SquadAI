@@ -72,6 +72,13 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	}
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(RushBaseAttackManoeuvre, pRushBaseAttackManoeuvre));
 
+	// Run flag home manoeuvre
+	TeamManoeuvre* pRunFlagHomeManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(RunTheFlagHomeManoeuvre, 1, 1, this, nullptr);
+	if(!pRunFlagHomeManoeuvre)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(RunTheFlagHomeManoeuvre, pRunFlagHomeManoeuvre));
 
 	return true;
 }
@@ -184,13 +191,8 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 		enemyTeam = TeamRed;
 	}
 
-
 	switch(manoeuvre)
 	{
-	case TestAllMoveManoeuvre:
-		
-		return (numberOfAvailableEntities >= m_manoeuvres[TestAllMoveManoeuvre]->GetMinNumberOfParticipants());
-		break;
 	case DefendBaseEntrancesManoeuvre:
 		return (numberOfAvailableEntities >= m_manoeuvres[DefendBaseEntrancesManoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[GetTeam()].m_state == InBase);
@@ -198,6 +200,10 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 	case RushBaseAttackManoeuvre:
 		return (numberOfAvailableEntities >= m_manoeuvres[RushBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[enemyTeam].m_state == InBase);
+		break;
+	case RunTheFlagHomeManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[RunTheFlagHomeManoeuvre]->GetMinNumberOfParticipants()) &&
+			   (m_flagData[enemyTeam].m_state == Stolen);
 		break;
 	default:
 		return TeamAI::ManoeuvrePreconditionsFulfilled(manoeuvre);
@@ -212,10 +218,25 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 //--------------------------------------------------------------------------------------
 bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 {
+	EntityTeam enemyTeam = None;
+	if(GetTeam() == TeamRed)
+	{
+		enemyTeam = TeamBlue;
+	}else
+	{
+		enemyTeam = TeamRed;
+	}
+
 	switch(manoeuvre)
 	{
-	case TestAllMoveManoeuvre:
-		return true;
+	case DefendBaseEntrancesManoeuvre:
+		return (m_flagData[GetTeam()].m_state == InBase);
+		break;
+	case RushBaseAttackManoeuvre:
+		return (m_flagData[enemyTeam].m_state == InBase);
+		break;
+	case RunTheFlagHomeManoeuvre:
+		return (m_flagData[enemyTeam].m_state == Stolen);
 		break;
 	default:
 		return TeamAI::ManoeuvreStillValid(manoeuvre);

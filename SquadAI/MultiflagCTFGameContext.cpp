@@ -268,7 +268,14 @@ void MultiflagCTFGameContext::FlagReturned(EntityTeam flagOwner)
 //--------------------------------------------------------------------------------------
 void MultiflagCTFGameContext::FlagCaptured(EntityTeam flagOwner)
 {
-	AddScore(m_flagCarriers[flagOwner]->GetTeam(), 1);
+	if(flagOwner == TeamRed)
+	{
+		AddScore(TeamBlue, 1);
+	}else
+	{
+		AddScore(TeamRed, 1);
+	}
+
 	m_flagCarriers[flagOwner] = nullptr;
 	FlagReturned(flagOwner);
 }

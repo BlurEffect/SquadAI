@@ -395,6 +395,103 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 //--------------------------------------------------------------------------------------
 Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 {
+	TeamParallelInitData rootInitData(TeamRequireAll, TeamRequireAll);
+	TeamBehaviour* pTeamParallelRoot = CreateParentTeamBehaviour(TeamParallelType, pTeamAI, "TeamParallelRoot", &rootInitData);
+
+	if(pTeamParallelRoot)
+	{
+		TeamBehaviour* pUpdateTeamAISequence = CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "UpdateTeamAISequence", nullptr);
+		
+		TeamParallelInitData manoeuvreCategoriesInitData(TeamRequireOne, TeamRequireAll);
+		TeamBehaviour* pManoeuvreCategoriesParallel = CreateParentTeamBehaviour(TeamParallelType, pTeamAI, "ManoeuvreCategoriesParallel", &manoeuvreCategoriesInitData);
+
+		if(pUpdateTeamAISequence && pManoeuvreCategoriesParallel)
+		{
+			reinterpret_cast<TeamComposite*>(pTeamParallelRoot)->AddChild(pUpdateTeamAISequence);
+			reinterpret_cast<TeamComposite*>(pTeamParallelRoot)->AddChild(pManoeuvreCategoriesParallel);
+			
+			TeamBehaviour* pTeamProcessMessagesAction = CreatePrimitiveTeamBehaviour(TeamProcessMessagesType, pTeamAI, "TeamProcessMessagesAction", 1.0f, 1.0f, nullptr);
+
+			// The different manoeuvre categories
+			TeamBehaviour* pAttackCharacteristicSelector = CreateParentTeamBehaviour(TeamActiveCharacteristicSelectorType, pTeamAI, "AttackCharacteristicSelector", nullptr);
+			TeamBehaviour* pDefendCharacteristicSelector = CreateParentTeamBehaviour(TeamActiveCharacteristicSelectorType, pTeamAI, "DefendCharacteristicSelector", nullptr);
+
+			if(pTeamProcessMessagesAction && pAttackCharacteristicSelector && pDefendCharacteristicSelector)
+			{
+				reinterpret_cast<TeamComposite*>(pUpdateTeamAISequence)->AddChild(pTeamProcessMessagesAction);
+
+				reinterpret_cast<TeamComposite*>(pManoeuvreCategoriesParallel)->AddChild(pAttackCharacteristicSelector);
+				reinterpret_cast<TeamComposite*>(pManoeuvreCategoriesParallel)->AddChild(pDefendCharacteristicSelector);
+
+				// These sequences are the "root" nodes of each concrete manoeuvre
+				TeamBehaviour* pRunTheFlagHomeSequence		= CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "RunTheFlagHomeSequence", nullptr);
+				TeamBehaviour* pRushBaseAttackSequence	    = CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "RushBaseAttackSequence", nullptr);
+				TeamBehaviour* pDefendBaseEntrancesSequence = CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "DefendBaseEntrancesSequence", nullptr);
+
+				if(pRunTheFlagHomeSequence && pRushBaseAttackSequence && pDefendBaseEntrancesSequence)
+				{
+					reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pRunTheFlagHomeSequence);
+					reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pRushBaseAttackSequence);
+					reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pDefendBaseEntrancesSequence);
+
+					// The precondition checks for each of the manoeuvres
+					ManoeuvrePreconditionsFulfilledInitData runTheFlagHomeInitData(RunTheFlagHomeManoeuvre);
+					TeamBehaviour* pRunTheFlagHomePreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "RunTheFlagHomePreconditionsCheck", 0.0f, 0.0f, &runTheFlagHomeInitData);
+					ManoeuvrePreconditionsFulfilledInitData rushBaseAttackInitData(RushBaseAttackManoeuvre);
+					TeamBehaviour* pRushBaseAttackPreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "RushBaseAttackPreconditionsCheck", 0.0f, 0.0f, &rushBaseAttackInitData);
+					ManoeuvrePreconditionsFulfilledInitData defendBaseEntrancesInitData(DefendBaseEntrancesManoeuvre);
+					TeamBehaviour* pDefendBaseEntrancesPreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "DefendBaseEntrancesPreconditionsCheck", 0.0f, 0.0f, &defendBaseEntrancesInitData);
+			
+					// The monitors constantly checking if the manoeuvres are still valid or should be aborted
+					TeamBehaviour* pRunTheFlagHomeMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "RunTheFlagHomeMonitor", nullptr);
+					TeamBehaviour* pRushBaseAttackMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "RushBaseAttackMonitor", nullptr);
+					TeamBehaviour* pDefendBaseEntrancesMonitor  = CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "DefendBaseEntrancesMonitor", nullptr);
+
+					if(pRunTheFlagHomePreconditionsCheck && pRushBaseAttackPreconditionsCheck && pDefendBaseEntrancesPreconditionsCheck &&
+					   pRunTheFlagHomeMonitor && pRushBaseAttackMonitor && pDefendBaseEntrancesMonitor)
+					{
+						reinterpret_cast<TeamComposite*>(pRunTheFlagHomeSequence)->AddChild(pRunTheFlagHomePreconditionsCheck);
+						reinterpret_cast<TeamComposite*>(pRunTheFlagHomeSequence)->AddChild(pRunTheFlagHomeMonitor);
+						reinterpret_cast<TeamComposite*>(pRushBaseAttackSequence)->AddChild(pRushBaseAttackPreconditionsCheck);
+						reinterpret_cast<TeamComposite*>(pRushBaseAttackSequence)->AddChild(pRushBaseAttackMonitor);
+						reinterpret_cast<TeamComposite*>(pDefendBaseEntrancesSequence)->AddChild(pDefendBaseEntrancesPreconditionsCheck);
+						reinterpret_cast<TeamComposite*>(pDefendBaseEntrancesSequence)->AddChild(pDefendBaseEntrancesMonitor);
+
+						// The condition checks performed during execution of the manoeuvres to ensure they are still valid
+						ManoeuvreStillValidInitData runTheFlagHomeStillValidInitData(RunTheFlagHomeManoeuvre);
+						TeamBehaviour* pRunTheFlagHomeStillValidCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvreStillValidType, pTeamAI, "RunTheFlagHomeStillValidCheck", 0.0f, 0.0f, &runTheFlagHomeStillValidInitData);
+						ManoeuvreStillValidInitData rushBaseAttackStillValidInitData(RushBaseAttackManoeuvre);
+						TeamBehaviour* pRushBaseAttackStillValidCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvreStillValidType, pTeamAI, "RushBaseAttackStillValidCheck", 0.0f, 0.0f, &rushBaseAttackStillValidInitData);
+						ManoeuvreStillValidInitData defendBaseEntrancesStillValidInitData(DefendBaseEntrancesManoeuvre);
+						TeamBehaviour* pDefendBaseEntrancesStillValidCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvreStillValidType, pTeamAI, "DefendBaseEntrancesStillValidCheck", 0.0f, 0.0f, &defendBaseEntrancesStillValidInitData);
+			
+						// The actual execution of the manoeuvres is handled by these actions
+						ExecuteTeamManoeuvreInitData executeRunTheFlagHomeInitData(RunTheFlagHomeManoeuvre);
+						TeamBehaviour* pExecuteRunTheFlagHomeAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteRunTheFlagHomeAction", 0.0f, 1.0f, &executeRunTheFlagHomeInitData);
+						ExecuteTeamManoeuvreInitData executeRushBaseAttackInitData(RushBaseAttackManoeuvre);
+						TeamBehaviour* pExecuteRushBaseAttackAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteRushBaseAttackAction", 1.0f, 0.0f, &executeRushBaseAttackInitData);
+						ExecuteTeamManoeuvreInitData executeDefendBaseEntrancesInitData(DefendBaseEntrancesManoeuvre);
+						TeamBehaviour* pExecuteDefendBaseEntrancesAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteDefendBaseEntrancesAction", 0.0f, 1.0f, &executeDefendBaseEntrancesInitData);
+
+						if(pRunTheFlagHomeStillValidCheck && pRushBaseAttackStillValidCheck && pDefendBaseEntrancesStillValidCheck &&
+						   pExecuteRunTheFlagHomeAction && pExecuteRushBaseAttackAction && pExecuteDefendBaseEntrancesAction)
+						{
+							reinterpret_cast<TeamMonitor*>(pRunTheFlagHomeMonitor)->AddCondition(pRunTheFlagHomeStillValidCheck);
+							reinterpret_cast<TeamMonitor*>(pRunTheFlagHomeMonitor)->AddAction(pExecuteRunTheFlagHomeAction);
+							reinterpret_cast<TeamMonitor*>(pRushBaseAttackMonitor)->AddCondition(pRushBaseAttackStillValidCheck);
+							reinterpret_cast<TeamMonitor*>(pRushBaseAttackMonitor)->AddAction(pExecuteRushBaseAttackAction);
+							reinterpret_cast<TeamMonitor*>(pDefendBaseEntrancesMonitor)->AddCondition(pDefendBaseEntrancesStillValidCheck);
+							reinterpret_cast<TeamMonitor*>(pDefendBaseEntrancesMonitor)->AddAction(pExecuteDefendBaseEntrancesAction);
+
+							return pTeamParallelRoot;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/*
 	TeamBehaviour* pTeamRoot = CreateParentTeamBehaviour(TeamActiveSelectorType, pTeamAI, "TeamRoot", nullptr);
 
 	if(pTeamRoot)
@@ -434,7 +531,7 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 			}
 		}
 	}
-
+	*/
 	return nullptr;
 }
 

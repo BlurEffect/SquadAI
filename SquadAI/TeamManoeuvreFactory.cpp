@@ -50,6 +50,16 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 		return new RushBaseAttack(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_waitForParticipantsInterval, pData->m_assemblyPointDistance);
 		break;
 		}
+	case RunTheFlagHomeManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		return new RunTheFlagHome(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
+		break;
+		}
 	default:
 		return nullptr;
 	}

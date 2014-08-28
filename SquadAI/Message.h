@@ -59,7 +59,8 @@ class Message
 {
 public:
 	Message(MessageType messageType) : m_messageType(messageType),
-									   m_isProcessed(false)
+									   m_numberOfReceivers(0),
+									   m_processedCount(0)
 	{}
 	virtual ~Message(void) = 0{}
 
@@ -75,7 +76,6 @@ private:
 	MessageType  m_messageType;			// The type of the message
 	unsigned int m_numberOfReceivers;	// The number of communicators that have received this message
 	unsigned int m_processedCount;		// Tells how many of the receivers have already processed this message
-	bool         m_isProcessed;			// Tells whether the message was processed by its recipient or not
 };		
 
 #endif // MESSAGE_H

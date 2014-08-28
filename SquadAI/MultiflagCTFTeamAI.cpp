@@ -99,10 +99,8 @@ void MultiflagCTFTeamAI::PrepareForSimulation(void)
 //--------------------------------------------------------------------------------------
 // Processes all inbox messages that the team AI received.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
+void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -112,10 +110,7 @@ bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetData().m_flagOwner].m_state     = Stolen;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = pMsg->GetData().m_carrierId;
 		
-		if(ForwardMessageToActiveManoeuvers(pMsg))
-		{
-			return false;
-		}
+		ForwardMessageToActiveManoeuvers(pMsg);
 
 		break;
 		}
@@ -126,10 +121,7 @@ bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetData().m_flagOwner].m_position  = pMsg->GetData().m_dropPosition;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
 		
-		if(ForwardMessageToActiveManoeuvers(pMsg))
-		{
-			return false;
-		}
+		ForwardMessageToActiveManoeuvers(pMsg);
 
 		break;
 		}
@@ -140,19 +132,15 @@ bool MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		m_flagData[pMsg->GetData().m_flagOwner].m_position  = m_flagData[pMsg->GetData().m_flagOwner].m_basePosition;
 		m_flagData[pMsg->GetData().m_flagOwner].m_carrierId = 0;
 		
-		if(ForwardMessageToActiveManoeuvers(pMsg))
-		{
-			return false;
-		}
+		ForwardMessageToActiveManoeuvers(pMsg);
 
 		break;
 		}
 	default:
 		// Forward other messages to the base class implementation of the function
-		return TeamAI::ProcessMessage(pMessage);
+		TeamAI::ProcessMessage(pMessage);
 	}
 
-	return true;
 }
 
 //--------------------------------------------------------------------------------------

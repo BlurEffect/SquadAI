@@ -30,10 +30,8 @@ RushBaseAttack::~RushBaseAttack(void)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the manoeuvre received.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool RushBaseAttack::ProcessMessage(Message* pMessage)
+void RushBaseAttack::ProcessMessage(Message* pMessage)
 {
 
 	// add steal flag message -> success
@@ -53,8 +51,6 @@ bool RushBaseAttack::ProcessMessage(Message* pMessage)
 			SetActive(false);
 			SetSucceeded(true);
 		}
-
-		return true;
 		break;
 	}
 	case EntityKilledMessageType:
@@ -81,7 +77,6 @@ bool RushBaseAttack::ProcessMessage(Message* pMessage)
 				}
 			}
 		}
-		return true;
 		break;
 	}
 	case UpdateOrderStateMessageType:
@@ -137,11 +132,10 @@ bool RushBaseAttack::ProcessMessage(Message* pMessage)
 			m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
 		}
 	}
-	return true;
 	break;
 	}
 	default:
-		return TeamManoeuvre::ProcessMessage(pMessage);
+		TeamManoeuvre::ProcessMessage(pMessage);
 	}
 }
 

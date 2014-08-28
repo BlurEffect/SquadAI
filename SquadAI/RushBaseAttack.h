@@ -58,7 +58,7 @@ public:
 
 protected:
 	
-	virtual bool ProcessMessage(Message* pMessage);
+	virtual void ProcessMessage(Message* pMessage);
 
 private:
 

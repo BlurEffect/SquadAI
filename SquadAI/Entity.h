@@ -198,7 +198,7 @@ public:
 
 protected:
 
-	virtual bool ProcessMessage(Message* pMessage);
+	virtual void ProcessMessage(Message* pMessage);
 	virtual void ProcessOrder(Order* pOrder);
 
 	// Process Orders

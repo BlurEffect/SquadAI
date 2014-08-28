@@ -686,13 +686,11 @@ bool Soldier::IsAtTarget(const XMFLOAT2& target)
 //--------------------------------------------------------------------------------------
 // Processes a given message. Default implementation.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool Soldier::ProcessMessage(Message* pMessage)
+void Soldier::ProcessMessage(Message* pMessage)
 {
 	// Forward all calls to the base class
-	return Entity::ProcessMessage(pMessage);
+	Entity::ProcessMessage(pMessage);
 }
 
 

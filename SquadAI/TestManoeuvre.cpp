@@ -26,10 +26,8 @@ TestManoeuvre::~TestManoeuvre(void)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the manoeuvre received.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool TestManoeuvre::ProcessMessage(Message* pMessage)
+void TestManoeuvre::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -74,11 +72,10 @@ bool TestManoeuvre::ProcessMessage(Message* pMessage)
 		// The order failed -> release the entity from the manoeuvre
 		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
 	}
-	return true;
 	break;
 	}
 	default:
-		return TeamManoeuvre::ProcessMessage(pMessage);
+		TeamManoeuvre::ProcessMessage(pMessage);
 	}
 
 	// Update any active attack orders?

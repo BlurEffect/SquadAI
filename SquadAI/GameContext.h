@@ -62,7 +62,7 @@ public:
 	virtual void ProcessEvent(EventType type, void* pEventData);
 protected:
 	
-	virtual bool ProcessMessage(Message* pMessage);
+	virtual void ProcessMessage(Message* pMessage);
 
 private:
 

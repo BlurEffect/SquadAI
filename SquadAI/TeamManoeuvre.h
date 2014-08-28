@@ -77,7 +77,7 @@ public:
 protected:
 	virtual void UpdateAttackOrders(unsigned long enemyId, const XMFLOAT2 newPosition);
 
-	virtual bool ProcessMessage(Message* pMessage);
+	virtual void ProcessMessage(Message* pMessage);
 
 	void CancelOrder(Entity* pEntity);
 	void CancelOrder(unsigned long id);

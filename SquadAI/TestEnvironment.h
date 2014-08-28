@@ -101,7 +101,7 @@ public:
 	void ProcessEvent(EventType type, void* pEventData);
 
 protected:
-	bool ProcessMessage(Message* pMessage);
+	void ProcessMessage(Message* pMessage);
 	
 
 private:

@@ -420,10 +420,8 @@ void Entity::ProcessEvent(EventType type, void* pEventData)
 //--------------------------------------------------------------------------------------
 // Processes a given message.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool Entity::ProcessMessage(Message* pMessage)
+void Entity::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -434,7 +432,6 @@ bool Entity::ProcessMessage(Message* pMessage)
 		{
 			ProcessEnemyKilled(pEntityKilledMessage->GetData().m_team, pEntityKilledMessage->GetData().m_id);
 		}
-		return true;
 		break;
 		}
 	case FollowOrderMessageType:
@@ -442,18 +439,16 @@ bool Entity::ProcessMessage(Message* pMessage)
 		FollowOrderMessage* pFollowOrderMessage = reinterpret_cast<FollowOrderMessage*>(pMessage);
 		// Orders are processed separately
 		ProcessOrder(pFollowOrderMessage->GetData().m_pOrder);
-		return true;
 		break;
 		}
 	case CancelOrderMessageType:
 		{
 		// Cancel the currently active order
 		m_pCurrentOrder = nullptr;
-		return true;
 		break;
 		}
 	default:
-		return Communicator::ProcessMessage(pMessage);
+		Communicator::ProcessMessage(pMessage);
 	}
 }
 

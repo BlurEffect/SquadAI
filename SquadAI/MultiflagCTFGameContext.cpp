@@ -84,14 +84,12 @@ void MultiflagCTFGameContext::Reset(void)
 //--------------------------------------------------------------------------------------
 // Processes a given message. Default implementation.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool MultiflagCTFGameContext::ProcessMessage(Message* pMessage)
+void MultiflagCTFGameContext::ProcessMessage(Message* pMessage)
 {
 	// Not expecting any messages, call the default implementation that simply marks all
 	// messages as processed.
-	return GameContext::ProcessMessage(pMessage);
+	GameContext::ProcessMessage(pMessage);
 }
 
 //--------------------------------------------------------------------------------------

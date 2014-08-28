@@ -28,7 +28,7 @@ void Communicator::SortOutProcessedMessages(void)
 		std::vector<Message*>::iterator it = m_outboxMessages.begin();
 		while(it != m_outboxMessages.end())
 		{
-			if((*it)->IsProcessed() && (*it))
+			if((*it) && (*it)->IsProcessed())
 			{
 				delete (*it);
 				(*it) = nullptr;
@@ -94,6 +94,7 @@ bool Communicator::SendMessage(Communicator* pReceiver, MessageType messageType,
 	if(pMessage)
 	{
 		m_outboxMessages.push_back(pMessage);
+		pMessage->IncreaseReceiverCount();
 		pReceiver->GetInboxMessages().push(pMessage);
 		return true;
 	}
@@ -115,7 +116,7 @@ void Communicator::ForwardMessage(Communicator* pReceiver, Message* pMessage)
 			// No need to store the message in the outbox, as it is already in the outbox of the
 			// original sender, who will take care of deleting it.
 
-			//pMessage->IncreaseReceiverCount();
+			pMessage->IncreaseReceiverCount();
 			pReceiver->GetInboxMessages().push(pMessage);
 		}
 	}
@@ -155,7 +156,7 @@ void Communicator::ResetCommunication(void)
 
 	// Use swap idiom to clear the inbox
 	std::queue<Message*> empty;
-	std::swap( m_inboxMessages, empty );
+	std::swap(m_inboxMessages, empty);
 
 }
 
@@ -176,10 +177,10 @@ void Communicator::ProcessMessages(void)
 {
 	while(!m_inboxMessages.empty())
 	{
-		bool wasFinalProcessing = ProcessMessage(m_inboxMessages.front());
+		ProcessMessage(m_inboxMessages.front());
 		// If the message was forwarded, don't set it as processed yet. Wait for the receiver of the 
 		// forwarded message to set it as processed.
-		m_inboxMessages.front()->SetProcessed(wasFinalProcessing);
+		m_inboxMessages.front()->IncreaseProcessedCount();
 		m_inboxMessages.pop();
 	}
 }
@@ -187,12 +188,10 @@ void Communicator::ProcessMessages(void)
 //--------------------------------------------------------------------------------------
 // Processes a given message. Default implementation.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool Communicator::ProcessMessage(Message* pMessage)
+void Communicator::ProcessMessage(Message* pMessage)
 {
-	return true;
+	// Do nothing
 }
 
 std::queue<Message*>& Communicator::GetInboxMessages(void)

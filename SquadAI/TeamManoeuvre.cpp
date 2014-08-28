@@ -146,10 +146,8 @@ void TeamManoeuvre::ProcessEvent(EventType type, void* pEventData)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the manoeuvre received.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool TeamManoeuvre::ProcessMessage(Message* pMessage)
+void TeamManoeuvre::ProcessMessage(Message* pMessage)
 {
 	// Default implementations of some messages that can be forwarded from a team AI
 
@@ -160,7 +158,6 @@ bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 		// Update any attack orders on this enemy with the newest position
 		EnemySpottedMessage* pMsg = reinterpret_cast<EnemySpottedMessage*>(pMessage);
 		UpdateAttackOrders(pMsg->GetData().m_enemyId, pMsg->GetData().m_enemyPosition);
-		return true;
 		break;
 		}
 	case UpdateEnemyPositionMessageType:
@@ -168,7 +165,6 @@ bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 		// Update attack orders
 		UpdateEnemyPositionMessage* pMsg = reinterpret_cast<UpdateEnemyPositionMessage*>(pMessage);
 		UpdateAttackOrders(pMsg->GetData().m_enemyId, pMsg->GetData().m_enemyPosition);
-		return true;
 		break;
 		}
 	case EntityKilledMessageType:
@@ -190,7 +186,6 @@ bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 				++it;
 			}
 		}
-		return true;
 		break;
 		}
 	case UpdateOrderStateMessageType:
@@ -205,11 +200,10 @@ bool TeamManoeuvre::ProcessMessage(Message* pMessage)
 			std::unordered_map<unsigned long, Order*>::iterator foundIt = m_activeOrders.find(pMsg->GetData().m_entityId);
 			m_activeOrders.erase(foundIt);
 		}
-		return true;
 		break;
 		}
 	default:
-		return Communicator::ProcessMessage(pMessage);
+		Communicator::ProcessMessage(pMessage);
 	}
 }
 

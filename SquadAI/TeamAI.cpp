@@ -120,10 +120,8 @@ void TeamAI::CancelOrder(unsigned long id)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the team AI received.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool TeamAI::ProcessMessage(Message* pMessage)
+void TeamAI::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -141,10 +139,7 @@ bool TeamAI::ProcessMessage(Message* pMessage)
 
 		// Update any attack orders on this enemy with the newest position
 		//UpdateAttackOrders(pMsg->GetData().m_enemyId);
-		if(ForwardMessageToActiveManoeuvers(pMessage))
-			{
-				return false;
-			}
+		ForwardMessageToActiveManoeuvers(pMessage);
 		break;
 		}
 	case LostSightOfEnemyMessageType:
@@ -167,10 +162,7 @@ bool TeamAI::ProcessMessage(Message* pMessage)
 		{
 			foundIt->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
 			//UpdateAttackOrders(pMsg->GetData().m_enemyId);
-			if(ForwardMessageToActiveManoeuvers(pMessage))
-			{
-				return false;
-			}
+			ForwardMessageToActiveManoeuvers(pMessage);
 		}
 		break;
 		}
@@ -212,10 +204,7 @@ bool TeamAI::ProcessMessage(Message* pMessage)
 			// Team AI can decide whether it wants to cancel the orders of the killed member or not
 		}
 
-		if(ForwardMessageToActiveManoeuvers(pMessage))
-			{
-				return false;
-			}
+		ForwardMessageToActiveManoeuvers(pMessage);
 		break;
 		}
 	case AttackedByEnemyMessageType:
@@ -229,10 +218,8 @@ bool TeamAI::ProcessMessage(Message* pMessage)
 		ScoreUpdateMessage* pMsg = reinterpret_cast<ScoreUpdateMessage*>(pMessage);
 		m_scores[pMsg->GetData().m_team] = static_cast<float>(pMsg->GetData().m_score) / pMsg->GetData().m_maxScore;
 		
-		if(ForwardMessageToActiveManoeuvers(pMessage))
-		{
-			return false;
-		}
+		ForwardMessageToActiveManoeuvers(pMessage);
+
 		break;
 		}
 	case TimeUpdateMessageType:
@@ -244,10 +231,8 @@ bool TeamAI::ProcessMessage(Message* pMessage)
 	case UpdateOrderStateMessageType:
 		{
 
-			if(ForwardMessageToActiveManoeuvers(pMessage))
-			{
-				return false;
-			}
+			ForwardMessageToActiveManoeuvers(pMessage);
+
 			/*
 		UpdateOrderStateMessage* pMsg = reinterpret_cast<UpdateOrderStateMessage*>(pMessage);
 		
@@ -259,33 +244,24 @@ bool TeamAI::ProcessMessage(Message* pMessage)
 		break;
 		}
 	default:
-		return Communicator::ProcessMessage(pMessage);
+		Communicator::ProcessMessage(pMessage);
 	}
-
-	return true;
 }
 
 //--------------------------------------------------------------------------------------
 // Forwards a given message to all currently active manoeuvres of the team AI.
 // Param1: A pointer to the message to forward.
-// Returns true if the message was successfully forwarded to at least one manoeuver, false
-// if the message wasn't forwarded to anyone.
 //--------------------------------------------------------------------------------------
-bool TeamAI::ForwardMessageToActiveManoeuvers(Message* pMessage)
+void TeamAI::ForwardMessageToActiveManoeuvers(Message* pMessage)
 {
-	bool wasForwarded = false;
-
 	for(std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator it = m_manoeuvres.begin(); it != m_manoeuvres.end(); ++it)
 	{
 		if(it->second->IsActive())
 		{
 			// Forward the message
 			ForwardMessage(it->second, pMessage);
-			wasForwarded = true;
 		}
 	}
-
-	return wasForwarded;
 }
 
 

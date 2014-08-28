@@ -110,11 +110,11 @@ protected:
 
 	void CancelOrder(unsigned long id);
 
-	virtual bool ProcessMessage(Message* pMessage);
+	virtual void ProcessMessage(Message* pMessage);
 	virtual void UpdateAttackOrders(unsigned long enemyId);
 
 
-	bool ForwardMessageToActiveManoeuvers(Message* pMessage);
+	void ForwardMessageToActiveManoeuvers(Message* pMessage);
 
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*> m_manoeuvres; // The available team manoeuvres for this team AI

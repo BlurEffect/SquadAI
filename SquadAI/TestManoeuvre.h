@@ -31,7 +31,7 @@ public:
 
 protected:
 	
-	virtual bool ProcessMessage(Message* pMessage);
+	virtual void ProcessMessage(Message* pMessage);
 
 private:
 	TeamAI* m_pTeamAI; // The team AI able to use this manoeuvre

@@ -25,10 +25,8 @@ RunTheFlagHome::~RunTheFlagHome(void)
 //--------------------------------------------------------------------------------------
 // Processes an inbox message that the manoeuvre received.
 // Param1: A pointer to the message to process.
-// Returns true if this was the final communicator to process the message, false if the
-// message was forwarded to another one.
 //--------------------------------------------------------------------------------------
-bool RunTheFlagHome::ProcessMessage(Message* pMessage)
+void RunTheFlagHome::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
@@ -41,7 +39,6 @@ bool RunTheFlagHome::ProcessMessage(Message* pMessage)
 		SetActive(false);
 		SetSucceeded(true);
 	}
-	return true;
 	break;
 	}
 	case EntityKilledMessageType:
@@ -52,7 +49,6 @@ bool RunTheFlagHome::ProcessMessage(Message* pMessage)
 		// Participants that get killed, drop out of the manoeuvre
 		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_id);
 	}
-	return true;
 	break;
 	}
 	case UpdateOrderStateMessageType:
@@ -95,11 +91,10 @@ bool RunTheFlagHome::ProcessMessage(Message* pMessage)
 			m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
 		}
 	}
-	return true;
 	break;
 	}
 	default:
-		return TeamManoeuvre::ProcessMessage(pMessage);
+		TeamManoeuvre::ProcessMessage(pMessage);
 	}
 }
 

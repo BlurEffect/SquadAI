@@ -150,6 +150,9 @@ void Logger::LogEntityKilled(Entity* pKilled, unsigned long* pShooterId)
 //--------------------------------------------------------------------------------------
 void Logger::LogManoeuvreInit(EntityTeam* team, TeamManoeuvreType* manoeuvre)
 {
+	//if(*team == TeamBlue)
+	//	return;
+
 	if(m_out.is_open())
 	{
 		m_out << '\n' << GetTeamName(*team) << " initiated manoeuvre " << TeamManoeuvre::GetManoeuvreNameFromType(*manoeuvre) << '.';
@@ -165,6 +168,9 @@ void Logger::LogManoeuvreInit(EntityTeam* team, TeamManoeuvreType* manoeuvre)
 //--------------------------------------------------------------------------------------
 void Logger::LogManoeuvreTerminate(EntityTeam* team, TeamManoeuvreType* manoeuvre)
 {
+	//if(*team == TeamBlue)
+	//	return;
+
 	if(m_out.is_open())
 	{
 		m_out << '\n' << GetTeamName(*team) << " terminated manoeuvre " << TeamManoeuvre::GetManoeuvreNameFromType(*manoeuvre) << '.';
@@ -180,6 +186,9 @@ void Logger::LogManoeuvreTerminate(EntityTeam* team, TeamManoeuvreType* manoeuvr
 //--------------------------------------------------------------------------------------
 void Logger::LogManoeuvrePreconditionCheck(EntityTeam* team, TeamManoeuvreType* manoeuvre)
 {
+	//if(*team == TeamBlue)
+	//	return;
+
 	if(m_out.is_open())
 	{
 		m_out << '\n' << GetTeamName(*team) << " checked preconditions for manoeuvre " << TeamManoeuvre::GetManoeuvreNameFromType(*manoeuvre) << '.';

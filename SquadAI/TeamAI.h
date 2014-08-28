@@ -112,7 +112,8 @@ protected:
 
 	virtual bool ProcessMessage(Message* pMessage);
 	virtual void UpdateAttackOrders(unsigned long enemyId);
-	
+
+
 	bool ForwardMessageToActiveManoeuvers(Message* pMessage);
 
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI

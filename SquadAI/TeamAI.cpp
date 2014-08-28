@@ -318,6 +318,7 @@ void TeamAI::UpdateAttackOrders(unsigned long enemyId)
 	}
 }
 
+
 //--------------------------------------------------------------------------------------
 // Process a given event. Default implementation.
 // Param1: The type of event.
@@ -544,7 +545,7 @@ void TeamAI::Reset(void)
 		it->second->Reset();
 	}
 
-	m_pBehaviour->Reset();
+	m_pBehaviour->Abort();
 }
 
 // Data access functions

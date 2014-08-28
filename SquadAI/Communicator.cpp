@@ -114,6 +114,8 @@ void Communicator::ForwardMessage(Communicator* pReceiver, Message* pMessage)
 		{
 			// No need to store the message in the outbox, as it is already in the outbox of the
 			// original sender, who will take care of deleting it.
+
+			//pMessage->IncreaseReceiverCount();
 			pReceiver->GetInboxMessages().push(pMessage);
 		}
 	}

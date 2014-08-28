@@ -65,11 +65,12 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
+	/*
 	if(m_pBehaviour)
 	{
 		delete m_pBehaviour;
 		m_pBehaviour = nullptr;
-	}
+	}*/
 
 	if(!m_pBehaviour)
 	{
@@ -146,7 +147,7 @@ void Entity::Reset(void)
 
 	ResetCommunication();
 
-	m_pBehaviour->Reset();
+	m_pBehaviour->Abort();
 }
 /*
 //--------------------------------------------------------------------------------------

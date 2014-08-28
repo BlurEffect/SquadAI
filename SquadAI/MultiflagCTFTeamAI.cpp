@@ -93,23 +93,7 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 //--------------------------------------------------------------------------------------
 void MultiflagCTFTeamAI::PrepareForSimulation(void)
 {
-	if(m_pBehaviour)
-	{
-		delete m_pBehaviour;
-		m_pBehaviour = nullptr;
-	}
-
-	// Hack, resetting would be better
-	if(!m_pBehaviour)
-		{
-			m_pBehaviour = BehaviourFactory::CreateBehaviourTree(SimpleTeamMultiflagCTFTree, this);
-			if(!m_pBehaviour)
-			{
-				//return false;
-			}
-
-			reinterpret_cast<TeamBehaviour*>(m_pBehaviour)->CalculateCharacteristicValues();
-		}
+	
 }
 
 //--------------------------------------------------------------------------------------
@@ -351,23 +335,22 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 		break;
 		}
 	case RunTheFlagHomeManoeuvre:
-
+		{
 		// Add the new flag carrier as participant to the manoeuvre
-		if(GetTeam() == TeamRed)
-		{
-			std::vector<Entity*>::iterator foundIt = std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[TeamBlue].m_carrierId));
-			m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
-			m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
-		}else
-		{
-			std::vector<Entity*>::iterator foundIt = std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[TeamRed].m_carrierId));
-			m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
-			m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
-		}
 
+		std::vector<Entity*>::iterator foundIt = std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[enemyTeam].m_carrierId));
+		if(foundIt == GetTeamMembers().end())
+		{
+			int a = 2; // DEBUG, should never happen
+		}
+			
+		m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
+		m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
+	
 		m_manoeuvres[manoeuvre]->Initiate();
 
 		break;
+		}
 	default:
 		// Forward the call to the base class
 		TeamAI::InitiateManoeuvre(manoeuvre);

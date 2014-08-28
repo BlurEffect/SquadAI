@@ -63,14 +63,19 @@ public:
 	{}
 	virtual ~Message(void) = 0{}
 
-	MessageType GetType(void) const { return m_messageType; }
-	bool        IsProcessed(void) const { return m_isProcessed; }
+	MessageType  GetType(void) const { return m_messageType; }
+	unsigned int GetNumberOfReceivers(void) const { return m_numberOfReceivers; }
+	unsigned int GetProcessedCount(void) const { return m_processedCount; }
+	bool         IsProcessed(void) const { return m_processedCount == m_numberOfReceivers; }
 
-	void SetProcessed(bool isProcessed) { m_isProcessed = isProcessed; }
+	void IncreaseProcessedCount(void) { ++m_processedCount; }
+	void IncreaseReceiverCount(void) { ++m_numberOfReceivers; }
 
 private:
-	MessageType m_messageType;	// The type of the message
-	bool        m_isProcessed;  // Tells whether the message was processed by its recipient or not
+	MessageType  m_messageType;			// The type of the message
+	unsigned int m_numberOfReceivers;	// The number of communicators that have received this message
+	unsigned int m_processedCount;		// Tells how many of the receivers have already processed this message
+	bool         m_isProcessed;			// Tells whether the message was processed by its recipient or not
 };		
 
 #endif // MESSAGE_H

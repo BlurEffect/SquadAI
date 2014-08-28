@@ -12,7 +12,7 @@
 #include "TestEnvironment.h"
 
 RunTheFlagHome::RunTheFlagHome(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI)
-	: TeamManoeuvre(DefendBaseEntrancesManoeuvre, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(RunTheFlagHomeManoeuvre, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI)
 {
 }

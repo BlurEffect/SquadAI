@@ -12,7 +12,7 @@
 #include "TestEnvironment.h"
 
 RushBaseAttack::RushBaseAttack(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float waitForParticipantsInterval, float assemblyPointDistance)
-	: TeamManoeuvre(DefendBaseEntrancesManoeuvre, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(RushBaseAttackManoeuvre, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
 	  m_assemblyPoint(0.0f, 0.0f),
 	  m_assemblyPointDistance(assemblyPointDistance),

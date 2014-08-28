@@ -24,7 +24,7 @@ public:
 
 	// To be overwritten by derived manoeuvre classes
 
-	void			Initiate(void);
+	BehaviourStatus Initiate(void);
 	BehaviourStatus Update(float deltaTime);
 	void			Terminate(void);
 

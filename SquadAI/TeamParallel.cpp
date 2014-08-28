@@ -50,9 +50,9 @@ void TeamParallel::CalculateCharacteristicValues(void)
 }
 
 //--------------------------------------------------------------------------------------
-// Updates the sequence.
+// Updates the parallel.
 // Param1: The time in seconds passed since the last frame.
-// Returns the state of the sequence.
+// Returns the state of the parallel.
 //--------------------------------------------------------------------------------------
 BehaviourStatus TeamParallel::Update(float deltaTime)
 {

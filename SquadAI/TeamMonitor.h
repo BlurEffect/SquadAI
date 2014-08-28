@@ -23,6 +23,9 @@ public:
 
 	void AddCondition(TeamBehaviour* pCondition);
 	void AddAction(TeamBehaviour* pAction);
+
+protected:
+	//virtual BehaviourStatus Update(float deltaTime);
 };
 
 #endif // TEAM_MONITOR_H

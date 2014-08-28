@@ -34,11 +34,22 @@ enum TeamManoeuvreType
 	RunTheFlagHomeManoeuvre
 };
 
+//--------------------------------------------------------------------------------------
+// The team AI is only able to execute one manoeuvre of a category at a time. These
+// are the currently available categories.
+//--------------------------------------------------------------------------------------
+enum TeamManoeuvreCategory
+{
+	AttackEnemyFlagCategory, // Contains all manoeuvres that attack the enemy flag
+	ProtectOwnFlagCategory,  // Contains all manoeuvres that protect the own flag of the team
+	NumberOfManoeuvreCategories
+};
+
 
 class TeamManoeuvre : public Communicator
 {
 public:
-	TeamManoeuvre(TeamManoeuvreType type, unsigned int minNumberParticipants, unsigned int maxNumberParticipants);
+	TeamManoeuvre(TeamManoeuvreType type, TeamManoeuvreCategory category, unsigned int minNumberParticipants, unsigned int maxNumberParticipants);
 	~TeamManoeuvre(void);
 
 	void AddParticipant(Entity* pEntity);
@@ -46,7 +57,7 @@ public:
 
 	// To be overwritten by derived manoeuvre classes
 
-	virtual void 			Initiate(void) = 0;
+	virtual BehaviourStatus Initiate(void) = 0;
 	virtual BehaviourStatus Update(float deltaTime) = 0;
 	virtual void			Terminate(void) = 0;
 
@@ -61,7 +72,9 @@ public:
 
 	bool						IsActive(void) const;
 	bool						HasSucceeded(void) const;
+	bool                        HasFailed(void) const;
 	TeamManoeuvreType			GetType(void) const;
+	TeamManoeuvreCategory       GetCategory(void) const;
 	unsigned int				GetMinNumberOfParticipants(void) const;
 	unsigned int				GetMaxNumberOfParticipants(void) const;
 	const std::vector<Entity*>& GetParticipants(void) const;
@@ -70,7 +83,9 @@ public:
 
 	void SetActive(bool active);
 	void SetSucceeded(bool succeeded);
+	void SetFailed(bool failed);
 	void SetType(TeamManoeuvreType type);
+	void SetCategory(TeamManoeuvreCategory category);
 	void SetMinNumberOfParticipants(unsigned int minNumberOfParticipants);
 	void SetMaxNumberOfParticipants(unsigned int maxNumberOfParticipants);
 
@@ -87,11 +102,13 @@ protected:
 	std::unordered_map<unsigned long, Order*> m_activeOrders; // The active orders currently being carried out by the entities participating in the manoeuvre
 	
 private:
-	bool              m_active;                  // Tells whether the manoeuvre is currently being executed or inactive
-	bool              m_succeeded;               // Tells whether the manoeuvre succeeded or failed
-	TeamManoeuvreType m_type;					 // Identifies the type of the manoeuvre
-	unsigned int      m_minNumberOfParticipants; // The minimal number of entities required to execute the manoeuvre
-	unsigned int	  m_maxNumberOfParticipants; // The maximal number of entities allowed to execute the manoeuvre
+	bool				  m_active;                  // Tells whether the manoeuvre is currently being executed or inactive
+	bool				  m_succeeded;               // Tells whether the manoeuvre succeeded 
+	bool                  m_failed;					 // Tells whether the manoeuvre failed
+	TeamManoeuvreType	  m_type;					 // Identifies the type of the manoeuvre
+	TeamManoeuvreCategory m_category;				 // The category this manoeuvre is associated to
+	unsigned int		  m_minNumberOfParticipants; // The minimal number of entities required to execute the manoeuvre
+	unsigned int		  m_maxNumberOfParticipants; // The maximal number of entities allowed to execute the manoeuvre
 };
 
 #endif // TEAM_MANOEUVRE_H

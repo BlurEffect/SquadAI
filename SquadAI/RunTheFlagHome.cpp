@@ -12,7 +12,7 @@
 #include "TestEnvironment.h"
 
 RunTheFlagHome::RunTheFlagHome(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI)
-	: TeamManoeuvre(RunTheFlagHomeManoeuvre, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(RunTheFlagHomeManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI)
 {
 }
@@ -36,7 +36,6 @@ void RunTheFlagHome::ProcessMessage(Message* pMessage)
 	if(pMsg->GetData().m_team == GetTeamAI()->GetTeam())
 	{
 		// The flag was captured -> the manoeuvre succeeded
-		SetActive(false);
 		SetSucceeded(true);
 	}
 	break;
@@ -70,7 +69,7 @@ void RunTheFlagHome::ProcessMessage(Message* pMessage)
 			
 			if(!pNewOrder)
 			{
-				SetActive(false);
+				SetFailed(true);
 			}else
 			{
 				// Find the entity
@@ -102,8 +101,9 @@ void RunTheFlagHome::ProcessMessage(Message* pMessage)
 // Initiates the manoeuvre. This mostly consists of sending initial orders to all
 // participating entities and everything that is involved in that process, such as 
 // determining targets etc.
+// Returns a behaviour status code representing the current state of the initiation of the manoeuvre.
 //--------------------------------------------------------------------------------------
-void RunTheFlagHome::Initiate(void)
+BehaviourStatus RunTheFlagHome::Initiate(void)
 {
 	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
 	{
@@ -114,8 +114,7 @@ void RunTheFlagHome::Initiate(void)
 			
 		if(!pNewOrder)
 		{
-			SetActive(false);
-			return;
+			return StatusFailure;
 		}
 
 		FollowOrderMessageData data(pNewOrder);
@@ -124,7 +123,7 @@ void RunTheFlagHome::Initiate(void)
 		m_activeOrders.insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
 	}
 	
-	SetActive(true);
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
@@ -142,7 +141,7 @@ BehaviourStatus RunTheFlagHome::Update(float deltaTime)
 	SortOutProcessedMessages();
 	ProcessMessages();
 
-	if((!IsActive() && !HasSucceeded()) || (GetNumberOfParticipants() < GetMinNumberOfParticipants()))
+	if(!IsActive() || HasFailed() || (GetNumberOfParticipants() < GetMinNumberOfParticipants()))
 	{
 		// The manoeuvre will fail if something failed during the initiation or if it wasn't
 		// initiated at all.

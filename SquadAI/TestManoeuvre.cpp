@@ -12,7 +12,7 @@
 
 
 TestManoeuvre::TestManoeuvre(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, TeamAI* pTeamAI)
-	: TeamManoeuvre(TestAllMoveManoeuvre, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(TestAllMoveManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
 	  m_entitiesReachedDestinationCount(0)
 {
@@ -86,8 +86,9 @@ void TestManoeuvre::ProcessMessage(Message* pMessage)
 // Initiates the manoeuvre. This mostly consists of sending initial orders to all
 // participating entities and everything that is involved in that process, such as 
 // determining targets etc.
+// Returns a behaviour status code representing the current state of the initiation of the manoeuvre.
 //--------------------------------------------------------------------------------------
-void TestManoeuvre::Initiate(void)
+BehaviourStatus TestManoeuvre::Initiate(void)
 {
 	if(m_pTeamAI->GetTeam() == TeamRed)
 	{
@@ -97,8 +98,7 @@ void TestManoeuvre::Initiate(void)
 			
 			if(!pNewOrder)
 			{
-				SetActive(false);
-				return;
+				return StatusFailure;
 			}
 
 			FollowOrderMessageData data(pNewOrder);
@@ -114,8 +114,7 @@ void TestManoeuvre::Initiate(void)
 			
 			if(!pNewOrder)
 			{
-				SetActive(false);
-				return;
+				return StatusFailure;
 			}
 
 			FollowOrderMessageData data(pNewOrder);
@@ -127,7 +126,7 @@ void TestManoeuvre::Initiate(void)
 		
 	}
 	
-	SetActive(true);
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------

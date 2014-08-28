@@ -57,6 +57,11 @@ bool TeamAI::Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICh
 	m_characteristic = characteristic;
 	m_pTestEnvironment = pEnvironment;
 	
+	for(unsigned int i = 0; i < NumberOfManoeuvreCategories; ++i)
+	{
+		m_activeManoeuvres[i] = nullptr;
+	}
+
 	return InitialiseManoeuvres();
 }
 
@@ -345,12 +350,26 @@ bool TeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 }
 
 //--------------------------------------------------------------------------------------
-// Processes a message sent to the team AI.
+// Initiates a manoeuvre.
 // Param1: Identifies the manoeuvre to initiate.
+// Returns a behaviour status code representing the current state of the initiation of 
+// the manoeuvre.
 //--------------------------------------------------------------------------------------
-void TeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
+BehaviourStatus TeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 {
-	
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt != m_manoeuvres.end())
+	{
+		// Abort running behaviours of the same category
+		if(m_activeManoeuvres[foundIt->second->GetCategory()] != nullptr)
+		{
+			TerminateManoeuvre(m_activeManoeuvres[foundIt->second->GetCategory()]->GetType());
+		}
+
+		return foundIt->second->Initiate();
+	}
+
+	return StatusFailure;
 }
 
 //--------------------------------------------------------------------------------------
@@ -361,7 +380,13 @@ void TeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 //--------------------------------------------------------------------------------------
 BehaviourStatus TeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime)
 {
-	return StatusSuccess;
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt != m_manoeuvres.end())
+	{
+		return foundIt->second->Update(deltaTime);
+	}
+
+	return StatusFailure;
 }
 
 //--------------------------------------------------------------------------------------
@@ -370,7 +395,27 @@ BehaviourStatus TeamAI::UpdateManoeuvre(TeamManoeuvreType manoeuvre, float delta
 //--------------------------------------------------------------------------------------
 void TeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
 {
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt != m_manoeuvres.end() && foundIt->second->IsActive())
+	{
+		foundIt->second->Terminate();
+		m_activeManoeuvres[foundIt->second->GetCategory()] = nullptr;
+	}
+}
 
+//--------------------------------------------------------------------------------------
+// Activates a certain manoeuvre.
+// Param1: Identifies the manoeuvre to activate.
+//--------------------------------------------------------------------------------------
+void TeamAI::ActivateManoeuvre(TeamManoeuvreType manoeuvre)
+{
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt != m_manoeuvres.end())
+	{
+		foundIt->second->SetActive(true);
+		// Remind the manoeuvre as active for the corresponding category
+		m_activeManoeuvres[foundIt->second->GetCategory()] = foundIt->second;
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -494,7 +539,7 @@ void TeamAI::RemoveTeamMember(unsigned long id)
 void TeamAI::Reset(void)
 {
 	m_enemyRecords.clear();
-	ResetCommunication();
+	
 
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
@@ -515,11 +560,18 @@ void TeamAI::Reset(void)
 
 	m_entityManoeuvreMap.clear();
 
+	for(unsigned int i = 0; i < NumberOfManoeuvreCategories; ++i)
+	{
+		m_activeManoeuvres[i] = nullptr;
+	}
+
 	// Reset all manoeuvres
 	for(std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator it = m_manoeuvres.begin(); it != m_manoeuvres.end(); ++it)
 	{
 		it->second->Reset();
 	}
+
+	ResetCommunication();
 
 	m_pBehaviour->Abort();
 }

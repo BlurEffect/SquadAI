@@ -27,13 +27,13 @@ void ExecuteTeamManoeuvre::OnInitialise(void)
 {
 	TeamBehaviour::OnInitialise();
 
-	GetTeamAI()->InitiateManoeuvre(GetManoeuvreType());
+	GetTeamAI()->ActivateManoeuvre(GetManoeuvreType());
 }
 
 //--------------------------------------------------------------------------------------
-// Updates the selector.
+// Updates the behaviour.
 // Param1: The time in seconds passed since the last frame.
-// Returns the state of the selector.
+// Returns the state of the behaviour.
 //--------------------------------------------------------------------------------------
 BehaviourStatus ExecuteTeamManoeuvre::Update(float deltaTime)
 {

@@ -12,7 +12,7 @@
 #include "TestEnvironment.h"
 
 RushBaseAttack::RushBaseAttack(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float waitForParticipantsInterval, float assemblyPointDistance)
-	: TeamManoeuvre(RushBaseAttackManoeuvre, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(RushBaseAttackManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
 	  m_assemblyPoint(0.0f, 0.0f),
 	  m_assemblyPointDistance(assemblyPointDistance),
@@ -48,7 +48,6 @@ void RushBaseAttack::ProcessMessage(Message* pMessage)
 			// The enemy flag was picked up, the manoeuvre succeeded
 			// Note: At the moment it is not distinguished whether an actual participant of this manoeuvre stole the 
 			//       flag or if another team member did so.
-			SetActive(false);
 			SetSucceeded(true);
 		}
 		break;
@@ -104,7 +103,7 @@ void RushBaseAttack::ProcessMessage(Message* pMessage)
 		
 					if(!pNewOrder)
 					{
-						SetActive(false);
+						SetFailed(true);
 					}
 		
 					// Find the participant
@@ -167,7 +166,7 @@ void RushBaseAttack::StartAttack(void)
 		
 		if(!pNewOrder)
 		{
-			SetActive(false);
+			SetFailed(true);
 		}
 		
 		FollowOrderMessageData data(pNewOrder);
@@ -277,8 +276,9 @@ void RushBaseAttack::DetermineAssemblyPoint(void)
 // Initiates the manoeuvre. This mostly consists of sending initial orders to all
 // participating entities and everything that is involved in that process, such as 
 // determining targets etc.
+// Returns a behaviour status code representing the current state of the initiation of the manoeuvre.
 //--------------------------------------------------------------------------------------
-void RushBaseAttack::Initiate(void)
+BehaviourStatus RushBaseAttack::Initiate(void)
 {
 	DetermineAssemblyPoint();
 
@@ -288,8 +288,7 @@ void RushBaseAttack::Initiate(void)
 			
 		if(!pNewOrder)
 		{
-			SetActive(false);
-			return;
+			return StatusFailure;
 		}
 
 		FollowOrderMessageData data(pNewOrder);
@@ -298,7 +297,7 @@ void RushBaseAttack::Initiate(void)
 		m_activeOrders.insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
 	}
 	
-	SetActive(true);
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
@@ -316,14 +315,9 @@ BehaviourStatus RushBaseAttack::Update(float deltaTime)
 	SortOutProcessedMessages();
 	ProcessMessages();
 
-	if((!IsActive() && !HasSucceeded()) || (GetNumberOfParticipants() < GetMinNumberOfParticipants()))
+	if(GetTeamAI()->GetTeam() == TeamRed && IsActive())
 	{
-		// The manoeuvre will fail if something failed during the initiation or if it wasn't
-		// initiated at all.
-		return StatusFailure;
-	}else if(HasSucceeded())
-	{
-		return StatusSuccess;
+		int a = 5;
 	}
 
 	m_timer += deltaTime;
@@ -332,6 +326,16 @@ BehaviourStatus RushBaseAttack::Update(float deltaTime)
 	{
 		// Waited long enough, start the attack
 		StartAttack();
+	}
+
+	if(!IsActive() || HasFailed() || (GetNumberOfParticipants() < GetMinNumberOfParticipants()))
+	{
+		// The manoeuvre will fail if something failed during the initiation or if it wasn't
+		// initiated at all.
+		return StatusFailure;
+	}else if(HasSucceeded())
+	{
+		return StatusSuccess;
 	}
 
 	return StatusRunning;

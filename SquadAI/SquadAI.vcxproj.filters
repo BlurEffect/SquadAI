@@ -501,6 +501,9 @@
     <ClCompile Include="RunTheFlagHome.cpp">
       <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
+    <ClCompile Include="InitiateTeamManoeuvre.cpp">
+      <Filter>Source Files\BehaviourTree\TeamBehaviours\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -889,6 +892,9 @@
     </ClInclude>
     <ClInclude Include="RunTheFlagHome.h">
       <Filter>Header Files\Manoeuvres</Filter>
+    </ClInclude>
+    <ClInclude Include="InitiateTeamManoeuvre.h">
+      <Filter>Header Files\BehaviourTree\TeamBehaviours\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

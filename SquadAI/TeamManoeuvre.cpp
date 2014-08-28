@@ -9,10 +9,12 @@
 #include "Order.h"
 
 
-TeamManoeuvre::TeamManoeuvre(TeamManoeuvreType type, unsigned int minNumberParticipants, unsigned int maxNumberParticipants)
+TeamManoeuvre::TeamManoeuvre(TeamManoeuvreType type, TeamManoeuvreCategory category, unsigned int minNumberParticipants, unsigned int maxNumberParticipants)
 	: m_active(false),
 	  m_succeeded(false),
+	  m_failed(false),
 	  m_type(type),
+	  m_category(category),
 	  m_minNumberOfParticipants(minNumberParticipants),
 	  m_maxNumberOfParticipants(maxNumberParticipants)
 {
@@ -72,11 +74,12 @@ void TeamManoeuvre::RemoveParticipant(unsigned long id)
 //--------------------------------------------------------------------------------------
 void TeamManoeuvre::Reset(void)
 {
-	ResetCommunication();
 	ClearOrders();
+	ResetCommunication();
 	m_participants.clear();
 	m_active = false;
 	m_succeeded = false;
+	m_failed = false;
 }
 
 //--------------------------------------------------------------------------------------
@@ -270,11 +273,13 @@ void TeamManoeuvre::UpdateAttackOrders(unsigned long enemyId, const XMFLOAT2 new
 // Initiates the manoeuvre. This mostly consists of sending initial orders to all
 // participating entities and everything that is involved in that process, such as 
 // determining targets etc.
+// Returns a behaviour status code representing the current state of the initiation of the manoeuvre.
 //--------------------------------------------------------------------------------------
-void TeamManoeuvre::Initiate(void)
+BehaviourStatus TeamManoeuvre::Initiate(void)
 {
 	// Default implementation.
 	m_active = true;
+	return StatusSuccess;
 }
 
 //--------------------------------------------------------------------------------------
@@ -296,12 +301,15 @@ BehaviourStatus TeamManoeuvre::Update(float deltaTime)
 		return StatusFailure;
 	}
 
-	if(m_active)
+	if(m_succeeded)
 	{
 		return StatusSuccess;
-	}else
+	}else if(m_failed)
 	{
 		return StatusFailure;
+	}else
+	{
+		return StatusRunning;
 	}
 }
 
@@ -324,6 +332,7 @@ void TeamManoeuvre::Terminate(void)
 
 	m_active = false;
 	m_succeeded = false;
+	m_failed = false;
 }
 
 
@@ -351,9 +360,19 @@ bool TeamManoeuvre::HasSucceeded(void) const
 	return m_succeeded;
 }
 
+bool TeamManoeuvre::HasFailed(void) const
+{
+	return m_failed;
+}
+
 TeamManoeuvreType TeamManoeuvre::GetType(void) const
 {
 	return m_type;
+}
+
+TeamManoeuvreCategory TeamManoeuvre::GetCategory(void) const
+{
+	return m_category;
 }
 
 unsigned int TeamManoeuvre::GetMinNumberOfParticipants(void) const
@@ -386,9 +405,19 @@ void TeamManoeuvre::SetSucceeded(bool succeeded)
 	m_succeeded = succeeded;
 }
 
+void TeamManoeuvre::SetFailed(bool failed)
+{
+	m_failed = failed;
+}
+
 void TeamManoeuvre::SetType(TeamManoeuvreType type)
 {
 	m_type = type;
+}
+
+void TeamManoeuvre::SetCategory(TeamManoeuvreCategory category)
+{
+	m_category = category;
 }
 
 void TeamManoeuvre::SetMinNumberOfParticipants(unsigned int minNumberOfParticipants) 

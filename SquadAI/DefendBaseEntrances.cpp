@@ -12,7 +12,7 @@
 #include "TestEnvironment.h"
 
 DefendBaseEntrances::DefendBaseEntrances(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float switchPositionsInterval)
-	: TeamManoeuvre(DefendBaseEntrancesManoeuvre, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(DefendBaseEntrancesManoeuvre, ProtectOwnFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
 	  m_switchPositionsInterval(switchPositionsInterval),
 	  m_timer(0.0f)
@@ -68,13 +68,13 @@ void DefendBaseEntrances::ProcessMessage(Message* pMessage)
 //--------------------------------------------------------------------------------------
 // isDtributes the participating entities over all base entrances to ensure that all
 // directions are guarded.
+// Returns true if the distribution of the team members succeeded, false otherwise.
 //--------------------------------------------------------------------------------------
-void DefendBaseEntrances::DistributeEntities(void)
+bool DefendBaseEntrances::DistributeEntities(void)
 {
 	if(GetNumberOfParticipants() == 0 || m_pTeamAI->GetTestEnvironment()->GetBaseEntrances(m_pTeamAI->GetTeam()).empty())
 	{
-		SetActive(false);
-		return;
+		return false;
 	}
 
 	m_guardedEntrances.clear();
@@ -109,8 +109,7 @@ void DefendBaseEntrances::DistributeEntities(void)
 			
 		if(!pNewOrder)
 		{
-			SetActive(false);
-			return;
+			return false;
 		}
 
 		FollowOrderMessageData data(pNewOrder);
@@ -124,6 +123,8 @@ void DefendBaseEntrances::DistributeEntities(void)
 			entranceIt = m_pTeamAI->GetTestEnvironment()->GetBaseEntrances(m_pTeamAI->GetTeam()).begin();
 		}
 	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------
@@ -149,11 +150,17 @@ bool DefendBaseEntrances::IsGuarded(Direction direction, const XMFLOAT2& entranc
 // Initiates the manoeuvre. This mostly consists of sending initial orders to all
 // participating entities and everything that is involved in that process, such as 
 // determining targets etc.
+// Returns a behaviour status code representing the current state of the initiation of the manoeuvre.
 //--------------------------------------------------------------------------------------
-void DefendBaseEntrances::Initiate(void)
+BehaviourStatus DefendBaseEntrances::Initiate(void)
 {
-	DistributeEntities();
-	SetActive(true);
+	if(DistributeEntities())
+	{
+		return StatusSuccess;
+	}else
+	{
+		return StatusFailure;
+	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -171,7 +178,15 @@ BehaviourStatus DefendBaseEntrances::Update(float deltaTime)
 	SortOutProcessedMessages();
 	ProcessMessages();
 
-	if((!IsActive() && !HasSucceeded()) || (GetNumberOfParticipants() < GetMinNumberOfParticipants()))
+	m_timer += deltaTime;
+
+	if(m_switchPositionsInterval != 0.0f && m_timer >= m_switchPositionsInterval)
+	{
+		DistributeEntities();
+		m_timer = 0.0f;
+	}
+
+	if(!IsActive() || HasFailed() || (GetNumberOfParticipants() < GetMinNumberOfParticipants()))
 	{
 		// The manoeuvre will fail if something failed during the initiation or if it wasn't
 		// initiated at all.
@@ -179,14 +194,6 @@ BehaviourStatus DefendBaseEntrances::Update(float deltaTime)
 	}else if(HasSucceeded())
 	{
 		return StatusSuccess;
-	}
-
-	m_timer += deltaTime;
-
-	if(m_switchPositionsInterval != 0.0f && m_timer >= m_switchPositionsInterval)
-	{
-		DistributeEntities();
-		m_timer = 0.0f;
 	}
 
 	return StatusRunning;

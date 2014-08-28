@@ -69,7 +69,7 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(DefendBaseEntrancesManoeuvre, pDefendBaseEntrancesManoeuvre));
 
 	// Rush base attack manoeuvre
-	RushBaseAttackInitData rushBaseData(10.0f, 15.0f);
+	RushBaseAttackInitData rushBaseData(5.0f, 15.0f);
 	TeamManoeuvre* pRushBaseAttackManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(RushBaseAttackManoeuvre, 4, 8, this, &rushBaseData);
 	if(!pRushBaseAttackManoeuvre)
 	{
@@ -253,11 +253,25 @@ bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 
 
 //--------------------------------------------------------------------------------------
-// Processes a message sent to the team AI.
-// Param1: A pointer to the message to process.
+// Initiates a manoeuvre.
+// Param1: Identifies the manoeuvre to initiate.
+// Returns a behaviour status code representing the current state of the initiation of 
+// the manoeuvre.
 //--------------------------------------------------------------------------------------
-void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
+BehaviourStatus MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 {
+	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
+	if(foundIt == m_manoeuvres.end())
+	{
+		return TeamAI::InitiateManoeuvre(manoeuvre);
+	}
+
+	// Abort running behaviours of the same category
+	if(m_activeManoeuvres[foundIt->second->GetCategory()] != nullptr)
+	{
+		TerminateManoeuvre(m_activeManoeuvres[foundIt->second->GetCategory()]->GetType());
+	}
+
 	EntityTeam team = GetTeam();
 	GetTestEnvironment()->RecordEvent(TeamManoeuvreInitLogEvent, &team, &manoeuvre);
 
@@ -294,7 +308,7 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 		}
 
 		// Initiate the manoeuvre
-		m_manoeuvres[manoeuvre]->Initiate();
+		return m_manoeuvres[manoeuvre]->Initiate();
 		break;
 		}
 	case RushBaseAttackManoeuvre:
@@ -319,7 +333,7 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 		}
 
 		// Initiate the manoeuvre
-		m_manoeuvres[manoeuvre]->Initiate();
+		return m_manoeuvres[manoeuvre]->Initiate();
 		break;
 		}
 	case RunTheFlagHomeManoeuvre:
@@ -335,13 +349,13 @@ void MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvre)
 		m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
 		m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
 	
-		m_manoeuvres[manoeuvre]->Initiate();
+		return m_manoeuvres[manoeuvre]->Initiate();
 
 		break;
 		}
 	default:
 		// Forward the call to the base class
-		TeamAI::InitiateManoeuvre(manoeuvre);
+		return TeamAI::InitiateManoeuvre(manoeuvre);
 	}
 	/*
 	// Check if this AI has a manoeuvre of that type associated to it
@@ -411,14 +425,18 @@ void MultiflagCTFTeamAI::TerminateManoeuvre(TeamManoeuvreType manoeuvre)
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*>::iterator foundIt = m_manoeuvres.find(manoeuvre);
 	if(foundIt != m_manoeuvres.end())
 	{
-		// Release all entities from the manoeuvre that is about to terminate
-		for(std::vector<Entity*>::const_iterator it = foundIt->second->GetParticipants().begin(); it != foundIt->second->GetParticipants().end(); ++it)
+		if(foundIt->second->IsActive())
 		{
-			m_entityManoeuvreMap[(*it)->GetId()] = nullptr;
-		}
+			// Release all entities from the manoeuvre that is about to terminate
+			for(std::vector<Entity*>::const_iterator it = foundIt->second->GetParticipants().begin(); it != foundIt->second->GetParticipants().end(); ++it)
+			{
+				m_entityManoeuvreMap[(*it)->GetId()] = nullptr;
+			}
 
-		// Terminate the manoeuvre
-		foundIt->second->Terminate();
+			// Terminate the manoeuvre
+			foundIt->second->Terminate();
+			m_activeManoeuvres[foundIt->second->GetCategory()] = nullptr;
+		}
 	}else
 	{
 		// Forward the call to the base class

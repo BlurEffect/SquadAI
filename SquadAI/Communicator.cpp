@@ -138,7 +138,8 @@ bool Communicator::SendEvent(Communicator* pReceiver, EventType eventType, void*
 }
 
 //--------------------------------------------------------------------------------------
-// Resets the communicator by clearing all received and sent messages.
+// Resets the communicator by clearing all received and sent messages. Should only be
+// called in between game rounds.
 //--------------------------------------------------------------------------------------
 void Communicator::ResetCommunication(void)
 {
@@ -153,6 +154,7 @@ void Communicator::ResetCommunication(void)
 	}
 
 	m_outboxMessages.clear();
+
 
 	// Use swap idiom to clear the inbox
 	std::queue<Message*> empty;

@@ -49,7 +49,7 @@ public:
 
 	// To be overwritten by derived manoeuvre classes
 
-	void			Initiate(void);
+	BehaviourStatus Initiate(void);
 	BehaviourStatus Update(float deltaTime);
 	void			Terminate(void);
 
@@ -68,7 +68,7 @@ protected:
 
 private:
 
-	void DistributeEntities(void);
+	bool DistributeEntities(void);
 	bool IsGuarded(Direction direction, const XMFLOAT2& entrance) const;
 
 	float m_switchPositionsInterval; // Determines after what time the participants will move to new defend positions (set to 0.0f to prevent any switches)

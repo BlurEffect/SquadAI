@@ -441,20 +441,32 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 					TeamBehaviour* pRushBaseAttackPreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "RushBaseAttackPreconditionsCheck", 0.0f, 0.0f, &rushBaseAttackInitData);
 					ManoeuvrePreconditionsFulfilledInitData defendBaseEntrancesInitData(DefendBaseEntrancesManoeuvre);
 					TeamBehaviour* pDefendBaseEntrancesPreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "DefendBaseEntrancesPreconditionsCheck", 0.0f, 0.0f, &defendBaseEntrancesInitData);
-			
+					
+					// The manoeuvre initiation actions that have to be executed before beginning the execution of the actual behaviours
+					InitiateTeamManoeuvreInitData initiateRunTheFlagHomeInitData(RunTheFlagHomeManoeuvre);
+					TeamBehaviour* pRunTheFlagHomeInitiationAction = CreatePrimitiveTeamBehaviour(TeamInitiateManoeuvreType, pTeamAI, "RunTheFlagHomeInitiationAction", 0.0f, 0.0f, &initiateRunTheFlagHomeInitData);
+					InitiateTeamManoeuvreInitData initiateRushBaseAttackInitData(RushBaseAttackManoeuvre);
+					TeamBehaviour* pRushBaseAttackInitiationAction = CreatePrimitiveTeamBehaviour(TeamInitiateManoeuvreType, pTeamAI, "RushBaseAttackInitiationAction", 0.0f, 0.0f, &initiateRushBaseAttackInitData);
+					InitiateTeamManoeuvreInitData initiateDefendBaseEntrancesInitData(DefendBaseEntrancesManoeuvre);
+					TeamBehaviour* pDefendBaseEntrancesInitiationAction = CreatePrimitiveTeamBehaviour(TeamInitiateManoeuvreType, pTeamAI, "DefendBaseEntrancesInitiationAction", 0.0f, 0.0f, &initiateDefendBaseEntrancesInitData);
+
 					// The monitors constantly checking if the manoeuvres are still valid or should be aborted
 					TeamBehaviour* pRunTheFlagHomeMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "RunTheFlagHomeMonitor", nullptr);
 					TeamBehaviour* pRushBaseAttackMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "RushBaseAttackMonitor", nullptr);
 					TeamBehaviour* pDefendBaseEntrancesMonitor  = CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "DefendBaseEntrancesMonitor", nullptr);
 
 					if(pRunTheFlagHomePreconditionsCheck && pRushBaseAttackPreconditionsCheck && pDefendBaseEntrancesPreconditionsCheck &&
+					   pRunTheFlagHomeInitiationAction && pRushBaseAttackInitiationAction && pDefendBaseEntrancesInitiationAction &&
 					   pRunTheFlagHomeMonitor && pRushBaseAttackMonitor && pDefendBaseEntrancesMonitor)
 					{
 						reinterpret_cast<TeamComposite*>(pRunTheFlagHomeSequence)->AddChild(pRunTheFlagHomePreconditionsCheck);
+						reinterpret_cast<TeamComposite*>(pRunTheFlagHomeSequence)->AddChild(pRunTheFlagHomeInitiationAction);
 						reinterpret_cast<TeamComposite*>(pRunTheFlagHomeSequence)->AddChild(pRunTheFlagHomeMonitor);
 						reinterpret_cast<TeamComposite*>(pRushBaseAttackSequence)->AddChild(pRushBaseAttackPreconditionsCheck);
+						reinterpret_cast<TeamComposite*>(pRushBaseAttackSequence)->AddChild(pRushBaseAttackInitiationAction);
 						reinterpret_cast<TeamComposite*>(pRushBaseAttackSequence)->AddChild(pRushBaseAttackMonitor);
 						reinterpret_cast<TeamComposite*>(pDefendBaseEntrancesSequence)->AddChild(pDefendBaseEntrancesPreconditionsCheck);
+						reinterpret_cast<TeamComposite*>(pDefendBaseEntrancesSequence)->AddChild(pDefendBaseEntrancesInitiationAction);
 						reinterpret_cast<TeamComposite*>(pDefendBaseEntrancesSequence)->AddChild(pDefendBaseEntrancesMonitor);
 
 						// The condition checks performed during execution of the manoeuvres to ensure they are still valid
@@ -699,6 +711,12 @@ TeamBehaviour* BehaviourFactory::CreatePrimitiveTeamBehaviour(PrimitiveTeamBehav
 	case TeamProcessMessagesType:
 		{
 		return new TeamProcessMessages(name, pTeamAI, aggressiveness, defensiveness);
+		break;
+		}
+	case TeamInitiateManoeuvreType:
+		{
+		InitiateTeamManoeuvreInitData* pData = reinterpret_cast<InitiateTeamManoeuvreInitData*>(pInitData);
+		return new InitiateTeamManoeuvre(name, pTeamAI, pData->m_manoeuvreType, aggressiveness, defensiveness);
 		break;
 		}
 	case TeamExecuteManoeuvreType:

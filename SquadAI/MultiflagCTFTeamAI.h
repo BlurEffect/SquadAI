@@ -55,7 +55,7 @@ public:
 
 	virtual bool ManoeuvreStillValid(TeamManoeuvreType manoeuvre);
 	virtual bool ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre);
-	virtual void InitiateManoeuvre(TeamManoeuvreType manoeuvre);
+	virtual BehaviourStatus InitiateManoeuvre(TeamManoeuvreType manoeuvre);
 	virtual BehaviourStatus UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime);
 	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
 

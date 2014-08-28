@@ -81,9 +81,10 @@ public:
 
 	virtual bool ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre);
 	virtual bool ManoeuvreStillValid(TeamManoeuvreType manoeuvre);
-	virtual void InitiateManoeuvre(TeamManoeuvreType manoeuvre);
+	virtual BehaviourStatus InitiateManoeuvre(TeamManoeuvreType manoeuvre);
 	virtual BehaviourStatus UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime);
 	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
+	virtual void ActivateManoeuvre(TeamManoeuvreType manoeuvre);
 
 	void ReleaseEntityFromManoeuvre(unsigned long entityId);
 
@@ -118,7 +119,8 @@ protected:
 
 	Behaviour*		  m_pBehaviour;   // The behaviour tree controlling the decisions of the team AI
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*> m_manoeuvres; // The available team manoeuvres for this team AI
-		std::unordered_map<unsigned long, TeamManoeuvre*> m_entityManoeuvreMap; // Keeps track of which team members are currently engaged in which manoeuvres
+	std::unordered_map<unsigned long, TeamManoeuvre*> m_entityManoeuvreMap; // Keeps track of which team members are currently engaged in which manoeuvres
+	TeamManoeuvre* m_activeManoeuvres[NumberOfManoeuvreCategories]; // Keeps track of the active manoeuvre for each category
 
 private:
 

@@ -223,7 +223,8 @@ void RushBaseAttack::DetermineAssemblyPoint(void)
 		//finalDirection.x = normOrthoVector.x * cosine + normOrthoVector.y * sine;
 		//finalDirection.y = -normOrthoVector.x * sine + normOrthoVector.y * cosine;
 
-		XMStoreFloat2(&m_assemblyPoint, XMLoadFloat2(&enemyBasePos) + XMLoadFloat2(&finalDirection) * m_assemblyPointDistance);
+		// Add a bit of randomisation
+		XMStoreFloat2(&m_assemblyPoint, XMLoadFloat2(&enemyBasePos) + XMLoadFloat2(&finalDirection) * (m_assemblyPointDistance + ((rand() % 200 - 100) * 0.01f) * GetTeamAI()->GetTestEnvironment()->GetGridSpacing() * 4.0f)); 
 
 	}while(GetTeamAI()->GetTestEnvironment()->IsBlocked(m_assemblyPoint));
 	
@@ -314,11 +315,6 @@ BehaviourStatus RushBaseAttack::Update(float deltaTime)
 	// Keep track of who has reached the target and let those defend until all have arrived
 	SortOutProcessedMessages();
 	ProcessMessages();
-
-	if(GetTeamAI()->GetTeam() == TeamRed && IsActive())
-	{
-		int a = 5;
-	}
 
 	m_timer += deltaTime;
 

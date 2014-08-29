@@ -34,6 +34,8 @@ public:
 	void ResetCommunication(void);
 	void ProcessMessages(void);
 
+	void ResetInbox(void);
+
 	std::queue<Message*>&  GetInboxMessages(void);
 	std::vector<Message*>& GetOutboxMessages(void);
 

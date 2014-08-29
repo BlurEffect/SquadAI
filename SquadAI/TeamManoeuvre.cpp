@@ -330,6 +330,8 @@ void TeamManoeuvre::Terminate(void)
 	m_activeOrders.clear();
 	m_participants.clear();
 
+	ResetInbox();
+
 	m_active = false;
 	m_succeeded = false;
 	m_failed = false;

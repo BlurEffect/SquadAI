@@ -47,6 +47,7 @@ public:
 	~MultiflagCTFTeamAI(void);
 
 	bool Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic);
+	virtual void Update(float deltaTime);
 	virtual void PrepareForSimulation(void);
 	//void ProcessMessage(Message* pMessage);
 	void Reset(void);

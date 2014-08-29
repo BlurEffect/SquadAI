@@ -196,6 +196,19 @@ void Communicator::ProcessMessage(Message* pMessage)
 	// Do nothing
 }
 
+//--------------------------------------------------------------------------------------
+// Resets the inbox of the communicator, marking all messages as processed before
+// deleting the handles to them.
+//--------------------------------------------------------------------------------------
+void Communicator::ResetInbox(void)
+{
+	while(!m_inboxMessages.empty())
+	{
+		m_inboxMessages.front()->IncreaseProcessedCount();
+		m_inboxMessages.pop();
+	}
+}
+
 std::queue<Message*>& Communicator::GetInboxMessages(void)
 {
 	return m_inboxMessages;

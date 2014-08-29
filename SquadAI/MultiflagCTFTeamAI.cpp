@@ -89,6 +89,23 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 }
 
 //--------------------------------------------------------------------------------------
+// Updates the team AI.
+// Param1: The time in seconds passed since the last frame.
+//--------------------------------------------------------------------------------------
+void MultiflagCTFTeamAI::Update(float deltaTime)
+{
+	TeamAI::Update(deltaTime);
+
+	EntityTeam enemyTeam = (GetTeam() == TeamRed) ? TeamBlue : TeamRed;
+	
+	if(m_flagData[enemyTeam].m_carrierId != 0)
+	{
+		// Get the position of the flag carrier and set it as the flag's current position
+		m_flagData[enemyTeam].m_position = (*(std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[enemyTeam].m_carrierId))))->GetPosition();
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Prepares the team AI for the simulation.
 //--------------------------------------------------------------------------------------
 void MultiflagCTFTeamAI::PrepareForSimulation(void)
@@ -104,6 +121,47 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
+	case EnemySpottedMessageType:
+		{
+		EnemySpottedMessage* pMsg = reinterpret_cast<EnemySpottedMessage*>(pMessage);
+		// Try to add the new enemy record.
+		std::pair<std::unordered_map<unsigned long, EnemyRecord>::iterator, bool> result = GetEnemyRecords().insert(std::pair<unsigned long, EnemyRecord>(pMsg->GetData().m_enemyId, EnemyRecord(pMsg->GetData().m_enemyPosition, pMsg->GetData().m_spotterId)));
+		if(!result.second)
+		{
+			// There already is a record for the spotted enemy -> Add the enemy as spotter and update the enemy position
+			result.first->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
+			result.first->second.m_spotterIds.insert(pMsg->GetData().m_spotterId);
+		}
+
+		// If the spotted enemy is the enemy flag carrier, update the flag position
+		if(m_flagData[GetTeam()].m_carrierId == pMsg->GetData().m_enemyId)
+		{
+			m_flagData[GetTeam()].m_position = pMsg->GetData().m_enemyPosition;
+		}
+
+		// Update any attack orders on this enemy with the newest position
+		// UpdateAttackOrders(pMsg->GetData().m_enemyId);
+		ForwardMessageToActiveManoeuvers(pMessage);
+		break;
+		}
+	case UpdateEnemyPositionMessageType:
+		{
+		UpdateEnemyPositionMessage* pMsg = reinterpret_cast<UpdateEnemyPositionMessage*>(pMessage);
+		std::unordered_map<unsigned long, EnemyRecord>::iterator foundIt = GetEnemyRecords().find(pMsg->GetData().m_enemyId);
+		if(foundIt != GetEnemyRecords().end())
+		{
+			foundIt->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
+			//UpdateAttackOrders(pMsg->GetData().m_enemyId);
+			ForwardMessageToActiveManoeuvers(pMessage);
+
+			// If the enemy is the enemy flag carrier, update the flag position
+			if(m_flagData[GetTeam()].m_carrierId == pMsg->GetData().m_enemyId)
+			{
+				m_flagData[GetTeam()].m_position = pMsg->GetData().m_enemyPosition;
+			}
+		}
+		break;
+		}
 	case FlagPickedUpMessageType:
 		{
 		FlagPickedUpMessage* pMsg = reinterpret_cast<FlagPickedUpMessage*>(pMessage);
@@ -210,7 +268,7 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 		break;
 	case RunTheFlagHomeManoeuvre:
 		// Only check for flag carrier
-		return (numberOfAvailableEntities >= m_manoeuvres[RunTheFlagHomeManoeuvre]->GetMinNumberOfParticipants()) &&
+		return //(numberOfAvailableEntities >= m_manoeuvres[RunTheFlagHomeManoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[enemyTeam].m_state == Stolen);
 		break;
 	default:
@@ -341,11 +399,15 @@ BehaviourStatus MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvr
 		// Add the new flag carrier as participant to the manoeuvre
 
 		std::vector<Entity*>::iterator foundIt = std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[enemyTeam].m_carrierId));
-		if(foundIt == GetTeamMembers().end())
+	
+		// If the flag carrier is still part of another manoeuvre, release it from that first, before assigning it to the
+		// new manoeuvre.
+
+		if(m_entityManoeuvreMap[(*foundIt)->GetId()] != nullptr)
 		{
-			int a = 2; // DEBUG, should never happen
+			ReleaseEntityFromManoeuvre((*foundIt)->GetId());
 		}
-			
+
 		m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
 		m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
 	

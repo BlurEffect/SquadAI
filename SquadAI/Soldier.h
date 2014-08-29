@@ -110,7 +110,6 @@ public:
 	float           GetAvoidWallsRadius(void) const;
 	float           GetSeparationRadius(void) const;
 	float           GetFireWeaponInterval(void) const;
-	const XMFLOAT2& GetViewDirection(void) const;
 	float			GetFieldOfView(void) const;
 	float			GetViewingDistance(void) const;
 	unsigned int    GetResumePathNode(void) const;

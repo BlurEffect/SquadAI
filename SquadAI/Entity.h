@@ -121,6 +121,7 @@ public:
 	const XMFLOAT2&						GetMovementTarget(void) const;
 	float								GetCurrentHealth(void) const;
 	float								GetMaximalHealth(void) const;
+	const XMFLOAT2&						GetViewDirection(void) const;
 
 	Order*                              GetCurrentOrder(void);
 	bool								IsObservationTargetSet(void) const;
@@ -142,6 +143,7 @@ public:
 	void SetMovementTarget(const XMFLOAT2& target);
 	void SetCurrentHealth(float health);
 	void SetMaximalHealth(float maxHealth);
+	void SetViewDirection(const XMFLOAT2& direction);
 
 	void SetObservationTargetSet(bool targetSet);
 	void SetObservationTarget(const XMFLOAT2& target);
@@ -194,6 +196,28 @@ public:
 		unsigned long m_id;
 	};
 
+	//--------------------------------------------------------------------------------------
+	// Functor used to find suspected threat within a container based on its id.
+	//--------------------------------------------------------------------------------------
+	class CompareEntityByDistanceToTarget
+	{
+	public:
+		CompareEntityByDistanceToTarget(const XMFLOAT2& target) : m_target(target){}
+		bool operator()(const Entity* pLeft, const Entity* pRight)
+		{
+			// Calculate the distances to the target
+			float squareDistanceLeft(0.0f);
+			float squareDistanceRight(0.0f);
+
+			XMStoreFloat(&squareDistanceLeft, XMVector2LengthSq(XMLoadFloat2(&m_target) - XMLoadFloat2(&pLeft->GetPosition())));
+			XMStoreFloat(&squareDistanceRight, XMVector2LengthSq(XMLoadFloat2(&m_target) - XMLoadFloat2(&pRight->GetPosition())));
+		
+			return squareDistanceLeft < squareDistanceRight;
+		}
+	private:
+		XMFLOAT2 m_target;
+	};
+
 	virtual void ProcessEvent(EventType type, void* pEventData);
 
 protected:
@@ -234,6 +258,8 @@ private:
 	XMFLOAT2                     m_attackTarget;			 // The position to attack
 	float						 m_currentHealth;			 // The current health state of the entity (percentage between 0.0 and 1.0 in relation to maximal health)
 	float                        m_maximalHealth;			 // The maximal amount of health for this entity
+
+	XMFLOAT2                     m_viewDirection;            // The direction the entity is currently looking at
 
 	std::vector<XMFLOAT2>*       m_pPath;                    // The path to the current movement target
 	XMFLOAT2			         m_observationTarget;		 // The position to observe while holding a position

@@ -31,7 +31,8 @@ enum TeamManoeuvreType
 	// Actual manoeuvres
 	DefendBaseEntrancesManoeuvre,
 	RushBaseAttackManoeuvre,
-	RunTheFlagHomeManoeuvre
+	RunTheFlagHomeManoeuvre,
+	ReturnDroppedFlagManoeuvre
 };
 
 //--------------------------------------------------------------------------------------

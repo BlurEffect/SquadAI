@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
     <ClCompile Include="InitiateTeamManoeuvre.cpp" />
+    <ClCompile Include="ReturnDroppedFlag.cpp" />
     <ClCompile Include="RunTheFlagHome.cpp" />
     <ClCompile Include="DefendBaseEntrances.cpp" />
     <ClCompile Include="ExecuteTeamManoeuvre.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="ActiveSelector.h" />
     <ClInclude Include="AimAtTarget.h" />
     <ClInclude Include="InitiateTeamManoeuvre.h" />
+    <ClInclude Include="ReturnDroppedFlag.h" />
     <ClInclude Include="RunTheFlagHome.h" />
     <ClInclude Include="DefendBaseEntrances.h" />
     <ClInclude Include="AppData.h" />

@@ -23,6 +23,7 @@ Entity::Entity(void) : CollidableObject(),
 					   m_movementTarget(0.0f, 0.0f),
 					   m_currentHealth(0.0f),
 					   m_maximalHealth(0.0f),
+					   m_viewDirection(0.0f, 1.0f),
 					   m_reportInterval(0.0f),
 					   m_reportTimer(0.0f),
 					   m_doReport(false)
@@ -713,6 +714,11 @@ float Entity::GetMaximalHealth(void) const
 	return m_maximalHealth;
 }
 
+const XMFLOAT2& Entity::GetViewDirection(void) const
+{
+	return m_viewDirection;
+}
+
 Order* Entity::GetCurrentOrder(void)
 {
 	return m_pCurrentOrder;
@@ -809,6 +815,11 @@ void Entity::SetCurrentHealth(float health)
 void Entity::SetMaximalHealth(float maxHealth)
 {
 	m_maximalHealth = maxHealth;
+}
+
+void Entity::SetViewDirection(const XMFLOAT2& direction)
+{
+	m_viewDirection = direction;
 }
 
 void Entity::SetObservationTargetSet(bool targetSet)

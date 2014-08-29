@@ -60,6 +60,16 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 		return new RunTheFlagHome(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
 		break;
 		}
+	case ReturnDroppedFlagManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		return new ReturnDroppedFlag(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
+		break;
+		}
 	default:
 		return nullptr;
 	}

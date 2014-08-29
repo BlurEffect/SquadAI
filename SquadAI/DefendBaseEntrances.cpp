@@ -37,12 +37,15 @@ void DefendBaseEntrances::ProcessMessage(Message* pMessage)
 	EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(pMessage);
 	if(pMsg->GetData().m_team == GetTeamAI()->GetTeam() && IsParticipant(pMsg->GetData().m_id))
 	{
+		// Remember the last view direction of the entity that was killed
+		XMFLOAT2 lastViewDirection = GetParticipant(pMsg->GetData().m_id)->GetViewDirection();
+
 		// Participants that get killed, drop out of the manoeuvre
 		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_id);
 
 		// A defender was killed, send all idle defenders to the entrance the killed entity was guarding to prevent a 
 		// likely intrusion of enemies.
-		ShiftDefense(m_guardedEntrances.at(pMsg->GetData().m_id).m_entranceDirection, m_guardedEntrances.at(pMsg->GetData().m_id).m_entrancePosition); 
+		ShiftDefense(m_guardedEntrances.at(pMsg->GetData().m_id).m_entranceDirection, m_guardedEntrances.at(pMsg->GetData().m_id).m_entrancePosition, lastViewDirection); 
 	}
 	break;
 	}
@@ -73,8 +76,9 @@ void DefendBaseEntrances::ProcessMessage(Message* pMessage)
 // Shifts the entities to ensure a more effective defense.
 // Param1: The direction of the entrance on which to focus.
 // Param2: The position of the entrance towards which the defense should be shifted.
+// Param3: The direction, into which the entities should initially look when defending.
 //--------------------------------------------------------------------------------------
-void DefendBaseEntrances::ShiftDefense(Direction entranceDirection, const XMFLOAT2& entrancePosition)
+void DefendBaseEntrances::ShiftDefense(Direction entranceDirection, const XMFLOAT2& entrancePosition, const XMFLOAT2& viewDirection)
 {
 	
 	// Find all idle defenders, and update their defend positions
@@ -85,6 +89,7 @@ void DefendBaseEntrances::ShiftDefense(Direction entranceDirection, const XMFLOA
 		if(GetTeamAI()->GetSpottedEnemies().at((*it)->GetId()).empty())
 		{
 			reinterpret_cast<DefendOrder*>(m_activeOrders[(*it)->GetId()])->SetDefendPosition(entrancePosition);
+			reinterpret_cast<DefendOrder*>(m_activeOrders[(*it)->GetId()])->SetViewDirection(viewDirection);
 			m_guardedEntrances.at((*it)->GetId()).m_entranceDirection = entranceDirection;
 			m_guardedEntrances.at((*it)->GetId()).m_entrancePosition = entrancePosition;
 		}
@@ -94,9 +99,11 @@ void DefendBaseEntrances::ShiftDefense(Direction entranceDirection, const XMFLOA
 //--------------------------------------------------------------------------------------
 // Distributes the participating entities over all base entrances to ensure that all
 // directions are guarded.
+// Param1: Determines whether new Defend Orders should be created or if it is sufficient to
+//         update existing ones.
 // Returns true if the distribution of the team members succeeded, false otherwise.
 //--------------------------------------------------------------------------------------
-bool DefendBaseEntrances::DistributeEntities(void)
+bool DefendBaseEntrances::DistributeEntities(bool createNewOrders)
 {
 	if(GetNumberOfParticipants() == 0 || m_pTeamAI->GetTestEnvironment()->GetBaseEntrances(m_pTeamAI->GetTeam()).empty())
 	{
@@ -131,18 +138,29 @@ bool DefendBaseEntrances::DistributeEntities(void)
 		XMFLOAT2 viewDirection(0.0f, 0.0f);
 		XMStoreFloat2(&viewDirection, XMLoadFloat2(&entranceIt->second[entranceNumber]) - XMLoadFloat2(&m_pTeamAI->GetFlagData(m_pTeamAI->GetTeam()).m_basePosition));
 
-		Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, entranceIt->second[entranceNumber], viewDirection);
-			
-		if(!pNewOrder)
+		if(createNewOrders)
 		{
-			return false;
+			Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, entranceIt->second[entranceNumber], viewDirection);
+			
+			if(!pNewOrder)
+			{
+				return false;
+			}
+
+			FollowOrderMessageData data(pNewOrder);
+			SendMessage(*it, FollowOrderMessageType, &data);
+
+			//m_guardedEntrances.insert(std::pair<unsigned long, GuardData>((*it)->GetId(), GuardData(entranceIt->first, entranceIt->second[entranceNumber])));
+			m_activeOrders.insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
+		}else
+		{
+
+			DefendOrder* order = reinterpret_cast<DefendOrder*>(m_activeOrders.find((*it)->GetId())->second);
+			order->SetDefendPosition(entranceIt->second[entranceNumber]);
+			order->SetViewDirection(viewDirection);
 		}
 
-		FollowOrderMessageData data(pNewOrder);
-		SendMessage(*it, FollowOrderMessageType, &data);
-
 		m_guardedEntrances.insert(std::pair<unsigned long, GuardData>((*it)->GetId(), GuardData(entranceIt->first, entranceIt->second[entranceNumber])));
-		m_activeOrders.insert(std::pair<unsigned long, Order*>((*it)->GetId(), pNewOrder));
 
 		if(++entranceIt == m_pTeamAI->GetTestEnvironment()->GetBaseEntrances(m_pTeamAI->GetTeam()).end())
 		{
@@ -180,7 +198,7 @@ bool DefendBaseEntrances::IsGuarded(Direction direction, const XMFLOAT2& entranc
 //--------------------------------------------------------------------------------------
 BehaviourStatus DefendBaseEntrances::Initiate(void)
 {
-	if(DistributeEntities())
+	if(DistributeEntities(true))
 	{
 		return StatusSuccess;
 	}else
@@ -208,7 +226,7 @@ BehaviourStatus DefendBaseEntrances::Update(float deltaTime)
 
 	if(m_switchPositionsInterval != 0.0f && m_timer >= m_switchPositionsInterval)
 	{
-		DistributeEntities();
+		DistributeEntities(false);
 		m_timer = 0.0f;
 	}
 

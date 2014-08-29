@@ -68,8 +68,8 @@ protected:
 
 private:
 
-	void ShiftDefense(Direction entranceDirection, const XMFLOAT2& entrancePosition);
-	bool DistributeEntities(void);
+	void ShiftDefense(Direction entranceDirection, const XMFLOAT2& entrancePosition, const XMFLOAT2& viewDirection);
+	bool DistributeEntities(bool createNewOrders);
 	bool IsGuarded(Direction direction, const XMFLOAT2& entrance) const;
 
 	float m_switchPositionsInterval; // Determines after what time the participants will move to new defend positions (set to 0.0f to prevent any switches)

@@ -751,11 +751,6 @@ float Soldier::GetFireWeaponInterval(void) const
 	return m_soldierProperties.m_fireWeaponInterval;
 }
 
-const XMFLOAT2& Soldier::GetViewDirection(void) const
-{
-	return m_movementManager.GetViewDirection();
-}
-
 float Soldier::GetFieldOfView(void) const
 {
 	return m_soldierProperties.m_fieldOfView;

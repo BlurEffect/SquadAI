@@ -14,7 +14,6 @@
 EntityMovementManager::EntityMovementManager(void) : m_pEntity(nullptr),
 												  	 m_pEnvironment(nullptr),
 													 m_velocity(XMFLOAT2(0.0f, 0.0f)),
-													 m_viewDirection(0.0f, 1.0f),
 													 m_steeringForce(0.0f, 0.0f),
 													 m_currentNode(0),
 													 m_seekTarget(0.0f, 0.0f)
@@ -54,17 +53,17 @@ void EntityMovementManager::SetInitialViewDirection(void)
 	// Only four possible start values
 	if(m_pEntity->GetRotation() == 0.0f)
 	{
-		m_viewDirection = XMFLOAT2(0.0f, 1.0f);
+		m_pEntity->SetViewDirection(XMFLOAT2(0.0f, 1.0f));
 	}else if(m_pEntity->GetRotation() == 90.0f)
 	{
-		m_viewDirection = XMFLOAT2(1.0f, 0.0f);
+		m_pEntity->SetViewDirection(XMFLOAT2(1.0f, 0.0f));
 	}else if(m_pEntity->GetRotation() == 180.0f)
 	{
-		m_viewDirection = XMFLOAT2(0.0f, -1.0f);
+		m_pEntity->SetViewDirection(XMFLOAT2(0.0f, -1.0f));
 	}else
 	{
 		// 270 degrees rotation
-		m_viewDirection = XMFLOAT2(-1.0f, 0.0f);
+		m_pEntity->SetViewDirection(XMFLOAT2(-1.0f, 0.0f));
 	}
 }
 
@@ -221,8 +220,12 @@ bool EntityMovementManager::Seek(const XMFLOAT2& targetPosition, float targetRea
 //--------------------------------------------------------------------------------------
 void EntityMovementManager::LookAt(const XMFLOAT2& lookAtPosition)
 {
-	XMStoreFloat2(&m_viewDirection, XMVector2Normalize(XMLoadFloat2(&lookAtPosition) - XMLoadFloat2(&m_pEntity->GetPosition())));
-	float rotation = (atan2(m_viewDirection.x, m_viewDirection.y)) * 180 / XM_PI;
+	XMFLOAT2 newViewDirection(0.0f, 1.0f);
+	XMStoreFloat2(&newViewDirection, XMVector2Normalize(XMLoadFloat2(&lookAtPosition) - XMLoadFloat2(&m_pEntity->GetPosition())));
+	
+	m_pEntity->SetViewDirection(newViewDirection);
+	
+	float rotation = (atan2(m_pEntity->GetViewDirection().x, m_pEntity->GetViewDirection().y)) * 180 / XM_PI;
 	m_pEntity->SetRotation(rotation);
 }
 
@@ -352,7 +355,7 @@ void EntityMovementManager::AvoidCollisions(float seeAheadDistance, float maxima
 	if(nearbyObjects.size() > 1)
 	{
 		XMFLOAT2 lineEndPoint(0.0f, 0.0f);
-		XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_viewDirection)) * seeAheadDistance);
+		XMStoreFloat2(&lineEndPoint, XMLoadFloat2(&m_pEntity->GetPosition()) + XMVector2Normalize(XMLoadFloat2(&m_pEntity->GetViewDirection())) * seeAheadDistance);
 
 		for(std::multimap<float, CollidableObject*>::iterator it = nearbyObjects.begin(); it != nearbyObjects.end(); ++it)
 		{
@@ -379,20 +382,20 @@ void EntityMovementManager::AvoidCollisions(float seeAheadDistance, float maxima
 				XMFLOAT2 entityToObject(0.0f, 0.0f);
 				XMStoreFloat2(&entityToObject, XMLoadFloat2(&it->second->GetPosition()) - XMLoadFloat2(&m_pEntity->GetPosition()));
 
-				float dot = GetViewDirection().x * (-entityToObject.y) + GetViewDirection().y * entityToObject.x;	
+				float dot = m_pEntity->GetViewDirection().x * (-entityToObject.y) + m_pEntity->GetViewDirection().y * entityToObject.x;	
 					
-				XMFLOAT2 avoidanceVector = GetViewDirection();
+				XMFLOAT2 avoidanceVector = m_pEntity->GetViewDirection();
 
 				if(dot > 0)
 				{
 					// Object is right of entity, steer left to avoid
-					avoidanceVector.x = -GetViewDirection().y;
-					avoidanceVector.y = GetViewDirection().x;
+					avoidanceVector.x = -m_pEntity->GetViewDirection().y;
+					avoidanceVector.y = m_pEntity->GetViewDirection().x;
 				}else
 				{
 					// Object is left of entity, steer right to avoid
-					avoidanceVector.x = GetViewDirection().y;
-					avoidanceVector.y = -GetViewDirection().x;
+					avoidanceVector.x = m_pEntity->GetViewDirection().y;
+					avoidanceVector.y = -m_pEntity->GetViewDirection().x;
 				}
 					
 				XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + XMVector2Normalize(XMLoadFloat2(&avoidanceVector)) * maximalForce);
@@ -493,11 +496,6 @@ bool EntityMovementManager::IsPathSet(void) const
 const XMFLOAT2& EntityMovementManager::GetVelocity(void) const
 {
 	return m_velocity;
-}
-
-const XMFLOAT2& EntityMovementManager::GetViewDirection(void) const
-{
-	return m_viewDirection;
 }
 
 unsigned int EntityMovementManager::GetCurrentNode(void) const

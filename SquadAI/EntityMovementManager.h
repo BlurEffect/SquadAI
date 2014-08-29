@@ -46,7 +46,6 @@ public:
 	// Data access functions
 	
 	const XMFLOAT2& GetVelocity(void) const;
-	const XMFLOAT2& GetViewDirection(void) const;
 
 	unsigned int GetCurrentNode(void) const;
 	void SetCurrentNode(unsigned int node);
@@ -59,7 +58,6 @@ private:
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 
 	XMFLOAT2 m_velocity;      // The initial velocity of the entity
-	XMFLOAT2 m_viewDirection; // The current view direction of the entity.
 	XMFLOAT2 m_steeringForce; // The accumulated force that will be applied to the entity
 	
 	// For follow path behaviour

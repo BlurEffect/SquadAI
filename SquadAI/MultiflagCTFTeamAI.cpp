@@ -61,7 +61,7 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	
 	// Defend base entrances manoeuvre
 	DefendBaseEntrancesInitData defendEntrancesData(5.0f);
-	TeamManoeuvre* pDefendBaseEntrancesManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(DefendBaseEntrancesManoeuvre, 4, 8, this, &defendEntrancesData);
+	TeamManoeuvre* pDefendBaseEntrancesManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(DefendBaseEntrancesManoeuvre, 3, 8, this, &defendEntrancesData);
 	if(!pDefendBaseEntrancesManoeuvre)
 	{
 		return false;
@@ -125,13 +125,16 @@ void MultiflagCTFTeamAI::ProcessMessage(Message* pMessage)
 		{
 		EnemySpottedMessage* pMsg = reinterpret_cast<EnemySpottedMessage*>(pMessage);
 		// Try to add the new enemy record.
-		std::pair<std::unordered_map<unsigned long, EnemyRecord>::iterator, bool> result = GetEnemyRecords().insert(std::pair<unsigned long, EnemyRecord>(pMsg->GetData().m_enemyId, EnemyRecord(pMsg->GetData().m_enemyPosition, pMsg->GetData().m_spotterId)));
+		std::pair<std::unordered_map<unsigned long, EnemyRecord>::iterator, bool> result = GetEnemyRecords().insert(std::pair<unsigned long, EnemyRecord>(pMsg->GetData().m_enemyId, EnemyRecord(pMsg->GetData().m_enemyPosition)));
 		if(!result.second)
 		{
 			// There already is a record for the spotted enemy -> Add the enemy as spotter and update the enemy position
 			result.first->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
-			result.first->second.m_spotterIds.insert(pMsg->GetData().m_spotterId);
 		}
+
+		// Add the enemy to the list of spotted enemies for the team member that spotted the enemy
+		// The set will prevent enemy IDs to be included more than once in the list.
+		m_spottedEnemies[pMsg->GetData().m_spotterId].insert(pMsg->GetData().m_enemyId);
 
 		// If the spotted enemy is the enemy flag carrier, update the flag position
 		if(m_flagData[GetTeam()].m_carrierId == pMsg->GetData().m_enemyId)

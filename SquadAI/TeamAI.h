@@ -49,13 +49,13 @@ enum TeamAICharacteristic
 //--------------------------------------------------------------------------------------
 struct EnemyRecord
 {
-	EnemyRecord(const XMFLOAT2& lastKnownPosition, unsigned long spotterId) : m_lastKnownPosition(lastKnownPosition)	
+	EnemyRecord(const XMFLOAT2& lastKnownPosition/*, unsigned long spotterId*/) : m_lastKnownPosition(lastKnownPosition)	
 	{
-		m_spotterIds.insert(spotterId);
+		//m_spotterIds.insert(spotterId);
 	}
 
 	XMFLOAT2			    m_lastKnownPosition; // The position, where the enemy was last seen
-	std::set<unsigned long> m_spotterIds;		 // The IDs of the friendly entities currently seeing this enemy
+	//std::set<unsigned long> m_spotterIds;		 // The IDs of the friendly entities currently seeing this enemy
 };
 
 
@@ -95,6 +95,7 @@ public:
 	TestEnvironment*				  GetTestEnvironment(void);
 	std::vector<Entity*>&				  GetTeamMembers(void);
 	std::unordered_map<unsigned long, EnemyRecord>& GetEnemyRecords(void);
+	const std::unordered_map<unsigned long, std::set<unsigned long>>& GetSpottedEnemies(void) const;
 	std::unordered_map<unsigned long, Order*>& GetActiveOrders(void);
 	float                                 GetScore(EntityTeam team) const;
 	float                                 GetTimeLeft(void) const;
@@ -121,6 +122,7 @@ protected:
 	std::unordered_map<TeamManoeuvreType, TeamManoeuvre*> m_manoeuvres; // The available team manoeuvres for this team AI
 	std::unordered_map<unsigned long, TeamManoeuvre*> m_entityManoeuvreMap; // Keeps track of which team members are currently engaged in which manoeuvres
 	TeamManoeuvre* m_activeManoeuvres[NumberOfManoeuvreCategories]; // Keeps track of the active manoeuvre for each category
+	std::unordered_map<unsigned long, std::set<unsigned long>> m_spottedEnemies; // Keeps track of the enemies in view for each team member
 
 private:
 

@@ -35,10 +35,14 @@ void DefendBaseEntrances::ProcessMessage(Message* pMessage)
 	case EntityKilledMessageType:
 	{
 	EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(pMessage);
-	if(IsParticipant(pMsg->GetData().m_id) && pMsg->GetData().m_team == GetTeamAI()->GetTeam())
+	if(pMsg->GetData().m_team == GetTeamAI()->GetTeam() && IsParticipant(pMsg->GetData().m_id))
 	{
 		// Participants that get killed, drop out of the manoeuvre
 		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_id);
+
+		// A defender was killed, send all idle defenders to the entrance the killed entity was guarding to prevent a 
+		// likely intrusion of enemies.
+		ShiftDefense(m_guardedEntrances.at(pMsg->GetData().m_id).m_entranceDirection, m_guardedEntrances.at(pMsg->GetData().m_id).m_entrancePosition); 
 	}
 	break;
 	}
@@ -66,7 +70,29 @@ void DefendBaseEntrances::ProcessMessage(Message* pMessage)
 }
 
 //--------------------------------------------------------------------------------------
-// isDtributes the participating entities over all base entrances to ensure that all
+// Shifts the entities to ensure a more effective defense.
+// Param1: The direction of the entrance on which to focus.
+// Param2: The position of the entrance towards which the defense should be shifted.
+//--------------------------------------------------------------------------------------
+void DefendBaseEntrances::ShiftDefense(Direction entranceDirection, const XMFLOAT2& entrancePosition)
+{
+	
+	// Find all idle defenders, and update their defend positions
+	// (Idle defenders are all, who don't have any enemies in their sight and thus are
+	// guaranteed not to be in a fight with an enemy)
+	for(std::vector<Entity*>::const_iterator it = GetParticipants().begin(); it != GetParticipants().end(); ++it)
+	{
+		if(GetTeamAI()->GetSpottedEnemies().at((*it)->GetId()).empty())
+		{
+			reinterpret_cast<DefendOrder*>(m_activeOrders[(*it)->GetId()])->SetDefendPosition(entrancePosition);
+			m_guardedEntrances.at((*it)->GetId()).m_entranceDirection = entranceDirection;
+			m_guardedEntrances.at((*it)->GetId()).m_entrancePosition = entrancePosition;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Distributes the participating entities over all base entrances to ensure that all
 // directions are guarded.
 // Returns true if the distribution of the team members succeeded, false otherwise.
 //--------------------------------------------------------------------------------------

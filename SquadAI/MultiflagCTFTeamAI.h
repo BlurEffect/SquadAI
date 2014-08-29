@@ -9,6 +9,8 @@
 
 // Includes
 #include <DirectXMath.h>
+#include <set>
+#include <unordered_map>
 #include "TeamAI.h"
 #include "ObjectTypes.h"
 #include "MultiflagCTFGameContext.h" // needs to know flag state -> move flag state somewhere else (game mode spceifc data structs?)

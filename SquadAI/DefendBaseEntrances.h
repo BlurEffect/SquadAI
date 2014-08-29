@@ -68,6 +68,7 @@ protected:
 
 private:
 
+	void ShiftDefense(Direction entranceDirection, const XMFLOAT2& entrancePosition);
 	bool DistributeEntities(void);
 	bool IsGuarded(Direction direction, const XMFLOAT2& entrance) const;
 

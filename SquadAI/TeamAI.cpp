@@ -134,13 +134,16 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		{
 		EnemySpottedMessage* pMsg = reinterpret_cast<EnemySpottedMessage*>(pMessage);
 		// Try to add the new enemy record.
-		std::pair<std::unordered_map<unsigned long, EnemyRecord>::iterator, bool> result = m_enemyRecords.insert(std::pair<unsigned long, EnemyRecord>(pMsg->GetData().m_enemyId, EnemyRecord(pMsg->GetData().m_enemyPosition, pMsg->GetData().m_spotterId)));
+		std::pair<std::unordered_map<unsigned long, EnemyRecord>::iterator, bool> result = m_enemyRecords.insert(std::pair<unsigned long, EnemyRecord>(pMsg->GetData().m_enemyId, EnemyRecord(pMsg->GetData().m_enemyPosition)));
 		if(!result.second)
 		{
 			// There already is a record for the spotted enemy -> Add the enemy as spotter and update the enemy position
 			result.first->second.m_lastKnownPosition = pMsg->GetData().m_enemyPosition;
-			result.first->second.m_spotterIds.insert(pMsg->GetData().m_spotterId);
 		}
+
+		// Add the enemy to the list of spotted enemies for the team member that spotted the enemy
+		// The set will prevent enemy IDs to be included more than once in the list.
+		m_spottedEnemies[pMsg->GetData().m_spotterId].insert(pMsg->GetData().m_enemyId);
 
 		// Update any attack orders on this enemy with the newest position
 		//UpdateAttackOrders(pMsg->GetData().m_enemyId);
@@ -151,12 +154,9 @@ void TeamAI::ProcessMessage(Message* pMessage)
 		{
 		LostSightOfEnemyMessage* pMsg = reinterpret_cast<LostSightOfEnemyMessage*>(pMessage);
 
-		// Remove the entity from the lost of entities that are able to see the enemy
-		std::unordered_map<unsigned long, EnemyRecord>::iterator foundIt = m_enemyRecords.find(pMsg->GetData().m_enemyId);
-		if(foundIt != m_enemyRecords.end())
-		{
-			foundIt->second.m_spotterIds.erase(pMsg->GetData().m_entityId);
-		}
+		// Remove the enemy as being spotted by the entity that lost eye contact
+		m_spottedEnemies[pMsg->GetData().m_entityId].erase(pMsg->GetData().m_enemyId);
+
 		break;
 		}
 	case UpdateEnemyPositionMessageType:
@@ -183,6 +183,13 @@ void TeamAI::ProcessMessage(Message* pMessage)
 			{
 				m_enemyRecords.erase(foundIt);
 			}
+
+			// Remove the enemy from the list of all spotters
+			for(std::unordered_map<unsigned long, std::set<unsigned long>>::iterator it = m_spottedEnemies.begin(); it != m_spottedEnemies.end(); ++it)
+			{
+				it->second.erase(pMsg->GetData().m_id);
+			}
+
 			/*
 			// Make sure to cancel all active attack orders associated to the killed enemy
 			std::unordered_map<unsigned long, Order*>::iterator it = m_activeOrders.begin();
@@ -200,12 +207,15 @@ void TeamAI::ProcessMessage(Message* pMessage)
 			*/
 		}else
 		{
-			// A friendly was killed
+			// A friendly was killed, clear his list of spotted enemies
+			m_spottedEnemies[pMsg->GetData().m_id].clear();
+
+			/*
 			for(std::unordered_map<unsigned long, EnemyRecord>::iterator it = m_enemyRecords.begin(); it != m_enemyRecords.end(); ++it)
 			{
 				it->second.m_spotterIds.erase(pMsg->GetData().m_id);
 			}
-
+			*/
 			// Team AI can decide whether it wants to cancel the orders of the killed member or not
 		}
 
@@ -515,6 +525,8 @@ void TeamAI::AddTeamMember(Entity* pEntity)
 			m_teamMembers.push_back(pEntity);
 			// Also, add an entry to the map that keeps track of which entities are engaged in manoeuvres.
 			m_entityManoeuvreMap.insert(std::pair<unsigned long, TeamManoeuvre*>(pEntity->GetId(), nullptr));
+			// Add a new entry to the map keeping track of spotted enemies for every entity
+			m_spottedEnemies.insert(std::pair<unsigned long, std::set<unsigned long>>(pEntity->GetId(), std::set<unsigned long>()));
 		}
 	}
 }
@@ -539,7 +551,7 @@ void TeamAI::RemoveTeamMember(unsigned long id)
 void TeamAI::Reset(void)
 {
 	m_enemyRecords.clear();
-	
+	m_spottedEnemies.clear();
 
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
@@ -601,6 +613,11 @@ std::vector<Entity*>& TeamAI::GetTeamMembers(void)
 std::unordered_map<unsigned long, EnemyRecord>& TeamAI::GetEnemyRecords(void)
 {
 	return m_enemyRecords;
+}
+
+const std::unordered_map<unsigned long, std::set<unsigned long>>& TeamAI::GetSpottedEnemies(void) const
+{
+	return m_spottedEnemies;
 }
 
 std::unordered_map<unsigned long, Order*>& TeamAI::GetActiveOrders(void)

@@ -1,27 +1,27 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
-*  RushBaseAttack.cpp
-*  A team manoeuvre that orders the participating entities to assemble and perform an
-*  all-out attack on the enemy flag trying to steal it by brute force/sheer number.
+*  CoordinatedBaseAttack.cpp
+*  A team manoeuvre that splits the participating entities into equally strong groups
+*  that will attack the enemy base from different directions.
 */
 
 // Includes
-#include "RushBaseAttack.h"
+#include "CoordinatedBaseAttack.h"
 #include "MultiflagCTFTeamAI.h"
 #include "Entity.h"
 #include "TestEnvironment.h"
 
-RushBaseAttack::RushBaseAttack(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float waitForParticipantsInterval)
-	: TeamManoeuvre(RushBaseAttackManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
+CoordinatedBaseAttack::CoordinatedBaseAttack(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, unsigned int numberOfGroups, float waitForParticipantsInterval)
+	: TeamManoeuvre(CoordinatedBaseAttackManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
-	  m_assemblyPoint(0.0f, 0.0f),
 	  m_waitForParticipantsInterval(waitForParticipantsInterval),
 	  m_timer(0.0f),
-	  m_currentPhase(AssemblePhase)
+	  m_currentPhase(AssemblePhase),
+	  m_numberOfGroups(numberOfGroups)
 {
 }
 
-RushBaseAttack::~RushBaseAttack(void)
+CoordinatedBaseAttack::~CoordinatedBaseAttack(void)
 {
 }
 
@@ -30,7 +30,7 @@ RushBaseAttack::~RushBaseAttack(void)
 // Processes an inbox message that the manoeuvre received.
 // Param1: A pointer to the message to process.
 //--------------------------------------------------------------------------------------
-void RushBaseAttack::ProcessMessage(Message* pMessage)
+void CoordinatedBaseAttack::ProcessMessage(Message* pMessage)
 {
 
 	// add steal flag message -> success
@@ -58,6 +58,8 @@ void RushBaseAttack::ProcessMessage(Message* pMessage)
 		{
 			// Participants that get killed, drop out of the manoeuvre
 			m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_id);
+
+			m_entityGroupMap.erase(pMsg->GetData().m_id);
 
 			if(m_currentPhase == AssemblePhase)
 			{
@@ -91,13 +93,12 @@ void RushBaseAttack::ProcessMessage(Message* pMessage)
 
 			if(m_currentPhase == AssemblePhase)
 			{
-				// Register the entity as having reached the assembly point
+				// Register the entity as having reached its assembly point
 				m_arrivedEntities.insert(pMsg->GetData().m_entityId);
 			
-				//
 				// Send a new defend order to let the entity wait for other entities
 				// It's a low priority order as it is sufficient if the entities are in the same area when the actual rush attack begins.
-				Order* pNewOrder = new DefendOrder(pMsg->GetData().m_entityId, DefendPositionOrder, LowPriority, XMFLOAT2(m_assemblyPoint), XMFLOAT2(0.0f,0.0f));
+				Order* pNewOrder = new DefendOrder(pMsg->GetData().m_entityId, DefendPositionOrder, MediumPriority, XMFLOAT2(m_assemblyPoints[m_entityGroupMap[pMsg->GetData().m_entityId]]), XMFLOAT2(0.0f,0.0f));
 		
 				if(!pNewOrder)
 				{
@@ -111,7 +112,7 @@ void RushBaseAttack::ProcessMessage(Message* pMessage)
 				SendMessage(*foundIt, FollowOrderMessageType, &data);
 
 				m_activeOrders.insert(std::pair<unsigned long, Order*>(pMsg->GetData().m_entityId, pNewOrder));
-				//
+
 				if(m_arrivedEntities.size() >= GetNumberOfParticipants())
 				{
 					// All participants arrived at the assembly point, no point in waiting for the interval to
@@ -140,17 +141,10 @@ void RushBaseAttack::ProcessMessage(Message* pMessage)
 //--------------------------------------------------------------------------------------
 // Starts the actual attack on the enemy base in order to steal the flag.
 //--------------------------------------------------------------------------------------
-void RushBaseAttack::StartAttack(void)
+void CoordinatedBaseAttack::StartAttack(void)
 {
-	// Cancel all old orders
-	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
-	{
-		CancelOrder((*it)->GetId());
-		m_activeOrders.erase(m_activeOrders.find((*it)->GetId()));
-	}
-
 	// Clear all current orders
-	//ClearOrders();
+	ClearOrders();
 
 	m_currentPhase = AttackPhase;
 
@@ -183,110 +177,40 @@ void RushBaseAttack::StartAttack(void)
 }
 
 //--------------------------------------------------------------------------------------
-// Determines the point at which to assemble the participants before sending them out
-// to attack the enemy base.
+// Distributes the participants over the number of groups that was specified upon creation
+// of the manoeuvre.
 //--------------------------------------------------------------------------------------
-void RushBaseAttack::DetermineAssemblyPoint(void)
+void CoordinatedBaseAttack::SetupGroups(void)
 {
-	// Randomly choose one of the attack positions set in edit mode as assembly point for the
-	// rush attack.
+	unsigned int groupNumber = 0;
 
-	unsigned int randIndex = rand() % GetTeamAI()->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).size();
+	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
+	{
+		m_entityGroupMap.insert(std::pair<unsigned long, unsigned int>((*it)->GetId(), groupNumber));
+		groupNumber = (groupNumber + 1) % m_numberOfGroups;
+	}
+}
+
+//--------------------------------------------------------------------------------------
+// Determines the points at which to assemble the participants of the different groups
+// before sending them out to attack the enemy base.
+//--------------------------------------------------------------------------------------
+void CoordinatedBaseAttack::DetermineAssemblyPoints(void)
+{
+	unsigned int index = rand() % GetTeamAI()->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).size();
 	std::unordered_map<Direction, std::vector<XMFLOAT2>>::const_iterator it = GetTeamAI()->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).begin();
-	std::advance(it, randIndex);
+	std::advance(it, index);
 
-	m_assemblyPoint = it->second.at(rand() % it->second.size());
-
-	/*
-	// Get the enemy flag base position
-	XMFLOAT2 redBasePosition = GetTeamAI()->GetFlagData(TeamRed).m_basePosition;
-	XMFLOAT2 blueBasePosition = GetTeamAI()->GetFlagData(TeamBlue).m_basePosition;
-	
-	XMFLOAT2 friendlyBasePos(0.0f, 0.0f);
-	XMFLOAT2 enemyBasePos(0.0f, 0.0f);
-
-	if(GetTeamAI()->GetTeam() == TeamRed)
+	for(unsigned int i = 0; i < m_numberOfGroups; ++i)
 	{
-		friendlyBasePos = GetTeamAI()->GetFlagData(TeamRed).m_basePosition;
-		enemyBasePos    = GetTeamAI()->GetFlagData(TeamBlue).m_basePosition;
-	}else
-	{
-		friendlyBasePos = GetTeamAI()->GetFlagData(TeamBlue).m_basePosition;
-		enemyBasePos    = GetTeamAI()->GetFlagData(TeamRed).m_basePosition;
+		m_assemblyPoints.push_back(it->second.at(rand() % it->second.size()));
+
+		++it;
+		if(it == GetTeamAI()->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).end())
+		{
+			it = GetTeamAI()->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).begin();
+		}
 	}
-
-
-	XMVECTOR baseToBaseVector = XMLoadFloat2(&enemyBasePos) - XMLoadFloat2(&friendlyBasePos);
-
-	float gridWidth = GetTeamAI()->GetTestEnvironment()->GetGridSize();
-
-	XMFLOAT2 normOrthoVector(0.0f, 0.0f);
-	XMStoreFloat2(&normOrthoVector, XMVector2Orthogonal(XMVector2Normalize(baseToBaseVector)));
-
-	XMFLOAT2 finalDirection(0.0f, 0.0f);
-
-	do
-	{
-		float randomAngle = XMConvertToRadians(static_cast<float>(rand() % 180));
-		
-		float sine = sin(randomAngle);
-		float cosine = cos(randomAngle);
-
-		// rotate point
-		finalDirection.x = normOrthoVector.x * cosine - normOrthoVector.y * sine;
-		finalDirection.y = normOrthoVector.x * sine + normOrthoVector.y * cosine;
-
-		//finalDirection.x = normOrthoVector.x * cosine + normOrthoVector.y * sine;
-		//finalDirection.y = -normOrthoVector.x * sine + normOrthoVector.y * cosine;
-
-		// Add a bit of randomisation
-		XMStoreFloat2(&m_assemblyPoint, XMLoadFloat2(&enemyBasePos) + XMLoadFloat2(&finalDirection) * (m_assemblyPointDistance + ((rand() % 200 - 100) * 0.01f) * GetTeamAI()->GetTestEnvironment()->GetGridSpacing() * 4.0f)); 
-
-	}while(GetTeamAI()->GetTestEnvironment()->IsBlocked(m_assemblyPoint));
-	*/
-
-	/*
-	// Get the enemy flag base position
-	XMFLOAT2 redBasePosition = GetTeamAI()->GetFlagData(TeamRed).m_basePosition;
-	XMFLOAT2 blueBasePosition = GetTeamAI()->GetFlagData(TeamBlue).m_basePosition;
-	
-	XMVECTOR baseToBaseVector;
-	
-	if(GetTeamAI()->GetTeam() == TeamRed)
-	{
-		baseToBaseVector = XMLoadFloat2(&redBasePosition) - XMLoadFloat2(&blueBasePosition);
-	}else
-	{
-		baseToBaseVector = XMLoadFloat2(&blueBasePosition) - XMLoadFloat2(&redBasePosition);
-	}
-	
-	XMFLOAT2 basePoint(0.0f, 0.0f);
-	XMStoreFloat2(&basePoint, XMVector2Normalize(baseToBaseVector) * m_assemblyPointDistance);
-
-	float gridWidth = GetTeamAI()->GetTestEnvironment()->GetGridSize();
-
-	XMVECTOR orthoVector = XMVector2Normalize(XMVector2Orthogonal(XMLoadFloat2(&basePoint)));
-
-	do
-	{
-		XMStoreFloat2(&m_assemblyPoint, XMLoadFloat2(&basePoint) + (orthoVector * (((rand() % 200 - 100) * 0.01) * gridWidth * 0.5)));
-	}while(GetTeamAI()->GetTestEnvironment()->IsBlocked(m_assemblyPoint));
-	*/
-
-	//m_assemblyPointDistance
-
-	// Note: Another approach to this could include annotations placed in the node graph to
-	//       mark good assembly points that are close to an enemy base but well covered.
-
-	/*
-	if(GetTeamAI()->GetTeam() == TeamRed)
-	{
-		m_assemblyPoint = XMFLOAT2(-20.0f, 20.0f);
-	}else
-	{
-		m_assemblyPoint = XMFLOAT2(20.0f, -20.0f);
-	}
-	*/
 }
 
 //--------------------------------------------------------------------------------------
@@ -295,13 +219,14 @@ void RushBaseAttack::DetermineAssemblyPoint(void)
 // determining targets etc.
 // Returns a behaviour status code representing the current state of the initiation of the manoeuvre.
 //--------------------------------------------------------------------------------------
-BehaviourStatus RushBaseAttack::Initiate(void)
+BehaviourStatus CoordinatedBaseAttack::Initiate(void)
 {
-	DetermineAssemblyPoint();
+	SetupGroups();
+	DetermineAssemblyPoints();
 
 	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
 	{
-		Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, MediumPriority, m_assemblyPoint);
+		Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, MediumPriority, m_assemblyPoints[m_entityGroupMap[(*it)->GetId()]]);
 			
 		if(!pNewOrder)
 		{
@@ -326,7 +251,7 @@ BehaviourStatus RushBaseAttack::Initiate(void)
 // Param1: The time passed since the last update.
 // Returns a behaviour status representing the state of the manoeuvre.
 //--------------------------------------------------------------------------------------
-BehaviourStatus RushBaseAttack::Update(float deltaTime)
+BehaviourStatus CoordinatedBaseAttack::Update(float deltaTime)
 {
 	// Keep track of who has reached the target and let those defend until all have arrived
 	SortOutProcessedMessages();
@@ -360,11 +285,13 @@ BehaviourStatus RushBaseAttack::Update(float deltaTime)
 // Terminates the manoeuvre. This mostly consists of cancelling all active orders and
 // removing all participating entities.
 //--------------------------------------------------------------------------------------
-void RushBaseAttack::Terminate(void)
+void CoordinatedBaseAttack::Terminate(void)
 {
 	m_timer = 0.0f;
 	m_arrivedEntities.clear();
 	m_currentPhase = AssemblePhase;
+	m_assemblyPoints.clear();
+	m_entityGroupMap.clear();
 
 	TeamManoeuvre::Terminate();
 }
@@ -372,31 +299,38 @@ void RushBaseAttack::Terminate(void)
 //--------------------------------------------------------------------------------------
 // Resets the manoeuvre. Should only be called to reset the manoeuver in between game rounds.
 //--------------------------------------------------------------------------------------
-void RushBaseAttack::Reset(void)
+void CoordinatedBaseAttack::Reset(void)
 {
 	m_timer = 0.0f;
 	m_arrivedEntities.clear();
 	m_currentPhase = AssemblePhase;
+	m_assemblyPoints.clear();
+	m_entityGroupMap.clear();
 
 	TeamManoeuvre::Reset();
 }
 
-MultiflagCTFTeamAI* RushBaseAttack::GetTeamAI(void)
+MultiflagCTFTeamAI* CoordinatedBaseAttack::GetTeamAI(void)
 {
 	return m_pTeamAI;
 }
 
-float RushBaseAttack::GetWaitForParticipantsInterval(void) const
+float CoordinatedBaseAttack::GetWaitForParticipantsInterval(void) const
 {
 	return m_waitForParticipantsInterval;
 }
 
-const XMFLOAT2& RushBaseAttack::GetAssemblyPoint(void) const
+const XMFLOAT2& CoordinatedBaseAttack::GetAssemblyPoint(unsigned int group) const
 {
-	return m_assemblyPoint;
+	return m_assemblyPoints[group];
 }
 
-void RushBaseAttack::SetTeamAI(MultiflagCTFTeamAI* pTeamAI)
+unsigned int CoordinatedBaseAttack::GetNumberOfGroups(void) const
+{
+	return m_numberOfGroups;
+}
+
+void CoordinatedBaseAttack::SetTeamAI(MultiflagCTFTeamAI* pTeamAI)
 {
 	if(pTeamAI)
 	{
@@ -404,12 +338,12 @@ void RushBaseAttack::SetTeamAI(MultiflagCTFTeamAI* pTeamAI)
 	}
 }
 
-void RushBaseAttack::SetWaitForParticipantsInterval(float interval)
+void CoordinatedBaseAttack::SetWaitForParticipantsInterval(float interval)
 {
 	m_waitForParticipantsInterval = interval;
 }
 
-void RushBaseAttack::SetAssemblyPoint(const XMFLOAT2& assemblyPoint)
+void CoordinatedBaseAttack::SetAssemblyPoint(unsigned int group, const XMFLOAT2& assemblyPoint)
 {
-	m_assemblyPoint = assemblyPoint;
+	m_assemblyPoints[group] = assemblyPoint;
 }

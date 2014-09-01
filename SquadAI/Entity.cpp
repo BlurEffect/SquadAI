@@ -581,7 +581,7 @@ void Entity::ProcessHit(float damage, unsigned long id, bool shooterAlive, const
 	if(!IsAlive())
 	{
 		// The entity just died, send an event to the test environment
-		EntityDiedEventData data(GetTeam(), GetId());
+		EntityDiedEventData data(GetTeam(), GetId(), id);
 		SendEvent(GetTestEnvironment(),EntityDiedEventType, &data);
 	}
 }

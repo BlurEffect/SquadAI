@@ -86,6 +86,7 @@ public:
 	//void ProcessMessage(Message* pMessage);
 
 	bool IsBlocked(const XMFLOAT2 worldPos) const;
+	EntityTeam GetTerritoryOwner(const XMFLOAT2 worldPos) const;
 
 	// Data access functions
 	float		 GetGridSize(void) const;
@@ -95,6 +96,7 @@ public:
 	const GameContext* GetGameContext(void) const;
 
 	const std::unordered_map<Direction, std::vector<XMFLOAT2>>& GetBaseEntrances(EntityTeam team) const;
+	const std::unordered_map<Direction, std::vector<XMFLOAT2>>& GetAttackPositions(EntityTeam team) const;
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);
 
@@ -113,6 +115,8 @@ private:
 	void UpdateBaseEntrances(void);
 	void UpdateNodeGraph(void);
 	void UpdateRespawns(float deltaTime);
+
+	Direction GetAttackDirectionFromRotation(float rotation);
 
 	void AddDeadEntity(unsigned long id);
 	bool AddProjectile(unsigned long shooterId, EntityTeam friendlyTeam, const XMFLOAT2& origin, const XMFLOAT2& target);
@@ -143,13 +147,14 @@ private:
 	std::vector<XMFLOAT2>       m_spawnPoints[NumberOfTeams-1];					    // Holds the spawn points of all teams
 
 	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_baseEntrances[NumberOfTeams-1]; // The base entrances and the directions they're facing at
+	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_attackPositions[NumberOfTeams-1]; // The attack positions and the attack direction associated to them
 
 	Pathfinder   m_pathfinder;                              // The pathfinder associated to this environment.
 	float        m_objectScaleFactors[NumberOfObjectTypes]; // Determines the scale of the different objects in relation to a grid field
 	unsigned int m_soldierCount[NumberOfTeams-1];			// Keeps track of how many soldiers have been placed in edit mode
 	bool		 m_flagSet[NumberOfTeams-1];				// Keeps track of the flags that have been placed in edit mode
 	unsigned int m_spawnPointCount[NumberOfTeams-1];		// Keeps track of the spawn points that have been placed in edit mode
-		
+	unsigned int m_attackPositionsCount[NumberOfTeams-1];   // Keeps track of the attack positions that have been placed in edit mode for eacg team	
 };
 
 #endif // TEST_ENVIRONMENT_H

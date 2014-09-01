@@ -69,7 +69,7 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(DefendBaseEntrancesManoeuvre, pDefendBaseEntrancesManoeuvre));
 
 	// Rush base attack manoeuvre
-	RushBaseAttackInitData rushBaseData(5.0f, 15.0f);
+	RushBaseAttackInitData rushBaseData(5.0f);
 	TeamManoeuvre* pRushBaseAttackManoeuvre = TeamManoeuvreFactory::CreateTeamManoeuvre(RushBaseAttackManoeuvre, 4, 8, this, &rushBaseData);
 	if(!pRushBaseAttackManoeuvre)
 	{
@@ -92,6 +92,24 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 		return false;
 	}
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(ReturnDroppedFlagManoeuvre, pReturnDroppedFlag));
+
+	// Coordinated base attack manoeuvre
+	CoordinatedBaseAttackInitData coordinatedBaseAttackData(2, 10.0f);
+	TeamManoeuvre* pCoordinatedBaseAttack = TeamManoeuvreFactory::CreateTeamManoeuvre(CoordinatedBaseAttackManoeuvre, 4, 6, this, &coordinatedBaseAttackData);
+	if(!pCoordinatedBaseAttack)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(CoordinatedBaseAttackManoeuvre, pCoordinatedBaseAttack));
+
+	// Distraction base attack manoeuvre
+	DistractionBaseAttackInitData distractionBaseAttackData(1, 10.0f);
+	TeamManoeuvre* pDistractionBaseAttack = TeamManoeuvreFactory::CreateTeamManoeuvre(DistractionBaseAttackManoeuvre, 3, 5, this, &distractionBaseAttackData);
+	if(!pDistractionBaseAttack)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(DistractionBaseAttackManoeuvre, pDistractionBaseAttack));
 
 	return true;
 }
@@ -277,6 +295,14 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 		return (numberOfAvailableEntities >= m_manoeuvres[RushBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[enemyTeam].m_state == InBase);
 		break;
+	case CoordinatedBaseAttackManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[CoordinatedBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
+				(m_flagData[enemyTeam].m_state == InBase);
+		break;
+	case DistractionBaseAttackManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[DistractionBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
+				(m_flagData[enemyTeam].m_state == InBase);
+		break;
 	case RunTheFlagHomeManoeuvre:
 		// Only check for flag carrier
 		return //(numberOfAvailableEntities >= m_manoeuvres[RunTheFlagHomeManoeuvre]->GetMinNumberOfParticipants()) &&
@@ -314,6 +340,12 @@ bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 		return (m_flagData[GetTeam()].m_state == InBase);
 		break;
 	case RushBaseAttackManoeuvre:
+		return (m_flagData[enemyTeam].m_state == InBase);
+		break;
+	case CoordinatedBaseAttackManoeuvre:
+		return (m_flagData[enemyTeam].m_state == InBase);
+		break;
+	case DistractionBaseAttackManoeuvre:
 		return (m_flagData[enemyTeam].m_state == InBase);
 		break;
 	case RunTheFlagHomeManoeuvre:
@@ -388,6 +420,56 @@ BehaviourStatus MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvr
 		break;
 		}
 	case RushBaseAttackManoeuvre:
+		{
+		// Keep track of how many entities have been added to the manoeuvre.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = GetTeamMembers().begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities <= m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants()) && (it != GetTeamMembers().end()))
+		{
+			// If the entity is not engaged in another manoeuver, add it to this one.
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()])
+			{
+				m_manoeuvres[manoeuvre]->AddParticipant(*it);
+				// Remember that this entity is now executing that manoeuver
+				m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+				++addedEntities;
+			}
+			++it;
+		}
+
+		// Initiate the manoeuvre
+		return m_manoeuvres[manoeuvre]->Initiate();
+		break;
+		}
+	case CoordinatedBaseAttackManoeuvre:
+		{
+		// Keep track of how many entities have been added to the manoeuvre.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = GetTeamMembers().begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities <= m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants()) && (it != GetTeamMembers().end()))
+		{
+			// If the entity is not engaged in another manoeuver, add it to this one.
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()])
+			{
+				m_manoeuvres[manoeuvre]->AddParticipant(*it);
+				// Remember that this entity is now executing that manoeuver
+				m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+				++addedEntities;
+			}
+			++it;
+		}
+
+		// Initiate the manoeuvre
+		return m_manoeuvres[manoeuvre]->Initiate();
+		break;
+		}
+	case DistractionBaseAttackManoeuvre:
 		{
 		// Keep track of how many entities have been added to the manoeuvre.
 		unsigned int addedEntities = 0;

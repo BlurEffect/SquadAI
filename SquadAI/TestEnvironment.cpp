@@ -24,10 +24,11 @@ TestEnvironment::TestEnvironment(void) : m_id(0),
 	
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
-		m_soldierCount[i]    = 0;
-		m_flagSet[i]         = false;
-		m_spawnPointCount[i] = 0;
-		m_pTeamAI[i]         = nullptr;
+		m_soldierCount[i]		  = 0;
+		m_flagSet[i]			  = false;
+		m_spawnPointCount[i]	  = 0;
+		m_pTeamAI[i]			  = nullptr;
+		m_attackPositionsCount[i] = 0;
 	}
 }
 
@@ -57,6 +58,8 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 	m_objectScaleFactors[BlueBaseAreaType]				= 1.0f; 
 	m_objectScaleFactors[RedSpawnPointType]				= 0.75f;
 	m_objectScaleFactors[BlueSpawnPointType]			= 0.75f;
+	m_objectScaleFactors[RedAttackPositionType]			= 0.5f;
+	m_objectScaleFactors[BlueAttackPositionType]		= 0.5f;
 	m_objectScaleFactors[DeadRedSoldierType]			= 1.0f; 
 	m_objectScaleFactors[DeadBlueSoldierType]			= 1.0f; 
 	m_objectScaleFactors[ProjectileType]				= 0.2f;
@@ -79,6 +82,7 @@ bool TestEnvironment::Initialise(float gridSize, unsigned int numberOfGridPartit
 		m_soldierCount[i] = 0;
 		m_flagSet[i]      = false;
 		m_spawnPointCount[i] = 0;
+		m_attackPositionsCount[i] = 0;
 		m_pTeamAI[i] = new MultiflagCTFTeamAI();
 		if(!m_pTeamAI[i])
 		{
@@ -412,10 +416,10 @@ void TestEnvironment::ProcessEvent(EventType type, void* pEventData)
 		
 		if(pEntityDiedData->m_team == TeamRed)
 		{
-			m_pGameContext->AddKill(TeamBlue, pEntityDiedData->m_team, pEntityDiedData->m_id);
+			m_pGameContext->AddKill(TeamBlue, pEntityDiedData->m_team, pEntityDiedData->m_id, pEntityDiedData->m_shooterId);
 		}else
 		{
-			m_pGameContext->AddKill(TeamRed, pEntityDiedData->m_team, pEntityDiedData->m_id);
+			m_pGameContext->AddKill(TeamRed, pEntityDiedData->m_team, pEntityDiedData->m_id, pEntityDiedData->m_shooterId);
 		}
 
 		AddDeadEntity(pEntityDiedData->m_id);
@@ -426,7 +430,7 @@ void TestEnvironment::ProcessEvent(EventType type, void* pEventData)
 			if(m_soldiers[i].GetId() != pEntityDiedData->m_id)
 			{
 				// Forward the message.
-				EntityKilledMessageData data(pEntityDiedData->m_team, pEntityDiedData->m_id);
+				EntityKilledMessageData data(pEntityDiedData->m_team, pEntityDiedData->m_id, pEntityDiedData->m_shooterId);
 				SendMessage(&m_soldiers[i], EntityKilledMessageType, &data);
 				//m_soldiers[i].ProcessMessage(pMessage);
 			}
@@ -620,6 +624,19 @@ bool TestEnvironment::PrepareSimulation(void)
 		case BlueSpawnPointType:
 			m_spawnPoints[TeamBlue].push_back(it->GetPosition());
 			break;
+		case RedAttackPositionType:
+			{
+			std::pair<std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator, bool> result =  m_attackPositions[TeamRed].insert(std::pair<Direction, std::vector<XMFLOAT2>>(GetAttackDirectionFromRotation(it->GetRotation()), std::vector<XMFLOAT2>()));
+			result.first->second.push_back(it->GetPosition());
+			
+			//(*result.first)->push_back(it->GetPosition());
+			break;
+			}
+		case BlueAttackPositionType:
+			std::pair<std::unordered_map<Direction, std::vector<XMFLOAT2>>::iterator, bool> result =  m_attackPositions[TeamBlue].insert(std::pair<Direction, std::vector<XMFLOAT2>>(GetAttackDirectionFromRotation(it->GetRotation()), std::vector<XMFLOAT2>()));
+			result.first->second.push_back(it->GetPosition());
+			
+			break;
 		}
 	}
 
@@ -707,7 +724,13 @@ bool TestEnvironment::AddObject(ObjectType type, const XMFLOAT2& position, float
 						 (type != BlueSpawnPointType || ((*it)->GetType() != BlueBaseAreaType)) &&
 					     (type != BlueBaseAreaType || ((*it)->GetType() != BlueSpawnPointType)) &&
 						 (type != BlueSpawnPointType || ((*it)->GetType() != BlueSoldierType)) &&
-					     (type != BlueSoldierType || ((*it)->GetType() != BlueSpawnPointType))
+					     (type != BlueSoldierType || ((*it)->GetType() != BlueSpawnPointType)) &&
+						 (type != RedAttackPositionType || ((*it)->GetType() != RedSoldierType)) &&
+						 (type != RedAttackPositionType || ((*it)->GetType() != BlueSoldierType)) &&
+						 (type != RedAttackPositionType || ((*it)->GetType() != RedBaseAreaType)) &&
+						 (type != BlueAttackPositionType || ((*it)->GetType() != RedSoldierType)) &&
+						 (type != BlueAttackPositionType || ((*it)->GetType() != BlueSoldierType)) &&
+						 (type != BlueAttackPositionType || ((*it)->GetType() != BlueBaseAreaType))
 						));
 
 		++it;
@@ -724,24 +747,32 @@ bool TestEnvironment::AddObject(ObjectType type, const XMFLOAT2& position, float
 			return false;
 		}
 
-		if(type == RedSoldierType)
+		switch(type)
 		{
+		case RedSoldierType:
 			++m_soldierCount[TeamRed];
-		}else if(type == BlueSoldierType)
-		{
+			break;
+		case BlueSoldierType:
 			++m_soldierCount[TeamBlue];
-		}else if(type == RedFlagType)
-		{
+			break;
+		case RedFlagType:
 			m_flagSet[TeamRed] = true;
-		}else if(type == BlueFlagType)
-		{
+			break;
+		case BlueFlagType:
 			m_flagSet[TeamBlue] = true;
-		}else if(type == RedSpawnPointType)
-		{
+			break;
+		case RedSpawnPointType:
 			++m_spawnPointCount[TeamRed];
-		}else if(type == BlueSpawnPointType)
-		{
+			break;
+		case BlueSpawnPointType:
 			++m_spawnPointCount[TeamBlue];
+			break;
+		case RedAttackPositionType:
+			++m_attackPositionsCount[TeamRed];
+			break;
+		case BlueAttackPositionType:
+			++m_attackPositionsCount[TeamBlue];
+			break;
 		}
 	}
 
@@ -785,25 +816,34 @@ bool TestEnvironment::RemoveObjects(const XMFLOAT2& position)
 	for(std::vector<EditModeObject*>::iterator it = foundObjects.begin(); it != foundObjects.end(); ++it)
 	{
 		// Update counts
-		if((*it)->GetType() == RedSoldierType)
+		switch((*it)->GetType())
 		{
+		case RedSoldierType:
 			--m_soldierCount[TeamRed];
-		}else if((*it)->GetType() == BlueSoldierType)
-		{
+			break;
+		case BlueSoldierType:
 			--m_soldierCount[TeamBlue];
-		}else if((*it)->GetType() == RedFlagType)
-		{
+			break;
+		case RedFlagType:
 			m_flagSet[TeamRed] = false;
-		}else if((*it)->GetType() == BlueFlagType)
-		{
+			break;
+		case BlueFlagType:
 			m_flagSet[TeamBlue] = false;
-		}else if((*it)->GetType() == RedSpawnPointType)
-		{
+			break;
+		case RedSpawnPointType:
 			--m_spawnPointCount[TeamRed];
-		}else if((*it)->GetType() == BlueSpawnPointType)
-		{
+			break;
+		case BlueSpawnPointType:
 			--m_spawnPointCount[TeamBlue];
+			break;
+		case RedAttackPositionType:
+			--m_attackPositionsCount[TeamRed];
+			break;
+		case BlueAttackPositionType:
+			--m_attackPositionsCount[TeamBlue];
+			break;
 		}
+
 	}
 
 	// Actual deletion of the objects
@@ -938,6 +978,7 @@ bool TestEnvironment::Load(std::string filename)
 			m_flagSet[i] = false;
 			m_soldierCount[i] = 0;
 			m_spawnPointCount[i] = 0;
+			m_attackPositionsCount[i] = 0;
 		}
 
 
@@ -1267,6 +1308,39 @@ void TestEnvironment::UpdateRespawns(float deltaTime)
 }
 
 //--------------------------------------------------------------------------------------
+// Returns the attack direction corresponding to a given rotation. Used to determine the
+// attack directions for attack positions placed in the test environment. The attack direction 
+// is opposite to the direction the attack point is actually facing. For instance, an attack
+// position facing east (90 degree rotation) is a position suitable to attack the west side of 
+// the enemy base, which is why west will be returned.
+// Param1: The rotation, for which to get the direction.
+// Returns the direction corresponding to the provided rotation.
+//--------------------------------------------------------------------------------------
+Direction TestEnvironment::GetAttackDirectionFromRotation(float rotation)
+{
+	// Note: Add additional code to return the closest direction for other
+	//       provided rotations.
+
+	if(rotation == 0.0f)
+	{
+		return South;
+	}else if(rotation == 90.0f || rotation == -270.0f)
+	{
+		return West;
+	}else if(rotation == 180.0f)
+	{
+		return North;
+	}else if(rotation == 270.0f || rotation == -90.0f)
+	{
+		return East;
+	}else
+	{
+		// As a default, return North (shouldn't be reached)
+		return North;
+	}
+}
+
+//--------------------------------------------------------------------------------------
 // Determines whether there is a direct line of sight between two fields on the grid.
 // Note: This only checks between the centre of the two given grid fields. Uses 
 //       Bresenham's line algorithm.
@@ -1451,6 +1525,20 @@ bool TestEnvironment::IsBlocked(const XMFLOAT2 worldPos) const
 }
 
 //--------------------------------------------------------------------------------------
+// Tells if and if so which team owns a certain tile of the test environment.
+// Param1: The world position, for which the corresponding grid field should be checked for
+//         ownership by the teams.
+// Returns the team the grid field belongs to (part of the base of the team).
+//--------------------------------------------------------------------------------------
+EntityTeam TestEnvironment::GetTerritoryOwner(const XMFLOAT2 worldPos) const
+{
+	XMFLOAT2 gridPos(0.0f, 0.0f);
+	WorldToGridPosition(worldPos, gridPos);
+
+	return m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].GetTerritoryOwner();
+}
+
+//--------------------------------------------------------------------------------------
 // Starts the simulation, switches from edit to simulation mode.
 // Returns true if the simulation could be started successfully.
 //--------------------------------------------------------------------------------------
@@ -1459,7 +1547,7 @@ bool TestEnvironment::StartSimulation(void)
 
 	for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
 	{
-		if(!m_flagSet[i] || m_soldierCount[i] < g_kSoldiersPerTeam || m_spawnPointCount[i] < 1)
+		if(!m_flagSet[i] || m_soldierCount[i] < g_kSoldiersPerTeam || m_spawnPointCount[i] < 1 || m_attackPositionsCount[i] < 1)
 		{
 			return false;
 		}
@@ -1510,6 +1598,7 @@ void TestEnvironment::EndSimulation(void)
 		m_spawnPoints[i].clear();
 		m_pTeamAI[i]->Reset();
 		m_baseEntrances[i].clear();
+		m_attackPositions[i].clear();
 	}
 
 	m_id = 0;
@@ -1673,6 +1762,16 @@ void TestEnvironment::UpdateNodeGraph(void)
 			XMFLOAT2 gridPos(0.0f, 0.0f);
 			WorldToGridPosition(it->GetPosition(), gridPos);
 			m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].SetTerritoryOwner(TeamBlue);
+		}else if(it->GetType() == RedAttackPositionType)
+		{
+			XMFLOAT2 gridPos(0.0f, 0.0f);
+			WorldToGridPosition(it->GetPosition(), gridPos);
+			m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].SetAttackPosition(TeamRed);
+		}else if(it->GetType() == BlueAttackPositionType)
+		{
+			XMFLOAT2 gridPos(0.0f, 0.0f);
+			WorldToGridPosition(it->GetPosition(), gridPos);
+			m_pNodes[static_cast<unsigned int>(gridPos.x)][static_cast<unsigned int>(gridPos.y)].SetAttackPosition(TeamBlue);
 		}
 	}
 
@@ -1966,6 +2065,11 @@ const GameContext* TestEnvironment::GetGameContext(void) const
 const std::unordered_map<Direction, std::vector<XMFLOAT2>>& TestEnvironment::GetBaseEntrances(EntityTeam team) const
 {
 	return m_baseEntrances[team];
+}
+
+const std::unordered_map<Direction, std::vector<XMFLOAT2>>& TestEnvironment::GetAttackPositions(EntityTeam team) const
+{
+	return m_attackPositions[team];
 }
 
 float TestEnvironment::GetGridSize(void) const

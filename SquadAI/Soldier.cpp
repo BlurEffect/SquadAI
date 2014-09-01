@@ -38,7 +38,7 @@ Soldier::~Soldier(void)
 //--------------------------------------------------------------------------------------
 bool Soldier::Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, EntityTeam team, const SoldierProperties& soldierProperties)
 {
-	if(!Entity::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData, pEnvironment, soldierProperties.m_maxHealth, team, m_soldierProperties.m_reportInterval))
+	if(!Entity::Initialise(id, position, rotation, uniformScale, category, colliderType, pColliderData, pEnvironment, soldierProperties.m_maxHealth, team, soldierProperties.m_reportInterval))
 	{
 		return false;
 	}

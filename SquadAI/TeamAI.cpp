@@ -225,6 +225,8 @@ void TeamAI::ProcessMessage(Message* pMessage)
 	case AttackedByEnemyMessageType:
 		{
 		AttackedByEnemyMessage* pMsg = reinterpret_cast<AttackedByEnemyMessage*>(pMessage);
+
+		ForwardMessageToActiveManoeuvers(pMessage);
 		// Add processing code
 		break;
 		}

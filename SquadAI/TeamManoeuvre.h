@@ -32,7 +32,9 @@ enum TeamManoeuvreType
 	DefendBaseEntrancesManoeuvre,
 	RushBaseAttackManoeuvre,
 	RunTheFlagHomeManoeuvre,
-	ReturnDroppedFlagManoeuvre
+	ReturnDroppedFlagManoeuvre,
+	CoordinatedBaseAttackManoeuvre,
+	DistractionBaseAttackManoeuvre
 };
 
 //--------------------------------------------------------------------------------------

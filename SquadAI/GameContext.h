@@ -36,7 +36,7 @@ public:
 	virtual void Reset(void);
 
 	void AddScore(EntityTeam team, unsigned int score);
-	void AddKill(EntityTeam team, EntityTeam victimTeam, unsigned long entityId);
+	void AddKill(EntityTeam team, EntityTeam victimTeam, unsigned long entityId, unsigned shooterId);
 	void AddShotFired(EntityTeam team, unsigned int shotsFired);
 
 	void RegisterTeamAI(TeamAI* pTeamAI);

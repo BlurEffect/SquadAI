@@ -146,7 +146,7 @@ void Application::ProcessInput(void)
 		if(m_inputManager.GetNextEntityType())
 		{
 			m_appData.m_selectedObjectType = ObjectType(m_appData.m_selectedObjectType + 1);
-			if(m_appData.m_selectedObjectType > BlueSpawnPointType)
+			if(m_appData.m_selectedObjectType > BlueAttackPositionType)
 			{
 				m_appData.m_selectedObjectType = ObjectType(0);
 			}
@@ -155,7 +155,7 @@ void Application::ProcessInput(void)
 			m_appData.m_selectedObjectType = ObjectType(m_appData.m_selectedObjectType - 1);
 			if(m_appData.m_selectedObjectType < 0)
 			{
-				m_appData.m_selectedObjectType = ObjectType(BlueSpawnPointType);
+				m_appData.m_selectedObjectType = ObjectType(BlueAttackPositionType);
 			}
 		}
 

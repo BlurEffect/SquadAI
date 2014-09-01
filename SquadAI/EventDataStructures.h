@@ -47,12 +47,14 @@ public:
 struct EntityDiedEventData
 {
 public:
-	EntityDiedEventData(EntityTeam team, unsigned long id) : m_team(team),
-															 m_id(id)
+	EntityDiedEventData(EntityTeam team, unsigned long id, unsigned long shooterId) : m_team(team),
+																					  m_id(id),
+																					  m_shooterId(shooterId)
 	{}
 
-	EntityTeam    m_team; // The team that the killed entity belongs to
-	unsigned long m_id;   // The id of the entity that was killed
+	EntityTeam    m_team;		// The team that the killed entity belongs to
+	unsigned long m_id;			// The id of the entity that was killed
+	unsigned long m_shooterId;	// The id of the entity that fired the projectile that killed the entity
 };
 
 

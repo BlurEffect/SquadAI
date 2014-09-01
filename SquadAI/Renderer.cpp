@@ -404,6 +404,16 @@ bool Renderer::InitialiseObjectRenderData()
 	m_objectRenderData[BlueSpawnPointType].m_colour       = XMFLOAT4(0.0f, 0.0f, 0.6f, 1.0f);
 	m_objectRenderData[BlueSpawnPointType].m_name         = "Blue Spawn Point";
 	m_objectRenderData[BlueSpawnPointType].m_baseZ        = 0.0f;
+	
+	m_objectRenderData[RedAttackPositionType].m_drawableType = TriangleType;
+	m_objectRenderData[RedAttackPositionType].m_colour       = XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f);
+	m_objectRenderData[RedAttackPositionType].m_name         = "Red Attack Point";
+	m_objectRenderData[RedAttackPositionType].m_baseZ        = -2.0f;
+
+	m_objectRenderData[BlueAttackPositionType].m_drawableType = TriangleType;
+	m_objectRenderData[BlueAttackPositionType].m_colour       = XMFLOAT4(0.0f, 0.5f, 1.0f, 1.0f);
+	m_objectRenderData[BlueAttackPositionType].m_name         = "Blue Attack Point";
+	m_objectRenderData[BlueAttackPositionType].m_baseZ        = -2.0f;
 
 	m_objectRenderData[DeadRedSoldierType].m_drawableType = TriangleType;
 	m_objectRenderData[DeadRedSoldierType].m_colour       = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);

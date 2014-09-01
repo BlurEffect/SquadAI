@@ -60,6 +60,8 @@ enum ObjectType
 	BlueBaseAreaType,		// A grid field that belongs to the blue base
 	RedSpawnPointType,		// A point, where red team members can respawn
 	BlueSpawnPointType,		// A point, where blue team members can respawn
+	RedAttackPositionType,  // A point, suitable for the red team to start attacks from (rather an assembly point, not the actual fight position)
+	BlueAttackPositionType, // A point, suitable for the blue team to start attacks from (rather an assembly point, not the actual fight position)
 	// Non placable
 	DeadRedSoldierType,		// A dead soldier of team red
 	DeadBlueSoldierType,	// A dead soldier of team blue

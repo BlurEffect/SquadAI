@@ -49,6 +49,7 @@ public:
 	CollidableObject*		  GetObstacle(void);
 	bool					  IsCovered(Direction direction) const;
 	EntityTeam				  GetTerritoryOwner(void) const;
+	EntityTeam                GetAttackPosition(void) const;
 	bool  		              IsEntranceToBase(void) const;
 	const std::vector<Node*>& GetAdjacentNodes(void) const;
 	float					  GetMovementCost(void) const;
@@ -63,6 +64,7 @@ public:
 	void SetCovered(Direction direction, bool isCovered);
 	void SetTerritoryOwner(EntityTeam team);
 	void SetEntranceToBase(bool isEntrance);
+	void SetAttackPosition(EntityTeam team);
 	void SetMovementCost(float cost);
 	void SetHeurisitcValue(float heuristicValue);
 
@@ -76,6 +78,7 @@ private:
 	bool		      m_coverProvided[NumberOfDirections]; // Tells whether this node is covered from some directions or is all in the open
 	EntityTeam        m_territoryOwner;					   // Tells whether this node is part of the base of a team
 	bool              m_isEntranceToBase;				   // Tells whether the node is an entrance node into a team base
+	EntityTeam        m_isAttackPosition;			       // Tells for which team this node is an attack position.
 
 	// Needed for pathfinding
 	std::vector<Node*> m_adjacentNodes;				   // The nodes in the graph that can be directly reached from this one

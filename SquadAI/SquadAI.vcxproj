@@ -85,6 +85,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActiveSelector.cpp" />
+    <ClCompile Include="CoordinatedBaseAttack.cpp" />
+    <ClCompile Include="DistractionBaseAttack.cpp" />
     <ClCompile Include="InitiateTeamManoeuvre.cpp" />
     <ClCompile Include="ReturnDroppedFlag.cpp" />
     <ClCompile Include="RunTheFlagHome.cpp" />
@@ -202,6 +204,8 @@
   <ItemGroup>
     <ClInclude Include="ActiveSelector.h" />
     <ClInclude Include="AimAtTarget.h" />
+    <ClInclude Include="CoordinatedBaseAttack.h" />
+    <ClInclude Include="DistractionBaseAttack.h" />
     <ClInclude Include="InitiateTeamManoeuvre.h" />
     <ClInclude Include="ReturnDroppedFlag.h" />
     <ClInclude Include="RunTheFlagHome.h" />

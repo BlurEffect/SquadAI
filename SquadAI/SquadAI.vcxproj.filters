@@ -507,6 +507,12 @@
     <ClCompile Include="ReturnDroppedFlag.cpp">
       <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
+    <ClCompile Include="DistractionBaseAttack.cpp">
+      <Filter>Source Files\Manoeuvres</Filter>
+    </ClCompile>
+    <ClCompile Include="CoordinatedBaseAttack.cpp">
+      <Filter>Source Files\Manoeuvres</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -900,6 +906,12 @@
       <Filter>Header Files\BehaviourTree\TeamBehaviours\Actions</Filter>
     </ClInclude>
     <ClInclude Include="ReturnDroppedFlag.h">
+      <Filter>Header Files\Manoeuvres</Filter>
+    </ClInclude>
+    <ClInclude Include="DistractionBaseAttack.h">
+      <Filter>Header Files\Manoeuvres</Filter>
+    </ClInclude>
+    <ClInclude Include="CoordinatedBaseAttack.h">
       <Filter>Header Files\Manoeuvres</Filter>
     </ClInclude>
   </ItemGroup>

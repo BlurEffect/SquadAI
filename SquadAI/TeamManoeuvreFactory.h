@@ -15,6 +15,8 @@
 #include "RushBaseAttack.h"
 #include "RunTheFlagHome.h"
 #include "ReturnDroppedFlag.h"
+#include "CoordinatedBaseAttack.h"
+#include "DistractionBaseAttack.h"
 
 // Forward declarations
 class TeamAI;

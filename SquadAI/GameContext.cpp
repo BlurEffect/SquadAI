@@ -50,17 +50,18 @@ void GameContext::AddScore(EntityTeam team, unsigned int score)
 //--------------------------------------------------------------------------------------
 // Adds a a number of kills to the total killcount of a team.
 // Param1: The team, for which to increase the killcount.
-// Param1: The team, a member of which was killed.
-// Param2: The id of the entity that was killed.
+// Param2: The team, a member of which was killed.
+// Param3: The id of the entity that was killed.
+// Param4: The id of the entity that killed the other entity.
 //--------------------------------------------------------------------------------------
-void GameContext::AddKill(EntityTeam team, EntityTeam victimTeam, unsigned long entityId)
+void GameContext::AddKill(EntityTeam team, EntityTeam victimTeam, unsigned long entityId, unsigned shooterId)
 {
 	if(!m_terminated)
 	{
 		m_kills[team] += 1;
 
 		// Notify the team AIs
-		EntityKilledMessageData data(victimTeam, entityId);
+		EntityKilledMessageData data(victimTeam, entityId, shooterId);
 		BroadcastMessage(EntityKilledMessageType, &data);
 	}
 }

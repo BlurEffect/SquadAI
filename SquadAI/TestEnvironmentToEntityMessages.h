@@ -21,12 +21,14 @@ using namespace DirectX;
 //--------------------------------------------------------------------------------------
 struct EntityKilledMessageData
 {
-	EntityKilledMessageData(EntityTeam team, unsigned long id) : m_team(team),
-																 m_id(id)
+	EntityKilledMessageData(EntityTeam team, unsigned long id, unsigned long shotterId) : m_team(team),
+																						  m_id(id),
+																						  m_shooterId(shotterId)
 	{}
 
-	EntityTeam    m_team; // The team that the killed entity belongs to
-	unsigned long m_id;   // The id of the entity that was killed
+	EntityTeam    m_team;		// The team that the killed entity belongs to
+	unsigned long m_id;			// The id of the entity that was killed
+	unsigned long m_shooterId;	// The id of the entity that shot the projectile killing the entity
 };
 
 //--------------------------------------------------------------------------------------

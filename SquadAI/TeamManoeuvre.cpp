@@ -22,7 +22,7 @@ TeamManoeuvre::TeamManoeuvre(TeamManoeuvreType type, TeamManoeuvreCategory categ
 
 TeamManoeuvre::~TeamManoeuvre(void)
 {
-	ClearOrders();
+	Reset();
 }
 
 //--------------------------------------------------------------------------------------
@@ -62,10 +62,6 @@ void TeamManoeuvre::RemoveParticipant(unsigned long id)
 
 		// Remove the entity from the participants
 		m_participants.erase(foundIt);
-	}else
-	{
-		//DEBUG
-		int a = 3;
 	}
 }
 

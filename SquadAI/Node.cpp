@@ -16,6 +16,7 @@ Node::Node() : m_nodeId(0),
 			   m_pObstacle(nullptr),
 			   m_territoryOwner(EntityTeam(None)),
 			   m_isEntranceToBase(false),
+			   m_isAttackPosition(None),
 			   m_movementCost(0.0f),
 			   m_heuristicValue(0.0f)
 {
@@ -77,6 +78,7 @@ void Node::Reset(void)
 	m_isObstacle     = false;
 	m_pObstacle      = nullptr;
 	m_isEntranceToBase = false;
+	m_isAttackPosition = None;
 	m_territoryOwner = None;
 
 	for(unsigned int i = 0; i < NumberOfDirections; ++i)
@@ -125,6 +127,11 @@ bool Node::IsCovered(Direction direction) const
 EntityTeam Node::GetTerritoryOwner(void) const
 {
 	return m_territoryOwner;
+}
+
+EntityTeam Node::GetAttackPosition(void) const
+{
+	return m_isAttackPosition;
 }
 
 bool Node::IsEntranceToBase(void) const
@@ -192,6 +199,11 @@ void Node::SetTerritoryOwner(EntityTeam team)
 void Node::SetEntranceToBase(bool isEntrance)
 {
 	m_isEntranceToBase = isEntrance;
+}
+
+void Node::SetAttackPosition(EntityTeam team)
+{
+	m_isAttackPosition = team;
 }
 
 void Node::SetMovementCost(float cost) 

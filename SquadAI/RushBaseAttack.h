@@ -22,19 +22,17 @@ enum BehaviourStatus;
 //--------------------------------------------------------------------------------------
 struct RushBaseAttackInitData
 {
-	RushBaseAttackInitData(float waitForParticipantsInterval, float assemblyPointDistance) 
-		: m_waitForParticipantsInterval(waitForParticipantsInterval),
-	      m_assemblyPointDistance(assemblyPointDistance)
+	RushBaseAttackInitData(float waitForParticipantsInterval) 
+		: m_waitForParticipantsInterval(waitForParticipantsInterval)
 	{}
 
 	float m_waitForParticipantsInterval; // Determines after what time the participants will start the actual attack
-	float m_assemblyPointDistance;       // Determines how far the assembly point is away from the enemy base (guideline)
 };
 
 class RushBaseAttack : public TeamManoeuvre
 {
 public:
-	RushBaseAttack(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float waitForParticipantsInterval, float assemblyPointDistance);
+	RushBaseAttack(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float waitForParticipantsInterval);
 	~RushBaseAttack(void);
 
 	// To be overwritten by derived manoeuvre classes
@@ -49,12 +47,10 @@ public:
 	MultiflagCTFTeamAI* GetTeamAI(void);
 	float GetWaitForParticipantsInterval(void) const;
 	const XMFLOAT2& GetAssemblyPoint(void) const;
-	float GetAssemblyPointDistance(void) const;
 
 	void SetTeamAI(MultiflagCTFTeamAI* pTeamAI);
 	void SetWaitForParticipantsInterval(float interval);
 	void SetAssemblyPoint(const XMFLOAT2& assemblyPoint);
-	void SetAssemblyPointDistance(float distance);
 
 protected:
 	
@@ -77,7 +73,6 @@ private:
 	ManoeuvrePhase m_currentPhase;       // The phase the manoeuvre is currently in
 	float m_waitForParticipantsInterval; // Determines after what time the participants will start the actual attack
 	XMFLOAT2 m_assemblyPoint;            // The position, at which to assemble the participants before starting the actual attack
-	float m_assemblyPointDistance;       // Determines how far the assembly point will be away from the enemy base (just a guideline)
 	float m_timer;					     // Keeps track of the time passed since the initiation of the manoeuvre
 	MultiflagCTFTeamAI* m_pTeamAI;       // The team AI able to use this manoeuvre (in this case a specific Multiflag Team AI is required)
 

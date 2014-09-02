@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ActiveBaseDefence.cpp" />
     <ClCompile Include="ActiveSelector.cpp" />
     <ClCompile Include="CoordinatedBaseAttack.cpp" />
     <ClCompile Include="DistractionBaseAttack.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="ManoeuvreStillValid.cpp" />
     <ClCompile Include="RushBaseAttack.cpp" />
     <ClCompile Include="SimpleBaseAttack.cpp" />
+    <ClCompile Include="SimpleBaseDefence.cpp" />
     <ClCompile Include="TeamManoeuvre.cpp" />
     <ClCompile Include="TeamActiveCharacteristicSelector.cpp" />
     <ClCompile Include="TeamActiveSelector.cpp" />
@@ -204,11 +206,14 @@
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActiveBaseDefence.h" />
     <ClInclude Include="ActiveSelector.h" />
     <ClInclude Include="AimAtTarget.h" />
     <ClInclude Include="CoordinatedBaseAttack.h" />
     <ClInclude Include="DistractionBaseAttack.h" />
+    <ClInclude Include="GuardedFlagCapture.h" />
     <ClInclude Include="InitiateTeamManoeuvre.h" />
+    <ClInclude Include="InterceptFlagCarrier.h" />
     <ClInclude Include="PickUpDroppedFlag.h" />
     <ClInclude Include="ReturnDroppedFlag.h" />
     <ClInclude Include="RunTheFlagHome.h" />
@@ -248,6 +253,7 @@
     <ClInclude Include="ManoeuvrePreconditionsFulfilled.h" />
     <ClInclude Include="RushBaseAttack.h" />
     <ClInclude Include="SimpleBaseAttack.h" />
+    <ClInclude Include="SimpleBaseDefence.h" />
     <ClInclude Include="TeamActiveCharacteristicSelector.h" />
     <ClInclude Include="LookAtTarget.h" />
     <ClInclude Include="TeamComposite.h" />

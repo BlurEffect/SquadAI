@@ -38,16 +38,32 @@ void DefendBaseEntrances::ProcessMessage(Message* pMessage)
 	if(pMsg->GetData().m_team == GetTeamAI()->GetTeam() && IsParticipant(pMsg->GetData().m_id))
 	{
 		// Remember the last view direction of the entity that was killed
-		XMFLOAT2 lastViewDirection = GetParticipant(pMsg->GetData().m_id)->GetViewDirection();
+		//XMFLOAT2 lastViewDirection = GetParticipant(pMsg->GetData().m_id)->GetViewDirection();
 
 		// Participants that get killed, drop out of the manoeuvre
 		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_id);
 
 		// A defender was killed, send all idle defenders to the entrance the killed entity was guarding to prevent a 
 		// likely intrusion of enemies.
-		ShiftDefense(m_guardedEntrances.at(pMsg->GetData().m_id).m_entranceDirection, m_guardedEntrances.at(pMsg->GetData().m_id).m_entrancePosition, lastViewDirection); 
+		//ShiftDefense(m_guardedEntrances.at(pMsg->GetData().m_id).m_entranceDirection, m_guardedEntrances.at(pMsg->GetData().m_id).m_entrancePosition, lastViewDirection); 
 	}
 	break;
+	}
+	case AttackedByEnemyMessageType:
+	{
+		AttackedByEnemyMessage* pMsg = reinterpret_cast<AttackedByEnemyMessage*>(pMessage);
+
+		if(IsParticipant(pMsg->GetData().m_entityId))
+		{
+			// Get the attack direction
+			XMFLOAT2 viewDirection(0.0f, 0.0f);
+			XMStoreFloat2(&viewDirection, XMLoadFloat2(&pMsg->GetData().m_attackPosition) - XMLoadFloat2(&GetParticipant(pMsg->GetData().m_entityId)->GetPosition()));
+
+			// A defender was attacked, send all idle defenders to the entrance that is being attacked
+			ShiftDefense(m_guardedEntrances.at(pMsg->GetData().m_entityId).m_entranceDirection, m_guardedEntrances.at(pMsg->GetData().m_entityId).m_entrancePosition, viewDirection); 
+		}
+
+		break;
 	}
 	case UpdateOrderStateMessageType:
 	{

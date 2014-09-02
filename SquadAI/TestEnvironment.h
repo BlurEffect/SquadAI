@@ -73,6 +73,7 @@ public:
 
 	void GetNearbyObjects(const XMFLOAT2& position, float radius, EntityGroup entityGroup, std::multimap<float, CollidableObject*>& collisionObjects);
 	bool GetRandomUnblockedTarget(XMFLOAT2& outPosition) const;
+	bool GetRandomUnblockedTargetInArea(const XMFLOAT2& centre, float radius, XMFLOAT2& outPosition) const;
 
 	//const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
 	bool CheckLineOfSightGrid(int startGridX, int startGridY, int endGridX, int endGridY);
@@ -88,6 +89,8 @@ public:
 	bool IsBlocked(const XMFLOAT2 worldPos) const;
 	EntityTeam GetTerritoryOwner(const XMFLOAT2 worldPos) const;
 
+
+
 	// Data access functions
 	float		 GetGridSize(void) const;
 	unsigned int GetNumberOfGridPartitions(void) const;
@@ -97,6 +100,8 @@ public:
 
 	const std::unordered_map<Direction, std::vector<XMFLOAT2>>& GetBaseEntrances(EntityTeam team) const;
 	const std::unordered_map<Direction, std::vector<XMFLOAT2>>& GetAttackPositions(EntityTeam team) const;
+	const std::vector<XMFLOAT2>& GetBaseFieldPositions(EntityTeam team) const;
+
 	Pathfinder&  GetPathfinder(void);
 	Node**	     GetNodes(void);
 
@@ -148,6 +153,7 @@ private:
 
 	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_baseEntrances[NumberOfTeams-1]; // The base entrances and the directions they're facing at
 	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_attackPositions[NumberOfTeams-1]; // The attack positions and the attack direction associated to them
+	std::vector<XMFLOAT2> m_baseFieldPositions[NumberOfTeams-1]; // The world positions of the team base grid fields for each team
 
 	Pathfinder   m_pathfinder;                              // The pathfinder associated to this environment.
 	float        m_objectScaleFactors[NumberOfObjectTypes]; // Determines the scale of the different objects in relation to a grid field

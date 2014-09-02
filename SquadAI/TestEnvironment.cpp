@@ -618,6 +618,12 @@ bool TestEnvironment::PrepareSimulation(void)
 			//m_pGameContext->ProcessMessage(&message);
 			break;
 			}
+		case RedBaseAreaType:
+			m_baseFieldPositions[TeamRed].push_back(it->GetPosition());
+			break;
+		case BlueBaseAreaType:
+			m_baseFieldPositions[TeamBlue].push_back(it->GetPosition());
+			break;
 		case RedSpawnPointType:
 			m_spawnPoints[TeamRed].push_back(it->GetPosition());
 			break;
@@ -1145,6 +1151,18 @@ bool TestEnvironment::GetRandomUnblockedTarget(XMFLOAT2& outPosition) const
 	return true;
 }
 
+//--------------------------------------------------------------------------------------
+// Randomly determines a position within a certain area of the test environment that is 
+// not occupied by an obstacle. 
+// Param1: The centre of the area, in which the random position should lie.
+// Param2: Radius around the centre of the area, in which the result position will lie.
+// Param3: Out paramter that will hold the randomly determined target position.
+// Returns true if a position was found false otherwise.
+//--------------------------------------------------------------------------------------
+bool TestEnvironment::GetRandomUnblockedTargetInArea(const XMFLOAT2& centre, float radius, XMFLOAT2& outPosition) const
+{
+
+}
 
 //--------------------------------------------------------------------------------------
 // Checks for collisions between a moving entity and a specified group of other entities. Collision
@@ -1599,6 +1617,7 @@ void TestEnvironment::EndSimulation(void)
 		m_pTeamAI[i]->Reset();
 		m_baseEntrances[i].clear();
 		m_attackPositions[i].clear();
+		m_baseFieldPositions[i].clear();
 	}
 
 	m_id = 0;
@@ -2070,6 +2089,11 @@ const std::unordered_map<Direction, std::vector<XMFLOAT2>>& TestEnvironment::Get
 const std::unordered_map<Direction, std::vector<XMFLOAT2>>& TestEnvironment::GetAttackPositions(EntityTeam team) const
 {
 	return m_attackPositions[team];
+}
+
+const std::vector<XMFLOAT2>& TestEnvironment::GetBaseFieldPositions(EntityTeam team) const
+{
+	return m_baseFieldPositions[team];
 }
 
 float TestEnvironment::GetGridSize(void) const

@@ -127,6 +127,13 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	}
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(PickUpDroppedFlagManoeuvre, pPickUpDroppedFlag));
 
+	// Simple base defence manoeuvre
+	TeamManoeuvre* pSimpleBaseDefence = TeamManoeuvreFactory::CreateTeamManoeuvre(SimpleBaseDefenceManoeuvre, 1, 3, this, nullptr);
+	if(!pSimpleBaseDefence)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(SimpleBaseDefenceManoeuvre, pSimpleBaseDefence));
 
 	return true;
 }
@@ -305,37 +312,41 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 		}
 
 		// Don't count flag carriers!
-		return (numberOfAvailableEntities >= m_manoeuvres[DefendBaseEntrancesManoeuvre]->GetMinNumberOfParticipants()) &&
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[GetTeam()].m_state == InBase);
 		break;
 	case RushBaseAttackManoeuvre:
-		return (numberOfAvailableEntities >= m_manoeuvres[RushBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[enemyTeam].m_state == InBase);
 		break;
 	case CoordinatedBaseAttackManoeuvre:
-		return (numberOfAvailableEntities >= m_manoeuvres[CoordinatedBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 				(m_flagData[enemyTeam].m_state == InBase);
 		break;
 	case DistractionBaseAttackManoeuvre:
-		return (numberOfAvailableEntities >= m_manoeuvres[DistractionBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 				(m_flagData[enemyTeam].m_state == InBase);
 		break;
 	case SimpleBaseAttackManoeuvre:
-		return (numberOfAvailableEntities >= m_manoeuvres[SimpleBaseAttackManoeuvre]->GetMinNumberOfParticipants()) &&
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 				(m_flagData[enemyTeam].m_state == InBase);
 		break;
 	case PickUpDroppedFlagManoeuvre:
-		return (numberOfAvailableEntities >= m_manoeuvres[PickUpDroppedFlagManoeuvre]->GetMinNumberOfParticipants()) &&
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 				(m_flagData[enemyTeam].m_state == Dropped);
 		break;
 	case RunTheFlagHomeManoeuvre:
 		// Only check for flag carrier
-		return //(numberOfAvailableEntities >= m_manoeuvres[RunTheFlagHomeManoeuvre]->GetMinNumberOfParticipants()) &&
+		return //(numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[enemyTeam].m_state == Stolen);
 		break;
 	case ReturnDroppedFlagManoeuvre:
-		return (numberOfAvailableEntities >= m_manoeuvres[RunTheFlagHomeManoeuvre]->GetMinNumberOfParticipants()) &&
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[GetTeam()].m_state == Dropped);
+		break;
+	case SimpleBaseDefenceManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
+			   (m_flagData[GetTeam()].m_state == InBase);
 		break;
 	default:
 		return TeamAI::ManoeuvrePreconditionsFulfilled(manoeuvre);
@@ -384,6 +395,9 @@ bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 		break;
 	case ReturnDroppedFlagManoeuvre:
 		return (m_flagData[GetTeam()].m_state == Dropped);
+		break;
+	case SimpleBaseDefenceManoeuvre:
+		return (m_flagData[GetTeam()].m_state == InBase);
 		break;
 	default:
 		return TeamAI::ManoeuvreStillValid(manoeuvre);
@@ -641,6 +655,31 @@ BehaviourStatus MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvr
 
 		return m_manoeuvres[manoeuvre]->Initiate();
 
+		break;
+		}
+	case SimpleBaseDefenceManoeuvre:
+		{
+		// Keep track of how many entities have been added to the manoeuvre.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = GetTeamMembers().begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities < m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants()) && (it != GetTeamMembers().end()))
+		{
+			// If the entity is not engaged in another manoeuver, add it to this one.
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()] && (m_flagData[enemyTeam].m_state != Stolen || (*it)->GetId() != m_flagData[enemyTeam].m_carrierId))
+			{
+				m_manoeuvres[manoeuvre]->AddParticipant(*it);
+				// Remember that this entity is now executing that manoeuver
+				m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+				++addedEntities;
+			}
+			++it;
+		}
+
+		// Initiate the manoeuvre
+		return m_manoeuvres[manoeuvre]->Initiate();
 		break;
 		}
 	default:

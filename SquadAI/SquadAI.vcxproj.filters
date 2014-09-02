@@ -531,6 +531,12 @@
     <ClCompile Include="ReturnDroppedFlag.cpp">
       <Filter>Source Files\Manoeuvres\Protect Own Flag</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleBaseDefence.cpp">
+      <Filter>Source Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="ActiveBaseDefence.cpp">
+      <Filter>Source Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">
@@ -936,6 +942,18 @@
       <Filter>Header Files\Manoeuvres\Protect Own Flag</Filter>
     </ClInclude>
     <ClInclude Include="ReturnDroppedFlag.h">
+      <Filter>Header Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="InterceptFlagCarrier.h">
+      <Filter>Header Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="GuardedFlagCapture.h">
+      <Filter>Header Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="ActiveBaseDefence.h">
+      <Filter>Header Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleBaseDefence.h">
       <Filter>Header Files\Manoeuvres\Protect Own Flag</Filter>
     </ClInclude>
   </ItemGroup>

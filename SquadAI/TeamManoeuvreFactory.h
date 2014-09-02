@@ -19,6 +19,7 @@
 #include "DistractionBaseAttack.h"
 #include "SimpleBaseAttack.h"
 #include "PickUpDroppedFlag.h"
+#include "SimpleBaseDefence.h"
 
 // Forward declarations
 class TeamAI;

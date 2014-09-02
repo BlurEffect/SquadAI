@@ -36,7 +36,11 @@ enum TeamManoeuvreType
 	CoordinatedBaseAttackManoeuvre,
 	DistractionBaseAttackManoeuvre,
 	SimpleBaseAttackManoeuvre,
-	PickUpDroppedFlagManoeuvre
+	PickUpDroppedFlagManoeuvre,
+	SimpleBaseDefenceManoeuvre,
+	ActiveBaseDefenceManoeuvre,
+	InterceptFlagCarrierManoeuvre,
+	GuardedFlagCaptureManoeuvre
 };
 
 //--------------------------------------------------------------------------------------

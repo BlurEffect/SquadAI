@@ -432,9 +432,11 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 				TeamBehaviour* pPickUpDroppedFlagSequence		= CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "PickUpDroppedFlagSequence", nullptr);
 				TeamBehaviour* pDefendBaseEntrancesSequence		= CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "DefendBaseEntrancesSequence", nullptr);
 				TeamBehaviour* pReturnDroppedFlagSequence		= CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "ReturnDroppedFlagSequence", nullptr);
+				TeamBehaviour* pSimpleBaseDefenceSequence		= CreateParentTeamBehaviour(TeamSequenceType, pTeamAI, "SimpleBaseDefenceSequence", nullptr);
+
 
 				if(pRunTheFlagHomeSequence && pRushBaseAttackSequence && pCoordinatedBaseAttackSequence && pDistractionBaseAttackSequence && 
-				   pSimpleBaseAttackSequence && pPickUpDroppedFlagSequence && pDefendBaseEntrancesSequence && pReturnDroppedFlagSequence)
+				   pSimpleBaseAttackSequence && pPickUpDroppedFlagSequence && pDefendBaseEntrancesSequence && pReturnDroppedFlagSequence && pSimpleBaseDefenceSequence)
 				{
 					if(pTeamAI->GetTeam() == TeamRed)
 					{
@@ -444,8 +446,9 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pDistractionBaseAttackSequence);
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pSimpleBaseAttackSequence);
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pPickUpDroppedFlagSequence);
-						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pDefendBaseEntrancesSequence);
+						//reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pDefendBaseEntrancesSequence);
 						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pReturnDroppedFlagSequence);
+						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pSimpleBaseDefenceSequence);
 					}else
 					{
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pRunTheFlagHomeSequence);
@@ -456,6 +459,7 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pPickUpDroppedFlagSequence);
 						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pDefendBaseEntrancesSequence);
 						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pReturnDroppedFlagSequence);
+						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pSimpleBaseDefenceSequence);
 					}
 
 					// The precondition checks for each of the manoeuvres
@@ -475,6 +479,9 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 					TeamBehaviour* pDefendBaseEntrancesPreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "DefendBaseEntrancesPreconditionsCheck", 0.0f, 0.0f, &defendBaseEntrancesInitData);
 					ManoeuvrePreconditionsFulfilledInitData returnDroppedFlagInitData(ReturnDroppedFlagManoeuvre);
 					TeamBehaviour* pReturnDroppedFlagPreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "ReturnDroppedFlagPreconditionsCheck", 0.0f, 0.0f, &returnDroppedFlagInitData);
+					ManoeuvrePreconditionsFulfilledInitData simpleBaseDefenceInitData(SimpleBaseDefenceManoeuvre);
+					TeamBehaviour* pSimpleBaseDefencePreconditionsCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvrePreconditionsFulfilledType, pTeamAI, "SimpleBaseDefencePreconditionsCheck", 0.0f, 0.0f, &simpleBaseDefenceInitData);
+
 
 					// The manoeuvre initiation actions that have to be executed before beginning the execution of the actual behaviours
 					InitiateTeamManoeuvreInitData initiateRunTheFlagHomeInitData(RunTheFlagHomeManoeuvre);
@@ -493,6 +500,9 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 					TeamBehaviour* pDefendBaseEntrancesInitiationAction = CreatePrimitiveTeamBehaviour(TeamInitiateManoeuvreType, pTeamAI, "DefendBaseEntrancesInitiationAction", 0.0f, 0.0f, &initiateDefendBaseEntrancesInitData);
 					InitiateTeamManoeuvreInitData initiateReturnDroppedFlagInitData(ReturnDroppedFlagManoeuvre);
 					TeamBehaviour* pReturnDroppedFlagInitiationAction = CreatePrimitiveTeamBehaviour(TeamInitiateManoeuvreType, pTeamAI, "ReturnDroppedFlagInitiationAction", 0.0f, 0.0f, &initiateReturnDroppedFlagInitData);
+					InitiateTeamManoeuvreInitData initiateSimpleBaseDefenceInitData(SimpleBaseDefenceManoeuvre);
+					TeamBehaviour* pSimpleBaseDefenceInitiationAction = CreatePrimitiveTeamBehaviour(TeamInitiateManoeuvreType, pTeamAI, "SimpleBaseDefenceInitiationAction", 0.0f, 0.0f, &initiateSimpleBaseDefenceInitData);
+
 
 					// The monitors constantly checking if the manoeuvres are still valid or should be aborted
 					TeamBehaviour* pRunTheFlagHomeMonitor			= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "RunTheFlagHomeMonitor", nullptr);
@@ -503,11 +513,12 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 					TeamBehaviour* pPickUpDroppedFlagMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "PickUpDroppedFlagMonitor", nullptr);
 					TeamBehaviour* pDefendBaseEntrancesMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "DefendBaseEntrancesMonitor", nullptr);
 					TeamBehaviour* pReturnDroppedFlagMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "ReturnDroppedFlagMonitor", nullptr);
+					TeamBehaviour* pSimpleBaseDefenceMonitor		= CreateParentTeamBehaviour(TeamMonitorType, pTeamAI, "SimpleBaseDefenceMonitor", nullptr);
+					
 
-
-					if(pRunTheFlagHomePreconditionsCheck && pRushBaseAttackPreconditionsCheck && pCoordinatedBaseAttackPreconditionsCheck && pDistractionBaseAttackPreconditionsCheck && pSimpleBaseAttackPreconditionsCheck && pPickUpDroppedFlagPreconditionsCheck && pDefendBaseEntrancesPreconditionsCheck && pReturnDroppedFlagPreconditionsCheck &&
-					   pRunTheFlagHomeInitiationAction && pRushBaseAttackInitiationAction && pCoordinatedBaseAttackInitiationAction && pDistractionBaseAttackInitiationAction && pSimpleBaseAttackInitiationAction && pPickUpDroppedFlagInitiationAction && pDefendBaseEntrancesInitiationAction && pReturnDroppedFlagInitiationAction &&
-					   pRunTheFlagHomeMonitor && pRushBaseAttackMonitor && pCoordinatedBaseAttackMonitor && pDistractionBaseAttackMonitor && pSimpleBaseAttackMonitor && pPickUpDroppedFlagMonitor && pDefendBaseEntrancesMonitor && pReturnDroppedFlagMonitor)
+					if(pRunTheFlagHomePreconditionsCheck && pRushBaseAttackPreconditionsCheck && pCoordinatedBaseAttackPreconditionsCheck && pDistractionBaseAttackPreconditionsCheck && pSimpleBaseAttackPreconditionsCheck && pPickUpDroppedFlagPreconditionsCheck && pDefendBaseEntrancesPreconditionsCheck && pReturnDroppedFlagPreconditionsCheck && pSimpleBaseDefencePreconditionsCheck &&
+					   pRunTheFlagHomeInitiationAction && pRushBaseAttackInitiationAction && pCoordinatedBaseAttackInitiationAction && pDistractionBaseAttackInitiationAction && pSimpleBaseAttackInitiationAction && pPickUpDroppedFlagInitiationAction && pDefendBaseEntrancesInitiationAction && pReturnDroppedFlagInitiationAction && pSimpleBaseDefenceInitiationAction &&
+					   pRunTheFlagHomeMonitor && pRushBaseAttackMonitor && pCoordinatedBaseAttackMonitor && pDistractionBaseAttackMonitor && pSimpleBaseAttackMonitor && pPickUpDroppedFlagMonitor && pDefendBaseEntrancesMonitor && pReturnDroppedFlagMonitor && pSimpleBaseDefenceMonitor)
 					{
 						reinterpret_cast<TeamComposite*>(pRunTheFlagHomeSequence)->AddChild(pRunTheFlagHomePreconditionsCheck);
 						reinterpret_cast<TeamComposite*>(pRunTheFlagHomeSequence)->AddChild(pRunTheFlagHomeInitiationAction);
@@ -533,6 +544,10 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 						reinterpret_cast<TeamComposite*>(pReturnDroppedFlagSequence)->AddChild(pReturnDroppedFlagPreconditionsCheck);
 						reinterpret_cast<TeamComposite*>(pReturnDroppedFlagSequence)->AddChild(pReturnDroppedFlagInitiationAction);
 						reinterpret_cast<TeamComposite*>(pReturnDroppedFlagSequence)->AddChild(pReturnDroppedFlagMonitor);
+						reinterpret_cast<TeamComposite*>(pSimpleBaseDefenceSequence)->AddChild(pSimpleBaseDefencePreconditionsCheck);
+						reinterpret_cast<TeamComposite*>(pSimpleBaseDefenceSequence)->AddChild(pSimpleBaseDefenceInitiationAction);
+						reinterpret_cast<TeamComposite*>(pSimpleBaseDefenceSequence)->AddChild(pSimpleBaseDefenceMonitor);
+
 
 						// The condition checks performed during execution of the manoeuvres to ensure they are still valid
 						ManoeuvreStillValidInitData runTheFlagHomeStillValidInitData(RunTheFlagHomeManoeuvre);
@@ -551,7 +566,11 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 						TeamBehaviour* pDefendBaseEntrancesStillValidCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvreStillValidType, pTeamAI, "DefendBaseEntrancesStillValidCheck", 0.0f, 0.0f, &defendBaseEntrancesStillValidInitData);
 						ManoeuvreStillValidInitData returnDroppedFlagStillValidInitData(ReturnDroppedFlagManoeuvre);
 						TeamBehaviour* pReturnDroppedFlagStillValidCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvreStillValidType, pTeamAI, "ReturnDroppedFlagStillValidCheck", 0.0f, 0.0f, &returnDroppedFlagStillValidInitData);
+						ManoeuvreStillValidInitData simpleBaseDefenceStillValidInitData(SimpleBaseDefenceManoeuvre);
+						TeamBehaviour* pSimpleBaseDefenceStillValidCheck = CreatePrimitiveTeamBehaviour(TeamManoeuvreStillValidType, pTeamAI, "SimpleBaseDefenceStillValidCheck", 0.0f, 0.0f, &simpleBaseDefenceStillValidInitData);
 			
+
+
 						// The actual execution of the manoeuvres is handled by these actions
 						ExecuteTeamManoeuvreInitData executeRunTheFlagHomeInitData(RunTheFlagHomeManoeuvre);
 						TeamBehaviour* pExecuteRunTheFlagHomeAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteRunTheFlagHomeAction", 0.0f, 1.0f, &executeRunTheFlagHomeInitData);
@@ -567,11 +586,13 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 						TeamBehaviour* pExecutePickUpDroppedFlagAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecutePickUpDroppedFlagAction", 0.7f, 0.5f, &executePickUpDroppedFlagInitData);
 						ExecuteTeamManoeuvreInitData executeDefendBaseEntrancesInitData(DefendBaseEntrancesManoeuvre);
 						TeamBehaviour* pExecuteDefendBaseEntrancesAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteDefendBaseEntrancesAction", 0.0f, 1.0f, &executeDefendBaseEntrancesInitData);
-						ExecuteTeamManoeuvreInitData returnDroppedFlagInitData(ReturnDroppedFlagManoeuvre);
-						TeamBehaviour* pReturnDroppedFlagAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ReturnDroppedFlagAction", 0.5f, 0.5f, &returnDroppedFlagInitData);
+						ExecuteTeamManoeuvreInitData executeReturnDroppedFlagInitData(ReturnDroppedFlagManoeuvre);
+						TeamBehaviour* pExecuteReturnDroppedFlagAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteReturnDroppedFlagAction", 0.5f, 0.5f, &executeReturnDroppedFlagInitData);
+						ExecuteTeamManoeuvreInitData executeSimpleBaseDefenceInitData(SimpleBaseDefenceManoeuvre);
+						TeamBehaviour* pExecuteSimpleBaseDefenceAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteSimpleBaseDefenceAction", 0.3f, 0.3f, &executeSimpleBaseDefenceInitData);
 
-						if(pRunTheFlagHomeStillValidCheck && pRushBaseAttackStillValidCheck && pCoordinatedBaseAttackStillValidCheck && pDistractionBaseAttackStillValidCheck && pSimpleBaseAttackStillValidCheck && pPickUpDroppedFlagStillValidCheck && pDefendBaseEntrancesStillValidCheck && pReturnDroppedFlagStillValidCheck &&
-						   pExecuteRunTheFlagHomeAction && pExecuteRushBaseAttackAction && pExecuteCoordinatedBaseAttackAction && pExecuteDistractionBaseAttackAction && pExecuteSimpleBaseAttackAction && pExecutePickUpDroppedFlagAction && pExecuteDefendBaseEntrancesAction && pReturnDroppedFlagAction)
+						if(pRunTheFlagHomeStillValidCheck && pRushBaseAttackStillValidCheck && pCoordinatedBaseAttackStillValidCheck && pDistractionBaseAttackStillValidCheck && pSimpleBaseAttackStillValidCheck && pPickUpDroppedFlagStillValidCheck && pDefendBaseEntrancesStillValidCheck && pReturnDroppedFlagStillValidCheck && pSimpleBaseDefenceStillValidCheck &&
+						   pExecuteRunTheFlagHomeAction && pExecuteRushBaseAttackAction && pExecuteCoordinatedBaseAttackAction && pExecuteDistractionBaseAttackAction && pExecuteSimpleBaseAttackAction && pExecutePickUpDroppedFlagAction && pExecuteDefendBaseEntrancesAction && pExecuteReturnDroppedFlagAction && pExecuteSimpleBaseDefenceAction)
 						{
 							reinterpret_cast<TeamMonitor*>(pRunTheFlagHomeMonitor)->AddCondition(pRunTheFlagHomeStillValidCheck);
 							reinterpret_cast<TeamMonitor*>(pRunTheFlagHomeMonitor)->AddAction(pExecuteRunTheFlagHomeAction);
@@ -588,7 +609,9 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 							reinterpret_cast<TeamMonitor*>(pDefendBaseEntrancesMonitor)->AddCondition(pDefendBaseEntrancesStillValidCheck);
 							reinterpret_cast<TeamMonitor*>(pDefendBaseEntrancesMonitor)->AddAction(pExecuteDefendBaseEntrancesAction);
 							reinterpret_cast<TeamMonitor*>(pReturnDroppedFlagMonitor)->AddCondition(pReturnDroppedFlagStillValidCheck);
-							reinterpret_cast<TeamMonitor*>(pReturnDroppedFlagMonitor)->AddAction(pReturnDroppedFlagAction);
+							reinterpret_cast<TeamMonitor*>(pReturnDroppedFlagMonitor)->AddAction(pExecuteReturnDroppedFlagAction);
+							reinterpret_cast<TeamMonitor*>(pSimpleBaseDefenceMonitor)->AddCondition(pSimpleBaseDefenceStillValidCheck);
+							reinterpret_cast<TeamMonitor*>(pSimpleBaseDefenceMonitor)->AddAction(pExecuteSimpleBaseDefenceAction);
 
 							return pTeamParallelRoot;
 						}

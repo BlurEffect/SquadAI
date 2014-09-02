@@ -112,6 +112,16 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 		return new PickUpDroppedFlag(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
 		break;
 		}
+	case SimpleBaseDefenceManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		return new SimpleBaseDefence(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
+		break;
+		}
 	default:
 		return nullptr;
 	}

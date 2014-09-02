@@ -175,6 +175,18 @@
     <Filter Include="Source Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes">
       <UniqueIdentifier>{d439ae08-4067-42d5-9a25-d8997e788218}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Manoeuvres\Protect Own Flag">
+      <UniqueIdentifier>{43296a93-111b-40cc-8a3f-a727781bedeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Manoeuvres\Attack Enemy Flag">
+      <UniqueIdentifier>{d9d78174-016f-45ee-9bff-51fff8cb824e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Manoeuvres\Attack Enemy Flag">
+      <UniqueIdentifier>{b0a83bd3-3479-4526-a1b2-d42a74033b66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Manoeuvres\Protect Own Flag">
+      <UniqueIdentifier>{86c1e767-5884-4573-8f61-bfdf91b823a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SimplePixelShader.cpp">
@@ -492,26 +504,32 @@
     <ClCompile Include="ManoeuvreStillValid.cpp">
       <Filter>Source Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="DefendBaseEntrances.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
-    </ClCompile>
-    <ClCompile Include="RushBaseAttack.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
-    </ClCompile>
-    <ClCompile Include="RunTheFlagHome.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
-    </ClCompile>
     <ClCompile Include="InitiateTeamManoeuvre.cpp">
       <Filter>Source Files\BehaviourTree\TeamBehaviours\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="ReturnDroppedFlag.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
+    <ClCompile Include="CoordinatedBaseAttack.cpp">
+      <Filter>Source Files\Manoeuvres\Attack Enemy Flag</Filter>
     </ClCompile>
     <ClCompile Include="DistractionBaseAttack.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
+      <Filter>Source Files\Manoeuvres\Attack Enemy Flag</Filter>
     </ClCompile>
-    <ClCompile Include="CoordinatedBaseAttack.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
+    <ClCompile Include="PickUpDroppedFlag.cpp">
+      <Filter>Source Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="RunTheFlagHome.cpp">
+      <Filter>Source Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="RushBaseAttack.cpp">
+      <Filter>Source Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleBaseAttack.cpp">
+      <Filter>Source Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="DefendBaseEntrances.cpp">
+      <Filter>Source Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="ReturnDroppedFlag.cpp">
+      <Filter>Source Files\Manoeuvres\Protect Own Flag</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -893,26 +911,32 @@
     <ClInclude Include="ManoeuvreStillValid.h">
       <Filter>Header Files\BehaviourTree\TeamBehaviours\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="DefendBaseEntrances.h">
-      <Filter>Header Files\Manoeuvres</Filter>
-    </ClInclude>
-    <ClInclude Include="RushBaseAttack.h">
-      <Filter>Header Files\Manoeuvres</Filter>
-    </ClInclude>
-    <ClInclude Include="RunTheFlagHome.h">
-      <Filter>Header Files\Manoeuvres</Filter>
-    </ClInclude>
     <ClInclude Include="InitiateTeamManoeuvre.h">
       <Filter>Header Files\BehaviourTree\TeamBehaviours\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="ReturnDroppedFlag.h">
-      <Filter>Header Files\Manoeuvres</Filter>
+    <ClInclude Include="CoordinatedBaseAttack.h">
+      <Filter>Header Files\Manoeuvres\Attack Enemy Flag</Filter>
     </ClInclude>
     <ClInclude Include="DistractionBaseAttack.h">
-      <Filter>Header Files\Manoeuvres</Filter>
+      <Filter>Header Files\Manoeuvres\Attack Enemy Flag</Filter>
     </ClInclude>
-    <ClInclude Include="CoordinatedBaseAttack.h">
-      <Filter>Header Files\Manoeuvres</Filter>
+    <ClInclude Include="PickUpDroppedFlag.h">
+      <Filter>Header Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="RunTheFlagHome.h">
+      <Filter>Header Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="RushBaseAttack.h">
+      <Filter>Header Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleBaseAttack.h">
+      <Filter>Header Files\Manoeuvres\Attack Enemy Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="DefendBaseEntrances.h">
+      <Filter>Header Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClInclude>
+    <ClInclude Include="ReturnDroppedFlag.h">
+      <Filter>Header Files\Manoeuvres\Protect Own Flag</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

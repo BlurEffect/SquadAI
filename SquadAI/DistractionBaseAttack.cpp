@@ -14,7 +14,7 @@
 #include "TestEnvironment.h"
 
 DistractionBaseAttack::DistractionBaseAttack(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, unsigned int numberOfSneakers, float waitForParticipantsInterval)
-	: TeamManoeuvre(CoordinatedBaseAttackManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(DistractionBaseAttackManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
 	  m_waitForParticipantsInterval(waitForParticipantsInterval),
 	  m_timer(0.0f),
@@ -61,7 +61,8 @@ void DistractionBaseAttack::ProcessMessage(Message* pMessage)
 		{
 			AttackedByEnemyMessage* pMsg = reinterpret_cast<AttackedByEnemyMessage*>(pMessage);
 
-			if(GetTeamAI()->GetTestEnvironment()->GetTerritoryOwner(pMsg->GetData().m_attackPosition))
+			if((m_distractionParticipants.find(pMsg->GetData().m_entityId) != m_distractionParticipants.end()) &&
+			   (GetTeamAI()->GetTestEnvironment()->GetTerritoryOwner(pMsg->GetData().m_attackPosition) != GetTeamAI()->GetTeam()))
 			{
 				StartSneakAttack();
 			}
@@ -154,7 +155,11 @@ void DistractionBaseAttack::ProcessMessage(Message* pMessage)
 				}
 			}else
 			{
-				m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
+				//m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
+
+				// Officially cancel the old order that was fulfilled and delete it.
+				//CancelOrder(pMsg->GetData().m_entityId);
+				//m_activeOrders.erase(m_activeOrders.find(pMsg->GetData().m_entityId));
 			}
 		
 		}else if(pMsg->GetData().m_orderState == FailedOrderState)

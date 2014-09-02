@@ -92,6 +92,26 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 		return new DistractionBaseAttack(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_numberOfSneakers, pData->m_waitForParticipantsInterval);
 		break;
 		}
+	case SimpleBaseAttackManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		return new SimpleBaseAttack(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
+		break;
+		}
+	case PickUpDroppedFlagManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		return new PickUpDroppedFlag(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
+		break;
+		}
 	default:
 		return nullptr;
 	}

@@ -88,6 +88,7 @@
     <ClCompile Include="CoordinatedBaseAttack.cpp" />
     <ClCompile Include="DistractionBaseAttack.cpp" />
     <ClCompile Include="InitiateTeamManoeuvre.cpp" />
+    <ClCompile Include="PickUpDroppedFlag.cpp" />
     <ClCompile Include="ReturnDroppedFlag.cpp" />
     <ClCompile Include="RunTheFlagHome.cpp" />
     <ClCompile Include="DefendBaseEntrances.cpp" />
@@ -95,6 +96,7 @@
     <ClCompile Include="ManoeuvrePreconditionsFulfilled.cpp" />
     <ClCompile Include="ManoeuvreStillValid.cpp" />
     <ClCompile Include="RushBaseAttack.cpp" />
+    <ClCompile Include="SimpleBaseAttack.cpp" />
     <ClCompile Include="TeamManoeuvre.cpp" />
     <ClCompile Include="TeamActiveCharacteristicSelector.cpp" />
     <ClCompile Include="TeamActiveSelector.cpp" />
@@ -207,6 +209,7 @@
     <ClInclude Include="CoordinatedBaseAttack.h" />
     <ClInclude Include="DistractionBaseAttack.h" />
     <ClInclude Include="InitiateTeamManoeuvre.h" />
+    <ClInclude Include="PickUpDroppedFlag.h" />
     <ClInclude Include="ReturnDroppedFlag.h" />
     <ClInclude Include="RunTheFlagHome.h" />
     <ClInclude Include="DefendBaseEntrances.h" />
@@ -244,6 +247,7 @@
     <ClInclude Include="Communicator.h" />
     <ClInclude Include="ManoeuvrePreconditionsFulfilled.h" />
     <ClInclude Include="RushBaseAttack.h" />
+    <ClInclude Include="SimpleBaseAttack.h" />
     <ClInclude Include="TeamActiveCharacteristicSelector.h" />
     <ClInclude Include="LookAtTarget.h" />
     <ClInclude Include="TeamComposite.h" />

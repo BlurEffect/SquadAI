@@ -65,6 +65,9 @@ bool Communicator::SendMessage(Communicator* pReceiver, MessageType messageType,
 	case UpdateEnemyPositionMessageType:
 		pMessage = new UpdateEnemyPositionMessage(*(reinterpret_cast<UpdateEnemyPositionMessageData*>(pData)));
 		break;
+	case AttackedByEnemyMessageType:
+		pMessage = new AttackedByEnemyMessage(*(reinterpret_cast<AttackedByEnemyMessageData*>(pData)));
+		break;
 	case ScoreUpdateMessageType:
 		pMessage = new ScoreUpdateMessage(*(reinterpret_cast<ScoreUpdateMessageData*>(pData)));
 		break;

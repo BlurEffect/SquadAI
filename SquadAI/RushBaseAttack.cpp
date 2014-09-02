@@ -191,8 +191,8 @@ void RushBaseAttack::DetermineAssemblyPoint(void)
 	// Randomly choose one of the attack positions set in edit mode as assembly point for the
 	// rush attack.
 
-	unsigned int randIndex = rand() % GetTeamAI()->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).size();
-	std::unordered_map<Direction, std::vector<XMFLOAT2>>::const_iterator it = GetTeamAI()->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).begin();
+	unsigned int randIndex = rand() % m_pTeamAI->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).size();
+	std::unordered_map<Direction, std::vector<XMFLOAT2>>::const_iterator it = m_pTeamAI->GetTestEnvironment()->GetAttackPositions(GetTeamAI()->GetTeam()).begin();
 	std::advance(it, randIndex);
 
 	m_assemblyPoint = it->second.at(rand() % it->second.size());
@@ -381,7 +381,7 @@ void RushBaseAttack::Reset(void)
 	TeamManoeuvre::Reset();
 }
 
-MultiflagCTFTeamAI* RushBaseAttack::GetTeamAI(void)
+const MultiflagCTFTeamAI* RushBaseAttack::GetTeamAI(void) const
 {
 	return m_pTeamAI;
 }

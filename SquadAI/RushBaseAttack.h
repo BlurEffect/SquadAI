@@ -44,7 +44,7 @@ public:
 	void Reset(void);
 
 	// Data access
-	MultiflagCTFTeamAI* GetTeamAI(void);
+	const MultiflagCTFTeamAI* GetTeamAI(void) const;
 	float GetWaitForParticipantsInterval(void) const;
 	const XMFLOAT2& GetAssemblyPoint(void) const;
 

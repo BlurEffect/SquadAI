@@ -34,7 +34,9 @@ enum TeamManoeuvreType
 	RunTheFlagHomeManoeuvre,
 	ReturnDroppedFlagManoeuvre,
 	CoordinatedBaseAttackManoeuvre,
-	DistractionBaseAttackManoeuvre
+	DistractionBaseAttackManoeuvre,
+	SimpleBaseAttackManoeuvre,
+	PickUpDroppedFlagManoeuvre
 };
 
 //--------------------------------------------------------------------------------------

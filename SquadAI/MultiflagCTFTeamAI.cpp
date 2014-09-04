@@ -145,13 +145,22 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(ActiveBaseDefenceManoeuvre, pActiveBaseDefenceAttack));
 
 	// Guarded flag capture manoeuvre
-	GuardedFlagCaptureInitData guardedFlagCaptureData(6.0f, 1.0f);
+	GuardedFlagCaptureInitData guardedFlagCaptureData(6.0f, 0.2f);
 	TeamManoeuvre* pGuardedFlagCapture = TeamManoeuvreFactory::CreateTeamManoeuvre(GuardedFlagCaptureManoeuvre, 2, 5, this, &guardedFlagCaptureData);
 	if(!pGuardedFlagCapture)
 	{
 		return false;
 	}
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(GuardedFlagCaptureManoeuvre, pGuardedFlagCapture));
+
+	// Intercept flag carrier manoeuvre
+	InterceptFlagCarrierInitData interceptFlagCarrierData(5.0f, 0.2f);
+	TeamManoeuvre* pInterceptFlagCarrier = TeamManoeuvreFactory::CreateTeamManoeuvre(InterceptFlagCarrierManoeuvre, 1, 5, this, &interceptFlagCarrierData);
+	if(!pInterceptFlagCarrier)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(InterceptFlagCarrierManoeuvre, pInterceptFlagCarrier));
 
 	return true;
 }
@@ -373,6 +382,11 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 	case GuardedFlagCaptureManoeuvre:
 		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[enemyTeam].m_state == Stolen);
+		break;
+	case InterceptFlagCarrierManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
+			(m_flagData[GetTeam()].m_state == Stolen);
+		break;
 	default:
 		return TeamAI::ManoeuvrePreconditionsFulfilled(manoeuvre);
 	}
@@ -429,6 +443,10 @@ bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 		break;
 	case GuardedFlagCaptureManoeuvre:
 		return (m_flagData[enemyTeam].m_state == Stolen);
+		break;
+	case InterceptFlagCarrierManoeuvre:
+		return (m_flagData[GetTeam()].m_state == Stolen);
+		break;
 	default:
 		return TeamAI::ManoeuvreStillValid(manoeuvre);
 	}
@@ -778,6 +796,42 @@ BehaviourStatus MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvr
 
 		// Add available entities to the manoeuvre until the maximally allowed number is reached.
 		while((addedEntities < m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants() - 1) && (it != availableEntities.end()))
+		{
+			m_manoeuvres[manoeuvre]->AddParticipant(*it);
+			// Remember that this entity is now executing that manoeuver
+			m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+			++addedEntities;
+			++it;
+		}
+
+		return m_manoeuvres[manoeuvre]->Initiate();
+
+		break;
+		}
+	case InterceptFlagCarrierManoeuvre:
+		{
+		std::vector<Entity*> availableEntities;
+
+		// Get all available entities
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			// If the entity is alive and not yet registered with a manoeuvre, remember it as available
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()])
+			{
+				availableEntities.push_back(*it);
+			}
+		}
+
+		// Sort the entities by distance to the home base, where the flag was just stolen
+		std::sort(availableEntities.begin(), availableEntities.end(), Entity::CompareEntityByDistanceToTarget(m_flagData[GetTeam()].m_basePosition));
+		
+		// Start adding entities to the manoeuvre making sure that the closest ones are added first.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = availableEntities.begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities < m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants()) && (it != availableEntities.end()))
 		{
 			m_manoeuvres[manoeuvre]->AddParticipant(*it);
 			// Remember that this entity is now executing that manoeuver

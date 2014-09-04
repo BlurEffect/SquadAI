@@ -144,6 +144,17 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 		return new GuardedFlagCapture(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_guardRadius, pData->m_updateMovementTargetsInterval);
 		break;
 		}
+	case InterceptFlagCarrierManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		InterceptFlagCarrierInitData* pData = reinterpret_cast<InterceptFlagCarrierInitData*>(pAdditionalData);
+		return new InterceptFlagCarrier(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_searchRadius, pData->m_updateCarrierPositionInterval);
+		break;
+		}
 	default:
 		return nullptr;
 	}

@@ -1173,9 +1173,9 @@ bool TestEnvironment::GetRandomUnblockedTargetInArea(const XMFLOAT2& centre, flo
 	int gridRadius = static_cast<int>(radius / GetGridSpacing());
 
 	int startX = (static_cast<int>(centreGridPos.x) - gridRadius >= 0) ? (static_cast<int>(centreGridPos.x) - gridRadius) : 0;
-	int endX	= (static_cast<int>(centreGridPos.x) + gridRadius < m_numberOfGridPartitions) ? (static_cast<int>(centreGridPos.x) + gridRadius) : m_numberOfGridPartitions - 1;
+	int endX	= (static_cast<unsigned int>(centreGridPos.x) + gridRadius < m_numberOfGridPartitions) ? (static_cast<int>(centreGridPos.x) + gridRadius) : m_numberOfGridPartitions - 1;
 	int startY = (static_cast<int>(centreGridPos.y) - gridRadius >= 0) ? (static_cast<int>(centreGridPos.y) - gridRadius) : 0;
-	int endY	= (static_cast<int>(centreGridPos.y) + gridRadius < m_numberOfGridPartitions) ? (static_cast<int>(centreGridPos.y) + gridRadius) : m_numberOfGridPartitions - 1;
+	int endY	= (static_cast<unsigned int>(centreGridPos.y) + gridRadius < m_numberOfGridPartitions) ? (static_cast<int>(centreGridPos.y) + gridRadius) : m_numberOfGridPartitions - 1;
 
 	// Note: Not sure if this is a good way of doing it, but some way is required from running into an infinite loop
 	//       below in case the whole area is blocked.
@@ -1192,7 +1192,7 @@ bool TestEnvironment::GetRandomUnblockedTargetInArea(const XMFLOAT2& centre, flo
 		++tryCount;
 	}while(m_pNodes[x][y].IsObstacle() && tryCount < maxTries);
 	
-	GridToWorldPosition(XMFLOAT2(x, y), outPosition);
+	GridToWorldPosition(XMFLOAT2(static_cast<float>(x), static_cast<float>(y)), outPosition);
 	
 	return (tryCount < maxTries);
 }

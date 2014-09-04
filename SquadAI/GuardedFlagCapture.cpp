@@ -16,8 +16,10 @@
 GuardedFlagCapture::GuardedFlagCapture(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float guardRadius, float updateMovementTargetsInterval)
 	: TeamManoeuvre(GuardedFlagCaptureManoeuvre, AttackEnemyFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
+	  m_timer(0.0f),
 	  m_guardRadius(guardRadius),
-	  m_updateMovementTargetsInterval(updateMovementTargetsInterval)
+	  m_updateMovementTargetsInterval(updateMovementTargetsInterval),
+	  m_flagCarrierId(0)
 {
 }
 
@@ -208,6 +210,7 @@ BehaviourStatus GuardedFlagCapture::Update(float deltaTime)
 void GuardedFlagCapture::Terminate(void)
 {
 	m_timer = 0.0f;
+	m_flagCarrierId = 0;
 	TeamManoeuvre::Terminate();
 }
 
@@ -217,6 +220,7 @@ void GuardedFlagCapture::Terminate(void)
 void GuardedFlagCapture::Reset(void)
 {
 	m_timer = 0.0f;
+	m_flagCarrierId = 0;
 	TeamManoeuvre::Reset();
 }
 

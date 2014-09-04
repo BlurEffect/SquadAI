@@ -540,6 +540,9 @@
     <ClCompile Include="GuardedFlagCapture.cpp">
       <Filter>Source Files\Manoeuvres\Attack Enemy Flag</Filter>
     </ClCompile>
+    <ClCompile Include="InterceptFlagCarrier.cpp">
+      <Filter>Source Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShader.h">

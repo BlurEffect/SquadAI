@@ -90,6 +90,7 @@
     <ClCompile Include="DistractionBaseAttack.cpp" />
     <ClCompile Include="GuardedFlagCapture.cpp" />
     <ClCompile Include="InitiateTeamManoeuvre.cpp" />
+    <ClCompile Include="InterceptFlagCarrier.cpp" />
     <ClCompile Include="PickUpDroppedFlag.cpp" />
     <ClCompile Include="ReturnDroppedFlag.cpp" />
     <ClCompile Include="RunTheFlagHome.cpp" />

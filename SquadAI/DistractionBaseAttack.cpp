@@ -61,6 +61,9 @@ void DistractionBaseAttack::ProcessMessage(Message* pMessage)
 		{
 			AttackedByEnemyMessage* pMsg = reinterpret_cast<AttackedByEnemyMessage*>(pMessage);
 
+			// An entity of the distraction team was attacked by a hostile entity positioned in the enemy base
+			// (suspected defender) -> gained the attention, now try to steal the flag by entering the base from
+			// the other side.
 			if((m_distractionParticipants.find(pMsg->GetData().m_entityId) != m_distractionParticipants.end()) &&
 			   (GetTeamAI()->GetTestEnvironment()->GetTerritoryOwner(pMsg->GetData().m_attackPosition) != GetTeamAI()->GetTeam()))
 			{
@@ -155,11 +158,23 @@ void DistractionBaseAttack::ProcessMessage(Message* pMessage)
 				}
 			}else
 			{
-				//m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
+				if(m_sneakParticipants.find(pMsg->GetData().m_entityId) != m_sneakParticipants.end())
+				{
+					Order* pNewOrder = new DefendOrder(pMsg->GetData().m_entityId, DefendPositionOrder, MediumPriority, m_sneakAssemblyPoint, XMFLOAT2(0.0f, 0.0f));
 
-				// Officially cancel the old order that was fulfilled and delete it.
-				//CancelOrder(pMsg->GetData().m_entityId);
-				//m_activeOrders.erase(m_activeOrders.find(pMsg->GetData().m_entityId));
+					if(!pNewOrder)
+					{
+						SetFailed(true);
+					}
+		
+					// Find the participant
+					std::vector<Entity*>::iterator foundIt = std::find_if(m_participants.begin(), m_participants.end(), Entity::FindEntityById(pMsg->GetData().m_entityId));
+
+					FollowOrderMessageData data(pNewOrder);
+					SendMessage(*foundIt, FollowOrderMessageType, &data);
+
+					m_activeOrders.insert(std::pair<unsigned long, Order*>(pMsg->GetData().m_entityId, pNewOrder));
+				}
 			}
 		
 		}else if(pMsg->GetData().m_orderState == FailedOrderState)

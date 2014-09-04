@@ -19,7 +19,7 @@ class MultiflagCTFTeamAI;
 enum BehaviourStatus;
 
 //--------------------------------------------------------------------------------------
-// Bundles additional data required to initialise a distraction attack manoeuvre.
+// Bundles additional data required to initialise a guarded flag capture manoeuvre.
 //--------------------------------------------------------------------------------------
 struct GuardedFlagCaptureInitData
 {

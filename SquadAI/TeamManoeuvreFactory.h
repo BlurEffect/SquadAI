@@ -22,6 +22,7 @@
 #include "SimpleBaseDefence.h"
 #include "ActiveBaseDefence.h"
 #include "GuardedFlagCapture.h"
+#include "InterceptFlagCarrier.h"
 
 // Forward declarations
 class TeamAI;

@@ -15,7 +15,7 @@
 #include "TestEnvironment.h"
 
 ActiveBaseDefence::ActiveBaseDefence(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float patrolRadius)
-	: TeamManoeuvre(SimpleBaseDefenceManoeuvre, ProtectOwnFlagCategory, minNumberParticipants, maxNumberParticipants),
+	: TeamManoeuvre(ActiveBaseDefenceManoeuvre, ProtectOwnFlagCategory, minNumberParticipants, maxNumberParticipants),
 	  m_pTeamAI(pTeamAI),
 	  m_patrolRadius(patrolRadius)
 {
@@ -39,9 +39,7 @@ void ActiveBaseDefence::ProcessMessage(Message* pMessage)
 		FlagPickedUpMessage* pMsg = reinterpret_cast<FlagPickedUpMessage*>(pMessage);
 		if(pMsg->GetData().m_flagOwner == GetTeamAI()->GetTeam())
 		{
-			// The enemy flag was picked up, the manoeuvre succeeded
-			// Note: At the moment it is not distinguished whether an actual participant of this manoeuvre stole the 
-			//       flag or if another team member did so.
+			// The team's flag was picked up, the manoeuvre failed
 			SetFailed(true);
 		}
 		break;
@@ -51,10 +49,13 @@ void ActiveBaseDefence::ProcessMessage(Message* pMessage)
 	EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(pMessage);
 	if(IsParticipant(pMsg->GetData().m_id) && pMsg->GetData().m_team == GetTeamAI()->GetTeam())
 	{
+		XMFLOAT2 deathPosition = GetParticipant(pMsg->GetData().m_id)->GetPosition();
+
 		// Participants that get killed, drop out of the manoeuvre
 		m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_id);
 
-		// Start investigating
+		// Send other participants to investigate the position, where the entity died
+		InvestigatePosition(deathPosition);
 	}
 	break;
 	}
@@ -64,7 +65,18 @@ void ActiveBaseDefence::ProcessMessage(Message* pMessage)
 	UpdateOrderStateMessage* pMsg = reinterpret_cast<UpdateOrderStateMessage*>(pMessage);
 	if(IsParticipant(pMsg->GetData().m_entityId))
 	{
-		if((pMsg->GetData().m_orderState == SucceededOrderState) || (pMsg->GetData().m_orderState == FailedOrderState))
+		if(pMsg->GetData().m_orderState == SucceededOrderState)
+		{
+			XMFLOAT2 movePosition(0.0f, 0.0f);
+			if(!m_pTeamAI->GetTestEnvironment()->GetRandomUnblockedTargetInArea(GetTeamAI()->GetFlagData(GetTeamAI()->GetTeam()).m_basePosition, m_patrolRadius, movePosition))
+			{
+				m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
+			}else
+			{
+				// Set the next patrol target
+				reinterpret_cast<MoveOrder*>(m_activeOrders[pMsg->GetData().m_entityId])->SetTargetPosition(movePosition);
+			}
+		}else if(pMsg->GetData().m_orderState == FailedOrderState)
 		{
 			m_pTeamAI->ReleaseEntityFromManoeuvre(pMsg->GetData().m_entityId);
 		}
@@ -86,11 +98,15 @@ BehaviourStatus ActiveBaseDefence::Initiate(void)
 {
 	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
 	{
-		// Randomly pick a grid field that belongs to the team's base and guard it.
+		// Randomly pick a grid field near the base and patrol to it.
 
-		XMFLOAT2 defendPosition = GetTeamAI()->GetTestEnvironment()->GetBaseFieldPositions(GetTeamAI()->GetTeam()).at(rand() % GetTeamAI()->GetTestEnvironment()->GetBaseFieldPositions(GetTeamAI()->GetTeam()).size());
+		XMFLOAT2 movePosition(0.0f, 0.0f);
+		if(!m_pTeamAI->GetTestEnvironment()->GetRandomUnblockedTargetInArea(GetTeamAI()->GetFlagData(GetTeamAI()->GetTeam()).m_basePosition, m_patrolRadius, movePosition))
+		{
+			return StatusFailure;
+		}
 
-		Order* pNewOrder = new DefendOrder((*it)->GetId(), DefendPositionOrder, MediumPriority, defendPosition, XMFLOAT2(0.0f, 0.0f));
+		Order* pNewOrder = new MoveOrder((*it)->GetId(), MoveToPositionOrder, MediumPriority, movePosition);
 
 		if(!pNewOrder)
 		{
@@ -158,7 +174,16 @@ void ActiveBaseDefence::Reset(void)
 //--------------------------------------------------------------------------------------
 void ActiveBaseDefence::InvestigatePosition(const XMFLOAT2& position)
 {
+	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
+	{
+		if(GetTeamAI()->GetSpottedEnemies().at((*it)->GetId()).empty())
+		{
+			// Change the movement target in the orders for the entities that should investigate the
+			// provided position
 
+			reinterpret_cast<MoveOrder*>(m_activeOrders[(*it)->GetId()])->SetTargetPosition(position);
+		}
+	}
 }
 
 // Data access functions

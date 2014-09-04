@@ -20,6 +20,8 @@
 #include "SimpleBaseAttack.h"
 #include "PickUpDroppedFlag.h"
 #include "SimpleBaseDefence.h"
+#include "ActiveBaseDefence.h"
+#include "GuardedFlagCapture.h"
 
 // Forward declarations
 class TeamAI;

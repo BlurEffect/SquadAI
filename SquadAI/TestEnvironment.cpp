@@ -732,11 +732,17 @@ bool TestEnvironment::AddObject(ObjectType type, const XMFLOAT2& position, float
 						 (type != BlueSpawnPointType || ((*it)->GetType() != BlueSoldierType)) &&
 					     (type != BlueSoldierType || ((*it)->GetType() != BlueSpawnPointType)) &&
 						 (type != RedAttackPositionType || ((*it)->GetType() != RedSoldierType)) &&
+						 (type != RedSoldierType || ((*it)->GetType() != RedAttackPositionType)) &&
 						 (type != RedAttackPositionType || ((*it)->GetType() != BlueSoldierType)) &&
+						 (type != BlueSoldierType || ((*it)->GetType() != RedAttackPositionType)) &&
 						 (type != RedAttackPositionType || ((*it)->GetType() != RedBaseAreaType)) &&
+						 (type != RedBaseAreaType || ((*it)->GetType() != RedAttackPositionType)) &&
 						 (type != BlueAttackPositionType || ((*it)->GetType() != RedSoldierType)) &&
+						 (type != RedSoldierType || ((*it)->GetType() != BlueAttackPositionType)) &&
 						 (type != BlueAttackPositionType || ((*it)->GetType() != BlueSoldierType)) &&
-						 (type != BlueAttackPositionType || ((*it)->GetType() != BlueBaseAreaType))
+						 (type != BlueSoldierType || ((*it)->GetType() != BlueAttackPositionType)) &&
+						 (type != BlueAttackPositionType || ((*it)->GetType() != BlueBaseAreaType)) &&
+						 (type != BlueBaseAreaType || ((*it)->GetType() != BlueAttackPositionType))
 						));
 
 		++it;
@@ -1161,7 +1167,34 @@ bool TestEnvironment::GetRandomUnblockedTarget(XMFLOAT2& outPosition) const
 //--------------------------------------------------------------------------------------
 bool TestEnvironment::GetRandomUnblockedTargetInArea(const XMFLOAT2& centre, float radius, XMFLOAT2& outPosition) const
 {
+	XMFLOAT2 centreGridPos(0.0f, 0.0f);
+	WorldToGridPosition(centre, centreGridPos);
 
+	int gridRadius = static_cast<int>(radius / GetGridSpacing());
+
+	int startX = (static_cast<int>(centreGridPos.x) - gridRadius >= 0) ? (static_cast<int>(centreGridPos.x) - gridRadius) : 0;
+	int endX	= (static_cast<int>(centreGridPos.x) + gridRadius < m_numberOfGridPartitions) ? (static_cast<int>(centreGridPos.x) + gridRadius) : m_numberOfGridPartitions - 1;
+	int startY = (static_cast<int>(centreGridPos.y) - gridRadius >= 0) ? (static_cast<int>(centreGridPos.y) - gridRadius) : 0;
+	int endY	= (static_cast<int>(centreGridPos.y) + gridRadius < m_numberOfGridPartitions) ? (static_cast<int>(centreGridPos.y) + gridRadius) : m_numberOfGridPartitions - 1;
+
+	// Note: Not sure if this is a good way of doing it, but some way is required from running into an infinite loop
+	//       below in case the whole area is blocked.
+	unsigned int maxTries = (endX - startX) * (endY - startY);
+	unsigned int tryCount = 0;
+
+	unsigned int x = 0;
+	unsigned int y = 0;
+
+	do
+	{
+		x = startX + rand() % (endX - startX);
+		y = startY + rand() % (endY - startY);
+		++tryCount;
+	}while(m_pNodes[x][y].IsObstacle() && tryCount < maxTries);
+	
+	GridToWorldPosition(XMFLOAT2(x, y), outPosition);
+	
+	return (tryCount < maxTries);
 }
 
 //--------------------------------------------------------------------------------------

@@ -88,6 +88,7 @@
     <ClCompile Include="ActiveSelector.cpp" />
     <ClCompile Include="CoordinatedBaseAttack.cpp" />
     <ClCompile Include="DistractionBaseAttack.cpp" />
+    <ClCompile Include="GuardedFlagCapture.cpp" />
     <ClCompile Include="InitiateTeamManoeuvre.cpp" />
     <ClCompile Include="PickUpDroppedFlag.cpp" />
     <ClCompile Include="ReturnDroppedFlag.cpp" />

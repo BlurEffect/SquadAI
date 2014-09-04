@@ -36,9 +36,7 @@ void SimpleBaseDefence::ProcessMessage(Message* pMessage)
 		FlagPickedUpMessage* pMsg = reinterpret_cast<FlagPickedUpMessage*>(pMessage);
 		if(pMsg->GetData().m_flagOwner == GetTeamAI()->GetTeam())
 		{
-			// The enemy flag was picked up, the manoeuvre succeeded
-			// Note: At the moment it is not distinguished whether an actual participant of this manoeuvre stole the 
-			//       flag or if another team member did so.
+			// The team's flag was picked up, the manoeuvre failed
 			SetFailed(true);
 		}
 		break;
@@ -79,6 +77,12 @@ void SimpleBaseDefence::ProcessMessage(Message* pMessage)
 //--------------------------------------------------------------------------------------
 BehaviourStatus SimpleBaseDefence::Initiate(void)
 {
+	if(GetTeamAI()->GetTestEnvironment()->GetBaseFieldPositions(GetTeamAI()->GetTeam()).empty())
+	{
+		return StatusFailure;
+	}
+
+
 	for(std::vector<Entity*>::iterator it = m_participants.begin(); it != m_participants.end(); ++it)
 	{
 		// Randomly pick a grid field that belongs to the team's base and guard it.

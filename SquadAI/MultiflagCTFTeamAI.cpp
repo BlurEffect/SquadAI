@@ -135,6 +135,24 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	}
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(SimpleBaseDefenceManoeuvre, pSimpleBaseDefence));
 
+	// Active base defence manoeuvre
+	ActiveBaseDefenceInitData activeBaseDefenceData(20.0f);
+	TeamManoeuvre* pActiveBaseDefenceAttack = TeamManoeuvreFactory::CreateTeamManoeuvre(ActiveBaseDefenceManoeuvre, 3, 5, this, &activeBaseDefenceData);
+	if(!pActiveBaseDefenceAttack)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(ActiveBaseDefenceManoeuvre, pActiveBaseDefenceAttack));
+
+	// Guarded flag capture manoeuvre
+	GuardedFlagCaptureInitData guardedFlagCaptureData(6.0f, 1.0f);
+	TeamManoeuvre* pGuardedFlagCapture = TeamManoeuvreFactory::CreateTeamManoeuvre(GuardedFlagCaptureManoeuvre, 2, 5, this, &guardedFlagCaptureData);
+	if(!pGuardedFlagCapture)
+	{
+		return false;
+	}
+	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(GuardedFlagCaptureManoeuvre, pGuardedFlagCapture));
+
 	return true;
 }
 
@@ -348,6 +366,13 @@ bool MultiflagCTFTeamAI::ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoe
 		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
 			   (m_flagData[GetTeam()].m_state == InBase);
 		break;
+	case ActiveBaseDefenceManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
+			   (m_flagData[GetTeam()].m_state == InBase);
+		break;
+	case GuardedFlagCaptureManoeuvre:
+		return (numberOfAvailableEntities >= m_manoeuvres[manoeuvre]->GetMinNumberOfParticipants()) &&
+			   (m_flagData[enemyTeam].m_state == Stolen);
 	default:
 		return TeamAI::ManoeuvrePreconditionsFulfilled(manoeuvre);
 	}
@@ -399,6 +424,11 @@ bool MultiflagCTFTeamAI::ManoeuvreStillValid(TeamManoeuvreType manoeuvre)
 	case SimpleBaseDefenceManoeuvre:
 		return (m_flagData[GetTeam()].m_state == InBase);
 		break;
+	case ActiveBaseDefenceManoeuvre:
+		return (m_flagData[GetTeam()].m_state == InBase);
+		break;
+	case GuardedFlagCaptureManoeuvre:
+		return (m_flagData[enemyTeam].m_state == Stolen);
 	default:
 		return TeamAI::ManoeuvreStillValid(manoeuvre);
 	}
@@ -680,6 +710,84 @@ BehaviourStatus MultiflagCTFTeamAI::InitiateManoeuvre(TeamManoeuvreType manoeuvr
 
 		// Initiate the manoeuvre
 		return m_manoeuvres[manoeuvre]->Initiate();
+		break;
+		}
+	case ActiveBaseDefenceManoeuvre:
+		{
+		// Keep track of how many entities have been added to the manoeuvre.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = GetTeamMembers().begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities < m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants()) && (it != GetTeamMembers().end()))
+		{
+			// If the entity is not engaged in another manoeuver, add it to this one.
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()] && (m_flagData[enemyTeam].m_state != Stolen || (*it)->GetId() != m_flagData[enemyTeam].m_carrierId))
+			{
+				m_manoeuvres[manoeuvre]->AddParticipant(*it);
+				// Remember that this entity is now executing that manoeuver
+				m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+				++addedEntities;
+			}
+			++it;
+		}
+
+		// Initiate the manoeuvre
+		return m_manoeuvres[manoeuvre]->Initiate();
+		break;
+		}
+	case GuardedFlagCaptureManoeuvre:
+		{
+		std::vector<Entity*> availableEntities;
+
+		// Get all available entities
+		for(std::vector<Entity*>::iterator it = GetTeamMembers().begin(); it != GetTeamMembers().end(); ++it)
+		{
+			// If the entity is alive and not yet registered with a manoeuvre, remember it as available.
+			// Ignore the flag carrier here, will be added separately
+			if((*it)->IsAlive() && !m_entityManoeuvreMap[(*it)->GetId()] && (*it)->GetId() != m_flagData[enemyTeam].m_carrierId)
+			{
+				availableEntities.push_back(*it);
+			}
+		}
+
+		// Add the flag carrier to the manoeuvre
+		std::vector<Entity*>::iterator foundIt = std::find_if(GetTeamMembers().begin(), GetTeamMembers().end(), Entity::FindEntityById(m_flagData[enemyTeam].m_carrierId));
+	
+		// If the flag carrier is still part of another manoeuvre, release it from that first, before assigning it to the
+		// new manoeuvre (needed in case the carrier obtained the flag by accident when actually executing another manoeuvre).
+
+		if(m_entityManoeuvreMap[(*foundIt)->GetId()] != nullptr)
+		{
+			ReleaseEntityFromManoeuvre((*foundIt)->GetId());
+		}
+
+		m_manoeuvres[manoeuvre]->AddParticipant(*foundIt);
+		m_entityManoeuvreMap[(*foundIt)->GetId()] = m_manoeuvres[manoeuvre];
+
+		// Add the other participants (guards)
+
+		// Sort the entities by distance to the current position of the enemy's flag
+		std::sort(availableEntities.begin(), availableEntities.end(), Entity::CompareEntityByDistanceToTarget(m_flagData[enemyTeam].m_position));
+		
+		// Start adding entities to the manoeuvre making sure that the closest ones are added first.
+		unsigned int addedEntities = 0;
+
+		std::vector<Entity*>::iterator it = availableEntities.begin();
+
+		// Add available entities to the manoeuvre until the maximally allowed number is reached.
+		while((addedEntities < m_manoeuvres[manoeuvre]->GetMaxNumberOfParticipants() - 1) && (it != availableEntities.end()))
+		{
+			m_manoeuvres[manoeuvre]->AddParticipant(*it);
+			// Remember that this entity is now executing that manoeuver
+			m_entityManoeuvreMap[(*it)->GetId()] = m_manoeuvres[manoeuvre];
+			++addedEntities;
+			++it;
+		}
+
+		return m_manoeuvres[manoeuvre]->Initiate();
+
 		break;
 		}
 	default:

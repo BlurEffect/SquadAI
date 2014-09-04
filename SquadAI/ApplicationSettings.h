@@ -41,7 +41,7 @@ const unsigned int g_kSoldiersPerTeam = 8; // The number of soldiers forming a t
 const float g_kPickupFlagRadiusRelative = 0.5f;  // An entity has to approach a flag this close (in relation to the grid spacing) in order to pick it up or return it
 const float g_kFlagResetTimer		    = 10.0f;  // A flag will be reset to its start position after it was dropped for this long
 const float g_kRespawnTimer				= 5.0f;   // Killed entities have to wait this long before being able to respawn 
-const float g_kGameRoundTimeLimit       = 120.0f; // The time a game round lasts in seconds
+const float g_kGameRoundTimeLimit       = 180.0f; // The time a game round lasts in seconds
 const unsigned int g_kWinScore          = 3;      // The score required by a team to win the game
 const float g_kNotifyTimeInterval       = 10.0f;  // Determines how often the team AIs are notified of the time left in the current round
 

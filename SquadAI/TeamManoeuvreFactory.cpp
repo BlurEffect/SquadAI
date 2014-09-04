@@ -122,6 +122,28 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 		return new SimpleBaseDefence(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI);
 		break;
 		}
+	case ActiveBaseDefenceManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		ActiveBaseDefenceInitData* pData = reinterpret_cast<ActiveBaseDefenceInitData*>(pAdditionalData);
+		return new ActiveBaseDefence(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_patrolRadius);
+		break;
+		}
+	case GuardedFlagCaptureManoeuvre:
+		{
+		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);
+		if(!pTeamAI)
+		{
+			return nullptr;
+		}
+		GuardedFlagCaptureInitData* pData = reinterpret_cast<GuardedFlagCaptureInitData*>(pAdditionalData);
+		return new GuardedFlagCapture(minNumberOfParticipants, maxNumberOfParticipants, pCTFTeamAI, pData->m_guardRadius, pData->m_updateMovementTargetsInterval);
+		break;
+		}
 	default:
 		return nullptr;
 	}

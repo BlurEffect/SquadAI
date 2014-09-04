@@ -23,19 +23,19 @@ enum BehaviourStatus;
 //--------------------------------------------------------------------------------------
 struct GuardedFlagCaptureInitData
 {
-	GuardedFlagCaptureInitData(unsigned int numberOfSneakers, float waitForParticipantsInterval) 
-		: m_numberOfSneakers(numberOfSneakers),
-		  m_waitForParticipantsInterval(waitForParticipantsInterval)
+	GuardedFlagCaptureInitData(float guardRadius, float updateMovementTargetsInterval) 
+		: m_guardRadius(guardRadius),
+		  m_updateMovementTargetsInterval(updateMovementTargetsInterval)
 	{}
 
-	unsigned int m_numberOfSneakers;			// Determines how many of the participants will be tasked with stealing the flag
-	float		 m_waitForParticipantsInterval; // Determines after what time the participants will start the actual attack
+	float m_guardRadius;				  // Determines how close the protectors stay to the flag carrier
+	float m_updateMovementTargetsInterval; // Determines how often the movement target is changed for the protectors
 };
 
 class GuardedFlagCapture : public TeamManoeuvre
 {
 public:
-	GuardedFlagCapture(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, unsigned int numberOfSneakers, float waitForParticipantsInterval);
+	GuardedFlagCapture(unsigned int minNumberParticipants, unsigned int maxNumberParticipants, MultiflagCTFTeamAI* pTeamAI, float guardRadius, float updateMovementTargetsInterval);
 	~GuardedFlagCapture(void);
 
 	// To be overwritten by derived manoeuvre classes
@@ -46,17 +46,15 @@ public:
 
 	void Reset(void);
 
-	// Data access
-	MultiflagCTFTeamAI* GetTeamAI(void);
-	float GetWaitForParticipantsInterval(void) const;
-	const XMFLOAT2& GetDistractionAssemblyPoint(void) const;
-	const XMFLOAT2& GetSneakAssemblyPoint(void) const;
-	unsigned int GetNumberOfSneakers(void) const;
+	// Data access functions
+
+	const MultiflagCTFTeamAI* GetTeamAI(void) const ;
+	float GetGuardRadius(void) const;
+	float GetUpdateMovementTargetsInterval(void) const;
 
 	void SetTeamAI(MultiflagCTFTeamAI* pTeamAI);
-	void SetWaitForParticipantsInterval(float interval);
-	void SetDistractionAssemblyPoint(const XMFLOAT2& assemblyPoint);
-	void SetSneakAssemblyPoint(const XMFLOAT2& assemblyPoint);
+	void SetGuardRadius(float radius);
+	void SetUpdateMovementTargetsInterval(float interval);
 
 protected:
 	
@@ -64,35 +62,15 @@ protected:
 
 private:
 
-	//--------------------------------------------------------------------------------------
-	// Available manoeuvre phases for this manoeuvre.
-	//--------------------------------------------------------------------------------------
-	enum ManoeuvrePhase
-	{
-		AssemblePhase,
-		DistractionAttackPhase,
-		SneakAttackPhase
-	};
+	void UpdateMovementTargets(void);
 
-	void SetupGroups(void);
-	bool DetermineAssemblyPoints(void);
-	void StartDistractionAttack(void);
-	void StartSneakAttack(void);
-
-	ManoeuvrePhase m_currentPhase;       // The phase the manoeuvre is currently in
-	float m_waitForParticipantsInterval; // Determines after what time the participants will start the actual attack
-	float m_timer;					     // Keeps track of the time passed since the initiation of the manoeuvre
+	float m_timer;					     // Keeps track of the time passed
 	MultiflagCTFTeamAI* m_pTeamAI;       // The team AI able to use this manoeuvre (in this case a specific Multiflag Team AI is required)
 
-	XMFLOAT2 m_distractionAssemblyPoint;            // The position, at which to assemble the participants before starting the distraction attack
-	XMFLOAT2 m_sneakAssemblyPoint;   // The position, at which to assemble the participants before trying to sneak into the enemy base
+	float m_guardRadius;			// Determines how close the protectors stay to the flag carrier
+	float m_updateMovementTargetsInterval; // Determines how often the movement target is changed for the protectors
 
-	unsigned int m_numberOfSneakers; // The number of entities taking part in the sneak attack
-
-	std::set<unsigned long> m_arrivedEntities; // Keeps track of the entities that have arrived at their assembly point
-
-	std::set<unsigned long> m_distractionParticipants; // Keeps track of which participants take part in the distraction manoeuvre
-	std::set<unsigned long> m_sneakParticipants;   // Keeps track of which participants take part in the flag steal manoeuvre
+	unsigned int m_flagCarrierId; // The number of entities taking part in the sneak attack
 };
 
 #endif // GUARDED_FLAG_CAPTURE_H

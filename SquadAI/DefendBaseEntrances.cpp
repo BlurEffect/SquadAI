@@ -32,6 +32,16 @@ void DefendBaseEntrances::ProcessMessage(Message* pMessage)
 {
 	switch(pMessage->GetType())
 	{
+	case FlagPickedUpMessageType:
+	{
+		FlagPickedUpMessage* pMsg = reinterpret_cast<FlagPickedUpMessage*>(pMessage);
+		if(pMsg->GetData().m_flagOwner == GetTeamAI()->GetTeam())
+		{
+			// The team's flag was picked up, the manoeuvre failed
+			SetFailed(true);
+		}
+		break;
+	}
 	case EntityKilledMessageType:
 	{
 	EntityKilledMessage* pMsg = reinterpret_cast<EntityKilledMessage*>(pMessage);

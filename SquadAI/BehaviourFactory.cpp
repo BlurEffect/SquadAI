@@ -223,25 +223,32 @@ Behaviour* BehaviourFactory::CreateSimpleCombatTree(Entity* pEntity)
 //--------------------------------------------------------------------------------------
 Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 {
-	Behaviour* pRoot = CreateUniversalBehaviour(ActiveSelectorType, "Root", nullptr);
+	
+	ParallelInitData rootInitData(RequireAll, RequireAll);
+	Behaviour* pRoot = CreateUniversalBehaviour(ParallelType, "Root", &rootInitData);
 
 	if(pRoot)
 	{
+		Behaviour* pMainRoot = CreateUniversalBehaviour(ActiveSelectorType, "MainRoot", nullptr);
 		Behaviour* pUpdateEntitySequence = CreateUniversalBehaviour(SequenceType, "UpdateEntitySequence", nullptr);
-		
-		if(pUpdateEntitySequence)
+	
+		if(pMainRoot && pUpdateEntitySequence)
 		{
-			ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
-			Behaviour* pAlwaysFailDecorator = CreateUniversalBehaviour(ReturnSpecificStatusType, "AlwaysFailDecorator", &data);
+			reinterpret_cast<Composite*>(pRoot)->AddChild(pUpdateEntitySequence);
+			reinterpret_cast<Composite*>(pRoot)->AddChild(pMainRoot);
+
+
+			//ReturnSpecificStatusInitData data(pUpdateEntitySequence, StatusFailure);
+			//Behaviour* pAlwaysFailDecorator = CreateUniversalBehaviour(ReturnSpecificStatusType, "AlwaysFailDecorator", &data);
 
 			Behaviour* pProcessMessagesAction		    = CreateUniversalIndividualBehaviour(ProcessMessagesType, pEntity, "ProcessMessagesAction", nullptr);
 			Behaviour* pEntityAliveCondition		    = CreateUniversalIndividualBehaviour(EntityAliveType, pEntity, "EntityAliveCondition", nullptr);
 			Behaviour* pUpdateThreatsAction				= CreateUniversalIndividualBehaviour(UpdateThreatsType, pEntity, "UpdateThreatsAction", nullptr);
 			Behaviour* pUpdateAttackReadinessAction		= CreateUniversalIndividualBehaviour(UpdateAttackReadinessType, pEntity, "UpdateAttackReadinessAction", nullptr);
 
-			if(pProcessMessagesAction && pAlwaysFailDecorator && pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
+			if(pProcessMessagesAction && /*pAlwaysFailDecorator &&*/ pEntityAliveCondition && pUpdateThreatsAction && pUpdateAttackReadinessAction)
 			{
-				reinterpret_cast<Composite*>(pRoot)->AddChild(pAlwaysFailDecorator);
+				//reinterpret_cast<Composite*>(pMainRoot)->AddChild(pAlwaysFailDecorator);
 
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pProcessMessagesAction);
 				reinterpret_cast<Composite*>(pUpdateEntitySequence)->AddChild(pEntityAliveCondition);
@@ -255,10 +262,10 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 				
 				if(pFightSequence && pApproachThreatSequence && pMovementSequence && pHoldPositionSelector)
 				{
-					reinterpret_cast<Composite*>(pRoot)->AddChild(pFightSequence);
-					reinterpret_cast<Composite*>(pRoot)->AddChild(pApproachThreatSequence);
-					reinterpret_cast<Composite*>(pRoot)->AddChild(pMovementSequence);
-					reinterpret_cast<Composite*>(pRoot)->AddChild(pHoldPositionSelector);
+					reinterpret_cast<Composite*>(pMainRoot)->AddChild(pFightSequence);
+					reinterpret_cast<Composite*>(pMainRoot)->AddChild(pApproachThreatSequence);
+					reinterpret_cast<Composite*>(pMainRoot)->AddChild(pMovementSequence);
+					reinterpret_cast<Composite*>(pMainRoot)->AddChild(pHoldPositionSelector);
 
 
 					Behaviour* pDetermineGreatestKnownThreatAction = CreateUniversalIndividualBehaviour(DetermineGreatestKnownThreatType, pEntity, "DetermineGreatestKnownThreatAction", nullptr);
@@ -301,9 +308,9 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 
 
 					if(pDetermineGreatestKnownThreatAction && pGreatestKnownThreatSetCondition && pAttackSelector && pDetermineGreatestSuspectedThreatAction && pGreatestSuspectedThreatSetCondition &&
-					   pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pDeterminePathToSuspectedThreatAction && pPathToSuspectedThreatSetCondition && pCheckInvestigatedThreatMonitor && pCheckInvestigatedTargetSequence && pDetermineGreatestSuspectedThreatUpdateAction && 
-					   pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDetermineMovementTargetAction && pMovementTargetSetCondition && pDeterminePathToMovementTargetAction && pPathToMovementTargetSetCondition && pCheckMovementTargetMonitor 
-					   && pMovingToHighestPriorityTargetCondition && pMoveToTargetAction && pFinaliseMovementAction && pChangeObservationTargetSequence && pIdleAction)
+						pDetermineApproachThreatPositionAction && pMovementTargetApproachThreatSetCondition && pDeterminePathToSuspectedThreatAction && pPathToSuspectedThreatSetCondition && pCheckInvestigatedThreatMonitor && pCheckInvestigatedTargetSequence && pDetermineGreatestSuspectedThreatUpdateAction && 
+						pStillInvestigatingGreatestThreatCondition && pMoveToApproachThreatTargetAction && pResolveSuspectedThreatAction && pDetermineMovementTargetAction && pMovementTargetSetCondition && pDeterminePathToMovementTargetAction && pPathToMovementTargetSetCondition && pCheckMovementTargetMonitor 
+						&& pMovingToHighestPriorityTargetCondition && pMoveToTargetAction && pFinaliseMovementAction && pChangeObservationTargetSequence && pIdleAction)
 					{
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pDetermineGreatestKnownThreatAction);
 						reinterpret_cast<Composite*>(pFightSequence)->AddChild(pGreatestKnownThreatSetCondition);
@@ -366,7 +373,7 @@ Behaviour* BehaviourFactory::CreateModifiedSimpleCombatTree(Entity* pEntity)
 							Behaviour* pAttackTargetAction				= CreateUniversalIndividualBehaviour(AttackTargetType, pEntity, "AttackTargetAction", nullptr);
 							
 							if(pReadyToAttackCondition && pDetermineAttackTargetAction && pAttackTargetSetCondition && 
-							   pAimAtTargetAction && pAttackTargetAction)
+								pAimAtTargetAction && pAttackTargetAction)
 							{
 								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pDetermineAttackTargetAction);
 								reinterpret_cast<Composite*>(pAttackSequence)->AddChild(pAttackTargetSetCondition);
@@ -610,6 +617,34 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 
 						// The actual execution of the manoeuvres is handled by these actions
 						ExecuteTeamManoeuvreInitData executeRunTheFlagHomeInitData(RunTheFlagHomeManoeuvre);
+						TeamBehaviour* pExecuteRunTheFlagHomeAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteRunTheFlagHomeAction", 0.5f, 0.5f, &executeRunTheFlagHomeInitData);
+						ExecuteTeamManoeuvreInitData executeRushBaseAttackInitData(RushBaseAttackManoeuvre);
+						TeamBehaviour* pExecuteRushBaseAttackAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteRushBaseAttackAction", 1.0f, 0.0f, &executeRushBaseAttackInitData);
+						ExecuteTeamManoeuvreInitData executeCoordinatedBaseAttackInitData(CoordinatedBaseAttackManoeuvre);
+						TeamBehaviour* pExecuteCoordinatedBaseAttackAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteCoordinatedBaseAttackAction", 0.8f, 0.1f, &executeCoordinatedBaseAttackInitData);
+						ExecuteTeamManoeuvreInitData executeDistractionBaseAttackInitData(DistractionBaseAttackManoeuvre);
+						TeamBehaviour* pExecuteDistractionBaseAttackAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteDistractionBaseAttackAction", 0.6f, 0.3f, &executeDistractionBaseAttackInitData);
+						ExecuteTeamManoeuvreInitData executeSimpleBaseAttackInitData(SimpleBaseAttackManoeuvre);
+						TeamBehaviour* pExecuteSimpleBaseAttackAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteSimpleBaseAttackAction", 0.5f, 0.2f, &executeSimpleBaseAttackInitData);
+						ExecuteTeamManoeuvreInitData executePickUpDroppedFlagInitData(PickUpDroppedFlagManoeuvre);
+						TeamBehaviour* pExecutePickUpDroppedFlagAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecutePickUpDroppedFlagAction", 0.6f, 0.5f, &executePickUpDroppedFlagInitData);
+						ExecuteTeamManoeuvreInitData executeDefendBaseEntrancesInitData(DefendBaseEntrancesManoeuvre);
+						TeamBehaviour* pExecuteDefendBaseEntrancesAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteDefendBaseEntrancesAction", 0.0f, 1.0f, &executeDefendBaseEntrancesInitData);
+						ExecuteTeamManoeuvreInitData executeReturnDroppedFlagInitData(ReturnDroppedFlagManoeuvre);
+						TeamBehaviour* pExecuteReturnDroppedFlagAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteReturnDroppedFlagAction", 0.5f, 0.6f, &executeReturnDroppedFlagInitData);
+						ExecuteTeamManoeuvreInitData executeSimpleBaseDefenceInitData(SimpleBaseDefenceManoeuvre);
+						TeamBehaviour* pExecuteSimpleBaseDefenceAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteSimpleBaseDefenceAction", 0.0f, 0.8f, &executeSimpleBaseDefenceInitData);
+						ExecuteTeamManoeuvreInitData executeActiveBaseDefenceInitData(ActiveBaseDefenceManoeuvre);
+						TeamBehaviour* pExecuteActiveBaseDefenceAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ActiveSimpleBaseDefenceAction", 0.2f, 0.6f, &executeActiveBaseDefenceInitData);
+						ExecuteTeamManoeuvreInitData executeGuardedFlagCaptureInitData(GuardedFlagCaptureManoeuvre);
+						TeamBehaviour* pExecuteGuardedFlagCaptureAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteGuardedFlagCaptureAction", 0.3f, 0.8f, &executeGuardedFlagCaptureInitData);
+						ExecuteTeamManoeuvreInitData executeInterceptFlagCarrierInitData(InterceptFlagCarrierManoeuvre);
+						TeamBehaviour* pExecuteInterceptFlagCarrierAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "InterceptFlagCarrierAction", 0.8f, 1.0f, &executeInterceptFlagCarrierInitData);
+
+						/*
+						
+						// The actual execution of the manoeuvres is handled by these actions
+						ExecuteTeamManoeuvreInitData executeRunTheFlagHomeInitData(RunTheFlagHomeManoeuvre);
 						TeamBehaviour* pExecuteRunTheFlagHomeAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteRunTheFlagHomeAction", 0.0f, 1.0f, &executeRunTheFlagHomeInitData);
 						ExecuteTeamManoeuvreInitData executeRushBaseAttackInitData(RushBaseAttackManoeuvre);
 						TeamBehaviour* pExecuteRushBaseAttackAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteRushBaseAttackAction", 1.0f, 0.0f, &executeRushBaseAttackInitData);
@@ -633,7 +668,7 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 						TeamBehaviour* pExecuteGuardedFlagCaptureAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "ExecuteGuardedFlagCaptureAction", 1.0f, 0.5f, &executeGuardedFlagCaptureInitData);
 						ExecuteTeamManoeuvreInitData executeInterceptFlagCarrierInitData(InterceptFlagCarrierManoeuvre);
 						TeamBehaviour* pExecuteInterceptFlagCarrierAction = CreatePrimitiveTeamBehaviour(TeamExecuteManoeuvreType, pTeamAI, "InterceptFlagCarrierAction", 1.0f, 1.0f, &executeInterceptFlagCarrierInitData);
-
+						*/
 
 						if(pRunTheFlagHomeStillValidCheck && pRushBaseAttackStillValidCheck && pCoordinatedBaseAttackStillValidCheck && pDistractionBaseAttackStillValidCheck && pSimpleBaseAttackStillValidCheck && pPickUpDroppedFlagStillValidCheck && pDefendBaseEntrancesStillValidCheck && pReturnDroppedFlagStillValidCheck && pSimpleBaseDefenceStillValidCheck && pActiveBaseDefenceStillValidCheck && pGuardedFlagCaptureStillValidCheck && pInterceptFlagCarrierStillValidCheck &&
 						   pExecuteRunTheFlagHomeAction && pExecuteRushBaseAttackAction && pExecuteCoordinatedBaseAttackAction && pExecuteDistractionBaseAttackAction && pExecuteSimpleBaseAttackAction && pExecutePickUpDroppedFlagAction && pExecuteDefendBaseEntrancesAction && pExecuteReturnDroppedFlagAction && pExecuteSimpleBaseDefenceAction && pExecuteActiveBaseDefenceAction && pExecuteGuardedFlagCaptureAction && pExecuteInterceptFlagCarrierAction)

@@ -26,7 +26,7 @@ public:
 	~EntityMovementManager(void);
 
 	bool Initialise(Entity* pEntity, TestEnvironment* pTestEnvironment);
-	void UpdatePosition(float deltaTime, float maxSpeed, float maxForce);
+	void UpdatePosition(float deltaTime, float maxSpeed, float maxForce, float handicap);
 	void Reset(void);
 
 	//bool SetPathTo(const XMFLOAT2& targetPosition);

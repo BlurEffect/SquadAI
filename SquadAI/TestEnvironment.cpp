@@ -515,6 +515,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			properties.m_maxAvoidWallsForce			= g_kSoldierMaxAvoidWallsForce;
 			properties.m_maxSeparationForce			= g_kSoldierMaxSeparationForce;
 			properties.m_targetReachedRadius		= g_kSoldierTargetReachedRadius;
+			properties.m_speedHandicap				= g_kSoliderSpeedHandicap;
 			properties.m_avoidWallsRadius			= m_gridSpacing; 
 			properties.m_separationRadius			= m_gridSpacing;
 			properties.m_fieldOfView				= g_kSoldierFieldOfView;
@@ -523,7 +524,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			properties.m_maxHealth					= g_kSoldierMaxHealth;
 			properties.m_lookAroundInterval         = g_kSoldierLookAroundInterval;
 			properties.m_reportInterval             = g_kReportInterval;
-
+			
 			CircleColliderData colliderData(it->GetPosition(), m_gridSpacing * m_objectScaleFactors[RedSoldierType] * 0.5f);
 
 			if(!m_soldiers[soldierIndex].Initialise(++m_id, it->GetPosition(), it->GetRotation(), it->GetUniformScale(), CategoryEntity, CircleColliderType, 
@@ -550,6 +551,7 @@ bool TestEnvironment::PrepareSimulation(void)
 			properties.m_maxAvoidWallsForce			= g_kSoldierMaxAvoidWallsForce;
 			properties.m_maxSeparationForce			= g_kSoldierMaxSeparationForce;
 			properties.m_targetReachedRadius		= g_kSoldierTargetReachedRadius;
+			properties.m_speedHandicap				= g_kSoliderSpeedHandicap;
 			properties.m_avoidWallsRadius			= m_gridSpacing; 
 			properties.m_separationRadius			= m_gridSpacing;
 			properties.m_fieldOfView				= g_kSoldierFieldOfView;

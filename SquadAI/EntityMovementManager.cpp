@@ -73,8 +73,9 @@ void EntityMovementManager::SetInitialViewDirection(void)
 // Param1: The time in seconds passed since the last frame.
 // Param2: The maximal speed of the entity.
 // Param3: The maximal size of the accumulated forces.
+// Param4: The handicap to use if the entity is currently being handicapped.
 //--------------------------------------------------------------------------------------
-void EntityMovementManager::UpdatePosition(float deltaTime, float maxSpeed, float maxForce)
+void EntityMovementManager::UpdatePosition(float deltaTime, float maxSpeed, float maxForce, float handicap)
 {
 	// Truncate steering force to not be greater than the maximal allowed force
 	float magnitude = 0.0f;
@@ -99,13 +100,26 @@ void EntityMovementManager::UpdatePosition(float deltaTime, float maxSpeed, floa
 		XMStoreFloat2(&newVelocity, XMVector2Normalize(XMLoadFloat2(&newVelocity)) * maxSpeed);
 	}
 
+	if(m_pEntity->IsHandicapped())
+	{
+		//newVelocity.x *= handicap;
+		//newVelocity.y *= handicap;
+	}
+		
 	// Set the new velocity and position on the entity
 
 	m_velocity = newVelocity;
 	//XMStoreFloat2(&m_velocity, XMLoadFloat2(&newVelocity) * deltaTime );
 		
 	XMFLOAT2 newPosition;
-	XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity) * deltaTime);
+
+	if(m_pEntity->IsHandicapped())
+	{
+		XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity) * deltaTime * handicap);
+	}else
+	{
+		XMStoreFloat2(&newPosition, XMLoadFloat2(&m_pEntity->GetPosition()) + XMLoadFloat2(&newVelocity) * deltaTime);
+	}
 
 	m_pEntity->SetPosition(newPosition);
 	m_pEntity->UpdateColliderPosition(newPosition);

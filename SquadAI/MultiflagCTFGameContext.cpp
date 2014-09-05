@@ -222,6 +222,8 @@ void MultiflagCTFGameContext::FlagPickedUp(EntityTeam flagOwner, Entity* pCarrie
 	m_flagStates[flagOwner]   = Stolen;
 	m_flagCarriers[flagOwner] = pCarrier;
 
+	m_flagCarriers[flagOwner]->SetHandicap(true);
+
 	// Notify teams.
 	FlagPickedUpMessageData data(flagOwner, pCarrier->GetId());
 	BroadcastMessage(FlagPickedUpMessageType, &data);
@@ -233,6 +235,8 @@ void MultiflagCTFGameContext::FlagPickedUp(EntityTeam flagOwner, Entity* pCarrie
 //--------------------------------------------------------------------------------------
 void MultiflagCTFGameContext::FlagDropped(EntityTeam flagOwner)
 {
+	m_flagCarriers[flagOwner]->SetHandicap(false);
+
 	m_flagStates[flagOwner]      = Dropped;
 	m_flagCarriers[flagOwner]    = nullptr;
 	m_flagResetTimers[flagOwner] = m_flagResetTimeLimit;
@@ -266,6 +270,8 @@ void MultiflagCTFGameContext::FlagReturned(EntityTeam flagOwner)
 //--------------------------------------------------------------------------------------
 void MultiflagCTFGameContext::FlagCaptured(EntityTeam flagOwner)
 {
+	m_flagCarriers[flagOwner]->SetHandicap(false);
+
 	if(flagOwner == TeamRed)
 	{
 		AddScore(TeamBlue, 1);

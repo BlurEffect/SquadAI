@@ -442,16 +442,16 @@ Behaviour* BehaviourFactory::CreateSimpleTeamMultiflagCTFTree(TeamAI* pTeamAI)
 				{
 					if(pTeamAI->GetTeam() == TeamRed)
 					{
-						//reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pRunTheFlagHomeSequence);
+						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pRunTheFlagHomeSequence);
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pRushBaseAttackSequence);
-						//reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pCoordinatedBaseAttackSequence);
-						//reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pDistractionBaseAttackSequence);
-						//reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pSimpleBaseAttackSequence);
+						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pCoordinatedBaseAttackSequence);
+						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pDistractionBaseAttackSequence);
+						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pSimpleBaseAttackSequence);
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pPickUpDroppedFlagSequence);
 						reinterpret_cast<TeamComposite*>(pAttackCharacteristicSelector)->AddChild(pGuardedFlagCaptureSequence);
-						//reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pDefendBaseEntrancesSequence);
+						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pDefendBaseEntrancesSequence);
 						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pReturnDroppedFlagSequence);
-						//reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pSimpleBaseDefenceSequence);
+						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pSimpleBaseDefenceSequence);
 						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pActiveBaseDefenceSequence);
 						reinterpret_cast<TeamComposite*>(pDefendCharacteristicSelector)->AddChild(pInterceptFlagCarrierSequence);
 

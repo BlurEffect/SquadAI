@@ -74,7 +74,7 @@ void Application::ProcessInput(void)
 	}
 
 	// Check if the user wants to create a new test application
-	if(m_inputManager.GetNewEnvironment())
+	if(m_appData.m_applicationState == EditMode && m_inputManager.GetNewEnvironment())
 	{
 		CreateNewTestEnvironment();
 		return;

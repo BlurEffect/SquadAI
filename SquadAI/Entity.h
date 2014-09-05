@@ -129,6 +129,8 @@ public:
 	bool                                IsPathSet(void) const;
 	std::vector<XMFLOAT2>*              GetPath(void);
 	float         GetReportInterval(void) const;
+
+	bool IsHandicapped(void) const;
 	bool DoUpdate(void) const;
 
 	void SetTestEnvironment(TestEnvironment* pEnvironment);
@@ -149,6 +151,8 @@ public:
 	void SetObservationTarget(const XMFLOAT2& target);
 	void SetPath(std::vector<XMFLOAT2>* pPath);
 	void SetReportInterval(float reportInterval);
+
+	void SetHandicap(bool isHandicapped);
 
 	//--------------------------------------------------------------------------------------
 	// Functor used to find an entity within a container based on its id.
@@ -267,6 +271,8 @@ private:
 	float                        m_reportInterval;           // Determines at which interval the entity will report updates to the team AI associated to it
 	float						 m_reportTimer;				 // Used to determine when to report to the team AI
 	bool                         m_doReport;                 // Determines whether certain updates are sent to the team AI or not during a frame
+
+	bool                         m_isHandicapped;            // Determines whether the entity can act as usual or is handicapped
 };
 
 #endif // ENTITY_H

@@ -27,7 +27,8 @@ struct SoldierProperties
 							  m_maxCollisionAvoidanceForce(0.0f),
 							  m_maxAvoidWallsForce(0.0f),
 							  m_maxSeparationForce(0.0f),       
-							  m_targetReachedRadius(0.0f),		
+							  m_targetReachedRadius(0.0f),
+							  m_speedHandicap(0.0f),
 							  m_avoidWallsRadius(0.0f),		 
 							  m_separationRadius(0.0f),
 							  m_fireWeaponInterval(0.0f),
@@ -46,6 +47,7 @@ struct SoldierProperties
 	float m_maxAvoidWallsForce;         // The maximal force that can result from avoiding walls (being pushed away from them)
 	float m_maxSeparationForce;         // The maximal force that can result from separation from other entities
 	float m_targetReachedRadius;		// When the distance between a soldier and his target is lower than this, latter one counts as reached
+	float m_speedHandicap;			    // When the soldier is handicapped (for instance carrying a flag) he can only move at this speed
 	float m_avoidWallsRadius;		    // When this close to an obstacle, the soldier will get pushed away from it (prevents intersection with walls)
 	float m_separationRadius;		    // When a soldier registers other entities within this radius it will steer for separation from them
 	

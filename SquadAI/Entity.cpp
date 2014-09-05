@@ -26,7 +26,8 @@ Entity::Entity(void) : CollidableObject(),
 					   m_viewDirection(0.0f, 1.0f),
 					   m_reportInterval(0.0f),
 					   m_reportTimer(0.0f),
-					   m_doReport(false)
+					   m_doReport(false),
+					   m_isHandicapped(false)
 {
 }
 
@@ -143,8 +144,8 @@ void Entity::Reset(void)
 	m_observationTargetSet     = false;
 	m_observationTarget		   = XMFLOAT2(0.0f, 0.0f);
 	m_currentHealth			   = m_maximalHealth;
-
-	m_pCurrentOrder = nullptr;
+	m_isHandicapped			   = false;
+	m_pCurrentOrder			   = nullptr;
 
 	ResetCommunication();
 
@@ -626,6 +627,7 @@ void Entity::ProcessRespawn(const XMFLOAT2& respawnPosition)
 	m_observationTargetSet     = false;
 	m_observationTarget		   = XMFLOAT2(0.0f, 0.0f);
 	m_currentHealth			   = m_maximalHealth;
+	m_isHandicapped            = false;
 
 	SetPosition(respawnPosition);
 	UpdateColliderPosition(respawnPosition);
@@ -749,6 +751,11 @@ float Entity::GetReportInterval(void) const
 	return m_reportInterval;
 }
 
+bool Entity::IsHandicapped(void) const
+{
+	return m_isHandicapped;
+}
+
 bool Entity::DoUpdate(void) const
 {
 	return m_doReport;
@@ -840,4 +847,9 @@ void Entity::SetPath(std::vector<XMFLOAT2>* pPath)
 void Entity::SetReportInterval(float reportInterval)
 {
 	m_reportInterval = reportInterval;
+}
+
+void Entity::SetHandicap(bool isHandicapped)
+{
+	m_isHandicapped = isHandicapped;
 }

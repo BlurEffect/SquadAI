@@ -89,7 +89,7 @@ BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 	m_movementManager.Separate(m_soldierProperties.m_separationRadius, m_soldierProperties.m_maxSeparationForce);
 	m_movementManager.StayAwayFromWalls(m_soldierProperties.m_avoidWallsRadius, m_soldierProperties.m_maxAvoidWallsForce);
 
-	m_movementManager.UpdatePosition(deltaTime, m_soldierProperties.m_maxSpeed, m_soldierProperties.m_maxTotalForce);
+	m_movementManager.UpdatePosition(deltaTime, m_soldierProperties.m_maxSpeed, m_soldierProperties.m_maxTotalForce, m_soldierProperties.m_speedHandicap);
 
 	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == MoveToPositionOrder && GetCurrentOrder()->GetOrderPriority() != LowPriority)
 	{

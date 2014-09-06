@@ -152,66 +152,7 @@ void MultiflagCTFGameContext::ProcessEvent(EventType type, void* pEventData)
 		GameContext::ProcessEvent(type, pEventData);
 	}
 }
-/*
-//--------------------------------------------------------------------------------------
-// Receives and processes a given message.
-// Param1: A pointer to the message to process.
-//--------------------------------------------------------------------------------------
-void MultiflagCTFGameContext::ProcessMessage(Message* pMessage)
-{	
-	// Catch all messages relevant to this game mode
 
-	switch(pMessage->GetType())
-	{
-	case AddObjectiveMessageType:
-		{
-		AddObjectiveMessage* pAddObjectiveMessage = reinterpret_cast<AddObjectiveMessage*>(pMessage);
-		SetFlag(pAddObjectiveMessage->GetObjective()->GetTeam(), pAddObjectiveMessage->GetObjective());
-		m_flagBasePositions[pAddObjectiveMessage->GetObjective()->GetTeam()] = pAddObjectiveMessage->GetObjective()->GetPosition();
-		break;
-		}
-	case EntityReachedObjectiveMessageType:
-		{
-		EntityReachedObjectiveMessage* pEntityReachedObjectiveMessage = reinterpret_cast<EntityReachedObjectiveMessage*>(pMessage);
-		switch(m_flagStates[pEntityReachedObjectiveMessage->GetObjective()->GetTeam()])
-		{
-		case InBase:
-			if(pEntityReachedObjectiveMessage->GetEntity()->GetTeam() != pEntityReachedObjectiveMessage->GetObjective()->GetTeam())
-			{
-				// An entity of a hostile team reached the flag, make the entity the new flag carrier
-				FlagPickedUp(pEntityReachedObjectiveMessage->GetObjective()->GetTeam(), pEntityReachedObjectiveMessage->GetEntity());
-			}else
-			{
-				for(unsigned int i = 0; i < NumberOfTeams-1; ++i)
-				{
-					// Check if there is a homecoming flag carrier
-					// (flag can only be returned when the own flag is at home, this collision with the own flag
-					// in base is used as an indicator whether the flag was successfully captured)
-					if(m_flagCarriers[i] && (pEntityReachedObjectiveMessage->GetEntity()->GetId() == m_flagCarriers[i]->GetId()))
-					{
-						// The flag carrier reached the base position of his own flag -> captured
-						FlagCaptured(pEntityReachedObjectiveMessage->GetObjective()->GetTeam());
-					}
-				}
-			}
-			break;
-		case Dropped:
-			if(pEntityReachedObjectiveMessage->GetEntity()->GetTeam() != pEntityReachedObjectiveMessage->GetObjective()->GetTeam())
-			{
-				// An entity of a hostile team reached the flag, make the entity the new flag carrier
-				FlagPickedUp(pEntityReachedObjectiveMessage->GetObjective()->GetTeam(), pEntityReachedObjectiveMessage->GetEntity());
-			}else
-			{
-				// An entity of the team the flag belongs to has reached the flag -> return it
-				FlagReturned(pEntityReachedObjectiveMessage->GetObjective()->GetTeam());
-			}
-			break;
-		}
-		break;
-		}
-	}
-}
-*/
 //--------------------------------------------------------------------------------------
 // Called when a flag is picked up.
 // Param1: The team, whose flag was picked up, that is stolen.

@@ -5,8 +5,6 @@
 *  memory according to observations made and events perceived.
 */
 
-#define DEBUG
-
 // Includes
 #include "EntitySensors.h"
 #include "Entity.h"
@@ -97,9 +95,6 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 					{
 						// Remember this enemy as a known threat
 						newKnownThreats.push_back(reinterpret_cast<Entity*>(it->second));
-#ifdef DEBUG
-					//	m_pEntity->GetTestEnvironment()->RecordEvent(EnemySpottedLogEvent, m_pEntity, it->second);
-#endif
 					}
 				}	
 			}
@@ -132,24 +127,8 @@ void EntitySensors::CheckForThreats(const XMFLOAT2& viewDirection, float viewing
 				++it;
 			}
 		}
-		/*
-		for(std::vector<KnownThreat>::iterator it = m_pEntity->GetKnownThreats().begin(); it != m_pEntity->GetKnownThreats().end(); ++it)
-		{
-			std::vector<Entity*>::const_iterator foundIt = std::find_if(newKnownThreats.begin(), newKnownThreats.end(), Entity::FindEntityById(it->m_pEntity->GetId()));
-			if(foundIt == newKnownThreats.end())
-			{
-				if(it->m_pEntity->IsAlive() && !m_pEntity->IsSuspectedThreat(it->m_pEntity->GetId()))
-				{
-					// The previously known threat can no longer be seen -> add to suspected threats
-					m_pEntity->AddSuspectedThreat(it->m_pEntity->GetId(), it->m_pEntity->GetPosition(), false);
-				}
-
-				m_pEntity->GetKnownThreats().erase(it++);
-			}
-		}
-		*/
+		
 		// Set new known threats
-		//m_pEntity->ClearKnownThreats();
 		for(std::vector<Entity*>::iterator it = newKnownThreats.begin(); it != newKnownThreats.end(); ++it)
 		{
 			// Check if the threat was known before

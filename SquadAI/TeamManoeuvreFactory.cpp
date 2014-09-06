@@ -25,9 +25,6 @@ TeamManoeuvre* TeamManoeuvreFactory::CreateTeamManoeuvre(TeamManoeuvreType type,
 {
 	switch(type)
 	{
-	case TestAllMoveManoeuvre:
-		return new TestManoeuvre(minNumberOfParticipants, maxNumberOfParticipants, pTeamAI);
-		break;
 	case DefendBaseEntrancesManoeuvre:
 		{
 		MultiflagCTFTeamAI* pCTFTeamAI = dynamic_cast<MultiflagCTFTeamAI*>(pTeamAI);

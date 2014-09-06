@@ -24,10 +24,6 @@ enum BehaviourStatus;
 //--------------------------------------------------------------------------------------
 enum TeamManoeuvreType
 {
-	// Test manoeuvres
-	TestAllAttackManoeuvre,
-	TestAllMoveManoeuvre,
-	TestAllDefendManoeuvre,
 	// Actual manoeuvres
 	DefendBaseEntrancesManoeuvre,
 	RushBaseAttackManoeuvre,

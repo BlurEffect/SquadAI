@@ -38,12 +38,12 @@ public:
 	void Update(float deltaTime);
 	void Reset(void);
 
-	//void ProcessMessage(Message* pMessage);
-
 	void FlagPickedUp(EntityTeam flagOwner, Entity* pCarrier);
 	void FlagDropped(EntityTeam flagOwner);
 	void FlagReturned(EntityTeam flagOwner);
 	void FlagCaptured(EntityTeam flagOwner);
+
+	void ProcessEvent(EventType type, void* pEventData);
 
 	// Data access functions
 
@@ -58,21 +58,18 @@ public:
 	void SetFlagBasePosition(EntityTeam team, const XMFLOAT2& basePosition);
 	void SetFlag(EntityTeam flagOwner, Objective* pCollidableObject);
 
-	void ProcessEvent(EventType type, void* pEventData);
 protected:
 	void ProcessMessage(Message* pMessage);
-	
 
 private:
 
-	float	  m_flagResetTimeLimit;					// The time it takes a flag to be returned to its base position once dropped
-	float     m_flagResetTimers[NumberOfTeams-1];   // Keeps track of how long it will take for each flag to be reset
-	FlagState m_flagStates[NumberOfTeams-1];	    // The current state of the flags of all teams
-	XMFLOAT2  m_flagBasePositions[NumberOfTeams-1]; // The base positions of the flags they will be returned to when dropped for too long or when returned/captured
-	XMFLOAT2  m_flagPositions[NumberOfTeams-1];     // The current positions of the flags of all teams
-	Entity*   m_flagCarriers[NumberOfTeams-1];      // Pointers to the current flag carriers, nullptr if the flag is not being carried
-
-	Objective* m_flags[NumberOfTeams-1];     // The flags of the teams
+	float	   m_flagResetTimeLimit;				 // The time it takes a flag to be returned to its base position once dropped
+	float      m_flagResetTimers[NumberOfTeams-1];   // Keeps track of how long it will take for each flag to be reset
+	FlagState  m_flagStates[NumberOfTeams-1];	     // The current state of the flags of all teams
+	XMFLOAT2   m_flagBasePositions[NumberOfTeams-1]; // The base positions of the flags they will be returned to when dropped for too long or when returned/captured
+	XMFLOAT2   m_flagPositions[NumberOfTeams-1];     // The current positions of the flags of all teams
+	Entity*    m_flagCarriers[NumberOfTeams-1];      // Pointers to the current flag carriers, nullptr if the flag is not being carried
+	Objective* m_flags[NumberOfTeams-1];			 // The flags of the teams
 };
 
 #endif // MULTIFLAG_CTF_GAME_CONTEXT_H

@@ -1,7 +1,7 @@
 /* 
 *  Kevin Meergans, SquadAI, 2014
 *  TestEnvironment.h
-*  Encapsulates a test setup and contains all entities
+*  Encapsulates a test setup and contains all objects
 *  that are part of it.
 */
 
@@ -59,7 +59,6 @@ public:
 	bool AddObject(ObjectType type, const XMFLOAT2& position, float rotation);
 	bool RemoveObjects(const XMFLOAT2& position);
 
-
 	bool Save(std::string filename);
 	bool Load(std::string filename);
 
@@ -75,42 +74,33 @@ public:
 	bool GetRandomUnblockedTarget(XMFLOAT2& outPosition) const;
 	bool GetRandomUnblockedTargetInArea(const XMFLOAT2& centre, float radius, XMFLOAT2& outPosition) const;
 
-	//const Entity* GetCollisionObject(const MovingEntity& entity); // currently not used
 	bool CheckLineOfSightGrid(int startGridX, int startGridY, int endGridX, int endGridY);
 	bool CheckLineOfSight(const XMFLOAT2& start, const XMFLOAT2& end);
-	void ResetNodeGraph(void);
-	
 	bool CheckCollision(const CollidableObject* pCollidableObject,  const XMFLOAT2& oldPosition, EntityGroup entityGroup, CollidableObject*& outCollisionObject);
-
-	void RecordEvent(LogEventType type, void* pObject1, void* pObject2);
 	
-	//void ProcessMessage(Message* pMessage);
+	void ResetNodeGraph(void);
+	void ProcessEvent(EventType type, void* pEventData);
 
-	bool IsBlocked(const XMFLOAT2 worldPos) const;
+	void	   RecordEvent(LogEventType type, void* pObject1, void* pObject2);
+	bool	   IsBlocked(const XMFLOAT2 worldPos) const;
 	EntityTeam GetTerritoryOwner(const XMFLOAT2 worldPos) const;
 
-
-
 	// Data access functions
-	float		 GetGridSize(void) const;
-	unsigned int GetNumberOfGridPartitions(void) const;
-	float	     GetGridSpacing(void) const;
-	bool         IsPaused(void) const;
-	const GameContext* GetGameContext(void) const;
+	float				GetGridSize(void) const;
+	unsigned int		GetNumberOfGridPartitions(void) const;
+	float				GetGridSpacing(void) const;
+	bool				IsPaused(void) const;
+	const GameContext*	GetGameContext(void) const;
+	Pathfinder&			GetPathfinder(void);
+	Node**				GetNodes(void);
 
 	const std::unordered_map<Direction, std::vector<XMFLOAT2>>& GetBaseEntrances(EntityTeam team) const;
 	const std::unordered_map<Direction, std::vector<XMFLOAT2>>& GetAttackPositions(EntityTeam team) const;
-	const std::vector<XMFLOAT2>& GetBaseFieldPositions(EntityTeam team) const;
-
-	Pathfinder&  GetPathfinder(void);
-	Node**	     GetNodes(void);
-
-	void ProcessEvent(EventType type, void* pEventData);
+	const std::vector<XMFLOAT2>&								GetBaseFieldPositions(EntityTeam team) const;
 
 protected:
-	void ProcessMessage(Message* pMessage);
-	
 
+	void ProcessMessage(Message* pMessage);
 private:
 
 	bool PrepareSimulation(void);
@@ -129,31 +119,30 @@ private:
 	unsigned long m_id;           // An id is assigned to each entity being created in the environment
 	bool          m_isPaused;     // Tells whether the simulation running in the environment is currently paused
 	bool          m_isInEditMode; // Tells whether the environment is in edit or simulation mode
-	
-	Logger m_logger; // The logger object that is used to record events
-	GameContext* m_pGameContext; // The current gamestate
+	Logger		  m_logger;		  // The logger object that is used to record events
+	GameContext*  m_pGameContext; // The current gamestate
 
 	std::list<std::pair<float, Entity*>> m_deadEntities;  // Contains pointers to currently dead entities and the duration of their absence from the game
 
 	// Grid
-	float               m_gridSize;               // The size of the grid along x and y axis
-	unsigned int        m_numberOfGridPartitions; // The number of grid fields along x and y axis
-	float               m_gridSpacing;			  // The size of a grid field along x and y axis
-	Node**              m_pNodes;                 // The graph made up of nodes representing the test environment when in simulation mode
-
-	TeamAI*  m_pTeamAI[NumberOfTeams-1]; // The team AIs controlling the entities of the teams
+	float			m_gridSize;					// The size of the grid along x and y axis
+	unsigned int	m_numberOfGridPartitions;	// The number of grid fields along x and y axis
+	float			m_gridSpacing;				// The size of a grid field along x and y axis
+	Node**			m_pNodes;					// The graph made up of nodes representing the test environment when in simulation mode
+	
+	TeamAI*		    m_pTeamAI[NumberOfTeams-1]; // The team AIs controlling the entities of the teams
 
 	// Objects
 	std::vector<EditModeObject> m_staticObjects;									// The static test environment objects, as set up by the user in edit mode
 	Soldier				        m_soldiers[g_kSoldiersPerTeam * (NumberOfTeams-1)]; // The soldier objects of all teams
-	Objective                        m_objectives[NumberOfTeams-1];						    // The flags of all teams
+	Objective                   m_objectives[NumberOfTeams-1];					    // The flags of all teams
 	std::list<Obstacle>         m_obstacles;										// The obstacles within the environment 
 	std::list<Projectile>       m_projectiles;										// Holds the currently active projectiles
 	std::vector<XMFLOAT2>       m_spawnPoints[NumberOfTeams-1];					    // Holds the spawn points of all teams
 
-	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_baseEntrances[NumberOfTeams-1]; // The base entrances and the directions they're facing at
-	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_attackPositions[NumberOfTeams-1]; // The attack positions and the attack direction associated to them
-	std::vector<XMFLOAT2> m_baseFieldPositions[NumberOfTeams-1]; // The world positions of the team base grid fields for each team
+	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_baseEntrances[NumberOfTeams-1];      // The base entrances and the directions they're facing at
+	std::unordered_map<Direction, std::vector<XMFLOAT2>> m_attackPositions[NumberOfTeams-1];    // The attack positions and the attack direction associated to them
+	std::vector<XMFLOAT2>								 m_baseFieldPositions[NumberOfTeams-1]; // The world positions of the team base grid fields for each team
 
 	Pathfinder   m_pathfinder;                              // The pathfinder associated to this environment.
 	float        m_objectScaleFactors[NumberOfObjectTypes]; // Determines the scale of the different objects in relation to a grid field

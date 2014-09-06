@@ -23,7 +23,7 @@ public:
 	Entity* GetEntity(void);
 
 private:
-	Entity*         m_pEntity; // The entity that this behaviour belongs to
+	Entity* m_pEntity; // The entity that this behaviour belongs to
 
 };
 

@@ -13,10 +13,9 @@
 #include <unordered_map>
 #include "TeamAI.h"
 #include "ObjectTypes.h"
-#include "MultiflagCTFGameContext.h" // needs to know flag state -> move flag state somewhere else (game mode spceifc data structs?)
+#include "MultiflagCTFGameContext.h"
 #include "TeamAIToEntityMessages.h"
 #include "TeamManoeuvreFactory.h"
-
 
 // Forward declarations
 class TestEnvironment;
@@ -48,40 +47,32 @@ public:
 	MultiflagCTFTeamAI(void);
 	~MultiflagCTFTeamAI(void);
 
-	bool Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic);
+	bool		 Initialise(EntityTeam team, TestEnvironment* pEnvironment, TeamAICharacteristic characteristic);
 	virtual void Update(float deltaTime);
 	virtual void PrepareForSimulation(void);
-	//void ProcessMessage(Message* pMessage);
-	void Reset(void);
+	void		 Reset(void);
+	void		 ProcessEvent(EventType type, void* pEventData);
 
-	void ProcessEvent(EventType type, void* pEventData);
-
-	virtual bool ManoeuvreStillValid(TeamManoeuvreType manoeuvre);
-	virtual bool ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre);
+	virtual bool			ManoeuvreStillValid(TeamManoeuvreType manoeuvre);
+	virtual bool			ManoeuvrePreconditionsFulfilled(TeamManoeuvreType manoeuvre);
 	virtual BehaviourStatus InitiateManoeuvre(TeamManoeuvreType manoeuvre);
 	virtual BehaviourStatus UpdateManoeuvre(TeamManoeuvreType manoeuvre, float deltaTime);
-	virtual void TerminateManoeuvre(TeamManoeuvreType manoeuvre);
+	virtual void			TerminateManoeuvre(TeamManoeuvreType manoeuvre);
+	
+	virtual void RegisterObjective(Objective* pObjective);
+
+	// Data access functions
 
 	const FlagData& GetFlagData(EntityTeam team) const;
-
-	virtual void RegisterObjective(Objective* pObjective);
 
 protected:
 
 	virtual bool InitialiseManoeuvres(void);
+	void		 ProcessMessage(Message* pMessage);
 
-	void ProcessMessage(Message* pMessage);
-	
-	// Available manoeuvres
-	BehaviourStatus AllAttack(float deltaTime);
-	BehaviourStatus AllDefend(float deltaTime);
-	BehaviourStatus AllMove(float deltaTime);
 private:
 
 	FlagData m_flagData[NumberOfTeams-1]; // Data about the flags of the two teams
-
-	//std::unordered_map<Direction, XMFLOAT2> m_friendlyBaseEntrances; // Contains information about the entrances to the base of team of this AI
-	//std::unordered_map<Direction, XMFLOAT2> m_enemyBaseEntrances;    // Contains information about the entrances to the base of the hostile team
 };
 
 #endif // MULTIFLAG_CTF_TEAM_AI_H

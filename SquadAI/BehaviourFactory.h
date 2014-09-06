@@ -63,12 +63,6 @@
 #include "TeamRepeat.h"
 #include "TeamReturnSpecificStatus.h"
 
-// Multiflag team behaviours
-// Actions
-//#include "TeamAllAttack.h"
-//#include "TeamAllDefend.h"
-//#include "TeamAllMove.h"
-
 // Forward declarations
 class Entity;
 class TeamAI;
@@ -133,10 +127,6 @@ enum PrimitiveTeamBehaviourType
 	TeamExecuteManoeuvreType,
 	TeamManoeuvrePreconditionsFulfilledType,
 	TeamManoeuvreStillValidType
-	
-	//TeamAllAttackType,
-	//TeamAllDefendType,
-	//TeamAllMoveType
 };
 
 //--------------------------------------------------------------------------------------
@@ -153,17 +143,7 @@ enum ParentTeamBehaviourType
 	TeamRepeatType,
 	TeamReturnSpecificStatusType
 };
-/*
-//--------------------------------------------------------------------------------------
-// Identifies the specific behaviours that can be used for team AIs in the different game modes.
-//--------------------------------------------------------------------------------------
-enum SpecificTeamBehaviourType
-{
-	TeamAllAttackType,
-	TeamAllDefendType,
-	TeamAllMoveType
-};
-*/
+
 //--------------------------------------------------------------------------------------
 // Lists available types of behaviour trees.
 //--------------------------------------------------------------------------------------
@@ -171,8 +151,8 @@ enum BehaviourTreeType
 {
 	SimpleIndividualMovementTree,
 	SimpleIndividualCombatTree,
-	ModifiedSimpleIndividualCombatTree,
-	SimpleTeamMultiflagCTFTree
+	ModifiedSimpleIndividualCombatTree, // The most evolved individual behaviour tree
+	SimpleTeamMultiflagCTFTree          // The behaviour tree for the CTF team AI
 };
 
 
@@ -192,9 +172,6 @@ private:
 	static Behaviour* CreateUniversalIndividualBehaviour(UniversalIndividualBehaviourType behaviourType, Entity* pEntity, const char* name, void* pInitData);
 	static TeamBehaviour* CreatePrimitiveTeamBehaviour(PrimitiveTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, float aggressiveness, float defensiveness, void* pInitData);
 	static TeamBehaviour* CreateParentTeamBehaviour(ParentTeamBehaviourType behaviourType, TeamAI* pTeamAI, const char* name, void* pInitData);
-
-	
-	//static Behaviour* CreateSpecificTeamBehaviour(SpecificTeamBehaviourType behaviourType, MultiflagCTFTeamAI* pMultiflagCTFTeamAI, const char* name, void* pInitData);
 };
 
 #endif // BEHAVIOUR_FACTORY_H

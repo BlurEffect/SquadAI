@@ -75,11 +75,11 @@ bool Node::AddAdjacentNode(Node* pNode)
 //--------------------------------------------------------------------------------------
 void Node::Reset(void)
 {
-	m_isObstacle     = false;
-	m_pObstacle      = nullptr;
+	m_isObstacle       = false;
+	m_pObstacle        = nullptr;
 	m_isEntranceToBase = false;
 	m_isAttackPosition = None;
-	m_territoryOwner = None;
+	m_territoryOwner   = None;
 
 	for(unsigned int i = 0; i < NumberOfDirections; ++i)
 	{

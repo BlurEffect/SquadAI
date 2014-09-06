@@ -492,9 +492,6 @@
     <ClCompile Include="TeamManoeuvre.cpp">
       <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
-    <ClCompile Include="TestManoeuvre.cpp">
-      <Filter>Source Files\Manoeuvres</Filter>
-    </ClCompile>
     <ClCompile Include="TeamManoeuvreFactory.cpp">
       <Filter>Source Files\Manoeuvres</Filter>
     </ClCompile>
@@ -542,6 +539,9 @@
     </ClCompile>
     <ClCompile Include="InterceptFlagCarrier.cpp">
       <Filter>Source Files\Manoeuvres\Protect Own Flag</Filter>
+    </ClCompile>
+    <ClCompile Include="Message.cpp">
+      <Filter>Source Files\Messages/Events</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -910,9 +910,6 @@
     </ClInclude>
     <ClInclude Include="TeamRepeat.h">
       <Filter>Header Files\BehaviourTree\TeamBehaviours\Composites/Branch Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="TestManoeuvre.h">
-      <Filter>Header Files\Manoeuvres</Filter>
     </ClInclude>
     <ClInclude Include="TeamManoeuvreFactory.h">
       <Filter>Header Files\Manoeuvres</Filter>

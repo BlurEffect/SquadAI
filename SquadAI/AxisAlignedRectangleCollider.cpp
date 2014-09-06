@@ -21,13 +21,6 @@ AxisAlignedRectangleCollider::AxisAlignedRectangleCollider(const XMFLOAT2& centr
 	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + m_halfGridSize, GetCentre().y + GetHeight() * 0.5f + m_halfGridSize);
 	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f + m_halfGridSize, GetCentre().y - GetHeight() * 0.5f + m_halfGridSize);
 	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f + m_halfGridSize, GetCentre().y - GetHeight() * 0.5f + m_halfGridSize);
-
-	/*
-	m_topLeft	  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
-	m_topRight	  = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y + GetHeight() * 0.5f);
-	m_bottomLeft  = XMFLOAT2(GetCentre().x - GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
-	m_bottomRight = XMFLOAT2(GetCentre().x + GetWidth() * 0.5f, GetCentre().y - GetHeight() * 0.5f);
-	*/
 }
 
 AxisAlignedRectangleCollider::~AxisAlignedRectangleCollider(void)
@@ -46,7 +39,6 @@ bool AxisAlignedRectangleCollider::CheckLineCollision(const XMFLOAT2& lineStart,
 	// Convert the coordinates to grid space (see note in constructor)
 	XMFLOAT2 lineStartGrid(lineStart.x + m_halfGridSize, lineStart.y + m_halfGridSize);
 	XMFLOAT2 lineEndGrid(lineEnd.x + m_halfGridSize, lineEnd.y + m_halfGridSize);
-	
 
 
 	// Determine intersections of the four lines making up the rectangle with the passed in line

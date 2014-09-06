@@ -66,10 +66,7 @@ BehaviourStatus TeamParallel::Update(float deltaTime)
 
     for(std::vector<TeamBehaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
     {
-		//if(!(*it)->IsTerminated())
-        //{
 		BehaviourStatus childStatus =   (*it)->Tick(deltaTime);
-        //}
 
 		if(childStatus == StatusSuccess)
         {

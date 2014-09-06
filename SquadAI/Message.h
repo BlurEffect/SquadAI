@@ -8,7 +8,7 @@
 *  were killed or objectives that were reached.
 */
 
-// Note: Messages are defined in their header files and certain types of messages are 
+// Note: Specific messages are defined in their header files and certain types of messages are 
 //       contained within a single header file. Although this is against encapsulation,
 //		 I decided to do so because there are many different messages and each of them
 //       is hardly more than a collection of a few member variables and corresponding getters.
@@ -21,15 +21,8 @@
 //--------------------------------------------------------------------------------------
 enum MessageType
 {
-	// Messages sent from entities to the test environment
-	//ProjectileFiredMessageType,			// A projectile was fired by an entity
-	
 	// Messages sent from the test environment to the entities
 	EntityKilledMessageType,			// An entity was killed and other entities are notified of this event (also sent from game context to team AI)
-
-	// Messages sent from the test environment to the game context
-	//AddObjectiveMessageType,			// Puts an objective object under the control of a specific game context
-	//EntityReachedObjectiveMessageType,	// An entity collided with an objective object.
 
 	// Messages sent from entities to the team AI
 	EnemySpottedMessageType,			// An enemy was spotted by an entity
@@ -58,19 +51,16 @@ enum MessageType
 class Message
 {
 public:
-	Message(MessageType messageType) : m_messageType(messageType),
-									   m_numberOfReceivers(0),
-									   m_processedCount(0)
-	{}
-	virtual ~Message(void) = 0{}
+	Message(MessageType messageType);
+	virtual ~Message(void) = 0;
 
-	MessageType  GetType(void) const { return m_messageType; }
-	unsigned int GetNumberOfReceivers(void) const { return m_numberOfReceivers; }
-	unsigned int GetProcessedCount(void) const { return m_processedCount; }
-	bool         IsProcessed(void) const { return m_processedCount == m_numberOfReceivers; }
+	MessageType  GetType(void) const;
+	unsigned int GetNumberOfReceivers(void) const;
+	unsigned int GetProcessedCount(void) const;
+	bool         IsProcessed(void) const;
 
-	void IncreaseProcessedCount(void) { ++m_processedCount; }
-	void IncreaseReceiverCount(void) { ++m_numberOfReceivers; }
+	void IncreaseProcessedCount(void);
+	void IncreaseReceiverCount(void);
 
 private:
 	MessageType  m_messageType;			// The type of the message

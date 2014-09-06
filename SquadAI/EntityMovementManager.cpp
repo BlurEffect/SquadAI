@@ -100,16 +100,9 @@ void EntityMovementManager::UpdatePosition(float deltaTime, float maxSpeed, floa
 		XMStoreFloat2(&newVelocity, XMVector2Normalize(XMLoadFloat2(&newVelocity)) * maxSpeed);
 	}
 
-	if(m_pEntity->IsHandicapped())
-	{
-		//newVelocity.x *= handicap;
-		//newVelocity.y *= handicap;
-	}
-		
 	// Set the new velocity and position on the entity
 
 	m_velocity = newVelocity;
-	//XMStoreFloat2(&m_velocity, XMLoadFloat2(&newVelocity) * deltaTime );
 		
 	XMFLOAT2 newPosition;
 
@@ -146,28 +139,6 @@ void EntityMovementManager::Reset(void)
 	m_velocity = XMFLOAT2(0.0f, 0.0f);
 	m_currentNode = 0;
 }
-
-/*
-//--------------------------------------------------------------------------------------
-// Calculate a path to the target position and set it active.
-// Param1: The target position of the path.
-// Returns true if a path for the entity could be created successfully, false otherwise.
-//--------------------------------------------------------------------------------------
-bool EntityMovementManager::SetPathTo(const XMFLOAT2& targetPosition)
-{
-	bool result = false;
-	result = m_pEnvironment->GetPathfinder().CalculatePath(AStar, EuclideanDistance, m_pEntity->GetPosition(), targetPosition, m_path);
-
-	if(result)
-	{
-		m_currentNode = 0;
-	}else
-	{
-		int a  = 2;
-	}
-
-	return result;
-}*/
 
 //--------------------------------------------------------------------------------------
 // Calculate a path to the target position.
@@ -252,52 +223,6 @@ void EntityMovementManager::Wait()
 	m_steeringForce = XMFLOAT2(0.0f, 0.0f);
 }
 
-/*
-//--------------------------------------------------------------------------------------
-// Calculate the path following force and add it to the total force.
-// Param1: When the entity has approached the target by this distance, it counts as reached.
-// Param2: The speed, at which the entity should follow the path.
-// Returns true if the end of the current path was reached, false if there is still way to go.
-//--------------------------------------------------------------------------------------
-bool EntityMovementManager::FollowPath(float nodeReachedRadius, float speed)
-{
-	if(!m_path.empty())
-	{
-		// There is an active path
-		XMFLOAT2 target = m_path[m_currentNode];
-	
-		// Calculate the distance between the current position of the entity and the target
-		float distance = 0.0f;
-		XMStoreFloat(&distance, XMVector2Length(XMLoadFloat2(&target) - XMLoadFloat2(&m_pEntity->GetPosition())));
-
-		if(distance <= nodeReachedRadius)
-		{
-			// The entity has reached the node
-			++m_currentNode;
-
-			if(m_currentNode >= m_path.size())
-			{
-				// Final destination reached, clear the path
-				m_path.clear();
-				m_velocity = XMFLOAT2(0.0f, 0.0f);
-			
-				return true;
-			}else
-			{
-				Seek(m_path[m_currentNode], nodeReachedRadius, speed);
-				return false;
-			}
-		}else
-		{
-			Seek(m_path[m_currentNode], nodeReachedRadius, speed);
-			return false;
-		}
-	}
-
-	return true;
-}*/
-
-
 //--------------------------------------------------------------------------------------
 // Calculate the path following force and add it to the total force.
 // Param1: A pointer to the path to follow.
@@ -376,21 +301,6 @@ void EntityMovementManager::AvoidCollisions(float seeAheadDistance, float maxima
 			
 			if((it->second->GetId() != m_pEntity->GetId()) && reinterpret_cast<CollidableObject*>(it->second)->GetCollider()->CheckLineCollision(m_pEntity->GetPosition(), lineEndPoint))
 			{
-				/*
-
-				lineEndPoint = XMFLOAT2(it->second->GetPosition().x + 10.0f, it->second->GetPosition().y);
-
-				XMVECTOR avoidanceForce = XMVector2Normalize(XMLoadFloat2(&lineEndPoint) - XMLoadFloat2(&it->second->GetPosition())) * m_maxCollisionAvoidanceForce;
-		
-				// Add the collision avoidance force to the accumulated steering force
-				XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + avoidanceForce);
-
-				break;
-
-				*/
-
-				// Alternative
-
 				// Determine whether the other entity is left or right of this entity
 
 				XMFLOAT2 entityToObject(0.0f, 0.0f);
@@ -494,16 +404,6 @@ void EntityMovementManager::Separate(float separationRadius, float maximalForce)
 		XMStoreFloat2(&m_steeringForce, XMLoadFloat2(&m_steeringForce) + separationVector);
 	}
 }
-
-/*
-//--------------------------------------------------------------------------------------
-// Tells whether there currently is a path set for the entity to follow.
-// Returns true if there is a patn set, false otherwise.
-//--------------------------------------------------------------------------------------
-bool EntityMovementManager::IsPathSet(void) const
-{
-	return (!m_path.empty());
-}*/
 
 // Data access functions
 

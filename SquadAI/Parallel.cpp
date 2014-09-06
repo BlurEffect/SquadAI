@@ -37,10 +37,7 @@ BehaviourStatus Parallel::Update(float deltaTime)
 
     for(std::vector<Behaviour*>::iterator it = m_children.begin(); it != m_children.end(); ++it)
     {
-		//if(!(*it)->IsTerminated())
-        //{
 		BehaviourStatus childStatus =   (*it)->Tick(deltaTime);
-        //}
 
 		if(childStatus == StatusSuccess)
         {

@@ -177,7 +177,6 @@ void TeamManoeuvre::ProcessMessage(Message* pMessage)
 		{
 			if(it->second->GetOrderType() == AttackEnemyOrder && reinterpret_cast<AttackOrder*>(it->second)->GetEnemyId() == pMsg->GetData().m_id)
 			{
-				// TODO: Check if this actually works, involves erasing of the iterator
 				CancelOrder(it->first);
 				it = m_activeOrders.erase(it);
 			}else

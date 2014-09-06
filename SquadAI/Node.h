@@ -16,18 +16,6 @@
 
 using namespace DirectX;
 
-/*
-//--------------------------------------------------------------------------------------
-// Defines possible values for a node's property of providing access into a team's base.
-//--------------------------------------------------------------------------------------
-enum BaseEntranceType
-{
-	RedEntrance,
-	BlueEntrance,
-	NoEntrance,
-	RedAndBlueEntrance
-};
-*/
 
 class Node
 {

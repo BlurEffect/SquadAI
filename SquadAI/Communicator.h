@@ -45,10 +45,8 @@ protected:
 	virtual void ProcessMessage(Message* pMessage) = 0;
 
 private:
-
 	std::queue<Message*>  m_inboxMessages;  // The unprocessed received messages of this communicator
 	std::vector<Message*> m_outboxMessages; // The messages sent by this communicator, which still await processing
-
 };
 
 #endif // COMMUNICATOR_H

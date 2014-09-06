@@ -24,13 +24,24 @@ HRESULT Cleanup(void);
 HRESULT InitialiseWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+BOOL WINAPI ConsoleCloseHandler(_In_  DWORD dwCtrlType)
+{
+	switch(dwCtrlType)
+	{
+	case CTRL_CLOSE_EVENT:
+		Cleanup();
+		return true;
+	default:
+		return false;
+	}
+}
+
 //--------------------------------------------------------------------------------------
 // Entry point to the program. Initializes everything and goes into a message processing 
 // loop. Idle time is used to update the application.
 //--------------------------------------------------------------------------------------
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)          
 {
- 
 	UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -39,7 +50,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
 	}
 
-	if(!g_application.Initialise(hInstance, g_hWnd, g_width, g_height))
+	if(!g_application.Initialise(hInstance, ConsoleCloseHandler, g_hWnd, g_width, g_height))
 	{
 			return 0;
 	}
@@ -158,3 +169,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     return 0;
 }
+
+
+

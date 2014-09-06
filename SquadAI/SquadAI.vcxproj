@@ -91,6 +91,7 @@
     <ClCompile Include="GuardedFlagCapture.cpp" />
     <ClCompile Include="InitiateTeamManoeuvre.cpp" />
     <ClCompile Include="InterceptFlagCarrier.cpp" />
+    <ClCompile Include="Message.cpp" />
     <ClCompile Include="PickUpDroppedFlag.cpp" />
     <ClCompile Include="ReturnDroppedFlag.cpp" />
     <ClCompile Include="RunTheFlagHome.cpp" />
@@ -199,7 +200,6 @@
     <ClCompile Include="TeamSelector.cpp" />
     <ClCompile Include="TeamSequence.cpp" />
     <ClCompile Include="TestEnvironment.cpp" />
-    <ClCompile Include="TestManoeuvre.cpp" />
     <ClCompile Include="TriangleDrawable.cpp" />
     <ClCompile Include="UniversalIndividualBehaviour.cpp" />
     <ClCompile Include="TeamBehaviour.cpp" />
@@ -277,7 +277,6 @@
     <ClInclude Include="TeamBehaviour.h" />
     <ClInclude Include="TeamManoeuvre.h" />
     <ClInclude Include="TeamProcessMessages.h" />
-    <ClInclude Include="TestManoeuvre.h" />
     <ClInclude Include="UniversalIndividualBehaviour.h" />
     <ClInclude Include="ProcessMessages.h" />
     <ClInclude Include="TestEnvironmentToEntityMessages.h" />

@@ -63,8 +63,6 @@ public:
 	virtual ~Entity(void) = 0;
 
 	bool         Initialise(unsigned long id, const XMFLOAT2& position, float rotation, float uniformScale, ObjectCategory category, ColliderType colliderType, void* pColliderData, TestEnvironment* pEnvironment, float maxHealth, EntityTeam team, float reportInterval);
-	//void         ProcessMessage(Message* pMessage);
-
 	virtual void Update(float deltaTime);
 	virtual void Activate(void);
 	virtual void Reset(void);
@@ -89,15 +87,15 @@ public:
 	virtual BehaviourStatus FinaliseMovement(float deltaTime)			            = 0;
 
 	// Threat management
-	void AddKnownThreat(Entity* pThreat, bool hasHitEntity);
-	void RemoveKnownThreat(unsigned long id);
-	void ClearKnownThreats(void);
-	bool IsKnownThreat(unsigned long id);
-	KnownThreat* GetKnownThreat(unsigned long id);
-	void AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasHitEntity);
-	void RemoveSuspectedThreat(unsigned long id);
-	void ClearSuspectedThreats(void);
-	bool IsSuspectedThreat(unsigned long id);
+	void			 AddKnownThreat(Entity* pThreat, bool hasHitEntity);
+	void			 RemoveKnownThreat(unsigned long id);
+	void			 ClearKnownThreats(void);
+	bool			 IsKnownThreat(unsigned long id);
+	KnownThreat*	 GetKnownThreat(unsigned long id);
+	void			 AddSuspectedThreat(unsigned long id, const XMFLOAT2& lastKnownPosition, bool hasHitEntity);
+	void			 RemoveSuspectedThreat(unsigned long id);
+	void			 ClearSuspectedThreats(void);
+	bool			 IsSuspectedThreat(unsigned long id);
 	SuspectedThreat* GetSuspectedThreat(unsigned long id);
 	
 	virtual bool IsInvestigatingGreatestSuspectedThreat(void);
@@ -128,7 +126,7 @@ public:
 	const XMFLOAT2&						GetObservationTarget(void) const;
 	bool                                IsPathSet(void) const;
 	std::vector<XMFLOAT2>*              GetPath(void);
-	float         GetReportInterval(void) const;
+	float								GetReportInterval(void) const;
 
 	bool IsHandicapped(void) const;
 	bool DoUpdate(void) const;
@@ -244,9 +242,7 @@ private:
 	Behaviour*       m_pBehaviour;   // The behaviour tree controlling the behaviour of this entity
 	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
 	EntityTeam       m_team;		 // The team the entity belongs to
-
 	TeamAI*          m_pTeamAI; // The team AI in charge of this entity
-
 	Order*           m_pCurrentOrder; // The currently active order for this entity, can be null if no order at the moment
 
 	// This is pretty much used like a blackboard to communicate between different

@@ -8,12 +8,26 @@
 // Includes
 #include "Application.h"
 
+Application::Application(void) : m_pHandlerRoutine(nullptr)
+{
+}
+
+Application::~Application(void)
+{
+}
+
 //--------------------------------------------------------------------------------------
 // Initialise the components of the application.
+// Param1: The instance to use.
+// Param2: The handler routine that should be set as console handler to allow for proper cleanup.
+// Param3: The width of the application window in pixels.
+// Param3: The height of the application window in pixels.
 // Returns true if all components were successfully initialised, false otherwise.
 //--------------------------------------------------------------------------------------
-bool Application::Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidth, unsigned int windowHeight)
+bool Application::Initialise(HINSTANCE hInst, PHANDLER_ROUTINE pHandlerRoutine, HWND hWnd, unsigned int windowWidth, unsigned int windowHeight)
 {
+	m_pHandlerRoutine = pHandlerRoutine;
+
 	m_appData.m_windowWidth  = windowWidth;
 	m_appData.m_windowHeight = windowHeight;
 
@@ -207,6 +221,11 @@ bool Application::SaveTestEnvironment(void)
 	freopen_s(&stream, "CONOUT$", "w+t", stdout);
 	freopen_s(&stream, "CONOUT$", "w+t", stderr);
 
+	if(m_pHandlerRoutine)
+	{
+		SetConsoleCtrlHandler(m_pHandlerRoutine, TRUE);
+	}
+
 	std::cout << "Please enter the name of the file, to which the current test environemnt should be saved."
 			  << "\nEnter 'cancel' to cancel the saving process."
 			  << "\nDon't forget to append the ending '.txt' to the filename." 
@@ -224,11 +243,17 @@ bool Application::SaveTestEnvironment(void)
 		std::cout << "\nSaving completed.";
 	}
 
+	if(m_pHandlerRoutine)
+	{
+		SetConsoleCtrlHandler(m_pHandlerRoutine, FALSE);
+	}
+
 	// Saving operation finished, get rid of console
 	FreeConsole();
 
 	return true;
 }
+
 
 //--------------------------------------------------------------------------------------
 // Load a test environment from a file specified by the user.
@@ -244,6 +269,11 @@ bool Application::LoadTestEnvironment(void)
 	freopen_s(&stream, "CONIN$", "r+t", stdin);
 	freopen_s(&stream, "CONOUT$", "w+t", stdout);
 	freopen_s(&stream, "CONOUT$", "w+t", stderr);
+
+	if(m_pHandlerRoutine)
+	{
+		SetConsoleCtrlHandler(m_pHandlerRoutine, TRUE);
+	}
 
 	std::cout << "Please enter the name of a file containing a test environment."
 			  << "\nDon't forget to append the ending '.txt' to the filename."
@@ -268,6 +298,11 @@ bool Application::LoadTestEnvironment(void)
 		}
 	}
 
+	if(m_pHandlerRoutine)
+	{
+		SetConsoleCtrlHandler(m_pHandlerRoutine, FALSE);
+	}
+
 	// Loading operation finished, get rid of console
 	FreeConsole();
 
@@ -289,6 +324,11 @@ bool Application::CreateNewTestEnvironment(void)
 	freopen_s(&stream, "CONOUT$", "w+t", stdout);
 	freopen_s(&stream, "CONOUT$", "w+t", stderr);
 
+	if(m_pHandlerRoutine)
+	{
+		SetConsoleCtrlHandler(m_pHandlerRoutine, TRUE);
+	}
+
 	std::cout << "Please enter the size and number of partitions for the new grid separated by a space."
 			  << "\nEnter 'cancel' to cancel the process."
 			  << "\nPress enter after providing a name to proceed.\n";
@@ -296,8 +336,7 @@ bool Application::CreateNewTestEnvironment(void)
 	// Note: Validation of the filename and error handling should be added.
 
 	// Get the input from the user or cancel the operation
-	
-	
+
 	std::string input;
 	getline(std::cin, input);
 
@@ -319,6 +358,11 @@ bool Application::CreateNewTestEnvironment(void)
 			std::cout << "\nAn error occurred.";
 			return false;
 		}
+	}
+
+	if(m_pHandlerRoutine)
+	{
+		SetConsoleCtrlHandler(m_pHandlerRoutine, FALSE);
 	}
 
 	// Saving operation finished, get rid of console

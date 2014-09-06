@@ -148,9 +148,5 @@ void EntityCombatManager::ShootAt(const XMFLOAT2& target)
 {
 	ProjectileFiredEventData data(m_pEntity->GetId(), m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
 	m_pEntity->SendEvent(m_pEnvironment, ProjectileFiredEventType, &data);
-
-	//ProjectileFiredMessage projectileFiredMessage(m_pEntity->GetId(), m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
-	//m_pEnvironment->ProcessMessage(&projectileFiredMessage);
-	//m_pEnvironment->AddProjectile(m_pEntity->GetId(), m_pEntity->GetTeam(), m_pEntity->GetPosition(), target);
 }
 

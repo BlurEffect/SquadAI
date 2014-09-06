@@ -28,15 +28,21 @@ using namespace DirectX;
 class Application
 {
 public:
-	bool Initialise(HINSTANCE hInst, HWND hWnd, unsigned int windowWidth, unsigned int windowHeight);
+	Application(void);
+	~Application(void);
+
+	bool Initialise(HINSTANCE hInst, PHANDLER_ROUTINE HandlerRoutine, HWND hWnd, unsigned int windowWidth, unsigned int windowHeight);
 	void Update(void);
 	void Cleanup(void);
+
 private:
 
 	void ProcessInput(void);
 	bool SaveTestEnvironment(void);
 	bool LoadTestEnvironment(void);
 	bool CreateNewTestEnvironment(void);
+
+	PHANDLER_ROUTINE   m_pHandlerRoutine;  // This handler is set as console handler for all allocated consoles
 
 	AppData            m_appData;          // The current state and properties of the app
 	OrthographicCamera m_camera;		   // The camera component of the application

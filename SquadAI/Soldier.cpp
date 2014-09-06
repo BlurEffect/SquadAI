@@ -57,18 +57,6 @@ bool Soldier::Initialise(unsigned long id, const XMFLOAT2& position, float rotat
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::MoveToTarget(float deltaTime)
 {
-	/*
-	
-	if(!m_movementManager.IsPathSet())
-	{
-		// There is no path set, create a new one
-		if(!m_movementManager.SetPathTo(GetMovementTarget()))
-		{
-			// No valid path exists to the target position
-			return StatusFailure;
-		}
-	}
-	*/
 	if(m_movementManager.FollowPath(GetPath(), m_soldierProperties.m_targetReachedRadius, m_soldierProperties.m_maxSpeed))
 	{
 		// The target was reached
@@ -152,12 +140,6 @@ BehaviourStatus Soldier::DetermineAttackTargetPosition(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::Idle(float deltaTime)
 {
-	if(GetTeam() == TeamBlue)
-	{
-		int a = 5;
-	}
-
-
 	// Do nothing
 	return StatusSuccess;
 }
@@ -205,45 +187,7 @@ BehaviourStatus Soldier::DetermineMovementTarget(float deltaTime)
 			SetMovementTargetSet(false);
 		}
 	}
-	/*
-	if(GetCurrentOrder())
-	{
-		if(GetCurrentOrder()->GetOrderType() == DefendPositionOrder)
-		{
-			if(IsAtTarget(reinterpret_cast<DefendOrder*>(GetCurrentOrder())->GetDefendPosition()))
-			{
-				SetMovementTargetSet(false);
-			}else
-			{
-				SetMovementTarget(reinterpret_cast<DefendOrder*>(GetCurrentOrder())->GetDefendPosition());
-				SetMovementTargetSet(true);
-			}
-
-			return StatusSuccess;
-		}
-
-		if(GetCurrentOrder()->GetOrderType() == MoveToPositionOrder)
-		{
-			SetMovementTarget(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetTargetPosition());
-			SetMovementTargetSet(true);
-
-			return StatusSuccess;
-		}
-	}
-
-	// If there is no order, just pick a random target position within the test environment to patrol
-	XMFLOAT2 patrolTarget(0.0f, 0.0f);
-	if(GetTestEnvironment()->GetRandomUnblockedTarget(patrolTarget))
-	{
-		m_movementManager.Reset();
-
-		SetMovementTarget(patrolTarget);
-		SetMovementTargetSet(true);
-	}else
-	{
-		SetMovementTargetSet(false);
-	}
-	*/
+	
 	// Always succeeds
 	return StatusSuccess;
 }
@@ -278,8 +222,6 @@ BehaviourStatus Soldier::DetermineApproachThreatTarget(float deltaTime)
 //--------------------------------------------------------------------------------------
 BehaviourStatus Soldier::UpdateThreats(float deltaTime)
 {
-	
-
 	m_sensors.CheckForThreats(GetViewDirection(), m_soldierProperties.m_viewingDistance, m_soldierProperties.m_fieldOfView);
 	return StatusSuccess;
 }
@@ -455,42 +397,7 @@ BehaviourStatus Soldier::DeterminePathToTarget(float deltaTime)
 		SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
 		m_movementManager.SetCurrentNode(0);
 	}
-	/*
-	if(GetCurrentOrder() && GetCurrentOrder()->GetOrderType() == MoveToPositionOrder)
-	{
-		if(!reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath()->empty())
-		{
-			if(GetCurrentOrder()->GetOrderPriority() == MediumPriority || GetCurrentOrder()->GetOrderPriority() == HighPriority)
-			{
-				// Use the path provided by the team AI
-				SetPath(reinterpret_cast<MoveOrder*>(GetCurrentOrder())->GetPath());
-				// If the path was started before, resume it.
-				m_movementManager.SetCurrentNode(GetResumePathNode());
-			}else
-			{
-				// Let the soldier find a path himself.
-				SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
-				m_movementManager.SetCurrentNode(0);
-
-				if(!GetPath())
-				{
-					UpdateOrderStateMessageData data(GetId(), FailedOrderState);
-					SendMessage(GetTeamAI(), UpdateOrderStateMessageType, &data);
-				}
-			}
-		}else
-		{
-			// Let the soldier find a path himself.
-			SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
-			m_movementManager.SetCurrentNode(0);
-		}
-	}else
-	{
-		// Let the soldier find a path himself.
-		SetPath(m_movementManager.CreatePathTo(GetMovementTarget()));
-		m_movementManager.SetCurrentNode(0);
-	}
-	*/
+	
 	return StatusSuccess;
 }
 

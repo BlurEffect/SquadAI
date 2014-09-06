@@ -61,7 +61,7 @@ struct SoldierProperties
 	// Other
 	float m_maxHealth;                  // The maximal health of the soldier
 	float m_lookAroundInterval;         // Determines how often the entity changes its look at position when holding a spot
-	float m_reportInterval;  // Determines how often the soldier sends a position update of all his known enemies to the team AI (in seconds).
+	float m_reportInterval;				// Determines how often the soldier sends a position update of all his known enemies to the team AI (in seconds).
 };
 
 class Soldier : public Entity

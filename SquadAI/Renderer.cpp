@@ -27,9 +27,14 @@ Renderer::Renderer() : m_pSwapChain(nullptr),
 {
 	XMStoreFloat4x4(&m_baseViewMatrix, XMMatrixIdentity());
 
-	for(int i = 0; i < NumberOfSentences; ++i)
+	for(unsigned int i = 0; i < NumberOfSentences; ++i)
 	{
 		m_pPermanentSentences[i] = nullptr;
+	}
+
+	for(unsigned int i = 0; i < NumberOfDrawableTypes; ++i)
+	{
+		m_drawableObjects[i] = nullptr;
 	}
 }
 
@@ -502,7 +507,7 @@ bool Renderer::InitialiseSentences(void)
 
 	// Calculate two reference points to make placement of sentences a bit more convenient
 	int right = static_cast<int>(m_windowWidth) / 2;
-	int top  = static_cast<int>(m_windowHeight) / 2;
+	int top   = static_cast<int>(m_windowHeight) / 2;
 
 	
 	m_pPermanentSentences[LabelState] = new SentenceDrawable(7, &m_font, "State: ", right - 250, top -20, XMFLOAT3(1.0f, 1.0f, 1.0f));
@@ -623,7 +628,6 @@ bool Renderer::InitialiseSentences(void)
 	{
 		return false;
 	}
-
 
 	m_pPermanentSentences[LabelShotsFired] = new SentenceDrawable(13, &m_font, "Shots fired: ", right - 250, top -200, XMFLOAT3(1.0f, 1.0f, 1.0f));
 	if(!m_pPermanentSentences[LabelShotsFired])

@@ -67,13 +67,6 @@ bool Entity::Initialise(unsigned long id, const XMFLOAT2& position, float rotati
 		return false;
 	}
 
-	/*
-	if(m_pBehaviour)
-	{
-		delete m_pBehaviour;
-		m_pBehaviour = nullptr;
-	}*/
-
 	if(!m_pBehaviour)
 	{
 		m_pBehaviour = BehaviourFactory::CreateBehaviourTree(ModifiedSimpleIndividualCombatTree, this);
@@ -151,58 +144,6 @@ void Entity::Reset(void)
 
 	m_pBehaviour->Abort();
 }
-/*
-//--------------------------------------------------------------------------------------
-// Receives and processes a given message sent by the test environment.
-// Param1: A pointer to the message to process.
-//--------------------------------------------------------------------------------------
-void Entity::ProcessMessage(Message* pMessage)
-{
-	switch(pMessage->GetType())
-	{
-	case HitMessageType:
-		{
-			// Make sure the entity is actually alive (cannot be hit when dead but in the rare case that the
-			// entity is hit by two projectiles during the same frame this if-statement will prevent all hits
-			// after the fatal one to be processed)
-			if(IsAlive())
-			{
-				HitMessage* pHitMessage = reinterpret_cast<HitMessage*>(pMessage);
-				ProcessHit(pHitMessage->GetDamage(), pHitMessage->GetShooterId(), pHitMessage->IsShooterAlive(), pHitMessage->GetPosition());
-			}
-			break;
-		}
-	case EntityKilledMessageType:
-		{
-			EntityKilledMessage* pEntityKilledMessage = reinterpret_cast<EntityKilledMessage*>(pMessage);
-			if(pEntityKilledMessage->GetTeam() != GetTeam())
-			{
-				ProcessEnemyKilled(pEntityKilledMessage->GetTeam(), pEntityKilledMessage->GetId());
-			}
-			break;
-		}
-	case ReadyToRespawnMessageType:
-		{
-			ReadyToRespawnMessage* pReadyToRespawnMessage = reinterpret_cast<ReadyToRespawnMessage*>(pMessage);
-			ProcessRespawn(pReadyToRespawnMessage->GetRespawnPosition());
-			break;
-		}
-	}
-}
-*/
-/*
-//--------------------------------------------------------------------------------------
-// Respawns the entity at a given position.
-// Param1: The position of the respawn point, where the entity will reenter the game.
-//--------------------------------------------------------------------------------------
-void Entity::Respawn(const XMFLOAT2& respawnPosition)
-{
-	Reset();
-	SetPosition(respawnPosition);
-	UpdateColliderPosition(respawnPosition);
-	SetRotation(static_cast<float>(rand() % 360));
-}
-*/
 
 //--------------------------------------------------------------------------------------
 // Adds a new threat to the entity's list of known threats.
@@ -462,6 +403,9 @@ void Entity::ProcessOrder(Order* pOrder)
 {
 	m_pCurrentOrder = pOrder;
 
+	// Stuff below is not used at the moment but offers ways to 
+	// add some special processing code for certain type of orders and priorities.
+
 	switch(pOrder->GetOrderType())
 	{
 	case AttackEnemyOrder:
@@ -485,6 +429,8 @@ void Entity::ProcessOrder(Order* pOrder)
 //--------------------------------------------------------------------------------------
 void Entity::ProcessAttackOrder(AttackOrder* pOrder)
 {
+	// Not used at the moment
+
 	switch(pOrder->GetOrderPriority())
 	{
 	case LowPriority:
@@ -502,6 +448,8 @@ void Entity::ProcessAttackOrder(AttackOrder* pOrder)
 //--------------------------------------------------------------------------------------
 void Entity::ProcessMoveOrder(MoveOrder* pOrder)
 {
+	// Not used at the moment
+
 	switch(pOrder->GetOrderPriority())
 	{
 	case LowPriority:
@@ -519,6 +467,8 @@ void Entity::ProcessMoveOrder(MoveOrder* pOrder)
 //--------------------------------------------------------------------------------------
 void Entity::ProcessDefendOrder(DefendOrder* pOrder)
 {
+	// Not used at the moment
+
 	switch(pOrder->GetOrderPriority())
 	{
 	case LowPriority:

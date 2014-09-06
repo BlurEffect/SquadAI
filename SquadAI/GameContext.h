@@ -42,6 +42,8 @@ public:
 	void RegisterTeamAI(TeamAI* pTeamAI);
 	void BroadcastMessage(MessageType type, void* pMessageData);
 
+	virtual void ProcessEvent(EventType type, void* pEventData);
+
 	// Data access functions
 
 	GameMode     GetGameMode(void) const;
@@ -59,13 +61,10 @@ public:
 	void SetNotifyTimeInterval(float timeInterval);
 	void SetMaxScore(unsigned int score);
 
-	virtual void ProcessEvent(EventType type, void* pEventData);
 protected:
-	
 	virtual void ProcessMessage(Message* pMessage);
 
 private:
-
 	GameMode     m_gameMode;                    // The game mode the game context is associated to
 	bool         m_terminated;					// Tells whether the game is terminated or not
 	float        m_maxTime;						// The time limit for a round of the game

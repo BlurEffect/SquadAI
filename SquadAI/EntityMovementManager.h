@@ -29,7 +29,6 @@ public:
 	void UpdatePosition(float deltaTime, float maxSpeed, float maxForce, float handicap);
 	void Reset(void);
 
-	//bool SetPathTo(const XMFLOAT2& targetPosition);
 	std::vector<XMFLOAT2>* CreatePathTo(const XMFLOAT2& targetPosition);
 
 	bool Seek(const XMFLOAT2& targetPosition, float targetReachedRadius, float speed);
@@ -40,8 +39,6 @@ public:
 	void AvoidCollisions(float seeAhead, float maximalForce);
 	void StayAwayFromWalls(float avoidWallsRadius, float maximalForce);
 	void Separate(float separationRadius, float maximalForce);
-
-	//bool IsPathSet(void) const;
 
 	// Data access functions
 	
@@ -54,18 +51,13 @@ private:
 
 	void SetInitialViewDirection(void);
 
-	Entity*          m_pEntity;      // The entity that this movement manager is associated to
-	TestEnvironment* m_pEnvironment; // The test environment that the entity is part of
-
-	XMFLOAT2 m_velocity;      // The initial velocity of the entity
-	XMFLOAT2 m_steeringForce; // The accumulated force that will be applied to the entity
-	
-	// For follow path behaviour
-	std::vector<XMFLOAT2> m_path;        // The current path of the entity, empty when no destination for pathfinding
-	unsigned int          m_currentNode; // The current target node within the path vector
-	
-	// For seek behaviour
-	XMFLOAT2              m_seekTarget;	// The current target to seek
+	Entity*				  m_pEntity;       // The entity that this movement manager is associated to
+	TestEnvironment*	  m_pEnvironment;  // The test environment that the entity is part of
+	XMFLOAT2			  m_velocity;      // The initial velocity of the entity
+	XMFLOAT2			  m_steeringForce; // The accumulated force that will be applied to the entity
+	std::vector<XMFLOAT2> m_path;          // The current path of the entity, empty when no destination for pathfinding
+	unsigned int          m_currentNode;   // The current target node within the path vector
+	XMFLOAT2              m_seekTarget;	   // The current target to seek
 };
 
 #endif // ENTITY_MOVEMENT_MANAGER_H

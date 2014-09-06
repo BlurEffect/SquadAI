@@ -29,7 +29,7 @@ public:
 	Behaviour(const Behaviour& sourceBehaviour);
 	virtual ~Behaviour(void);
 
-	Behaviour& Behaviour::operator= (const Behaviour& sourceBehaviour);
+	Behaviour& Behaviour::operator=(const Behaviour& sourceBehaviour);
 
 	BehaviourStatus Tick(float deltaTime);
 
@@ -38,6 +38,8 @@ public:
 
 	bool IsTerminated(void) const;
 	bool IsRunning(void) const;
+
+	// Data access functions
 
 	unsigned long   GetId(void) const;
 	const char*     GetName(void) const;

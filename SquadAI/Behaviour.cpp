@@ -104,7 +104,7 @@ bool Behaviour::IsRunning(void) const
 //--------------------------------------------------------------------------------------
 void Behaviour::OnInitialise(void)
 {
-
+	// Default implementation, do nothing.
 }
 
 //--------------------------------------------------------------------------------------
@@ -115,6 +115,8 @@ void Behaviour::OnTerminate(BehaviourStatus status)
 {
 	Reset();
 }
+
+// Data access functions
 
 unsigned long Behaviour::GetId(void) const
 {

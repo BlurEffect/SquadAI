@@ -21,7 +21,7 @@ const float g_kSoldierMaxSeeAhead(6.0f);				 // Determines how far the soldier c
 const float g_kSoldierMaxCollisionAvoidanceForce(0.6f);  // The maximal force that can result from avoiding collisions
 const float g_kSoldierMaxAvoidWallsForce(5.0f); //1.2         // The maximal force that can result from being pushed away from walls
 const float g_kSoldierMaxSeparationForce(1.2f);          // The maximal force that can result from separation from other entities
-const float g_kSoldierTargetReachedRadius(1.0f);		 // When the distance between an entity and its target is lower than this, latter one counts as reached
+const float g_kSoldierTargetReachedRadius(0.8f);		 // When the distance between an entity and its target is lower than this, latter one counts as reached
 const float g_kSoliderSpeedHandicap(0.75f);         // When the soldier is handicapped (for instance carrying a flag) his movement speed is only this fraction of the usual value
 
 // Combat

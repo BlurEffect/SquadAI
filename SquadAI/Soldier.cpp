@@ -4,7 +4,7 @@
 *  Represents a fighting entity in the test environment.
 */
 
-#define DEBUG
+//#define DEBUG
 
 // Includes
 #include "Soldier.h"

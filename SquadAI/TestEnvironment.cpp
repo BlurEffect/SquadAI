@@ -7,7 +7,7 @@
 
 #include "TestEnvironment.h"
 
-#define DEBUG
+//#define DEBUG
 
 TestEnvironment::TestEnvironment(void) : m_id(0),
 										 m_isPaused(true),

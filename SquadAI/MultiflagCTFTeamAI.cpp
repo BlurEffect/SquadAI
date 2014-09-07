@@ -137,7 +137,7 @@ bool MultiflagCTFTeamAI::InitialiseManoeuvres(void)
 	m_manoeuvres.insert(std::pair<TeamManoeuvreType, TeamManoeuvre*>(ActiveBaseDefenceManoeuvre, pActiveBaseDefenceAttack));
 
 	// Guarded flag capture manoeuvre
-	GuardedFlagCaptureInitData guardedFlagCaptureData(6.0f, 0.2f);
+	GuardedFlagCaptureInitData guardedFlagCaptureData(6.0f, 0.1f);
 	TeamManoeuvre* pGuardedFlagCapture = TeamManoeuvreFactory::CreateTeamManoeuvre(GuardedFlagCaptureManoeuvre, 3, 5, this, &guardedFlagCaptureData);
 	if(!pGuardedFlagCapture)
 	{

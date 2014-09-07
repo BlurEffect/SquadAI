@@ -5,7 +5,7 @@
 *  responsible for drawing the scene.
 */
 
-#define DEBUG
+//#define DEBUG
 
 // Includes
 #include "Renderer.h"
